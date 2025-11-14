@@ -1,0 +1,77 @@
+name: moko_local
+
+services:
+  app_postgres:
+    image: postgres:17.7-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: 'user'
+      POSTGRES_PASSWORD: 'password'
+      POSTGRES_DB: 'moko'
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - '5443:5432'
+    networks:
+      - moko_backend
+    volumes:
+      - moko_postgres_data:/var/lib/postgresql/data
+      - ./init-scripts/sql:/docker-entrypoint-initdb.d/
+
+  app_rabbitmq:
+    image: rabbitmq:4.2-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: 'user'
+      RABBITMQ_DEFAULT_PASS: 'password'
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - moko_backend
+    volumes:
+      - moko_rabbitmq_all:/var/lib/rabbitmq/
+      - moko_rabbitmq_all:/var/log/rabbitmq/
+
+  idp_mysql:
+    image: mysql:9.5
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root'
+      MYSQL_DATABASE: 'keycloak'
+      MYSQL_USER: 'keycloak'
+      MYSQL_PASSWORD: 'password'
+    ports:
+      - '3307:3306'
+    volumes:
+      - moko_mysql_data:/var/lib/mysql
+    networks:
+      - moko_kc
+
+  idp_keycloak:
+    image: quay.io/keycloak/keycloak:26.4
+    environment:
+      KEYCLOAK_ADMIN: 'admin'
+      KEYCLOAK_ADMIN_PASSWORD: 'admin'
+      KC_DB: 'mysql'
+      KC_DB_URL_HOST: 'idp_mysql'
+      KC_DB_URL_DATABASE: 'keycloak'
+      KC_DB_USERNAME: 'keycloak'
+      KC_DB_PASSWORD: 'password'
+    command: start-dev
+    ports:
+      - "8180:8080"
+    depends_on:
+      - idp_mysql
+    networks:
+      - moko_kc
+
+volumes:
+  moko_postgres_data:
+  moko_rabbitmq_all:
+  moko_mysql_data:
+
+networks:
+  moko_kc:
+    name: moko-kc-network
+    driver: bridge
+  moko_backend:
+    name: moko-back-network
+    driver: bridge
