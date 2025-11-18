@@ -27,6 +27,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.jmolecules.integrations:jmolecules-starter-ddd:0.29.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.springframework.amqp:spring-rabbit-test")
@@ -34,8 +35,10 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:rabbitmq")
     testImplementation("org.testcontainers:postgresql")
-    "developmentOnly"("org.springframework.boot:spring-boot-devtools")
+
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("org.postgresql:postgresql")
+
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

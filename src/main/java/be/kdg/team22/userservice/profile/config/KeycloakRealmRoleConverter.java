@@ -1,4 +1,4 @@
-package be.kdg.team22.userservice.config;
+package be.kdg.team22.userservice.profile.config;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;
