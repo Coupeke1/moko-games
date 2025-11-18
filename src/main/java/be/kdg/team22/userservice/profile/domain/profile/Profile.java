@@ -11,10 +11,10 @@ public class Profile {
     private String email;
 
     public Profile(ProfileId id, String username, String email, Instant createdAt) {
-        this.id = Objects.requireNonNull(id);
-        this.username = Objects.requireNonNull(username);
-        this.email = Objects.requireNonNull(email);
-        this.createdAt = Objects.requireNonNull(createdAt);
+        this.id = Objects.requireNonNull(id, "id is required");
+        this.username = Objects.requireNonNull(username, "username is required");
+        this.email = Objects.requireNonNull(email, "email is required");
+        this.createdAt = Objects.requireNonNull(createdAt, "createdAt is required");
     }
 
     public static Profile createNew(ProfileId id, String username, String email) {
@@ -22,8 +22,8 @@ public class Profile {
     }
 
     public void update(String username, String email) {
-        this.username = Objects.requireNonNull(username);
-        this.email = Objects.requireNonNull(email);
+        this.username = Objects.requireNonNull(username, "username is required");
+        this.email = Objects.requireNonNull(email, "email is required");
     }
 
     public ProfileId id() {

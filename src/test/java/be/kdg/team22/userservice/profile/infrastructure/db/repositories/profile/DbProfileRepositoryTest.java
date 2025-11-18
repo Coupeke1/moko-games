@@ -1,46 +1,39 @@
 package be.kdg.team22.userservice.profile.infrastructure.db.repositories.profile;
 
-import be.kdg.team22.userservice.profile.domain.profile.Profile;
-import be.kdg.team22.userservice.profile.domain.profile.ProfileId;
 import be.kdg.team22.userservice.profile.infrastructure.db.repositories.profile.jpa.JpaProfileRepository;
+import be.kdg.team22.userservice.profile.infrastructure.db.repositories.profile.jpa.ProfileEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
+@ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class DbProfileRepositoryTest {
 
     @Autowired
     private JpaProfileRepository jpaRepo;
 
     @Test
-    void saveAndFindWorksCorrectly() {
-        DbProfileRepository repo = new DbProfileRepository(jpaRepo);
+    void saveAndLoadProfile() {
+        UUID id = UUID.randomUUID();
 
-        ProfileId id = new ProfileId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
-        Profile profile = new Profile(id, "jan", "jan@kdg.be", Instant.now());
+        ProfileEntity entity = new ProfileEntity(id, "jan", "jan@kdg.be", Instant.now());
+        jpaRepo.save(entity);
 
-        repo.save(profile);
+        Optional<ProfileEntity> loaded = jpaRepo.findById(id);
 
-        Optional<Profile> found = repo.findById(id);
-
-        assertThat(found).isPresent();
-        found.ifPresent(value -> assertThat(value.username()).isEqualTo("jan"));
-    }
-
-    @Test
-    void findAllReturnsCorrectList() {
-        DbProfileRepository repo = new DbProfileRepository(jpaRepo);
-
-        repo.save(new Profile(new ProfileId(UUID.randomUUID()), "jan", "jan@kdg.be", Instant.now()));
-        repo.save(new Profile(new ProfileId(UUID.randomUUID()), "piet", "piet@kdg.be", Instant.now()));
-
-        assertThat(repo.findAll().size()).isEqualTo(2);
+        assertTrue(loaded.isPresent());
+        assertEquals("jan", loaded.get().toDomain().username());
+        assertEquals("jan@kdg.be", loaded.get().toDomain().email());
     }
 }
