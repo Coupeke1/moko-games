@@ -1,0 +1,40 @@
+﻿image: eclipse-temurin:21
+
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
+
+cache:
+  key: "${CI_COMMIT_REF_SLUG}"
+  paths:
+    - .gradle/caches/
+    - .gradle/wrapper/
+
+stages:
+  - test
+  - build
+
+
+test_job:
+  stage: test
+  script:
+    - ./gradlew clean test --no-daemon
+  artifacts:
+    when: always
+    reports:
+      junit: build/test-results/test/*.xml
+  only:
+    - merge_requests
+    - main
+    - develop
+
+build_job:
+  stage: build
+  script:
+    - ./gradlew clean build --no-daemon
+  artifacts:
+    paths:
+      - build/libs/*.jar
+  only:
+    - main
+    - tags

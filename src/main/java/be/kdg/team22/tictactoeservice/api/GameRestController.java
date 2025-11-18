@@ -4,7 +4,6 @@ import be.kdg.team22.tictactoeservice.api.models.GameModel;
 import be.kdg.team22.tictactoeservice.application.GameService;
 import be.kdg.team22.tictactoeservice.domain.Game;
 import be.kdg.team22.tictactoeservice.domain.GameId;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
