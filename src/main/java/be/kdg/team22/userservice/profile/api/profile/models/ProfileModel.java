@@ -1,4 +1,4 @@
-package be.kdg.team22.userservice.profile.api.profile;
+package be.kdg.team22.userservice.profile.api.profile.models;
 
 import be.kdg.team22.userservice.profile.domain.profile.Profile;
 

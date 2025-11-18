@@ -20,44 +20,50 @@ public class ProfileService {
     }
 
     public Profile getOrCreate(Jwt jwt) {
-        String subject = jwt.getSubject();
-        if (subject == null) {
-            throw new MissingRequiredClaimException("Missing 'sub' claim in JWT");
-        }
+        ProfileId id = new ProfileId(UUID.fromString(extractRequired(jwt, "sub")));
 
-        UUID uuid = UUID.fromString(subject);
-        ProfileId id = new ProfileId(uuid);
+        String username = extractUsername(jwt);
+        String email = extractRequired(jwt, "email");
 
         return profiles.findById(id)
                 .orElseGet(() -> {
-                    String username = extractUsername(jwt);
-                    String email = jwt.getClaimAsString("email");
-                    if (email == null) {
-                        throw new MissingRequiredClaimException("Missing 'email' claim in JWT");
-                    }
                     Profile profile = Profile.createNew(id, username, email);
                     profiles.save(profile);
                     return profile;
                 });
     }
 
+    public Profile update(Jwt jwt, String newUsername, String newEmail) {
+        ProfileId id = new ProfileId(UUID.fromString(extractRequired(jwt, "sub")));
+
+        Profile profile = profiles.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Profile not found"));
+
+        profile.update(newUsername, newEmail);
+        profiles.save(profile);
+
+        return profile;
+    }
+
     public Profile getById(ProfileId id) {
         return profiles.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Profile not found: " + id.value()));
+                .orElseThrow(() -> new NoSuchElementException("Profile not found"));
+    }
+
+    private String extractRequired(Jwt jwt, String claim) {
+        String jwtClaim = jwt.getClaimAsString(claim);
+        if (jwtClaim == null)
+            throw new MissingRequiredClaimException("Missing claim: " + claim);
+        return jwtClaim;
     }
 
     private String extractUsername(Jwt jwt) {
-        String preferred = jwt.getClaimAsString("preferred_username");
-        if (preferred != null) return preferred;
+        if (jwt.hasClaim("preferred_username"))
+            return jwt.getClaimAsString("preferred_username");
 
-        String username = jwt.getClaimAsString("username");
-        if (username != null) return username;
+        if (jwt.hasClaim("username"))
+            return jwt.getClaimAsString("username");
 
-        String subject = jwt.getSubject();
-        if (subject == null) {
-            throw new MissingRequiredClaimException("Missing both username and subject claims in JWT");
-        }
-
-        return subject;
+        return extractRequired(jwt, "sub");
     }
 }
