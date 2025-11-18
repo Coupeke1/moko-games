@@ -4,15 +4,16 @@ import { Justify } from "@/components/layout/justify";
 import { Items } from "@/components/layout/items";
 
 interface Props {
-    gap?: Gap,
-    justify?: Justify,
-    items?: Items,
-    children: ReactNode
+    gap?: Gap;
+    justify?: Justify;
+    items?: Items;
+    wrap?: boolean;
+    children: ReactNode;
 }
 
-export default function Row({ gap = Gap.Medium, justify = Justify.None, items = Items.Start, children }: Props) {
+export default function Row({ gap = Gap.Medium, justify = Justify.None, items = Items.Start, wrap, children }: Props) {
     return (
-        <section className={`flex flex-row ${gap} ${justify} ${items}`}>
+        <section className={`flex flex-row ${gap} ${justify} ${items} ${wrap ? "flex-wrap" : ""}`}>
             {children}
         </section>
     )

@@ -10,7 +10,7 @@ interface Props {
 
 export default function Page({ children }: Props) {
     return (
-        <section className="flex flex-col justify-between min-h-screen mx-auto max-w-4xl px-4 pt-5 pb-2.5">
+        <section className="flex flex-col gap-8 justify-between min-h-screen mx-auto max-w-4xl px-4 pt-5 pb-2.5">
             <Column gap={Gap.Gigantic}>
                 <section className="w-full">
                     <NavigationBar />
