@@ -14,7 +14,6 @@ stages:
   - test
   - build
 
-
 test_job:
   stage: test
   script:
@@ -23,10 +22,6 @@ test_job:
     when: always
     reports:
       junit: build/test-results/test/*.xml
-  only:
-    - merge_requests
-    - main
-    - develop
 
 build_job:
   stage: build
@@ -35,6 +30,3 @@ build_job:
   artifacts:
     paths:
       - build/libs/*.jar
-  only:
-    - main
-    - tags
