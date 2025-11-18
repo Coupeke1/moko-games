@@ -1,6 +1,5 @@
-﻿image: eclipse-temurin:21
-
-variables:
+﻿variables:
+  DEFAULT_IMAGE: "eclipse-temurin:21-jdk-alpine"
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
 
@@ -11,11 +10,21 @@ cache:
     - .gradle/wrapper/
 
 stages:
-  - test
   - build
+  - test
 
-test_job:
+build:
+  stage: build
+  image: $DEFAULT_IMAGE
+  script:
+    - ./gradlew clean build --no-daemon
+  artifacts:
+    paths:
+      - build/libs/*.jar
+
+test:
   stage: test
+  image: $DEFAULT_IMAGE
   script:
     - ./gradlew clean test --no-daemon
   artifacts:
@@ -23,10 +32,5 @@ test_job:
     reports:
       junit: build/test-results/test/*.xml
 
-build_job:
-  stage: build
-  script:
-    - ./gradlew clean build --no-daemon
-  artifacts:
-    paths:
-      - build/libs/*.jar
+include:
+  - template: Jobs/Dependency-Scanning.gitlab-ci.yml
