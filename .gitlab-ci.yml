@@ -1,4 +1,4 @@
-﻿variables:
+variables:
   DEFAULT_IMAGE: "eclipse-temurin:21-jdk-alpine"
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
