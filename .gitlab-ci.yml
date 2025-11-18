@@ -3,21 +3,15 @@
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
 
-cache:
-  key: "${CI_COMMIT_REF_SLUG}"
-  paths:
-    - .gradle/caches/
-    - .gradle/wrapper/
-
 stages:
-  - hello_test
   - build
   - test
 
-hello_test:
-  stage: hello_test
-  script:
-    - echo "Pipelinewerkt"
+cache:
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - .gradle/caches/
+    - .gradle/wrapper/
 
 build:
   stage: build
