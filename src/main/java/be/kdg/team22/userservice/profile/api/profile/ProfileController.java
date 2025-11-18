@@ -18,7 +18,6 @@ import java.util.UUID;
 @RequestMapping("/api/profiles")
 @Validated
 public class ProfileController {
-
     private final ProfileService service;
 
     public ProfileController(ProfileService service) {

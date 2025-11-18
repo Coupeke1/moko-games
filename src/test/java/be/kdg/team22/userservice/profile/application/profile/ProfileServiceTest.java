@@ -8,6 +8,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.time.Instant;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 class ProfileServiceTest {
-
     private final ProfileRepository repo = mock(ProfileRepository.class);
     private final ProfileService service = new ProfileService(repo);
 
@@ -86,5 +86,49 @@ class ProfileServiceTest {
         assertThatThrownBy(() -> service.getOrCreate(jwt))
                 .isInstanceOf(MissingRequiredClaimException.class)
                 .hasMessageContaining("email");
+    }
+
+    @Test
+    void updateUpdatesProfile() {
+        String sub = "99999999-9999-9999-9999-999999999999";
+        ProfileId id = new ProfileId(UUID.fromString(sub));
+
+        Profile existing = new Profile(id, "old", "old@mail", Instant.now());
+
+        when(repo.findById(id)).thenReturn(Optional.of(existing));
+        doNothing().when(repo).save(any(Profile.class));
+
+        Jwt jwt = jwt(sub, "ignored", "ignored@mail");
+
+        Profile updated = service.update(jwt, "newname", "new@mail");
+
+        assertThat(updated.username()).isEqualTo("newname");
+        assertThat(updated.email()).isEqualTo("new@mail");
+    }
+
+    @Test
+    void updateThrowsWhenProfileNotExists() {
+        String sub = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+        ProfileId id = new ProfileId(UUID.fromString(sub));
+
+        when(repo.findById(id)).thenReturn(Optional.empty());
+
+        Jwt jwt = jwt(sub, "ignored", "ignored@mail");
+
+        assertThatThrownBy(() -> service.update(jwt, "x", "x@mail"))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    void updateMissingSubjectThrows() {
+        Jwt jwt = Jwt.withTokenValue("dummy")
+                .header("alg", "none")
+                .claim("email", "mail@mail")
+                .claim("preferred_username", "user")
+                .build();
+
+        assertThatThrownBy(() -> service.update(jwt, "x", "mail@mail"))
+                .isInstanceOf(MissingRequiredClaimException.class)
+                .hasMessageContaining("sub");
     }
 }
