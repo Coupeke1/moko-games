@@ -1,4 +1,4 @@
-﻿package be.kdg.team22.tictactoeservice.config;
+package be.kdg.team22.tictactoeservice.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

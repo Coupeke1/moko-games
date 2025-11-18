@@ -1,4 +1,4 @@
-﻿package be.kdg.team22.tictactoeservice.domain;
+package be.kdg.team22.tictactoeservice.domain;
 
 import org.jmolecules.ddd.annotation.ValueObject;
 import org.springframework.util.Assert;

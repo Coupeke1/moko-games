@@ -1,4 +1,4 @@
-﻿package be.kdg.team22.tictactoeservice.domain;
+package be.kdg.team22.tictactoeservice.domain;
 
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
@@ -7,17 +7,24 @@ import java.util.UUID;
 @AggregateRoot
 public class Game {
     private final GameId id;
-    private Board board;
+    private final Board board;
+    private GameStatus status;
 
-    private Game(GameId id, Board board) {
-        this.id = id;
-        this.board = board;
+    public Game(int requestedSize) {
+        this.id = new GameId(UUID.randomUUID());
+        this.board = Board.create(requestedSize);
+        this.status = GameStatus.IN_PROGRESS;
     }
 
-    public static Game create(int size) {
-        return new Game(
-                new GameId(UUID.randomUUID()),
-                Board.empty(size)
-        );
+    public GameId getId() {
+        return id;
+    }
+
+    public Board getBoard() {
+        return board;
+    }
+
+    public GameStatus getStatus() {
+        return status;
     }
 }

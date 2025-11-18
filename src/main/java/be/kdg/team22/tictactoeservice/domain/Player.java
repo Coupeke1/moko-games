@@ -1,7 +1,9 @@
-﻿package be.kdg.team22.tictactoeservice.domain;
+package be.kdg.team22.tictactoeservice.domain;
 
-import org.jmolecules.ddd.annotation.ValueObject;
+public enum Player {
+    X, O;
 
-@ValueObject
-public class Player {
+    public Player getOpposite() {
+        return this == X ? O : X;
+    }
 }

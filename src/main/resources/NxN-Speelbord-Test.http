@@ -1,0 +1,8 @@
+﻿### Genarte Board
+
+POST localhost:8080/api/games?size=5
+Accept: application/json
+
+
+### Get Game
+GET localhost:8080/api/games/a19b3399-b5df-422e-8831-064d90977513
