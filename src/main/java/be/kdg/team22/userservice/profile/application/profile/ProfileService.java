@@ -21,7 +21,7 @@ public class ProfileService {
     }
 
     public Profile getOrCreate(Jwt jwt) {
-        // subject is verplicht
+
         String subject = jwt.getSubject();
         if (subject == null) {
             throw new MissingRequiredClaimException("Missing 'sub' claim in JWT");

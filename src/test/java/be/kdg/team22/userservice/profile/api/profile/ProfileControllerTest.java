@@ -76,7 +76,7 @@ class ProfileControllerTest {
 
     @Test
     void invalidUuidReturns400() throws Exception {
-        // /api/profiles/{id} is publiek (permitAll), dus geen JWT nodig
+
         mockMvc.perform(get("/api/profiles/not-a-uuid"))
                 .andExpect(status().isBadRequest());
     }

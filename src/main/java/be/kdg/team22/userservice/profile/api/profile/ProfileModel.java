@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record ProfileModel(
-        UUID keycloakId,
+        UUID id,
         String username,
         String email,
         Instant createdAt

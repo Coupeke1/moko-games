@@ -16,7 +16,7 @@ public class ProfileEntity {
 
     @Id
     @Column(name = "keycloak_id", nullable = false)
-    private UUID keycloakId;
+    private UUID id;
 
     private String username;
 
@@ -28,8 +28,8 @@ public class ProfileEntity {
     protected ProfileEntity() {
     }
 
-    public ProfileEntity(UUID keycloakId, String username, String email, Instant createdAt) {
-        this.keycloakId = keycloakId;
+    public ProfileEntity(UUID id, String username, String email, Instant createdAt) {
+        this.id = id;
         this.username = username;
         this.email = email;
         this.createdAt = createdAt;
@@ -46,7 +46,7 @@ public class ProfileEntity {
 
     public Profile toDomain() {
         return new Profile(
-                new ProfileId(keycloakId),
+                new ProfileId(id),
                 username,
                 email,
                 createdAt
