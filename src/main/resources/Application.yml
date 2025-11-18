@@ -1,0 +1,10 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/moko
+          jwk-set-uri: http://localhost:8180/realms/moko/protocol/openid-connect/certs
+
+server:
+  port: 8081
