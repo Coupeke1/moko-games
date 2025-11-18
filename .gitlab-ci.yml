@@ -17,6 +17,7 @@ build:
   stage: build
   image: $DEFAULT_IMAGE
   script:
+    - chmod +x ./gradlew
     - ./gradlew clean build --no-daemon
   artifacts:
     paths:
@@ -26,6 +27,7 @@ test:
   stage: test
   image: $DEFAULT_IMAGE
   script:
+    - chmod +x ./gradlew
     - ./gradlew clean test --no-daemon
   artifacts:
     when: always
