@@ -13,7 +13,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "profiles")
 public class ProfileEntity {
-
     @Id
     @Column(name = "keycloak_id", nullable = false)
     private UUID id;

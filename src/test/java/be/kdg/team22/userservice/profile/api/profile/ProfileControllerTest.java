@@ -21,7 +21,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 class ProfileControllerTest {
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -76,7 +75,6 @@ class ProfileControllerTest {
 
     @Test
     void invalidUuidReturns400() throws Exception {
-
         mockMvc.perform(get("/api/profiles/not-a-uuid"))
                 .andExpect(status().isBadRequest());
     }

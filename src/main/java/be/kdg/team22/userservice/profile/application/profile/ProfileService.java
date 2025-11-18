@@ -13,7 +13,6 @@ import java.util.UUID;
 @Service
 @Transactional
 public class ProfileService {
-
     private final ProfileRepository profiles;
 
     public ProfileService(ProfileRepository profiles) {
@@ -21,7 +20,6 @@ public class ProfileService {
     }
 
     public Profile getOrCreate(Jwt jwt) {
-
         String subject = jwt.getSubject();
         if (subject == null) {
             throw new MissingRequiredClaimException("Missing 'sub' claim in JWT");
