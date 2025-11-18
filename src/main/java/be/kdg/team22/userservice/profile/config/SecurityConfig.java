@@ -1,4 +1,4 @@
-package be.kdg.team22.userservice.config;
+package be.kdg.team22.userservice.profile.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
