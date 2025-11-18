@@ -10,8 +10,14 @@ cache:
     - .gradle/wrapper/
 
 stages:
+  - hello_test
   - build
   - test
+
+hello_test:
+  stage: hello_test
+  script:
+    - echo "Pipelinewerkt"
 
 build:
   stage: build
