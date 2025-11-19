@@ -4,6 +4,7 @@ import be.kdg.team22.tictactoeservice.config.BoardSizeProperties;
 import be.kdg.team22.tictactoeservice.domain.Game;
 import be.kdg.team22.tictactoeservice.domain.GameId;
 import be.kdg.team22.tictactoeservice.domain.NotFoundException;
+import be.kdg.team22.tictactoeservice.domain.PlayerId;
 import be.kdg.team22.tictactoeservice.repository.GameRepository;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +19,12 @@ public class GameService {
         this.gameRepository = gameRepository;
     }
 
-    public Game startGame(int requestedSize) {
+    public Game startGame(int requestedSize, PlayerId playerXId, PlayerId PlayerOId) {
         if (requestedSize < boardConfig.getMinSize() || requestedSize > boardConfig.getMaxSize()) {
             throw new IllegalArgumentException("Board size must be between " + boardConfig.getMinSize() + " and " + boardConfig.getMaxSize());
         }
 
-        Game game = new Game(requestedSize);
+        Game game = new Game(requestedSize, playerXId, PlayerOId);
         gameRepository.save(game);
         return game;
     }

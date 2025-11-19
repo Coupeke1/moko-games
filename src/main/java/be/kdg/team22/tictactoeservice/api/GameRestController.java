@@ -4,6 +4,7 @@ import be.kdg.team22.tictactoeservice.api.models.GameModel;
 import be.kdg.team22.tictactoeservice.application.GameService;
 import be.kdg.team22.tictactoeservice.domain.Game;
 import be.kdg.team22.tictactoeservice.domain.GameId;
+import be.kdg.team22.tictactoeservice.domain.PlayerId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,8 @@ public class GameRestController {
 
     @PostMapping({"/", ""})
     public ResponseEntity<GameModel> createGame(@RequestParam(defaultValue = "3") int size) {
-        Game game = service.startGame(size);
+        //TODO: inject player ids with keycloak
+        Game game = service.startGame(size, PlayerId.create(), PlayerId.create());
         GameModel model = GameModel.fromDomain(game);
 
         return ResponseEntity.ok(model);
