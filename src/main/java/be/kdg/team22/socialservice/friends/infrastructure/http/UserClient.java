@@ -15,7 +15,7 @@ public class UserClient {
 
     public UserClient(RestClient.Builder builder) {
         this.restClient = builder
-                .baseUrl("http://user-service:8080/api/users")
+                .baseUrl("http://user-service:8080//api/profiles")
                 .build();
     }
 
@@ -24,7 +24,7 @@ public class UserClient {
     public UserResponse getByUsername(String username) {
         try {
             return restClient.get()
-                    .uri("/by-username/{username}", username)
+                    .uri("/find/{username}", username)
                     .retrieve()
                     .body(UserResponse.class);
         } catch (HttpClientErrorException e) {
