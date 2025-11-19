@@ -1,0 +1,19 @@
+﻿### Create Game
+
+POST localhost:8086/api/games/
+Accept: application/json
+
+> {%
+    client.global.set("gameId", response.body.id);
+%}
+
+### Reset Game
+
+POST localhost:8086/api/games/{{gameId}}/reset
+Accept: application/json
+
+
+### Reset Non Existing Game
+
+POST localhost:8086/api/games/00000000-0000-0000-0000-000000000000/reset
+Accept: application/json

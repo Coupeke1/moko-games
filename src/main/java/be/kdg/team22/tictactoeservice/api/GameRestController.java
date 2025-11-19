@@ -33,4 +33,12 @@ public class GameRestController {
 
         return ResponseEntity.ok(model);
     }
+
+    @PostMapping("/{id}/reset")
+    public ResponseEntity<GameModel> resetGame(@PathVariable UUID id) {
+        Game game = service.resetGame(new GameId(id));
+        GameModel model = GameModel.formDomain(game);
+
+        return ResponseEntity.ok(model);
+    }
 }
