@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Transactional
@@ -33,10 +34,22 @@ public class FriendService {
             throw new IllegalArgumentException("Cannot add yourself as a friend");
         }
 
-        friendshipRepository.findBetween(currentUser, targetUser)
-                .ifPresent(f -> {
-                    throw new IllegalStateException("Friendship already exists or is pending");
-                });
+        Optional<Friendship> existingFriendship = friendshipRepository.findBetween(currentUser, targetUser);
+
+        if (existingFriendship.isPresent()) {
+            Friendship existing = existingFriendship.get();
+
+            switch (existing.status()) {
+                case PENDING -> throw new IllegalStateException("Friend request already pending");
+                case ACCEPTED -> throw new IllegalStateException("You are already friends");
+
+                case REJECTED, CANCELED -> {
+                    existing.resetToPending(currentUser, targetUser);
+                    friendshipRepository.save(existing);
+                    return;
+                }
+            }
+        }
 
         Friendship friendship = Friendship.createNew(currentUser, targetUser);
         friendshipRepository.save(friendship);

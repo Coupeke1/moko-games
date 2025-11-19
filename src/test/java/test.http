@@ -1,18 +1,17 @@
-############################################################
 # 1) AUTHENTICATIE — JWT ophalen (PASSWORD GRANT)
-############################################################
+
 POST http://localhost:8180/realms/moko/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
 grant_type = password &
 client_id = user-service &
 client_secret = ZmXSd2mIzB6hsLrybeD3gH0c11vPwrej &
-username = jan &
-password = loginjan &
+username = mathias &
+password = loginmathias &
 scope = openid
 
 > {%
-    client.global.set("jan_token", response.body.access_token);
+    client.global.set("mathias_token", response.body.access_token);
 %}
 
 ###
@@ -22,148 +21,127 @@ Content-Type: application/x-www-form-urlencoded
 grant_type = password &
 client_id = user-service &
 client_secret = ZmXSd2mIzB6hsLrybeD3gH0c11vPwrej &
-username = piet &
-password = loginpiet &
+username = kaj &
+password = loginkaj &
 scope = openid
 
 > {%
-    client.global.set("piet_token", response.body.access_token);
+    client.global.set("kaj_token", response.body.access_token);
 %}
 
 
+### 2) USER-SERVICE TESTS — PROFIEL OPHALEN
 
-############################################################
-# 2) USER-SERVICE TESTS — PROFIEL OPHALEN
-############################################################
-
-### Get Jan profile (me)
+### Get Mathias profile (me)
 GET http://localhost:8080/api/profiles/me
-Authorization: Bearer {{jan_token}}
+Authorization: Bearer {{mathias_token}}
 
 > {%
-    client.global.set("jan_id", response.body.id);
+    client.global.set("mathias_id", response.body.id);
 %}
 
-### Get Piet profile (me)
+### Get Kaj profile (me)
 GET http://localhost:8080/api/profiles/me
-Authorization: Bearer {{piet_token}}
+Authorization: Bearer {{kaj_token}}
 
 > {%
-    client.global.set("piet_id", response.body.id);
+    client.global.set("kaj_id", response.body.id);
 %}
 
-### Get Jan by username
-GET http://localhost:8080/api/profiles/find/jan
-Authorization: Bearer {{piet_token}}
+### Get Mathias by username
+GET http://localhost:8080/api/profiles/find/mathias
+Authorization: Bearer {{kaj_token}}
 
-### Get Piet by username
-GET http://localhost:8080/api/profiles/find/piet
-Authorization: Bearer {{jan_token}}
+### Get Kaj by username
+GET http://localhost:8080/api/profiles/find/kaj
+Authorization: Bearer {{mathias_token}}
 
 
-
-############################################################
 # 3) SOCIAL-SERVICE — SEND FRIEND REQUEST
-############################################################
 
-### Jan → Piet: send friend request
-POST http://localhost:8081/api/friends/add
-Authorization: Bearer {{jan_token}}
+### Mathias → Kaj: send friend request
+POST http://localhost:8083/api/friends/add
+Authorization: Bearer {{mathias_token}}
 Content-Type: application/json
 
 {
-  "username": "piet"
+  "username": "kaj"
 }
 
 
 
-############################################################
-# 4) SOCIAL-SERVICE — OVERVIEW REQUESTS
-############################################################
+### 4) SOCIAL-SERVICE — OVERVIEW REQUESTS
 
-### Jan sees outgoing
-GET http://localhost:8081/api/friends
-Authorization: Bearer {{jan_token}}
+### Mathias sees outgoing
+GET http://localhost:8083/api/friends
+Authorization: Bearer {{mathias_token}}
 
-### Piet sees incoming
-GET http://localhost:8081/api/friends
-Authorization: Bearer {{piet_token}}
+### Kaj sees incoming
+GET http://localhost:8083/api/friends
+Authorization: Bearer {{kaj_token}}
 
 
+# 5) Kaj ACCEPTS friend request
 
-############################################################
-# 5) Piet ACCEPTS friend request
-############################################################
-
-POST http://localhost:8081/api/friends/accept/{{jan_id}}
-Authorization: Bearer {{piet_token}}
+### Kaj accepts Mathias request
+POST http://localhost:8083/api/friends/accept/{{mathias_id}}
+Authorization: Bearer {{kaj_token}}
 
 
-
-############################################################
 # 6) Both should now be FRIENDS
-############################################################
-
-### Jan friend list
-GET http://localhost:8081/api/friends
-Authorization: Bearer {{jan_token}}
-
-### Piet friend list
-GET http://localhost:8081/api/friends
-Authorization: Bearer {{piet_token}}
 
 
+### Mathias friend list
+GET http://localhost:8083/api/friends
+Authorization: Bearer {{mathias_token}}
 
-############################################################
+### Kaj friend list
+GET http://localhost:8083/api/friends
+Authorization: Bearer {{kaj_token}}
+
+
 # 7) TEST REJECT FLOW
-############################################################
 
-### First remove friendship (Jan removes Piet)
-DELETE http://localhost:8081/api/friends/remove/{{piet_id}}
-Authorization: Bearer {{jan_token}}
+### First remove friendship (Mathias removes Kaj)
+DELETE http://localhost:8083/api/friends/remove/{{kaj_id}}
+Authorization: Bearer {{mathias_token}}
 
-### Jan sends new request
-POST http://localhost:8081/api/friends/add
-Authorization: Bearer {{jan_token}}
+### Mathias sends new request
+POST http://localhost:8083/api/friends/add
+Authorization: Bearer {{mathias_token}}
 Content-Type: application/json
 
 {
-  "username": "piet"
+  "username": "kaj"
 }
 
-### Piet rejects the request
-POST http://localhost:8081/api/friends/reject/{{jan_id}}
-Authorization: Bearer {{piet_token}}
+### Kaj rejects the request
+POST http://localhost:8083/api/friends/reject/{{mathias_id}}
+Authorization: Bearer {{kaj_token}}
 
 
-
-############################################################
 # 8) TEST CANCEL FLOW
-############################################################
 
-### Jan sends again
-POST http://localhost:8081/api/friends/add
-Authorization: Bearer {{jan_token}}
+### Mathias sends again
+POST http://localhost:8083/api/friends/add
+Authorization: Bearer {{mathias_token}}
 Content-Type: application/json
 
 {
-  "username": "piet"
+  "username": "kaj"
 }
 
-### Jan cancels his own request
-POST http://localhost:8081/api/friends/cancel/{{piet_id}}
-Authorization: Bearer {{jan_token}}
+### Mathias cancels his own request
+POST http://localhost:8083/api/friends/cancel/{{kaj_id}}
+Authorization: Bearer {{mathias_token}}
 
 
-
-############################################################
 # 9) FINAL — CLEANUP CHECK
-############################################################
 
-### Jan overview
-GET http://localhost:8081/api/friends
-Authorization: Bearer {{jan_token}}
+### Mathias overview
+GET http://localhost:8083/api/friends
+Authorization: Bearer {{mathias_token}}
 
-### Piet overview
-GET http://localhost:8081/api/friends
-Authorization: Bearer {{piet_token}}
+### Kaj overview
+GET http://localhost:8083/api/friends
+Authorization: Bearer {{kaj_token}}

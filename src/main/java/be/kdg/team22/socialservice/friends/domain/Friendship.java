@@ -6,8 +6,8 @@ import java.util.Objects;
 public class Friendship {
 
     private final FriendshipId id;
-    private final UserId requester;
-    private final UserId receiver;
+    private UserId requester;
+    private UserId receiver;
     private final Instant createdAt;
     private Instant updatedAt;
     private FriendshipStatus status;
@@ -64,6 +64,13 @@ public class Friendship {
             throw new IllegalStateException("Only pending requests can be canceled");
 
         this.status = FriendshipStatus.CANCELED;
+        this.updatedAt = Instant.now();
+    }
+
+    public void resetToPending(UserId requester, UserId receiver) {
+        this.requester = requester;
+        this.receiver = receiver;
+        this.status = FriendshipStatus.PENDING;
         this.updatedAt = Instant.now();
     }
 

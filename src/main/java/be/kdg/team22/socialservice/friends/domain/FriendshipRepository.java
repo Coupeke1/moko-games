@@ -7,6 +7,7 @@ public interface FriendshipRepository {
 
     Optional<Friendship> findById(FriendshipId id);
 
+
     Optional<Friendship> findBetween(UserId user1, UserId user2);
 
     List<Friendship> findAllFor(UserId user);

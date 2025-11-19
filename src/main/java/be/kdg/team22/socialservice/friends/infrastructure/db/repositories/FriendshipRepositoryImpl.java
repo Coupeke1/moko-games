@@ -26,8 +26,7 @@ public class FriendshipRepositoryImpl implements FriendshipRepository {
 
     @Override
     public Optional<Friendship> findBetween(UserId u1, UserId u2) {
-        return jpa.findByRequesterIdAndReceiverId(u1.value(), u2.value())
-                .or(() -> jpa.findByRequesterIdAndReceiverId(u2.value(), u1.value()))
+        return jpa.findBetween(u1.value(), u2.value())
                 .map(FriendshipEntity::toDomain);
     }
 

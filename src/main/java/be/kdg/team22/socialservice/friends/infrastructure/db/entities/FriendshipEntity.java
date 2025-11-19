@@ -10,21 +10,25 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "friendships",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"requester_id", "receiver_id"}))
+@Table(
+        name = "friendships",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "friendships_requester_id_receiver_id_key",
+                        columnNames = {"requester_id", "receiver_id"})
+        }
+)
 public class FriendshipEntity {
 
     @Id
     private UUID id;
 
-    @Column(nullable = false, name = "requester_id")
+    @Column(name = "requester_id", nullable = false)
     private UUID requesterId;
 
-    @Column(nullable = false, name = "receiver_id")
+    @Column(name = "receiver_id", nullable = false)
     private UUID receiverId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private FriendshipStatus status;
 
     @Column(nullable = false)
@@ -33,8 +37,7 @@ public class FriendshipEntity {
     @Column(nullable = false)
     private Instant updatedAt;
 
-    protected FriendshipEntity() {
-    }
+    protected FriendshipEntity() {}
 
     public FriendshipEntity(UUID id, UUID requesterId, UUID receiverId,
                             FriendshipStatus status, Instant createdAt, Instant updatedAt) {
@@ -46,14 +49,14 @@ public class FriendshipEntity {
         this.updatedAt = updatedAt;
     }
 
-    public static FriendshipEntity fromDomain(Friendship f) {
+    public static FriendshipEntity fromDomain(Friendship friendship) {
         return new FriendshipEntity(
-                f.id().value(),
-                f.requester().value(),
-                f.receiver().value(),
-                f.status(),
-                f.createdAt(),
-                f.updatedAt()
+                friendship.id().value(),
+                friendship.requester().value(),
+                friendship.receiver().value(),
+                friendship.status(),
+                friendship.createdAt(),
+                friendship.updatedAt()
         );
     }
 
@@ -68,4 +71,3 @@ public class FriendshipEntity {
         );
     }
 }
-
