@@ -7,9 +7,6 @@ stages:
   - build
   - test
 
-include:
-  - template: Security/Dependency-Scanning.gitlab-ci.yml
-
 cache:
   key: "$CI_COMMIT_REF_SLUG"
   paths:
@@ -39,12 +36,6 @@ test:
     when: always
     reports:
       junit: build/test-results/test/*.xml
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH == "main"'
-
-dependency_scanning:
-  stage: test
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == "main"'
