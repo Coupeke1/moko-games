@@ -18,7 +18,6 @@ public class Friendship {
                       Instant createdAt,
                       Instant updatedAt,
                       FriendshipStatus status) {
-
         this.id = Objects.requireNonNull(id);
         this.requester = Objects.requireNonNull(requester);
         this.receiver = Objects.requireNonNull(receiver);
@@ -40,7 +39,7 @@ public class Friendship {
 
     public void accept(UserId actingUser) {
         if (!actingUser.value().equals(receiver.value()))
-            throw new IllegalStateException("Only receiver can accept");
+            throw new IllegalStateException("Only receiver can accept this request");
         if (status != FriendshipStatus.PENDING)
             throw new IllegalStateException("Only pending requests can be accepted");
 
@@ -50,11 +49,21 @@ public class Friendship {
 
     public void reject(UserId actingUser) {
         if (!actingUser.value().equals(receiver.value()))
-            throw new IllegalStateException("Only receiver can reject");
+            throw new IllegalStateException("Only receiver can reject this request");
         if (status != FriendshipStatus.PENDING)
             throw new IllegalStateException("Only pending requests can be rejected");
 
         this.status = FriendshipStatus.REJECTED;
+        this.updatedAt = Instant.now();
+    }
+
+    public void cancel(UserId actingUser) {
+        if (!actingUser.value().equals(requester.value()))
+            throw new IllegalStateException("Only requester can cancel this request");
+        if (status != FriendshipStatus.PENDING)
+            throw new IllegalStateException("Only pending requests can be canceled");
+
+        this.status = FriendshipStatus.CANCELED;
         this.updatedAt = Instant.now();
     }
 
@@ -70,6 +79,10 @@ public class Friendship {
         return receiver;
     }
 
+    public FriendshipStatus status() {
+        return status;
+    }
+
     public Instant createdAt() {
         return createdAt;
     }
@@ -78,18 +91,14 @@ public class Friendship {
         return updatedAt;
     }
 
-    public FriendshipStatus status() {
-        return status;
-    }
-
     public boolean involves(UserId user) {
-        return requester.value().equals(user.value()) ||
-                receiver.value().equals(user.value());
+        return requester.value().equals(user.value())
+                || receiver.value().equals(user.value());
     }
 
     public UserId otherSide(UserId user) {
         if (requester.value().equals(user.value())) return receiver;
         if (receiver.value().equals(user.value())) return requester;
-        throw new IllegalArgumentException("User is not part of this friendship");
+        throw new IllegalArgumentException("User not part of friendship");
     }
 }

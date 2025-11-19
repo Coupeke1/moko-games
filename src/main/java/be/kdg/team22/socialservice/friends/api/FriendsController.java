@@ -48,6 +48,13 @@ public class FriendsController {
         friendService.rejectRequest(currentUser, id);
     }
 
+    @PostMapping("/cancel/{id}")
+    public void cancel(@AuthenticationPrincipal Jwt jwt,
+                       @PathVariable UUID id) {
+        var currentUser = UserId.fromJwt(jwt);
+        friendService.cancelRequest(currentUser, id);
+    }
+
     @DeleteMapping("/remove/{id}")
     public void remove(@AuthenticationPrincipal Jwt jwt,
                        @PathVariable UUID id) {

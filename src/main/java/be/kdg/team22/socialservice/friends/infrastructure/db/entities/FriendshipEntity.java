@@ -15,13 +15,12 @@ import java.util.UUID;
 public class FriendshipEntity {
 
     @Id
-    @Column(nullable = false)
     private UUID id;
 
-    @Column(name = "requester_id", nullable = false)
+    @Column(nullable = false, name = "requester_id")
     private UUID requesterId;
 
-    @Column(name = "receiver_id", nullable = false)
+    @Column(nullable = false, name = "receiver_id")
     private UUID receiverId;
 
     @Enumerated(EnumType.STRING)
@@ -37,12 +36,8 @@ public class FriendshipEntity {
     protected FriendshipEntity() {
     }
 
-    public FriendshipEntity(UUID id,
-                            UUID requesterId,
-                            UUID receiverId,
-                            FriendshipStatus status,
-                            Instant createdAt,
-                            Instant updatedAt) {
+    public FriendshipEntity(UUID id, UUID requesterId, UUID receiverId,
+                            FriendshipStatus status, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.requesterId = requesterId;
         this.receiverId = receiverId;
@@ -73,3 +68,4 @@ public class FriendshipEntity {
         );
     }
 }
+

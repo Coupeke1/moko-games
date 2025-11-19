@@ -10,6 +10,7 @@ import be.kdg.team22.socialservice.friends.infrastructure.http.UserClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Transactional
@@ -25,8 +26,8 @@ public class FriendService {
     }
 
     public void sendFriendRequest(UserId currentUser, String targetUsername) {
-        var targetUserResponse = userClient.getByUsername(targetUsername);
-        var targetUser = UserId.from(targetUserResponse.id());
+        UserClient.UserResponse targetUserResponse = userClient.getByUsername(targetUsername);
+        UserId targetUser = UserId.from(targetUserResponse.id());
 
         if (currentUser.value().equals(targetUser.value())) {
             throw new IllegalArgumentException("Cannot add yourself as a friend");
@@ -37,14 +38,14 @@ public class FriendService {
                     throw new IllegalStateException("Friendship already exists or is pending");
                 });
 
-        var friendship = Friendship.createNew(currentUser, targetUser);
+        Friendship friendship = Friendship.createNew(currentUser, targetUser);
         friendshipRepository.save(friendship);
     }
 
     public void acceptRequest(UserId currentUser, UUID otherUserId) {
-        var other = UserId.from(otherUserId);
+        UserId other = UserId.from(otherUserId);
 
-        var friendship = friendshipRepository.findBetween(currentUser, other)
+        Friendship friendship = friendshipRepository.findBetween(currentUser, other)
                 .orElseThrow(() -> new IllegalArgumentException("No friendship found"));
 
         friendship.accept(currentUser);
@@ -53,9 +54,9 @@ public class FriendService {
     }
 
     public void rejectRequest(UserId currentUser, UUID otherUserId) {
-        var other = UserId.from(otherUserId);
+        UserId other = UserId.from(otherUserId);
 
-        var friendship = friendshipRepository.findBetween(other, currentUser)
+        Friendship friendship = friendshipRepository.findBetween(other, currentUser)
                 .orElseThrow(() -> new IllegalArgumentException("No friendship found"));
 
         friendship.reject(currentUser);
@@ -64,9 +65,9 @@ public class FriendService {
     }
 
     public void removeFriend(UserId currentUser, UUID otherUserId) {
-        var other = UserId.from(otherUserId);
+        UserId other = UserId.from(otherUserId);
 
-        var friendship = friendshipRepository.findBetween(currentUser, other)
+        Friendship friendship = friendshipRepository.findBetween(currentUser, other)
                 .orElseThrow(() -> new IllegalArgumentException("No friendship found"));
 
         if (friendship.status() != FriendshipStatus.ACCEPTED) {
@@ -76,32 +77,42 @@ public class FriendService {
         friendshipRepository.delete(friendship);
     }
 
-    public FriendsOverviewModel getOverview(UserId currentUser) {
-        var all = friendshipRepository.findAllFor(currentUser);
+    public void cancelRequest(UserId currentUser, UUID otherUserId) {
+        UserId other = UserId.from(otherUserId);
+        Friendship friendship = friendshipRepository.findBetween(currentUser, other)
+                .orElseThrow(() -> new IllegalArgumentException("No friendship found"));
 
-        var friends = all.stream()
+        friendship.cancel(currentUser);
+
+        friendshipRepository.save(friendship);
+    }
+
+    public FriendsOverviewModel getOverview(UserId currentUser) {
+        List<Friendship> all = friendshipRepository.findAllFor(currentUser);
+
+        List<FriendModel> friends = all.stream()
                 .filter(f -> f.status() == FriendshipStatus.ACCEPTED)
-                .map(f -> toFriendModel(currentUser, f))
+                .map(friendship -> toFriendModel(currentUser, friendship))
                 .toList();
 
-        var incoming = all.stream()
+        List<FriendModel> incoming = all.stream()
                 .filter(f -> f.status() == FriendshipStatus.PENDING &&
                         f.receiver().value().equals(currentUser.value()))
-                .map(f -> toFriendModel(currentUser, f))
+                .map(friendship -> toFriendModel(currentUser, friendship))
                 .toList();
 
-        var outgoing = all.stream()
+        List<FriendModel> outgoing = all.stream()
                 .filter(f -> f.status() == FriendshipStatus.PENDING &&
                         f.requester().value().equals(currentUser.value()))
-                .map(f -> toFriendModel(currentUser, f))
+                .map(friendship -> toFriendModel(currentUser, friendship))
                 .toList();
 
         return new FriendsOverviewModel(friends, incoming, outgoing);
     }
 
     private FriendModel toFriendModel(UserId currentUser, Friendship f) {
-        var other = f.otherSide(currentUser);
-        var userResponse = userClient.getById(other.value());
+        UserId other = f.otherSide(currentUser);
+        UserClient.UserResponse userResponse = userClient.getById(other.value());
 
         return new FriendModel(
                 other.value().toString(),
