@@ -1,6 +1,0 @@
-﻿board:
-  min-size: 3
-  max-size: 10
-
-server:
-  port: 8086

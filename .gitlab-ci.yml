@@ -8,9 +8,6 @@ stages:
   - test
   - dependency_scanning
 
-include:
-  - template: Security/Dependency-Scanning.gitlab-ci.yml
-
 cache:
   key: "$CI_COMMIT_REF_SLUG"
   paths:
