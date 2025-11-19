@@ -6,7 +6,6 @@ variables:
 stages:
   - build
   - test
-  - dependency_scanning
 
 cache:
   key: "$CI_COMMIT_REF_SLUG"
@@ -37,12 +36,6 @@ test:
     when: always
     reports:
       junit: build/test-results/test/*.xml
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH == "main"'
-
-dependency_scanning:
-  stage: dependency_scanning
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == "main"'
