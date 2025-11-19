@@ -44,7 +44,6 @@ test:
     - if: '$CI_COMMIT_BRANCH == "main"'
 
 dependency_scanning:
-  extends: .dependency_scanning
   stage: test
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
