@@ -5,9 +5,9 @@ variables:
   DOCKER_IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
 
 stages:
+  - package
   - build
   - test
-  - package
 
 cache:
   key: "$CI_COMMIT_REF_SLUG"
