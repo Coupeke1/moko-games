@@ -51,8 +51,7 @@ package:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   script:
-    - docker build \
-      --build-arg CI_COMMIT_SHA="$CI_COMMIT_SHA" \
+    - docker build --build-arg CI_COMMIT_SHA="$CI_COMMIT_SHA" \
       --build-arg CI_PIPELINE_CREATED_AT="$CI_PIPELINE_CREATED_AT" \
       --build-arg CI_COMMIT_REF_NAME="$CI_COMMIT_REF_NAME" \
       --build-arg CI_COMMIT_TAG="$CI_COMMIT_TAG" \
