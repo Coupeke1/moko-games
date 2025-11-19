@@ -10,4 +10,8 @@ public record GameId(UUID id) {
     public GameId {
         Assert.notNull(id, "Game id must not be null");
     }
+
+    public static GameId create() {
+        return new GameId(UUID.randomUUID());
+    }
 }

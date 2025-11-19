@@ -11,7 +11,7 @@ public class Game {
     private GameStatus status;
 
     public Game(int requestedSize) {
-        this.id = new GameId(UUID.randomUUID());
+        this.id = GameId.create();
         this.board = Board.create(requestedSize);
         this.status = GameStatus.IN_PROGRESS;
     }

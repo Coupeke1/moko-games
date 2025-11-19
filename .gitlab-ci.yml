@@ -23,6 +23,7 @@ build:
     paths:
       - build/libs/*.jar
   rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == "main"'
 
 test:
@@ -36,4 +37,8 @@ test:
     reports:
       junit: build/test-results/test/*.xml
   rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == "main"'
+
+include:
+  - template: Jobs/Dependency-Scanning.gitlab-ci.yml

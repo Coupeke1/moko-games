@@ -29,6 +29,6 @@ public class GameService {
     }
 
     public Game getGame(GameId id) {
-        return gameRepository.findById(id).orElseThrow(() -> new NotFoundException("Game with id " + id + " not found"));
+        return gameRepository.findById(id).orElseThrow(() -> new NotFoundException("Game with id " + id.id() + " not found"));
     }
 }
