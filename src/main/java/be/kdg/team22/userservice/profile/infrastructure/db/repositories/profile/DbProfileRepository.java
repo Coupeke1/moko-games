@@ -1,6 +1,5 @@
 package be.kdg.team22.userservice.profile.infrastructure.db.repositories.profile;
 
-
 import be.kdg.team22.userservice.profile.domain.profile.Profile;
 import be.kdg.team22.userservice.profile.domain.profile.ProfileId;
 import be.kdg.team22.userservice.profile.domain.profile.ProfileRepository;
@@ -23,6 +22,12 @@ public class DbProfileRepository implements ProfileRepository {
     @Override
     public Optional<Profile> findById(ProfileId id) {
         return jpa.findById(id.value())
+                .map(ProfileEntity::toDomain);
+    }
+
+    @Override
+    public Optional<Profile> findByUsername(String username) {
+        return jpa.findByUsername(username)
                 .map(ProfileEntity::toDomain);
     }
 

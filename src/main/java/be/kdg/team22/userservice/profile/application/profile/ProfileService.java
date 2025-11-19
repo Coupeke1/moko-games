@@ -49,6 +49,11 @@ public class ProfileService {
                 .orElseThrow(() -> new NoSuchElementException("Profile not found"));
     }
 
+    public Profile getByUsername(String username) {
+        return profiles.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("Profile not found with username: " + username));
+    }
+
     private String extractRequired(Jwt jwt, String claim) {
         String jwtClaim = jwt.getClaimAsString(claim);
         if (jwtClaim == null)
