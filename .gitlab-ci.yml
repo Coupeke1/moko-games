@@ -1,0 +1,41 @@
+variables:
+  DEFAULT_IMAGE: "eclipse-temurin:21-jdk-alpine"
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
+
+stages:
+  - build
+  - test
+
+cache:
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - .gradle/caches/
+    - .gradle/wrapper/
+
+build:
+  stage: build
+  image: $DEFAULT_IMAGE
+  script:
+    - chmod +x ./gradlew
+    - ./gradlew clean build --no-daemon
+  artifacts:
+    paths:
+      - build/libs/*.jar
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+test:
+  stage: test
+  image: $DEFAULT_IMAGE
+  script:
+    - chmod +x ./gradlew
+    - ./gradlew clean test --no-daemon
+  artifacts:
+    when: always
+    reports:
+      junit: build/test-results/test/*.xml
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
