@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -20,7 +19,7 @@ public class ProfileService {
     }
 
     public Profile getOrCreate(Jwt jwt) {
-        ProfileId id = new ProfileId(UUID.fromString(extractRequired(jwt, "sub")));
+        ProfileId id = ProfileId.get(jwt);
 
         String username = extractUsername(jwt);
         String email = extractRequired(jwt, "email");
@@ -34,7 +33,7 @@ public class ProfileService {
     }
 
     public Profile update(Jwt jwt, String newUsername, String newEmail) {
-        ProfileId id = new ProfileId(UUID.fromString(extractRequired(jwt, "sub")));
+        ProfileId id = ProfileId.get(jwt);
 
         Profile profile = profiles.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Profile not found"));
