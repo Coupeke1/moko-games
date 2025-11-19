@@ -6,7 +6,7 @@ import be.kdg.team22.tictactoeservice.domain.Player;
 
 import java.util.UUID;
 
-public record GameModel(UUID id, Player[][] board, GameStatus gameStatus, Player currentPlayer) {
+public record GameModel(UUID id, Player[][] board, GameStatus status, Player currentPlayer) {
     public static GameModel formDomain(Game game) {
         return new GameModel(
                 game.getId().id(),
