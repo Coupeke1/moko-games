@@ -52,18 +52,18 @@ package:
     DOCKER_TLS_CERTDIR: ""
   script:
     - echo "Building Docker image..."
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker login -u "$CI_REGISTRY_USER" -password-stdin "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - |
       TAG=$CI_COMMIT_REF_SLUG
       if [[ -n "$CI_COMMIT_TAG" ]]; then
         TAG=$CI_COMMIT_TAG
       fi
-    - docker build \
-      --build-arg CI_COMMIT_SHA="$CI_COMMIT_SHA" \
-      --build-arg CI_PIPELINE_CREATED_AT="$CI_PIPELINE_CREATED_AT" \
-      --build-arg CI_COMMIT_REF_NAME="$CI_COMMIT_REF_NAME" \
-      --build-arg CI_COMMIT_TAG="$CI_COMMIT_TAG" \
-      --build-arg CI_PIPELINE_ID="$CI_PIPELINE_ID" \
+    - docker build
+      --build-arg CI_COMMIT_SHA="$CI_COMMIT_SHA"
+      --build-arg CI_PIPELINE_CREATED_AT="$CI_PIPELINE_CREATED_AT"
+      --build-arg CI_COMMIT_REF_NAME="$CI_COMMIT_REF_NAME"
+      --build-arg CI_COMMIT_TAG="$CI_COMMIT_TAG"
+      --build-arg CI_PIPELINE_ID="$CI_PIPELINE_ID"
       -t $CI_REGISTRY_IMAGE:$TAG .
     - docker push $CI_REGISTRY_IMAGE:$TAG
   rules:
