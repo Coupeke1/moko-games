@@ -21,7 +21,7 @@ public class GameRestController {
     @PostMapping({"/", ""})
     public ResponseEntity<GameModel> createGame(@RequestParam(defaultValue = "3") int size) {
         Game game = service.startGame(size);
-        GameModel model = GameModel.formDomain(game);
+        GameModel model = GameModel.fromDomain(game);
 
         return ResponseEntity.ok(model);
     }
@@ -29,7 +29,7 @@ public class GameRestController {
     @GetMapping("/{id}")
     public ResponseEntity<GameModel> getGame(@PathVariable UUID id) {
         Game game = service.getGame(new GameId(id));
-        GameModel model = GameModel.formDomain(game);
+        GameModel model = GameModel.fromDomain(game);
 
         return ResponseEntity.ok(model);
     }
@@ -37,7 +37,7 @@ public class GameRestController {
     @PostMapping("/{id}/reset")
     public ResponseEntity<GameModel> resetGame(@PathVariable UUID id) {
         Game game = service.resetGame(new GameId(id));
-        GameModel model = GameModel.formDomain(game);
+        GameModel model = GameModel.fromDomain(game);
 
         return ResponseEntity.ok(model);
     }
