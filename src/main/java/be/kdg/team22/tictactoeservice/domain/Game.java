@@ -2,8 +2,6 @@ package be.kdg.team22.tictactoeservice.domain;
 
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
-import java.util.UUID;
-
 @AggregateRoot
 public class Game {
     private final GameId id;
