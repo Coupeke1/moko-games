@@ -15,7 +15,7 @@ public class UserClient {
 
     public UserClient(RestClient.Builder builder) {
         this.restClient = builder
-                .baseUrl("http://localhost:8080//api/profiles")
+                .baseUrl("http://localhost:8080/api/profiles")
                 .build();
     }
 

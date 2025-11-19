@@ -16,7 +16,7 @@ class FriendshipTest {
         UserId requester = user(UUID.randomUUID());
         UserId receiver = user(UUID.randomUUID());
 
-        Friendship f = Friendship.createNew(requester, receiver);
+        Friendship f = new Friendship(requester, receiver);
 
         assertThat(f.requester()).isEqualTo(requester);
         assertThat(f.receiver()).isEqualTo(receiver);
@@ -89,7 +89,7 @@ class FriendshipTest {
         UserId c = user(UUID.randomUUID());
         UserId d = user(UUID.randomUUID());
 
-        Friendship f = Friendship.createNew(a, b);
+        Friendship f = new Friendship(a, b);
         f.reject(b);
 
         f.resetToPending(c, d);
@@ -105,7 +105,7 @@ class FriendshipTest {
         UserId b = user(UUID.randomUUID());
         UserId c = user(UUID.randomUUID());
 
-        Friendship f = Friendship.createNew(a, b);
+        Friendship f = new Friendship(a, b);
 
         assertThat(f.involves(a)).isTrue();
         assertThat(f.involves(b)).isTrue();
@@ -117,7 +117,7 @@ class FriendshipTest {
         UserId a = user(UUID.randomUUID());
         UserId b = user(UUID.randomUUID());
 
-        Friendship f = Friendship.createNew(a, b);
+        Friendship f = new Friendship(a, b);
 
         assertThat(f.otherSide(a)).isEqualTo(b);
         assertThat(f.otherSide(b)).isEqualTo(a);

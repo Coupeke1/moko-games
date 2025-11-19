@@ -23,42 +23,42 @@ public class FriendsController {
 
     @GetMapping
     public FriendsOverviewModel getFriends(@AuthenticationPrincipal Jwt jwt) {
-        UserId currentUser = UserId.fromJwt(jwt);
+        UserId currentUser = UserId.get(jwt);
         return friendService.getOverview(currentUser);
     }
 
     @PostMapping("/add")
     public void addFriend(@AuthenticationPrincipal Jwt jwt,
                           @RequestBody AddFriendRequestModel request) {
-        UserId currentUser = UserId.fromJwt(jwt);
+        UserId currentUser = UserId.get(jwt);
         friendService.sendFriendRequest(currentUser, request.username());
     }
 
     @PostMapping("/accept/{id}")
     public void accept(@AuthenticationPrincipal Jwt jwt,
                        @PathVariable UUID id) {
-        UserId currentUser = UserId.fromJwt(jwt);
+        UserId currentUser = UserId.get(jwt);
         friendService.acceptRequest(currentUser, id);
     }
 
     @PostMapping("/reject/{id}")
     public void reject(@AuthenticationPrincipal Jwt jwt,
                        @PathVariable UUID id) {
-        UserId currentUser = UserId.fromJwt(jwt);
+        UserId currentUser = UserId.get(jwt);
         friendService.rejectRequest(currentUser, id);
     }
 
     @PostMapping("/cancel/{id}")
     public void cancel(@AuthenticationPrincipal Jwt jwt,
                        @PathVariable UUID id) {
-        var currentUser = UserId.fromJwt(jwt);
+        var currentUser = UserId.get(jwt);
         friendService.cancelRequest(currentUser, id);
     }
 
     @DeleteMapping("/remove/{id}")
     public void remove(@AuthenticationPrincipal Jwt jwt,
                        @PathVariable UUID id) {
-        UserId currentUser = UserId.fromJwt(jwt);
+        UserId currentUser = UserId.get(jwt);
         friendService.removeFriend(currentUser, id);
     }
 }

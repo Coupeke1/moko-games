@@ -51,7 +51,7 @@ public class FriendService {
             }
         }
 
-        Friendship friendship = Friendship.createNew(currentUser, targetUser);
+        Friendship friendship = new Friendship(currentUser, targetUser);
         friendshipRepository.save(friendship);
     }
 
@@ -128,7 +128,7 @@ public class FriendService {
         UserClient.UserResponse userResponse = userClient.getById(other.value());
 
         return new FriendModel(
-                other.value().toString(),
+                other.value(),
                 userResponse.username(),
                 f.status().name()
         );

@@ -26,15 +26,14 @@ public class Friendship {
         this.status = Objects.requireNonNull(status);
     }
 
-    public static Friendship createNew(UserId requester, UserId receiver) {
-        return new Friendship(
-                FriendshipId.newId(),
-                requester,
-                receiver,
-                Instant.now(),
-                Instant.now(),
-                FriendshipStatus.PENDING
-        );
+    public Friendship(UserId requester,
+                      UserId receiver) {
+        this.id = FriendshipId.newId();
+        this.requester = Objects.requireNonNull(requester);
+        this.receiver = Objects.requireNonNull(receiver);
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+        this.status = FriendshipStatus.PENDING;
     }
 
     public void accept(UserId actingUser) {

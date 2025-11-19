@@ -46,9 +46,9 @@ class FriendsControllerTest {
         UUID outgoingId = UUID.randomUUID();
 
         FriendsOverviewModel overview = new FriendsOverviewModel(
-                List.of(new FriendModel(friendId.toString(), "friend", "ACCEPTED")),
-                List.of(new FriendModel(incomingId.toString(), "incoming", "PENDING")),
-                List.of(new FriendModel(outgoingId.toString(), "outgoing", "PENDING"))
+                List.of(new FriendModel(friendId, "friend", "ACCEPTED")),
+                List.of(new FriendModel(incomingId, "incoming", "PENDING")),
+                List.of(new FriendModel(outgoingId, "outgoing", "PENDING"))
         );
 
         when(friendService.getOverview(any(UserId.class))).thenReturn(overview);

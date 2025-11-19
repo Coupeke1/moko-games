@@ -12,19 +12,19 @@ public record UserId(UUID value) {
         }
     }
 
+    public static UserId create(String value) {
+        return new UserId(UUID.fromString(value));
+    }
     public static UserId from(UUID uuid) {
         return new UserId(uuid);
     }
 
-    public static UserId fromString(String value) {
-        return new UserId(UUID.fromString(value));
-    }
-
-    public static UserId fromJwt(Jwt jwt) {
+    public static UserId get(Jwt jwt) {
         String sub = jwt.getClaimAsString(StandardClaimNames.SUB);
         if (sub == null) {
             throw new IllegalArgumentException("JWT does not contain subject (sub) claim");
         }
-        return fromString(sub);
+        return create(sub);
     }
+
 }
