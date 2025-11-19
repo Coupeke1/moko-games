@@ -1,7 +1,7 @@
+### 1) Haal JWT-token op via Keycloak (PASSWORD GRANT)
 POST http://localhost:8180/realms/moko/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
-#CLIENTID & SECRET invullen voor elke specifieke client
 grant_type = password &
 client_id = user-service &
 client_secret = ZmXSd2mIzB6hsLrybeD3gH0c11vPwrej &
@@ -9,7 +9,44 @@ username = mathias &
 password = loginmathias &
 scope = openid
 
-
 > {%
-    client.global.set("access_token", response.body.access_token)
+    client.global.set("access_token", response.body.access_token);
 %}
+
+
+### 2) GET /api/profiles/me
+GET http://localhost:8080/api/profiles/me
+Authorization: Bearer {{access_token}}
+
+### 3) PATCH /api/profiles/me (profiel updaten)
+PATCH http://localhost:8080/api/profiles/me
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "username": "mathias-updated",
+  "email": "mathias.updated@kdg.be"
+}
+
+### 4) GET /api/profiles/{id} (opvragen profiel via ID)
+GET http://localhost:8080/api/profiles/11111111-1111-1111-1111-111111111111
+Authorization: Bearer {{access_token}}
+
+### 5) Ongeldig: PATCH zonder auth (verwacht 401)
+PATCH http://localhost:8080/api/profiles/me
+Content-Type: application/json
+
+{
+  "username": "should-fail",
+  "email": "fail@mail.be"
+}
+
+### 6) Ongeldig: PATCH invalid email (verwacht 400)
+PATCH http://localhost:8080/api/profiles/me
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "username": "invalid-test",
+  "email": "not-an-email"
+}
