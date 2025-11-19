@@ -78,7 +78,7 @@ public class GameControllerIntegrationTest {
         String id = extractId(createResponse);
 
 
-        Game game = gameRepository.findById(new GameId(UUID.fromString(id))).orElseThrow();
+        Game game = gameRepository.findById(GameId.fromString(id)).orElseThrow();
         setGameStatus(game, GameStatus.WON);
         gameRepository.save(game);
 
