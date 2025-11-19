@@ -44,4 +44,10 @@ public class ProfileController {
         Profile profile = service.getById(new ProfileId(id));
         return ResponseEntity.ok(ProfileModel.from(profile));
     }
+
+    @GetMapping("/find/{username}")
+    public ResponseEntity<ProfileModel> getByUsername(@PathVariable String username) {
+        Profile profile = service.getByUsername(username);
+        return ResponseEntity.ok(ProfileModel.from(profile));
+    }
 }
