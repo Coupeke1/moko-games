@@ -31,4 +31,11 @@ public class GameService {
     public Game getGame(GameId id) {
         return gameRepository.findById(id).orElseThrow(() -> new NotFoundException("Game with id " + id.id() + " not found"));
     }
+
+    public Game resetGame(GameId id) {
+        Game game = getGame(id);
+        game.reset();
+        gameRepository.save(game);
+        return game;
+    }
 }

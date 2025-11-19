@@ -3,6 +3,7 @@ package be.kdg.team22.tictactoeservice.application;
 import be.kdg.team22.tictactoeservice.config.BoardSizeProperties;
 import be.kdg.team22.tictactoeservice.domain.Game;
 import be.kdg.team22.tictactoeservice.domain.GameId;
+import be.kdg.team22.tictactoeservice.domain.GameStatus;
 import be.kdg.team22.tictactoeservice.domain.NotFoundException;
 import be.kdg.team22.tictactoeservice.repository.GameRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,12 +12,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-
+import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
 public class GameServiceTest {
     @Mock
     private GameRepository gameRepository;
@@ -108,5 +110,45 @@ public class GameServiceTest {
         when(gameRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> gameService.getGame(id));
+    }
+
+    @Test
+    void shouldResetExistingFinishedGame() throws NoSuchFieldException, IllegalAccessException {
+        // Arrange
+        Game storedGame = spy(new Game(3));
+
+        Field statusField = Game.class.getDeclaredField("status");
+        statusField.setAccessible(true);
+        statusField.set(storedGame, GameStatus.WON);
+
+        GameId gameId = storedGame.getId();
+        when(gameRepository.findById(gameId)).thenReturn(Optional.of(storedGame));
+
+        // Act
+        Game result = gameService.resetGame(gameId);
+
+        // Assert
+        verify(storedGame).reset();
+        verify(gameRepository).save(storedGame);
+        assertEquals(storedGame, result);
+    }
+
+    @Test
+    void shouldThrowWhenResettingInProgressGame() {
+        // Arrange
+        Game storedGame = spy(new Game(3));
+        GameId gameId = storedGame.getId();
+        when(gameRepository.findById(gameId)).thenReturn(Optional.of(storedGame));
+
+        // Assert
+        assertThrows(IllegalStateException.class, () -> gameService.resetGame(gameId));
+    }
+
+    @Test
+    void shouldThrowWhenResettingUnknownGame() {
+        GameId id = GameId.create();
+        when(gameRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> gameService.resetGame(id));
     }
 }
