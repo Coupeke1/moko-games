@@ -1,0 +1,12 @@
+﻿### Genarte Board
+
+POST localhost:8080/api/games?size=3
+Accept: application/json
+
+
+### Get Game
+GET localhost:8080/api/games/972fe1f2-2a8a-4f7e-b365-edc63429f052
+Accept: application/json
+
+### Generate Invalid Board
+POST localhost:8080/api/games?size=2

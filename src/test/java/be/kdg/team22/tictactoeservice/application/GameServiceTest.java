@@ -36,7 +36,37 @@ public class GameServiceTest {
     }
 
     @Test
-    void shouldStartGameWithValidSize() {
+    void shouldStartGameWithSize3x3() {
+        // Arrange
+        Game expectedGame = new Game(3);
+        doNothing().when(gameRepository).save(expectedGame);
+
+        // Act
+        Game game = gameService.startGame(3);
+
+        // Asset
+        assertNotNull(game);
+        assertEquals(3, game.getBoard().getSize());
+        verify(gameRepository).save(any(Game.class));
+    }
+
+    @Test
+    void shouldStartGameWithSize4x4() {
+        // Arrange
+        Game expectedGame = new Game(4);
+        doNothing().when(gameRepository).save(expectedGame);
+
+        // Act
+        Game game = gameService.startGame(4);
+
+        // Asset
+        assertNotNull(game);
+        assertEquals(4, game.getBoard().getSize());
+        verify(gameRepository).save(any(Game.class));
+    }
+
+    @Test
+    void shouldStartGameWithSize5x5() {
         // Arrange
         Game expectedGame = new Game(5);
         doNothing().when(gameRepository).save(expectedGame);
