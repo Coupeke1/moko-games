@@ -1,10 +1,7 @@
 package be.kdg.team22.tictactoeservice.application;
 
 import be.kdg.team22.tictactoeservice.config.BoardSizeProperties;
-import be.kdg.team22.tictactoeservice.domain.Game;
-import be.kdg.team22.tictactoeservice.domain.GameId;
-import be.kdg.team22.tictactoeservice.domain.GameStatus;
-import be.kdg.team22.tictactoeservice.domain.NotFoundException;
+import be.kdg.team22.tictactoeservice.domain.*;
 import be.kdg.team22.tictactoeservice.repository.GameRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,11 +37,13 @@ public class GameServiceTest {
     @Test
     void shouldStartGameWithSize3x3() {
         // Arrange
-        Game expectedGame = new Game(3);
+        PlayerId playerXId = new PlayerId(UUID.randomUUID());
+        PlayerId playerOId = new PlayerId(UUID.randomUUID());
+        Game expectedGame = new Game(3, playerXId, playerOId);
         doNothing().when(gameRepository).save(expectedGame);
 
         // Act
-        Game game = gameService.startGame(3);
+        Game game = gameService.startGame(3, playerXId, playerOId);
 
         // Asset
         assertNotNull(game);
@@ -55,11 +54,13 @@ public class GameServiceTest {
     @Test
     void shouldStartGameWithSize4x4() {
         // Arrange
-        Game expectedGame = new Game(4);
+        PlayerId playerXId = new PlayerId(UUID.randomUUID());
+        PlayerId playerOId = new PlayerId(UUID.randomUUID());
+        Game expectedGame = new Game(4, playerXId, playerOId);
         doNothing().when(gameRepository).save(expectedGame);
 
         // Act
-        Game game = gameService.startGame(4);
+        Game game = gameService.startGame(4,  playerXId, playerOId);
 
         // Asset
         assertNotNull(game);
@@ -70,11 +71,13 @@ public class GameServiceTest {
     @Test
     void shouldStartGameWithSize5x5() {
         // Arrange
-        Game expectedGame = new Game(5);
+        PlayerId playerXId = new PlayerId(UUID.randomUUID());
+        PlayerId playerOId = new PlayerId(UUID.randomUUID());
+        Game expectedGame = new Game(5, playerXId, playerOId);
         doNothing().when(gameRepository).save(expectedGame);
 
         // Act
-        Game game = gameService.startGame(5);
+        Game game = gameService.startGame(5, playerXId, playerOId);
 
         // Asset
         assertNotNull(game);
@@ -84,17 +87,17 @@ public class GameServiceTest {
 
     @Test
     void shouldThrowWhenToSmall() {
-        assertThrows(IllegalArgumentException.class, () -> gameService.startGame(2));
+        assertThrows(IllegalArgumentException.class, () -> gameService.startGame(2, new PlayerId(UUID.randomUUID()), new PlayerId(UUID.randomUUID())));
     }
 
     @Test
     void shouldThrowWhenToBig() {
-        assertThrows(IllegalArgumentException.class, () -> gameService.startGame(11));
+        assertThrows(IllegalArgumentException.class, () -> gameService.startGame(11, new PlayerId(UUID.randomUUID()), new PlayerId(UUID.randomUUID())));
     }
 
     @Test
     void shouldGetExistingGame() {
-        Game storedGame = new Game(5);
+        Game storedGame = new Game(5,  new PlayerId(UUID.randomUUID()), new PlayerId(UUID.randomUUID()));
 
         when(gameRepository.findById(storedGame.getId())).thenReturn(Optional.of(storedGame));
 
@@ -115,7 +118,7 @@ public class GameServiceTest {
     @Test
     void shouldResetExistingFinishedGame() throws NoSuchFieldException, IllegalAccessException {
         // Arrange
-        Game storedGame = spy(new Game(3));
+        Game storedGame = spy(new Game(3,  new PlayerId(UUID.randomUUID()), new PlayerId(UUID.randomUUID())));
 
         Field statusField = Game.class.getDeclaredField("status");
         statusField.setAccessible(true);
@@ -136,7 +139,7 @@ public class GameServiceTest {
     @Test
     void shouldThrowWhenResettingInProgressGame() {
         // Arrange
-        Game storedGame = spy(new Game(3));
+        Game storedGame = spy(new Game(3, new PlayerId(UUID.randomUUID()), new PlayerId(UUID.randomUUID())));
         GameId gameId = storedGame.getId();
         when(gameRepository.findById(gameId)).thenReturn(Optional.of(storedGame));
 

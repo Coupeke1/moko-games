@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -12,7 +13,7 @@ public class GameTest {
 
     @BeforeEach
     public void setup() {
-        game = new Game(3);
+        game = new Game(3, new PlayerId(UUID.randomUUID()), new PlayerId(UUID.randomUUID()));
     }
 
     @Test

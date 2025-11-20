@@ -27,7 +27,7 @@ public class GameControllerIntegrationTest {
 
     @Test
     void shouldCreateGameWithDefaultSize() throws Exception {
-        mockMvc.perform(post("/api/games"))
+        mockMvc.perform(post(String.format("/api/games?playerXId=%s&playerOId=%s", UUID.randomUUID(), UUID.randomUUID())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.board.length()").value(3))
@@ -36,7 +36,7 @@ public class GameControllerIntegrationTest {
 
     @Test
     void shouldCreateWithCustomSize() throws Exception {
-        mockMvc.perform(post("/api/games?size=5"))
+        mockMvc.perform(post(String.format("/api/games?size=5&playerXId=%s&playerOId=%s", UUID.randomUUID(), UUID.randomUUID())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.board.length()").value(5))
@@ -45,14 +45,14 @@ public class GameControllerIntegrationTest {
 
     @Test
     void shouldRejectInvalidSize() throws Exception {
-        mockMvc.perform(post("/api/games?size=1"))
+        mockMvc.perform(post(String.format("/api/games?size=1&playerXId=%s&playerOId=%s",  UUID.randomUUID(), UUID.randomUUID())))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void shouldFetchExistingGame() throws Exception {
         // Create Game
-        String body = mockMvc.perform(post("/api/games"))
+        String body = mockMvc.perform(post(String.format("/api/games?playerXId=%s&playerOId=%s", UUID.randomUUID(), UUID.randomUUID())))
                 .andReturn().getResponse().getContentAsString();
 
         String id = extractId(body);
@@ -71,7 +71,7 @@ public class GameControllerIntegrationTest {
 
     @Test
     void shouldResetFinishedGame() throws Exception {
-        String createResponse = mockMvc.perform(post("/api/games"))
+        String createResponse = mockMvc.perform(post(String.format("/api/games?playerXId=%s&playerOId=%s", UUID.randomUUID(), UUID.randomUUID())))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
@@ -92,7 +92,7 @@ public class GameControllerIntegrationTest {
 
     @Test
     void shouldreturnbadrequestforunfinshedGame() throws Exception {
-        String createResponse = mockMvc.perform(post("/api/games?size=3"))
+        String createResponse = mockMvc.perform(post(String.format("/api/games?size=3&playerXId=%s&playerOId=%s", UUID.randomUUID(), UUID.randomUUID())))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
