@@ -56,12 +56,12 @@ public class ProfileService {
         if (token.hasClaim("username"))
             return token.getClaimAsString("username");
 
-        throw new ClaimNotFoundException("username");
+        throw ClaimNotFoundException.username();
     }
 
     private String getEmail(Jwt token) {
         if (!token.hasClaim("email"))
-            throw new ClaimNotFoundException("email");
+            throw ClaimNotFoundException.email();
 
         return token.getClaimAsString("email");
     }
