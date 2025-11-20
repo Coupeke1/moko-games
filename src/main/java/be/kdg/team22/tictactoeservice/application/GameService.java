@@ -5,8 +5,6 @@ import be.kdg.team22.tictactoeservice.domain.NotFoundException;
 import be.kdg.team22.tictactoeservice.domain.game.Game;
 import be.kdg.team22.tictactoeservice.domain.game.GameId;
 import be.kdg.team22.tictactoeservice.domain.player.Player;
-import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
-import be.kdg.team22.tictactoeservice.domain.player.PlayerRole;
 import be.kdg.team22.tictactoeservice.repository.GameRepository;
 import org.springframework.stereotype.Service;
 
@@ -23,10 +21,8 @@ public class GameService {
         this.gameRepository = gameRepository;
     }
 
-    public Game startGame(int requestedSize, PlayerId playerXId, PlayerId playerOId) {
-        Player playerX = new Player(playerXId, PlayerRole.X);
-        Player playerO = new Player(playerOId, PlayerRole.O);
-        Game game = Game.create(boardConfig.getMinSize(), boardConfig.getMaxSize(), requestedSize, List.of(playerX, playerO));
+    public Game startGame(int requestedSize, List<Player> players) {
+        Game game = Game.create(boardConfig.getMinSize(), boardConfig.getMaxSize(), requestedSize, players);
         gameRepository.save(game);
         return game;
     }

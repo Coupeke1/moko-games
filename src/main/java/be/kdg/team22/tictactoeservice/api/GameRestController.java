@@ -1,14 +1,17 @@
 package be.kdg.team22.tictactoeservice.api;
 
 import be.kdg.team22.tictactoeservice.api.models.GameModel;
-import be.kdg.team22.tictactoeservice.api.models.PlayerIdsModel;
+import be.kdg.team22.tictactoeservice.api.models.PlayersModel;
 import be.kdg.team22.tictactoeservice.application.GameService;
 import be.kdg.team22.tictactoeservice.domain.game.Game;
 import be.kdg.team22.tictactoeservice.domain.game.GameId;
+import be.kdg.team22.tictactoeservice.domain.player.Player;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -23,9 +26,11 @@ public class GameRestController {
     @PostMapping({"/", ""})
     public ResponseEntity<GameModel> createGame(
             @RequestParam(defaultValue = "3") int size,
-            @RequestBody PlayerIdsModel players
+            @RequestBody PlayersModel playersModel
     ) {
-        Game game = service.startGame(size, new PlayerId(players.playerXId()), new PlayerId(players.playerOId()));
+        List<Player> players = new ArrayList<>();
+        playersModel.players().forEach((playerId, playerRole) -> players.add(new Player(new PlayerId(playerId), playerRole)));
+        Game game = service.startGame(size, players);
         GameModel model = GameModel.fromDomain(game);
 
         return ResponseEntity.ok(model);

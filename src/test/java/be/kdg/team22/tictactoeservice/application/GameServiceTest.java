@@ -56,7 +56,7 @@ public class GameServiceTest {
         doNothing().when(gameRepository).save(expectedGame);
 
         // Act
-        Game game = gameService.startGame(3, playerX.id(), playerO.id());
+        Game game = gameService.startGame(3, List.of(playerX, playerO));
 
         // Asset
         assertNotNull(game);
@@ -69,9 +69,8 @@ public class GameServiceTest {
         // Arrange
         Game expectedGame = Game.create(boardConfig.getMinSize(), boardConfig.getMaxSize(), 4, players);
         doNothing().when(gameRepository).save(expectedGame);
-
         // Act
-        Game game = gameService.startGame(4,  PlayerId.create(), PlayerId.create());
+        Game game = gameService.startGame(4, players);
 
         // Asset
         assertNotNull(game);
@@ -86,7 +85,7 @@ public class GameServiceTest {
         doNothing().when(gameRepository).save(expectedGame);
 
         // Act
-        Game game = gameService.startGame(5, PlayerId.create(), PlayerId.create());
+        Game game = gameService.startGame(5, players);
 
         // Asset
         assertNotNull(game);
@@ -96,12 +95,12 @@ public class GameServiceTest {
 
     @Test
     void shouldThrowWhenTooSmall() {
-        assertThrows(IllegalArgumentException.class, () -> gameService.startGame(2, new PlayerId(UUID.randomUUID()), new PlayerId(UUID.randomUUID())));
+        assertThrows(IllegalArgumentException.class, () -> gameService.startGame(2, players));
     }
 
     @Test
     void shouldThrowWhenTooBig() {
-        assertThrows(IllegalArgumentException.class, () -> gameService.startGame(11, new PlayerId(UUID.randomUUID()), new PlayerId(UUID.randomUUID())));
+        assertThrows(IllegalArgumentException.class, () -> gameService.startGame(11, players));
     }
 
     @Test

@@ -76,6 +76,6 @@ public class Game {
         this.status = GameStatus.IN_PROGRESS;
         this.board = Board.create(this.board.getSize());
 
-        this.currentRole = players.getFirst().role();
+        this.currentRole = PlayerRole.X;
     }
 }
