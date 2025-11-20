@@ -71,7 +71,7 @@ public class LobbyController {
                 lobby.gameId().value(),
                 lobby.ownerId().value(),
                 players,
-                lobby.status().name(),
+                lobby.status(),
                 lobby.createdAt()
         );
     }
