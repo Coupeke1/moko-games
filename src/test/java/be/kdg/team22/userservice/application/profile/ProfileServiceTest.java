@@ -3,12 +3,13 @@ package be.kdg.team22.userservice.application.profile;
 import be.kdg.team22.userservice.domain.profile.Profile;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
 import be.kdg.team22.userservice.domain.profile.ProfileRepository;
+import be.kdg.team22.userservice.domain.profile.exceptions.ClaimNotFoundException;
+import be.kdg.team22.userservice.domain.profile.exceptions.NotFoundException;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.time.Instant;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -59,13 +60,13 @@ class ProfileServiceTest {
     @Test
     void missingSubjectThrows() {
         Jwt jwt = Jwt.withTokenValue("dummy").header("alg", "none").claim("email", "jan@kdg.be").claim("preferred_username", "jan").build();
-        assertThatThrownBy(() -> service.getOrCreate(jwt)).isInstanceOf(MissingRequiredClaimException.class).hasMessageContaining("sub");
+        assertThatThrownBy(() -> service.getOrCreate(jwt)).isInstanceOf(ClaimNotFoundException.class);
     }
 
     @Test
     void missingEmailThrows() {
         Jwt jwt = Jwt.withTokenValue("dummy").header("alg", "none").subject("33333333-3333-3333-3333-333333333333").claim("preferred_username", "jan").build();
-        assertThatThrownBy(() -> service.getOrCreate(jwt)).isInstanceOf(MissingRequiredClaimException.class).hasMessageContaining("email");
+        assertThatThrownBy(() -> service.getOrCreate(jwt)).isInstanceOf(ClaimNotFoundException.class).hasMessageContaining("email");
     }
 
     @Test
@@ -93,12 +94,12 @@ class ProfileServiceTest {
         when(repository.findById(id)).thenReturn(Optional.empty());
         Jwt token = token(sub, "ignored", "ignored@mail");
 
-        assertThatThrownBy(() -> service.update(token, "x", "x@mail")).isInstanceOf(NoSuchElementException.class);
+        assertThatThrownBy(() -> service.update(token, "x", "x@mail")).isInstanceOf(NotFoundException.class);
     }
 
     @Test
     void updateMissingSubjectThrows() {
         Jwt token = Jwt.withTokenValue("dummy").header("alg", "none").claim("email", "mail@mail").claim("preferred_username", "user").build();
-        assertThatThrownBy(() -> service.update(token, "x", "mail@mail")).isInstanceOf(MissingRequiredClaimException.class).hasMessageContaining("sub");
+        assertThatThrownBy(() -> service.update(token, "x", "mail@mail")).isInstanceOf(ClaimNotFoundException.class);
     }
 }

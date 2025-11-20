@@ -61,7 +61,7 @@ public class ProfileService {
 
     private String getEmail(Jwt token) {
         if (!token.hasClaim("email"))
-            throw new ClaimNotFoundException("username");
+            throw new ClaimNotFoundException("email");
 
         return token.getClaimAsString("email");
     }
