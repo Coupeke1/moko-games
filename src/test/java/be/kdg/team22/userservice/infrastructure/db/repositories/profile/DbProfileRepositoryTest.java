@@ -1,10 +1,8 @@
 package be.kdg.team22.userservice.infrastructure.db.repositories.profile;
 
+import be.kdg.team22.userservice.config.TestcontainersConfig;
 import be.kdg.team22.userservice.infrastructure.db.repositories.jpa.JpaProfileRepository;
 import be.kdg.team22.userservice.infrastructure.db.repositories.jpa.ProfileEntity;
-import be.kdg.team22.userservice.config.TestcontainersConfig;
-import be.kdg.team22.userservice.profile.infrastructure.db.repositories.profile.jpa.JpaProfileRepository;
-import be.kdg.team22.userservice.profile.infrastructure.db.repositories.profile.jpa.ProfileEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
