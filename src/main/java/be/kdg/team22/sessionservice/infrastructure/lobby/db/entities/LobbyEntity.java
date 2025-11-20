@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "lobbies")
 public class LobbyEntity {
-
     @Id
     private UUID id;
 
@@ -40,15 +39,7 @@ public class LobbyEntity {
     protected LobbyEntity() {
     }
 
-    public LobbyEntity(
-            UUID id,
-            UUID gameId,
-            UUID ownerId,
-            Set<UUID> playerIds,
-            LobbyStatus status,
-            Instant createdAt,
-            Instant updatedAt
-    ) {
+    public LobbyEntity(final UUID id, final UUID gameId, final UUID ownerId, final Set<UUID> playerIds, final LobbyStatus status, final Instant createdAt, final Instant updatedAt) {
         this.id = id;
         this.gameId = gameId;
         this.ownerId = ownerId;
@@ -58,7 +49,7 @@ public class LobbyEntity {
         this.updatedAt = updatedAt;
     }
 
-    public static LobbyEntity fromDomain(Lobby lobby) {
+    public static LobbyEntity fromDomain(final Lobby lobby) {
         LobbyEntity e = new LobbyEntity();
         e.id = lobby.id().value();
         e.gameId = lobby.gameId().value();
@@ -71,15 +62,7 @@ public class LobbyEntity {
     }
 
     public Lobby toDomain() {
-        return new Lobby(
-                LobbyId.from(id),
-                GameId.from(gameId),
-                PlayerId.from(ownerId),
-                playerIds.stream().map(PlayerId::from).collect(Collectors.toSet()),
-                status,
-                createdAt,
-                updatedAt
-        );
+        return new Lobby(LobbyId.from(id), GameId.from(gameId), PlayerId.from(ownerId), playerIds.stream().map(PlayerId::from).collect(Collectors.toSet()), status, createdAt, updatedAt);
     }
 }
 

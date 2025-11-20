@@ -21,58 +21,37 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/lobbies")
 public class LobbyController {
+    private final LobbyService service;
 
-    private final LobbyService lobbyService;
-
-    public LobbyController(LobbyService lobbyService) {
-        this.lobbyService = lobbyService;
+    public LobbyController(LobbyService service) {
+        this.service = service;
     }
 
     @PostMapping
-    public ResponseEntity<LobbyResponseModel> create(
-            @RequestBody CreateLobbyModel model,
-            @AuthenticationPrincipal Jwt jwt
-    ) {
-        PlayerId ownerId = PlayerId.get(jwt);
+    public ResponseEntity<LobbyResponseModel> create(@RequestBody final CreateLobbyModel model, @AuthenticationPrincipal final Jwt token) {
+        PlayerId ownerId = PlayerId.get(token);
         GameId gameId = new GameId(model.gameId());
-        Lobby lobby = lobbyService.createLobby(
-                gameId,
-                ownerId
-        );
+        Lobby lobby = service.createLobby(gameId, ownerId);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(toResponseModel(lobby));
+        return ResponseEntity.status(HttpStatus.CREATED).body(toResponseModel(lobby));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LobbyResponseModel> getById(@PathVariable UUID id) {
-        Lobby lobby = lobbyService.findLobby(LobbyId.from(id));
+    public ResponseEntity<LobbyResponseModel> getById(@PathVariable final UUID id) {
+        Lobby lobby = service.findLobby(LobbyId.from(id));
         return ResponseEntity.ok(toResponseModel(lobby));
     }
 
     @GetMapping
     public ResponseEntity<List<LobbyResponseModel>> getAll() {
-        List<Lobby> lobbies = lobbyService.findAllLobbies();
-        List<LobbyResponseModel> response = lobbies.stream()
-                .map(this::toResponseModel)
-                .toList();
+        List<Lobby> lobbies = service.findAllLobbies();
+        List<LobbyResponseModel> response = lobbies.stream().map(this::toResponseModel).toList();
 
         return ResponseEntity.ok(response);
     }
 
-    private LobbyResponseModel toResponseModel(Lobby lobby) {
-        Set<UUID> players = lobby.players()
-                .stream()
-                .map(PlayerId::value)
-                .collect(Collectors.toSet());
-
-        return new LobbyResponseModel(
-                lobby.id().value(),
-                lobby.gameId().value(),
-                lobby.ownerId().value(),
-                players,
-                lobby.status(),
-                lobby.createdAt()
-        );
+    private LobbyResponseModel toResponseModel(final Lobby lobby) {
+        Set<UUID> players = lobby.players().stream().map(PlayerId::value).collect(Collectors.toSet());
+        return new LobbyResponseModel(lobby.id().value(), lobby.gameId().value(), lobby.ownerId().value(), players, lobby.status(), lobby.createdAt());
     }
 }

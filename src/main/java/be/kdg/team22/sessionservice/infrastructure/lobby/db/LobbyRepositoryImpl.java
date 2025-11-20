@@ -11,28 +11,24 @@ import java.util.Optional;
 
 @Repository
 public class LobbyRepositoryImpl implements LobbyRepository {
+    private final LobbyJpaRepository repository;
 
-    private final LobbyJpaRepository jpa;
-
-    public LobbyRepositoryImpl(LobbyJpaRepository jpa) {
-        this.jpa = jpa;
+    public LobbyRepositoryImpl(LobbyJpaRepository repository) {
+        this.repository = repository;
     }
 
     @Override
-    public Optional<Lobby> findById(LobbyId id) {
-        return jpa.findById(id.value()).map(LobbyEntity::toDomain);
+    public Optional<Lobby> findById(final LobbyId id) {
+        return repository.findById(id.value()).map(LobbyEntity::toDomain);
     }
 
     @Override
     public List<Lobby> findAll() {
-        return jpa.findAll()
-                .stream()
-                .map(LobbyEntity::toDomain)
-                .toList();
+        return repository.findAll().stream().map(LobbyEntity::toDomain).toList();
     }
 
     @Override
-    public void save(Lobby lobby) {
-        jpa.save(LobbyEntity.fromDomain(lobby));
+    public void save(final Lobby lobby) {
+        repository.save(LobbyEntity.fromDomain(lobby));
     }
 }

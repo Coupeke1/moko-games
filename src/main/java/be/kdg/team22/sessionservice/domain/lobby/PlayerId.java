@@ -8,7 +8,8 @@ import java.util.UUID;
 
 public record PlayerId(UUID value) {
     public PlayerId {
-        if (value == null) throw new IllegalArgumentException("PlayerId cannot be null");
+        if (value == null)
+            throw new IllegalArgumentException("PlayerId cannot be null");
     }
 
     public static PlayerId from(UUID uuid) {
