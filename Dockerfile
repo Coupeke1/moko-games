@@ -7,11 +7,10 @@ COPY gradle ./gradle
 COPY build.gradle.kts settings.gradle.kts ./
 
 RUN chmod +x ./gradlew
-RUN ./gradlew build +x test --no-daemon || true
 
 COPY src ./src
 
-RUN ./gradlew clean build --no-daemon
+RUN ./gradlew clean build -x test --no-daemon
 
 FROM eclipse-temurin:21-jdk-alpine
 
@@ -19,7 +18,7 @@ WORKDIR /app
 
 COPY --from=build /app/build/libs/*.jar app.jar
 
-EXPOSE 8086
+EXPOSE 8080
 
 ARG CI_COMMIT_SHA
 ARG CI_PIPELINE_CREATED_AT
