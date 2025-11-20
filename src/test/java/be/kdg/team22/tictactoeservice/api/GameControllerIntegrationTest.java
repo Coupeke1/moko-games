@@ -50,6 +50,32 @@ public class GameControllerIntegrationTest {
     }
 
     @Test
+    void shouldCreateGameWithCorrectPlayers() throws Exception {
+        UUID playerXId = UUID.randomUUID();
+        UUID playerOId = UUID.randomUUID();
+        mockMvc.perform(post(String.format("/api/games?playerXId=%s&playerOId=%s",playerXId, playerOId)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.playerXId").value(playerXId.toString()))
+                .andExpect(jsonPath("$.playerOId").value(playerOId.toString()));
+    }
+
+    @Test
+    void shouldRejectWithMissingPlayers() throws Exception {
+        UUID playerXId = UUID.randomUUID();
+        UUID playerOId = UUID.randomUUID();
+
+        mockMvc.perform(post(String.format("/api/games?playerXId=%s", playerXId)))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(post(String.format("/api/games?playerOId=%s", playerOId)))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(post("/api/games"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void shouldFetchExistingGame() throws Exception {
         // Create Game
         String body = mockMvc.perform(post(String.format("/api/games?playerXId=%s&playerOId=%s", UUID.randomUUID(), UUID.randomUUID())))
