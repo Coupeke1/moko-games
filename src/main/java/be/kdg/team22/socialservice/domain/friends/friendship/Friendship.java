@@ -1,6 +1,6 @@
 package be.kdg.team22.socialservice.domain.friends.friendship;
 
-import be.kdg.team22.socialservice.application.friends.exceptions.CannotRemoveException;
+import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.CannotRemoveException;
 import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.CannotAcceptException;
 import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.NoMatchingUsersException;
 import be.kdg.team22.socialservice.domain.friends.user.UserId;
