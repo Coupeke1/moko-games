@@ -1,4 +1,4 @@
-package be.kdg.team22.socialservice.infrastructure.exceptions;
+package be.kdg.team22.socialservice.domain.friends.user.exceptions;
 
 public class NotReachableException extends RuntimeException {
     public NotReachableException(String service) {
