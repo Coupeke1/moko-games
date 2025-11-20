@@ -1,5 +1,10 @@
 package be.kdg.team22.tictactoeservice.domain;
 
+import be.kdg.team22.tictactoeservice.domain.game.Game;
+import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
+import be.kdg.team22.tictactoeservice.domain.player.Player;
+import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
+import be.kdg.team22.tictactoeservice.domain.player.PlayerRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

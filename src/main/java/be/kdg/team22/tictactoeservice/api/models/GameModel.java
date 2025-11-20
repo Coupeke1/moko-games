@@ -1,9 +1,9 @@
 package be.kdg.team22.tictactoeservice.api.models;
 
-import be.kdg.team22.tictactoeservice.domain.Game;
-import be.kdg.team22.tictactoeservice.domain.GameStatus;
-import be.kdg.team22.tictactoeservice.domain.Player;
-import be.kdg.team22.tictactoeservice.domain.PlayerRole;
+import be.kdg.team22.tictactoeservice.domain.game.Game;
+import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
+import be.kdg.team22.tictactoeservice.domain.player.Player;
+import be.kdg.team22.tictactoeservice.domain.player.PlayerRole;
 
 import java.util.List;
 import java.util.UUID;

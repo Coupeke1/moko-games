@@ -1,4 +1,4 @@
-package be.kdg.team22.tictactoeservice.domain;
+package be.kdg.team22.tictactoeservice.domain.player;
 
 public enum PlayerRole {
     X, O;

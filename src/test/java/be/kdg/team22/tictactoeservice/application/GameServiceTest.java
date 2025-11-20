@@ -1,7 +1,13 @@
 package be.kdg.team22.tictactoeservice.application;
 
 import be.kdg.team22.tictactoeservice.config.BoardSizeProperties;
-import be.kdg.team22.tictactoeservice.domain.*;
+import be.kdg.team22.tictactoeservice.domain.NotFoundException;
+import be.kdg.team22.tictactoeservice.domain.game.Game;
+import be.kdg.team22.tictactoeservice.domain.game.GameId;
+import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
+import be.kdg.team22.tictactoeservice.domain.player.Player;
+import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
+import be.kdg.team22.tictactoeservice.domain.player.PlayerRole;
 import be.kdg.team22.tictactoeservice.repository.GameRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -89,12 +95,12 @@ public class GameServiceTest {
     }
 
     @Test
-    void shouldThrowWhenToSmall() {
+    void shouldThrowWhenTooSmall() {
         assertThrows(IllegalArgumentException.class, () -> gameService.startGame(2, new PlayerId(UUID.randomUUID()), new PlayerId(UUID.randomUUID())));
     }
 
     @Test
-    void shouldThrowWhenToBig() {
+    void shouldThrowWhenTooBig() {
         assertThrows(IllegalArgumentException.class, () -> gameService.startGame(11, new PlayerId(UUID.randomUUID()), new PlayerId(UUID.randomUUID())));
     }
 

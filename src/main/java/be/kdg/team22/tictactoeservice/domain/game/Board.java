@@ -1,5 +1,6 @@
-package be.kdg.team22.tictactoeservice.domain;
+package be.kdg.team22.tictactoeservice.domain.game;
 
+import be.kdg.team22.tictactoeservice.domain.player.PlayerRole;
 import org.jmolecules.ddd.annotation.ValueObject;
 
 @ValueObject

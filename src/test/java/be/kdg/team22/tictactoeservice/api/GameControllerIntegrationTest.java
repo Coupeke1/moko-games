@@ -1,9 +1,9 @@
 package be.kdg.team22.tictactoeservice.api;
 
 import be.kdg.team22.tictactoeservice.api.models.PlayerIdsModel;
-import be.kdg.team22.tictactoeservice.domain.Game;
-import be.kdg.team22.tictactoeservice.domain.GameId;
-import be.kdg.team22.tictactoeservice.domain.GameStatus;
+import be.kdg.team22.tictactoeservice.domain.game.Game;
+import be.kdg.team22.tictactoeservice.domain.game.GameId;
+import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
 import be.kdg.team22.tictactoeservice.repository.GameRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -92,12 +92,12 @@ public class GameControllerIntegrationTest {
         PlayerIdsModel playerOModel = new PlayerIdsModel(null, UUID.randomUUID());
         PlayerIdsModel noPlayersModel = new PlayerIdsModel(null, null);
 
-        mockMvc.perform(post("/api/games?playerXId=%s")
+        mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(playerXModel)))
                 .andExpect(status().isBadRequest());
 
-        mockMvc.perform(post("/api/games?playerOId=%s")
+        mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(playerOModel)))
                 .andExpect(status().isBadRequest());

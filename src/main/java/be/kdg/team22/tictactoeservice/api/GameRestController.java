@@ -3,9 +3,9 @@ package be.kdg.team22.tictactoeservice.api;
 import be.kdg.team22.tictactoeservice.api.models.GameModel;
 import be.kdg.team22.tictactoeservice.api.models.PlayerIdsModel;
 import be.kdg.team22.tictactoeservice.application.GameService;
-import be.kdg.team22.tictactoeservice.domain.Game;
-import be.kdg.team22.tictactoeservice.domain.GameId;
-import be.kdg.team22.tictactoeservice.domain.PlayerId;
+import be.kdg.team22.tictactoeservice.domain.game.Game;
+import be.kdg.team22.tictactoeservice.domain.game.GameId;
+import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

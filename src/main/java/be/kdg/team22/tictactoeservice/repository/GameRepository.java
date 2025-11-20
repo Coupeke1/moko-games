@@ -1,7 +1,7 @@
 package be.kdg.team22.tictactoeservice.repository;
 
-import be.kdg.team22.tictactoeservice.domain.Game;
-import be.kdg.team22.tictactoeservice.domain.GameId;
+import be.kdg.team22.tictactoeservice.domain.game.Game;
+import be.kdg.team22.tictactoeservice.domain.game.GameId;
 
 import java.util.Optional;
 
