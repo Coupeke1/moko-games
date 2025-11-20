@@ -70,7 +70,10 @@ class LobbyControllerTest {
                                 {
                                   "gameId": "00000000-0000-0000-0000-000000000005",
                                   "maxPlayers": 4,
-                                  "boardSize": 3
+                                  "settings": {
+                                    "type": "ticTacToe",
+                                    "boardSize": 3
+                                  }
                                 }
                                 """))
                 .andExpect(status().isCreated())
@@ -93,7 +96,10 @@ class LobbyControllerTest {
                                 {
                                   "gameId": "00000000-0000-0000-0000-000000000005",
                                   "maxPlayers": 4,
-                                  "boardSize": 3
+                                  "settings": {
+                                    "type": "ticTacToe",
+                                    "boardSize": 3
+                                  }
                                 }
                                 """))
                 .andExpect(status().isUnauthorized());
@@ -111,7 +117,10 @@ class LobbyControllerTest {
                                 {
                                   "gameId": null,
                                   "maxPlayers": 4,
-                                  "boardSize": 3
+                                  "settings": {
+                                    "type": "ticTacToe",
+                                    "boardSize": 3
+                                  }
                                 }
                                 """))
                 .andExpect(status().isBadRequest());
@@ -125,9 +134,7 @@ class LobbyControllerTest {
 
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
-        repo.save(lobbyEntity(
-                id, gameId, ownerId, Set.of(ownerId), settings
-        ));
+        repo.save(lobbyEntity(id, gameId, ownerId, Set.of(ownerId), settings));
 
         mock.perform(get("/api/lobbies/" + id)
                         .with(tokenWithUser(ownerId.toString(), "owner", "owner@kdg.be")))
@@ -152,9 +159,7 @@ class LobbyControllerTest {
         UUID ownerId = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
-        repo.save(lobbyEntity(
-                UUID.randomUUID(), UUID.randomUUID(), ownerId, Set.of(ownerId), settings
-        ));
+        repo.save(lobbyEntity(UUID.randomUUID(), UUID.randomUUID(), ownerId, Set.of(ownerId), settings));
 
         mock.perform(get("/api/lobbies")
                         .with(tokenWithUser(ownerId.toString(), "user", "user@kdg.be")))
@@ -168,9 +173,7 @@ class LobbyControllerTest {
         UUID ownerId = UUID.fromString("99999999-9999-9999-9999-999999999999");
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
-        repo.save(lobbyEntity(
-                id, UUID.randomUUID(), ownerId, Set.of(ownerId), settings
-        ));
+        repo.save(lobbyEntity(id, UUID.randomUUID(), ownerId, Set.of(ownerId), settings));
 
         mock.perform(post("/api/lobbies/" + id + "/close")
                         .with(tokenWithUser(ownerId.toString(), "owner", "owner@kdg.be"))
@@ -186,9 +189,7 @@ class LobbyControllerTest {
         UUID otherId = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
-        repo.save(lobbyEntity(
-                id, UUID.randomUUID(), ownerId, Set.of(ownerId), settings
-        ));
+        repo.save(lobbyEntity(id, UUID.randomUUID(), ownerId, Set.of(ownerId), settings));
 
         mock.perform(post("/api/lobbies/" + id + "/close")
                         .with(tokenWithUser(otherId.toString(), "other", "other@kdg.be"))
@@ -203,9 +204,7 @@ class LobbyControllerTest {
 
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
-        repo.save(lobbyEntity(
-                id, UUID.randomUUID(), ownerId, Set.of(ownerId), settings
-        ));
+        repo.save(lobbyEntity(id, UUID.randomUUID(), ownerId, Set.of(ownerId), settings));
 
         mock.perform(put("/api/lobbies/" + id + "/settings")
                         .with(tokenWithUser(ownerId.toString(), "owner", "owner@kdg.be"))
@@ -233,9 +232,7 @@ class LobbyControllerTest {
 
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
-        repo.save(lobbyEntity(
-                id, UUID.randomUUID(), ownerId, Set.of(ownerId), settings
-        ));
+        repo.save(lobbyEntity(id, UUID.randomUUID(), ownerId, Set.of(ownerId), settings));
 
         mock.perform(put("/api/lobbies/" + id + "/settings")
                         .with(tokenWithUser(otherId.toString(), "other", "other@kdg.be"))

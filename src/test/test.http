@@ -1,4 +1,4 @@
-### 1) JWT Token ophalen voor OWNER (mathias)
+### 1) JWT Token OWNER (mathias)
 POST http://localhost:8180/realms/moko/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
@@ -14,7 +14,8 @@ scope = openid
 %}
 
 
-### 2) JWT Token ophalen voor TWEEDE GEBRUIKER (kaj)
+
+### 2) JWT Token OTHER (kaj)
 POST http://localhost:8180/realms/moko/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
@@ -30,7 +31,8 @@ scope = openid
 %}
 
 
-### 3) POST Create Lobby (owner = mathias)
+
+### 3) POST Create Lobby
 POST http://localhost:8081/api/lobbies
 Authorization: Bearer {{owner_token}}
 Content-Type: application/json
@@ -38,7 +40,11 @@ Content-Type: application/json
 {
   "gameId": "00000000-0000-0000-0000-000000000005",
   "maxPlayers": 4,
-  "boardSize": 3
+  "settings": {
+    "type": "checkers",
+    "boardSize": 10,
+    "flyingKings": true
+  }
 }
 
 > {%
@@ -46,12 +52,14 @@ Content-Type: application/json
 %}
 
 
+
 ### 4) GET Lobby by ID
 GET http://localhost:8081/api/lobbies/{{lobby_id}}
 Authorization: Bearer {{owner_token}}
 
 
-### 5) INVALID - Missing GameId (400)
+
+### 5) INVALID - Missing GameId
 POST http://localhost:8081/api/lobbies
 Authorization: Bearer {{owner_token}}
 Content-Type: application/json
@@ -59,13 +67,18 @@ Content-Type: application/json
 {
   "gameId": null,
   "maxPlayers": 4,
-  "boardSize": 3
+  "settings": {
+    "type": "ticTacToe",
+    "boardSize": 3
+  }
 }
 
 
-### 6) GET Lobby - Not Found (404)
+
+### 6) GET Lobby - Not Found
 GET http://localhost:8081/api/lobbies/11111111-1111-1111-1111-111111111111
 Authorization: Bearer {{owner_token}}
+
 
 
 ### 7) CLOSE Lobby (owner only)
@@ -73,12 +86,14 @@ POST http://localhost:8081/api/lobbies/{{lobby_id}}/close
 Authorization: Bearer {{owner_token}}
 
 
-### 8) INVALID - Close already closed lobby (400)
+
+### 8) INVALID - Close already closed
 POST http://localhost:8081/api/lobbies/{{lobby_id}}/close
 Authorization: Bearer {{owner_token}}
 
 
-### 9) PUT /settings – update TicTacToe settings (owner only)
+
+### 9) PUT settings – Checkers update
 PUT http://localhost:8081/api/lobbies/{{lobby_id}}/settings
 Authorization: Bearer {{owner_token}}
 Content-Type: application/json
@@ -93,7 +108,8 @@ Content-Type: application/json
 }
 
 
-### 10) INVALID - Non-owner (kaj) tries to update settings
+
+### 10) INVALID - Non-owner updates settings
 PUT http://localhost:8081/api/lobbies/{{lobby_id}}/settings
 Authorization: Bearer {{other_token}}
 Content-Type: application/json
@@ -107,8 +123,7 @@ Content-Type: application/json
 }
 
 
+
 ### 11) GET All Lobbies
 GET http://localhost:8081/api/lobbies
 Authorization: Bearer {{owner_token}}
-
-###

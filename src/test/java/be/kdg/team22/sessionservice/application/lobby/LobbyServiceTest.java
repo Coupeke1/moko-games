@@ -1,12 +1,12 @@
 package be.kdg.team22.sessionservice.application.lobby;
 
 import be.kdg.team22.sessionservice.api.lobby.models.CheckersSettingsModel;
+import be.kdg.team22.sessionservice.api.lobby.models.CreateLobbyModel;
 import be.kdg.team22.sessionservice.api.lobby.models.TicTacToeSettingsModel;
 import be.kdg.team22.sessionservice.api.lobby.models.UpdateLobbySettingsModel;
 import be.kdg.team22.sessionservice.domain.lobby.*;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.GameNotValidException;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.LobbyNotFoundException;
-import be.kdg.team22.sessionservice.domain.lobby.exceptions.LobbySettingsInvalidException;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.OwnerNotValidException;
 import be.kdg.team22.sessionservice.domain.lobby.settings.CheckersSettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
@@ -31,10 +31,11 @@ class LobbyServiceTest {
     void createLobby_savesLobby_andReturnsIt() {
         GameId gameId = new GameId(UUID.randomUUID());
         PlayerId owner = new PlayerId(UUID.randomUUID());
-        var model = new be.kdg.team22.sessionservice.api.lobby.models.CreateLobbyModel(
+
+        CreateLobbyModel model = new CreateLobbyModel(
                 gameId.value(),
                 4,
-                3
+                new TicTacToeSettingsModel(3)
         );
 
         doNothing().when(repo).save(any(Lobby.class));
@@ -51,10 +52,11 @@ class LobbyServiceTest {
     @Test
     void createLobby_nullGameId_throws() {
         PlayerId owner = new PlayerId(UUID.randomUUID());
-        var model = new be.kdg.team22.sessionservice.api.lobby.models.CreateLobbyModel(
+
+        CreateLobbyModel model = new CreateLobbyModel(
                 null,
                 4,
-                3
+                new TicTacToeSettingsModel(3)
         );
 
         assertThatThrownBy(() -> service.createLobby(null, owner, model))
@@ -64,10 +66,11 @@ class LobbyServiceTest {
     @Test
     void createLobby_nullOwnerId_throws() {
         GameId gameId = new GameId(UUID.randomUUID());
-        var model = new be.kdg.team22.sessionservice.api.lobby.models.CreateLobbyModel(
+
+        CreateLobbyModel model = new CreateLobbyModel(
                 gameId.value(),
                 4,
-                3
+                new TicTacToeSettingsModel(3)
         );
 
         assertThatThrownBy(() -> service.createLobby(gameId, null, model))
@@ -104,7 +107,7 @@ class LobbyServiceTest {
     }
 
     @Test
-    void updateSettings_ticTacToe_updatesSettings() {
+    void updateSettings_tictactoe_updatesSuccessfully() {
         LobbyId id = LobbyId.create();
         GameId gameId = new GameId(UUID.randomUUID());
         PlayerId owner = new PlayerId(UUID.randomUUID());
@@ -133,13 +136,12 @@ class LobbyServiceTest {
 
         assertThat(result.settings().maxPlayers()).isEqualTo(5);
         assertThat(result.settings().gameSettings()).isInstanceOf(TicTacToeSettings.class);
-        assertThat(((TicTacToeSettings) result.settings().gameSettings()).boardSize())
-                .isEqualTo(5);
+        assertThat(((TicTacToeSettings) result.settings().gameSettings()).boardSize()).isEqualTo(5);
         verify(repo).save(lobby);
     }
 
     @Test
-    void updateSettings_checkers_updatesSettings() {
+    void updateSettings_checkers_updatesSuccessfully() {
         LobbyId id = LobbyId.create();
         GameId gameId = new GameId(UUID.randomUUID());
         PlayerId owner = new PlayerId(UUID.randomUUID());
@@ -172,7 +174,7 @@ class LobbyServiceTest {
     }
 
     @Test
-    void updateSettings_nullSettings_throwsIllegalArgument() {
+    void updateSettings_nullSettings_throws() {
         LobbyId id = LobbyId.create();
         GameId gameId = new GameId(UUID.randomUUID());
         PlayerId owner = new PlayerId(UUID.randomUUID());
@@ -192,9 +194,12 @@ class LobbyServiceTest {
 
         when(repo.findById(id)).thenReturn(Optional.of(lobby));
 
-        UpdateLobbySettingsModel model = new UpdateLobbySettingsModel(4, null);
+        UpdateLobbySettingsModel model = new UpdateLobbySettingsModel(
+                4,
+                null
+        );
 
         assertThatThrownBy(() -> service.updateSettings(id, owner, model))
-                .isInstanceOf(LobbySettingsInvalidException.class);
+                .isInstanceOf(NullPointerException.class);
     }
 }

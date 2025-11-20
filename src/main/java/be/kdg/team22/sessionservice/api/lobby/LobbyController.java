@@ -15,7 +15,6 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -77,27 +76,21 @@ public class LobbyController {
     }
 
     private LobbyResponseModel toResponseModel(final Lobby lobby) {
-        Set<UUID> players = lobby.players()
-                .stream()
-                .map(PlayerId::value)
-                .collect(Collectors.toSet());
+
+        GameSettingsModel settingsModel = switch (lobby.settings().gameSettings()) {
+            case TicTacToeSettings t -> new TicTacToeSettingsModel(t.boardSize());
+            case CheckersSettings c -> new CheckersSettingsModel(c.boardSize(), c.flyingKings());
+        };
 
         return new LobbyResponseModel(
                 lobby.id().value(),
                 lobby.gameId().value(),
                 lobby.ownerId().value(),
-                players,
+                lobby.players().stream().map(PlayerId::value).collect(Collectors.toSet()),
                 lobby.settings().maxPlayers(),
-                toApiSettings(lobby),
                 lobby.status(),
-                lobby.createdAt()
+                lobby.createdAt(),
+                settingsModel
         );
-    }
-
-    private GameSettingsModel toApiSettings(final Lobby lobby) {
-        return switch (lobby.settings().gameSettings()) {
-            case TicTacToeSettings ttt -> new TicTacToeSettingsModel(ttt.boardSize());
-            case CheckersSettings chk -> new CheckersSettingsModel(chk.boardSize(), chk.flyingKings());
-        };
     }
 }
