@@ -11,13 +11,21 @@ public class Game {
     private PlayerId playerOId;
     private Player currentPlayer;
 
-    public Game(int requestedSize, PlayerId playerXId, PlayerId playerOId) {
+    private Game(int requestedSize, PlayerId playerXId, PlayerId playerOId) {
         this.id = GameId.create();
         this.board = Board.create(requestedSize);
         this.status = GameStatus.IN_PROGRESS;
         this.playerXId = playerXId;
         this.playerOId = playerOId;
         this.currentPlayer = Player.X;
+    }
+
+    public static Game create(int minSize, int maxSize, int size, PlayerId playerXId, PlayerId playerOId) {
+        if (size < minSize || size > maxSize) {
+            throw new IllegalArgumentException("Board size must be between " + minSize + " and " + maxSize);
+        }
+
+        return new Game(size, playerXId, playerOId);
     }
 
     public GameId getId() {
@@ -50,10 +58,6 @@ public class Game {
 
         this.status = GameStatus.IN_PROGRESS;
         this.board = Board.create(this.board.getSize());
-
-        PlayerId temp = this.playerXId;
-        this.playerXId = this.playerOId;
-        this.playerOId = temp;
 
         this.currentPlayer = Player.X;
     }

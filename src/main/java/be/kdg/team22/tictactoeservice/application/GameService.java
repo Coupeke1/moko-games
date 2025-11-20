@@ -20,15 +20,11 @@ public class GameService {
     }
 
     public Game startGame(int requestedSize, PlayerId playerXId, PlayerId playerOId) {
-        if (requestedSize < boardConfig.getMinSize() || requestedSize > boardConfig.getMaxSize()) {
-            throw new IllegalArgumentException("Board size must be between " + boardConfig.getMinSize() + " and " + boardConfig.getMaxSize());
-        }
-
         if (playerXId.equals(playerOId)) {
             throw new IllegalArgumentException("Player X and Player O must have different IDs");
         }
 
-        Game game = new Game(requestedSize, playerXId, playerOId);
+        Game game = Game.create(boardConfig.getMinSize(), boardConfig.getMaxSize(), requestedSize, playerXId, playerOId);
         gameRepository.save(game);
         return game;
     }
