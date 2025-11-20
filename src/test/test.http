@@ -86,8 +86,9 @@ Content-Type: application/json
 {
   "maxPlayers": 5,
   "settings": {
-    "type": "ticTacToe",
-    "boardSize": 4
+    "type": "checkers",
+    "boardSize": 12,
+    "flyingKings": true
   }
 }
 

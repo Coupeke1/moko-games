@@ -34,7 +34,6 @@ public class LobbyService {
         int maxPlayers = model.maxPlayers() != null ? model.maxPlayers() : 4;
         int boardSize = model.boardSize() != null ? model.boardSize() : 3;
 
-        // voorlopig 1 game: Tic-Tac-Toe
         LobbySettings settings = new LobbySettings(
                 new TicTacToeSettings(boardSize),
                 maxPlayers

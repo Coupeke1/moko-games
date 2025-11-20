@@ -1,13 +1,13 @@
 package be.kdg.team22.sessionservice.api.lobby;
 
-import be.kdg.team22.sessionservice.api.lobby.models.CreateLobbyModel;
-import be.kdg.team22.sessionservice.api.lobby.models.LobbyResponseModel;
-import be.kdg.team22.sessionservice.api.lobby.models.UpdateLobbySettingsModel;
+import be.kdg.team22.sessionservice.api.lobby.models.*;
 import be.kdg.team22.sessionservice.application.lobby.LobbyService;
 import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
 import be.kdg.team22.sessionservice.domain.lobby.PlayerId;
+import be.kdg.team22.sessionservice.domain.lobby.settings.CheckersSettings;
+import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/lobbies")
 public class LobbyController {
+
     private final LobbyService service;
 
     public LobbyController(final LobbyService service) {
@@ -35,8 +36,8 @@ public class LobbyController {
     ) {
         PlayerId ownerId = PlayerId.get(token);
         GameId gameId = new GameId(model.gameId());
-        Lobby lobby = service.createLobby(gameId, ownerId, model);
 
+        Lobby lobby = service.createLobby(gameId, ownerId, model);
         return ResponseEntity.status(HttpStatus.CREATED).body(toResponseModel(lobby));
     }
 
@@ -49,9 +50,9 @@ public class LobbyController {
     @GetMapping
     public ResponseEntity<List<LobbyResponseModel>> getAll() {
         List<Lobby> lobbies = service.findAllLobbies();
-        List<LobbyResponseModel> response = lobbies.stream().map(this::toResponseModel).toList();
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(lobbies.stream()
+                .map(this::toResponseModel)
+                .toList());
     }
 
     @PostMapping("/{id}/close")
@@ -87,8 +88,16 @@ public class LobbyController {
                 lobby.ownerId().value(),
                 players,
                 lobby.settings().maxPlayers(),
+                toApiSettings(lobby),
                 lobby.status(),
                 lobby.createdAt()
         );
+    }
+
+    private GameSettingsModel toApiSettings(final Lobby lobby) {
+        return switch (lobby.settings().gameSettings()) {
+            case TicTacToeSettings ttt -> new TicTacToeSettingsModel(ttt.boardSize());
+            case CheckersSettings chk -> new CheckersSettingsModel(chk.boardSize(), chk.flyingKings());
+        };
     }
 }

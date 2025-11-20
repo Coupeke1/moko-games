@@ -39,6 +39,25 @@ class LobbyControllerTest {
         repo.deleteAll();
     }
 
+    private LobbyEntity lobbyEntity(
+            UUID id,
+            UUID gameId,
+            UUID ownerId,
+            Set<UUID> players,
+            LobbySettings settings
+    ) {
+        return new LobbyEntity(
+                id,
+                gameId,
+                ownerId,
+                players,
+                settings,
+                LobbyStatus.OPEN,
+                Instant.now(),
+                Instant.now()
+        );
+    }
+
     @Test
     void createLobby_createsRecord_andReturns201() throws Exception {
         String owner = "11111111-1111-1111-1111-111111111111";
@@ -58,7 +77,9 @@ class LobbyControllerTest {
                 .andExpect(jsonPath("$.ownerId").value(owner))
                 .andExpect(jsonPath("$.gameId").value("00000000-0000-0000-0000-000000000005"))
                 .andExpect(jsonPath("$.players[0]").value(owner))
-                .andExpect(jsonPath("$.maxPlayers").value(4));
+                .andExpect(jsonPath("$.maxPlayers").value(4))
+                .andExpect(jsonPath("$.settings.type").value("ticTacToe"))
+                .andExpect(jsonPath("$.settings.boardSize").value(3));
 
         assertThat(repo.count()).isEqualTo(1);
     }
@@ -104,15 +125,8 @@ class LobbyControllerTest {
 
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
-        repo.save(new LobbyEntity(
-                id,
-                gameId,
-                ownerId,
-                Set.of(ownerId),
-                settings,
-                LobbyStatus.OPEN,
-                Instant.now(),
-                Instant.now()
+        repo.save(lobbyEntity(
+                id, gameId, ownerId, Set.of(ownerId), settings
         ));
 
         mock.perform(get("/api/lobbies/" + id)
@@ -121,15 +135,15 @@ class LobbyControllerTest {
                 .andExpect(jsonPath("$.id").value(id.toString()))
                 .andExpect(jsonPath("$.gameId").value(gameId.toString()))
                 .andExpect(jsonPath("$.ownerId").value(ownerId.toString()))
-                .andExpect(jsonPath("$.maxPlayers").value(4));
+                .andExpect(jsonPath("$.maxPlayers").value(4))
+                .andExpect(jsonPath("$.settings.type").value("ticTacToe"))
+                .andExpect(jsonPath("$.settings.boardSize").value(3));
     }
 
     @Test
     void getLobbyById_returns404IfNotFound() throws Exception {
-        String someUser = "33333333-3333-3333-3333-333333333333";
-
         mock.perform(get("/api/lobbies/ffffffff-ffff-ffff-ffff-ffffffffffff")
-                        .with(tokenWithUser(someUser, "user", "user@kdg.be")))
+                        .with(tokenWithUser("33333333-3333-3333-3333-333333333333", "user", "user@kdg.be")))
                 .andExpect(status().isNotFound());
     }
 
@@ -138,15 +152,8 @@ class LobbyControllerTest {
         UUID ownerId = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
-        repo.save(new LobbyEntity(
-                UUID.randomUUID(),
-                UUID.randomUUID(),
-                ownerId,
-                Set.of(ownerId),
-                settings,
-                LobbyStatus.OPEN,
-                Instant.now(),
-                Instant.now()
+        repo.save(lobbyEntity(
+                UUID.randomUUID(), UUID.randomUUID(), ownerId, Set.of(ownerId), settings
         ));
 
         mock.perform(get("/api/lobbies")
@@ -158,19 +165,11 @@ class LobbyControllerTest {
     @Test
     void closeLobby_owner_succeeds() throws Exception {
         UUID id = UUID.randomUUID();
-        UUID gameId = UUID.randomUUID();
         UUID ownerId = UUID.fromString("99999999-9999-9999-9999-999999999999");
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
-        repo.save(new LobbyEntity(
-                id,
-                gameId,
-                ownerId,
-                Set.of(ownerId),
-                settings,
-                LobbyStatus.OPEN,
-                Instant.now(),
-                Instant.now()
+        repo.save(lobbyEntity(
+                id, UUID.randomUUID(), ownerId, Set.of(ownerId), settings
         ));
 
         mock.perform(post("/api/lobbies/" + id + "/close")
@@ -183,20 +182,12 @@ class LobbyControllerTest {
     @Test
     void closeLobby_nonOwner_returnsBadRequest() throws Exception {
         UUID id = UUID.randomUUID();
-        UUID gameId = UUID.randomUUID();
         UUID ownerId = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
         UUID otherId = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
-        repo.save(new LobbyEntity(
-                id,
-                gameId,
-                ownerId,
-                Set.of(ownerId),
-                settings,
-                LobbyStatus.OPEN,
-                Instant.now(),
-                Instant.now()
+        repo.save(lobbyEntity(
+                id, UUID.randomUUID(), ownerId, Set.of(ownerId), settings
         ));
 
         mock.perform(post("/api/lobbies/" + id + "/close")
@@ -208,19 +199,12 @@ class LobbyControllerTest {
     @Test
     void updateSettings_owner_succeeds() throws Exception {
         UUID id = UUID.randomUUID();
-        UUID gameId = UUID.randomUUID();
         UUID ownerId = UUID.fromString("12121212-1212-1212-1212-121212121212");
+
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
-        repo.save(new LobbyEntity(
-                id,
-                gameId,
-                ownerId,
-                Set.of(ownerId),
-                settings,
-                LobbyStatus.OPEN,
-                Instant.now(),
-                Instant.now()
+        repo.save(lobbyEntity(
+                id, UUID.randomUUID(), ownerId, Set.of(ownerId), settings
         ));
 
         mock.perform(put("/api/lobbies/" + id + "/settings")
@@ -232,31 +216,25 @@ class LobbyControllerTest {
                                   "maxPlayers": 5,
                                   "settings": {
                                     "type": "ticTacToe",
-                                    "boardSize": 3
+                                    "boardSize": 4
                                   }
                                 }
                                 """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.maxPlayers").value(5));
+                .andExpect(jsonPath("$.maxPlayers").value(5))
+                .andExpect(jsonPath("$.settings.boardSize").value(4));
     }
 
     @Test
     void updateSettings_nonOwner_returnsBadRequest() throws Exception {
         UUID id = UUID.randomUUID();
-        UUID gameId = UUID.randomUUID();
         UUID ownerId = UUID.fromString("13131313-1313-1313-1313-131313131313");
         UUID otherId = UUID.fromString("14141414-1414-1414-1414-141414141414");
+
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
-        repo.save(new LobbyEntity(
-                id,
-                gameId,
-                ownerId,
-                Set.of(ownerId),
-                settings,
-                LobbyStatus.OPEN,
-                Instant.now(),
-                Instant.now()
+        repo.save(lobbyEntity(
+                id, UUID.randomUUID(), ownerId, Set.of(ownerId), settings
         ));
 
         mock.perform(put("/api/lobbies/" + id + "/settings")
