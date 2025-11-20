@@ -8,9 +8,7 @@ import org.springframework.context.annotation.Import;
 @SpringBootTest
 @Import(TestcontainersConfig.class)
 class UserServiceApplicationTests {
-
     @Test
     void contextLoads() {
     }
-
 }
