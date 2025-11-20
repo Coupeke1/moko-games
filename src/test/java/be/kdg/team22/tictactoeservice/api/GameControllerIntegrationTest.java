@@ -81,19 +81,19 @@ public class GameControllerIntegrationTest {
 
     @Test
     void shouldCreateGameWithCorrectPlayers() throws Exception {
-        UUID playerXId = UUID.randomUUID();
-        UUID playerOId = UUID.randomUUID();
+        UUID playerXUuid = UUID.randomUUID();
+        UUID playerOUuid = UUID.randomUUID();
         playersModel = new PlayersModel(Map.of(
-                playerXId, PlayerRole.X,
-                playerOId, PlayerRole.O
+                playerXUuid, PlayerRole.X,
+                playerOUuid, PlayerRole.O
         ));
         mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(playersModel)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.players[0].id.id").value(playerXId.toString()))
-                .andExpect(jsonPath("$.players[1].id.id").value(playerOId.toString()));
+                .andExpect(jsonPath("$.players[0].id.id").value(playerXUuid.toString()))
+                .andExpect(jsonPath("$.players[1].id.id").value(playerOUuid.toString()));
     }
 
     @Test
