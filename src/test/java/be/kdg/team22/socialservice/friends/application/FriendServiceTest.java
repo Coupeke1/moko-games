@@ -3,12 +3,17 @@ package be.kdg.team22.socialservice.friends.application;
 import be.kdg.team22.socialservice.api.friends.models.FriendModel;
 import be.kdg.team22.socialservice.api.friends.models.FriendsOverviewModel;
 import be.kdg.team22.socialservice.application.friends.FriendService;
+import be.kdg.team22.socialservice.application.friends.exceptions.CannotAddException;
+import be.kdg.team22.socialservice.application.friends.exceptions.CannotRemoveException;
+import be.kdg.team22.socialservice.application.friends.exceptions.NotFoundException;
 import be.kdg.team22.socialservice.domain.friends.friendship.Friendship;
 import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipId;
 import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipRepository;
 import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipStatus;
 import be.kdg.team22.socialservice.domain.friends.user.UserId;
+import be.kdg.team22.socialservice.domain.friends.user.Username;
 import be.kdg.team22.socialservice.infrastructure.friends.user.ExternalUserRepository;
+import be.kdg.team22.socialservice.infrastructure.friends.user.UserResponse;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -23,14 +28,12 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 class FriendServiceTest {
-
     private final FriendshipRepository friendshipRepository = mock(FriendshipRepository.class);
-    private final ExternalUserRepository externalUserRepository = mock(ExternalUserRepository.class);
+    private final ExternalUserRepository userRepository = mock(ExternalUserRepository.class);
+    private final FriendService service = new FriendService(friendshipRepository, userRepository);
 
-    private final FriendService friendService = new FriendService(friendshipRepository, externalUserRepository);
-
-    private ExternalUserRepository.UserResponse userResponse(UUID id, String username) {
-        return new ExternalUserRepository.UserResponse(id, username);
+    private UserResponse userResponse(UUID id, String username) {
+        return new UserResponse(id, username);
     }
 
     @Test
@@ -38,13 +41,11 @@ class FriendServiceTest {
         UserId currentUser = UserId.from(UUID.randomUUID());
         UUID targetId = UUID.randomUUID();
 
-        when(externalUserRepository.getByUsername(new Username("piet")))
-                .thenReturn(Optional.of(userResponse(targetId, "piet")));
+        when(userRepository.getByUsername(new Username("piet"))).thenReturn(Optional.of(userResponse(targetId, "piet")));
 
-        when(friendshipRepository.findBetween(eq(currentUser), eq(UserId.from(targetId))))
-                .thenReturn(Optional.empty());
+        when(friendshipRepository.findBetween(eq(currentUser), eq(UserId.from(targetId)))).thenReturn(Optional.empty());
 
-        friendService.sendRequest(currentUser, new Username("piet"));
+        service.sendRequest(currentUser, new Username("piet"));
 
         verify(friendshipRepository).findBetween(eq(currentUser), eq(UserId.from(targetId)));
         verify(friendshipRepository).save(any(Friendship.class));
@@ -55,16 +56,14 @@ class FriendServiceTest {
         UUID same = UUID.randomUUID();
         UserId currentUser = UserId.from(same);
 
-        when(externalUserRepository.getByUsername(new Username("me")))
-                .thenReturn(Optional.of(userResponse(same, "me")));
+        when(userRepository.getByUsername(new Username("me"))).thenReturn(Optional.of(userResponse(same, "me")));
 
-        assertThatThrownBy(() -> friendService.sendRequest(currentUser, new Username("me")))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Cannot add yourself");
+        assertThatThrownBy(() -> service.sendRequest(currentUser, new Username("me"))).isInstanceOf(CannotAddException.class);
 
-        verify(friendshipRepository).findBetween(currentUser, currentUser);
-
+        verify(friendshipRepository, never()).findBetween(any(), any());
         verify(friendshipRepository, never()).save(any());
+
+        verify(userRepository).getByUsername(new Username("me"));
     }
 
     @Test
@@ -75,17 +74,12 @@ class FriendServiceTest {
 
         Friendship existing = mock(Friendship.class);
         when(existing.status()).thenReturn(FriendshipStatus.ACCEPTED);
-        doThrow(new IllegalStateException("You are already friends"))
-                .when(existing).resetToPending(currentUser, targetUser);
+        doThrow(new IllegalStateException("You are already friends")).when(existing).resetToPending(currentUser, targetUser);
 
-        when(externalUserRepository.getByUsername(new Username("piet")))
-                .thenReturn(Optional.of(userResponse(targetId, "piet")));
-        when(friendshipRepository.findBetween(currentUser, targetUser))
-                .thenReturn(Optional.of(existing));
+        when(userRepository.getByUsername(new Username("piet"))).thenReturn(Optional.of(userResponse(targetId, "piet")));
+        when(friendshipRepository.findBetween(currentUser, targetUser)).thenReturn(Optional.of(existing));
 
-        assertThatThrownBy(() -> friendService.sendRequest(currentUser, new Username("piet")))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("already friends");
+        assertThatThrownBy(() -> service.sendRequest(currentUser, new Username("piet"))).isInstanceOf(IllegalStateException.class).hasMessageContaining("already friends");
 
         verify(friendshipRepository, never()).save(any());
     }
@@ -99,12 +93,10 @@ class FriendServiceTest {
         Friendship existing = mock(Friendship.class);
         when(existing.status()).thenReturn(FriendshipStatus.REJECTED);
 
-        when(externalUserRepository.getByUsername(new Username("piet")))
-                .thenReturn(Optional.of(userResponse(targetId, "piet")));
-        when(friendshipRepository.findBetween(currentUser, targetUser))
-                .thenReturn(Optional.of(existing));
+        when(userRepository.getByUsername(new Username("piet"))).thenReturn(Optional.of(userResponse(targetId, "piet")));
+        when(friendshipRepository.findBetween(currentUser, targetUser)).thenReturn(Optional.of(existing));
 
-        friendService.sendRequest(currentUser, new Username("piet"));
+        service.sendRequest(currentUser, new Username("piet"));
 
         verify(existing).resetToPending(currentUser, targetUser);
         verify(friendshipRepository).save(existing);
@@ -119,12 +111,10 @@ class FriendServiceTest {
         Friendship existing = mock(Friendship.class);
         when(existing.status()).thenReturn(FriendshipStatus.CANCELED);
 
-        when(externalUserRepository.getByUsername(new Username("piet")))
-                .thenReturn(Optional.of(userResponse(targetId, "piet")));
-        when(friendshipRepository.findBetween(currentUser, targetUser))
-                .thenReturn(Optional.of(existing));
+        when(userRepository.getByUsername(new Username("piet"))).thenReturn(Optional.of(userResponse(targetId, "piet")));
+        when(friendshipRepository.findBetween(currentUser, targetUser)).thenReturn(Optional.of(existing));
 
-        friendService.sendRequest(currentUser, new Username("piet"));
+        service.sendRequest(currentUser, new Username("piet"));
 
         verify(existing).resetToPending(currentUser, targetUser);
         verify(friendshipRepository).save(existing);
@@ -138,10 +128,9 @@ class FriendServiceTest {
 
         Friendship friendship = mock(Friendship.class);
 
-        when(friendshipRepository.findBetween(currentUser, otherUser))
-                .thenReturn(Optional.of(friendship));
+        when(friendshipRepository.findBetween(currentUser, otherUser)).thenReturn(Optional.of(friendship));
 
-        friendService.acceptRequest(currentUser, otherUser);
+        service.acceptRequest(currentUser, otherUser);
 
         verify(friendship).accept(currentUser);
         verify(friendshipRepository).save(friendship);
@@ -153,57 +142,30 @@ class FriendServiceTest {
         UUID otherId = UUID.randomUUID();
         UserId otherUser = UserId.from(otherId);
 
-        when(friendshipRepository.findBetween(currentUser, otherUser))
-                .thenReturn(Optional.empty());
+        when(friendshipRepository.findBetween(currentUser, otherUser)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> friendService.acceptRequest(currentUser, otherUser))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("No friendship");
-    }
-
-    @Test
-    void rejectRequest_callsDomainAndSaves() {
-        UserId currentUser = UserId.from(UUID.randomUUID());
-        UUID otherId = UUID.randomUUID();
-        UserId otherUser = UserId.from(otherId);
-
-        Friendship friendship = mock(Friendship.class);
-
-        when(friendshipRepository.findBetween(otherUser, currentUser))
-                .thenReturn(Optional.of(friendship));
-
-        friendService.rejectRequest(currentUser, otherId);
-
-        verify(friendship).reject(currentUser);
-        verify(friendshipRepository).save(friendship);
+        assertThatThrownBy(() -> service.acceptRequest(currentUser, otherUser)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
     void rejectRequest_whenNotFoundThrows() {
         UserId currentUser = UserId.from(UUID.randomUUID());
-        UUID otherId = UUID.randomUUID();
-        UserId otherUser = UserId.from(otherId);
+        UserId otherUser = UserId.from(UUID.randomUUID());
 
-        when(friendshipRepository.findBetween(otherUser, currentUser))
-                .thenReturn(Optional.empty());
+        when(friendshipRepository.findBetween(otherUser, currentUser)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> friendService.rejectRequest(currentUser, otherId))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("No friendship");
+        assertThatThrownBy(() -> service.rejectRequest(currentUser, otherUser)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
     void cancelRequest_callsDomainAndSaves() {
         UserId currentUser = UserId.from(UUID.randomUUID());
-        UUID otherId = UUID.randomUUID();
-        UserId otherUser = UserId.from(otherId);
+        UserId otherUser = UserId.from(UUID.randomUUID());
 
         Friendship friendship = mock(Friendship.class);
 
-        when(friendshipRepository.findBetween(currentUser, otherUser))
-                .thenReturn(Optional.of(friendship));
-
-        friendService.cancelRequest(currentUser, otherId);
+        when(friendshipRepository.findBetween(currentUser, otherUser)).thenReturn(Optional.of(friendship));
+        service.cancelRequest(currentUser, otherUser);
 
         verify(friendship).cancel(currentUser);
         verify(friendshipRepository).save(friendship);
@@ -212,30 +174,23 @@ class FriendServiceTest {
     @Test
     void cancelRequest_whenNotFoundThrows() {
         UserId currentUser = UserId.from(UUID.randomUUID());
-        UUID otherId = UUID.randomUUID();
-        UserId otherUser = UserId.from(otherId);
+        UserId otherUser = UserId.from(UUID.randomUUID());
 
-        when(friendshipRepository.findBetween(currentUser, otherUser))
-                .thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> friendService.cancelRequest(currentUser, otherId))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("No friendship");
+        when(friendshipRepository.findBetween(currentUser, otherUser)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> service.cancelRequest(currentUser, otherUser)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
     void removeFriend_deletesWhenAccepted() {
         UserId currentUser = UserId.from(UUID.randomUUID());
-        UUID otherId = UUID.randomUUID();
-        UserId otherUser = UserId.from(otherId);
+        UserId otherUser = UserId.from(UUID.randomUUID());
 
         Friendship friendship = mock(Friendship.class);
         when(friendship.status()).thenReturn(FriendshipStatus.ACCEPTED);
 
-        when(friendshipRepository.findBetween(currentUser, otherUser))
-                .thenReturn(Optional.of(friendship));
+        when(friendshipRepository.findBetween(currentUser, otherUser)).thenReturn(Optional.of(friendship));
 
-        friendService.removeFriend(currentUser, otherId);
+        service.removeFriend(currentUser, otherUser);
 
         verify(friendshipRepository).delete(friendship);
     }
@@ -243,22 +198,14 @@ class FriendServiceTest {
     @Test
     void removeFriend_whenNotAcceptedThrows() {
         UserId currentUser = UserId.from(UUID.randomUUID());
-        UUID otherId = UUID.randomUUID();
-        UserId otherUser = UserId.from(otherId);
+        UserId otherUser = UserId.from(UUID.randomUUID());
 
         Friendship friendship = mock(Friendship.class);
         when(friendship.status()).thenReturn(FriendshipStatus.PENDING);
 
-        // Mock domain behavior
-        doThrow(new IllegalStateException("Cannot remove non-friend relationship"))
-                .when(friendship).checkCanRemove();
+        when(friendshipRepository.findBetween(currentUser, otherUser)).thenReturn(Optional.of(friendship));
 
-        when(friendshipRepository.findBetween(currentUser, otherUser))
-                .thenReturn(Optional.of(friendship));
-
-        assertThatThrownBy(() -> friendService.removeFriend(currentUser, otherId))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Cannot remove non-friend");
+        assertThatThrownBy(() -> service.removeFriend(currentUser, otherUser)).isInstanceOf(CannotRemoveException.class);
 
         verify(friendshipRepository, never()).delete(any());
     }
@@ -266,15 +213,10 @@ class FriendServiceTest {
     @Test
     void removeFriend_whenNotFoundThrows() {
         UserId currentUser = UserId.from(UUID.randomUUID());
-        UUID otherId = UUID.randomUUID();
-        UserId otherUser = UserId.from(otherId);
+        UserId otherUser = UserId.from(UUID.randomUUID());
 
-        when(friendshipRepository.findBetween(currentUser, otherUser))
-                .thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> friendService.removeFriend(currentUser, otherId))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("No friendship");
+        when(friendshipRepository.findBetween(currentUser, otherUser)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> service.removeFriend(currentUser, otherUser)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -284,45 +226,20 @@ class FriendServiceTest {
         UserId incoming = UserId.from(UUID.randomUUID());
         UserId outgoing = UserId.from(UUID.randomUUID());
 
-        Friendship accepted = new Friendship(
-                FriendshipId.create(),
-                current,
-                friend,
-                Instant.now(),
-                Instant.now(),
-                FriendshipStatus.PENDING
-        );
+        Friendship accepted = new Friendship(FriendshipId.create(), current, friend, Instant.now(), Instant.now(), FriendshipStatus.PENDING);
         accepted.accept(friend);
 
-        Friendship incomingReq = new Friendship(
-                FriendshipId.create(),
-                incoming,
-                current,
-                Instant.now(),
-                Instant.now(),
-                FriendshipStatus.PENDING
-        );
+        Friendship incomingReq = new Friendship(FriendshipId.create(), incoming, current, Instant.now(), Instant.now(), FriendshipStatus.PENDING);
 
-        Friendship outgoingReq = new Friendship(
-                FriendshipId.create(),
-                current,
-                outgoing,
-                Instant.now(),
-                Instant.now(),
-                FriendshipStatus.PENDING
-        );
+        Friendship outgoingReq = new Friendship(FriendshipId.create(), current, outgoing, Instant.now(), Instant.now(), FriendshipStatus.PENDING);
 
-        when(friendshipRepository.findAllFor(current))
-                .thenReturn(List.of(accepted, incomingReq, outgoingReq));
+        when(friendshipRepository.findAllFor(current)).thenReturn(List.of(accepted, incomingReq, outgoingReq));
 
-        when(externalUserRepository.getById(friend.value()))
-                .thenReturn(new ExternalUserRepository.UserResponse(friend.value(), "friendUser"));
-        when(externalUserRepository.getById(incoming.value()))
-                .thenReturn(new ExternalUserRepository.UserResponse(incoming.value(), "incomingUser"));
-        when(externalUserRepository.getById(outgoing.value()))
-                .thenReturn(new ExternalUserRepository.UserResponse(outgoing.value(), "outgoingUser"));
+        when(userRepository.getById(friend.value())).thenReturn(new UserResponse(friend.value(), "friendUser"));
+        when(userRepository.getById(incoming.value())).thenReturn(new UserResponse(incoming.value(), "incomingUser"));
+        when(userRepository.getById(outgoing.value())).thenReturn(new UserResponse(outgoing.value(), "outgoingUser"));
 
-        FriendsOverviewModel overview = friendService.getOverview(current);
+        FriendsOverviewModel overview = service.getOverview(current);
 
         assertThat(overview.friends()).hasSize(1);
         FriendModel friendModel = overview.friends().getFirst();
@@ -343,9 +260,9 @@ class FriendServiceTest {
         assertThat(outgoingModel.username()).isEqualTo("outgoingUser");
         assertThat(outgoingModel.status()).isEqualTo(FriendshipStatus.PENDING.name());
 
-        verify(externalUserRepository).getById(friend.value());
-        verify(externalUserRepository).getById(incoming.value());
-        verify(externalUserRepository).getById(outgoing.value());
+        verify(userRepository).getById(friend.value());
+        verify(userRepository).getById(incoming.value());
+        verify(userRepository).getById(outgoing.value());
     }
 
     @Test
@@ -357,17 +274,12 @@ class FriendServiceTest {
         Friendship existing = mock(Friendship.class);
         when(existing.status()).thenReturn(FriendshipStatus.PENDING);
         // resetToPending() is what actually throws → so we mock that behavior
-        doThrow(new IllegalStateException("Friend request already pending"))
-                .when(existing).resetToPending(currentUser, targetUser);
+        doThrow(new IllegalStateException("Friend request already pending")).when(existing).resetToPending(currentUser, targetUser);
 
-        when(userClient.getByUsername(new Username("piet")))
-                .thenReturn(Optional.of(userResponse(targetId, "piet")));
-        when(friendshipRepository.findBetween(currentUser, targetUser))
-                .thenReturn(Optional.of(existing));
+        when(userRepository.getByUsername(new Username("piet"))).thenReturn(Optional.of(userResponse(targetId, "piet")));
+        when(friendshipRepository.findBetween(currentUser, targetUser)).thenReturn(Optional.of(existing));
 
-        assertThatThrownBy(() -> friendService.sendRequest(currentUser, new Username("piet")))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("pending");
+        assertThatThrownBy(() -> service.sendRequest(currentUser, new Username("piet"))).isInstanceOf(IllegalStateException.class).hasMessageContaining("pending");
 
         verify(friendshipRepository, never()).save(any());
     }

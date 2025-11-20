@@ -3,17 +3,22 @@ package be.kdg.team22.socialservice.friends.domain;
 import be.kdg.team22.socialservice.domain.friends.friendship.Friendship;
 import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipId;
 import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipStatus;
+import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.CannotAcceptException;
+import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.NoMatchingUsersException;
 import be.kdg.team22.socialservice.domain.friends.user.UserId;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class FriendshipTest {
 
-    private UserId user(UUID id) { return UserId.from(id); }
+    private UserId user(UUID id) {
+        return UserId.from(id);
+    }
 
     @Test
     void createNew_initializesCorrectly() {
@@ -55,7 +60,7 @@ class FriendshipTest {
         );
 
         assertThatThrownBy(() -> f.accept(other))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(CannotAcceptException.class);
     }
 
     @Test
@@ -90,17 +95,15 @@ class FriendshipTest {
     void resetToPending_updatesState() {
         UserId a = user(UUID.randomUUID());
         UserId b = user(UUID.randomUUID());
-        UserId c = user(UUID.randomUUID());
-        UserId d = user(UUID.randomUUID());
 
         Friendship f = new Friendship(a, b);
         f.reject(b);
 
-        f.resetToPending(c, d);
+        f.resetToPending(a, b);
 
         assertThat(f.status()).isEqualTo(FriendshipStatus.PENDING);
-        assertThat(f.requester()).isEqualTo(c);
-        assertThat(f.receiver()).isEqualTo(d);
+        assertThat(f.requester()).isEqualTo(a);
+        assertThat(f.receiver()).isEqualTo(b);
     }
 
     @Test
@@ -128,6 +131,6 @@ class FriendshipTest {
 
         UserId c = user(UUID.randomUUID());
         assertThatThrownBy(() -> f.otherSide(c))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(NoMatchingUsersException.class);
     }
 }

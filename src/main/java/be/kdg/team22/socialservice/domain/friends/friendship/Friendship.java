@@ -1,5 +1,6 @@
 package be.kdg.team22.socialservice.domain.friends.friendship;
 
+import be.kdg.team22.socialservice.application.friends.exceptions.CannotRemoveException;
 import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.CannotAcceptException;
 import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.NoMatchingUsersException;
 import be.kdg.team22.socialservice.domain.friends.user.UserId;
@@ -73,8 +74,16 @@ public class Friendship {
         throw new NoMatchingUsersException();
     }
 
+    public void checkCanRemove() {
+        if (status == FriendshipStatus.ACCEPTED)
+            return;
+        throw new CannotRemoveException();
+    }
+
     private void checkBeforeChanging(UserId user) {
-        if (!user.value().equals(receiver.value()) || status != FriendshipStatus.PENDING)
+        boolean isRequesterOrReceiver = user.value().equals(requester.value()) || user.value().equals(receiver.value());
+
+        if (!isRequesterOrReceiver || status != FriendshipStatus.PENDING)
             throw new CannotAcceptException();
     }
 

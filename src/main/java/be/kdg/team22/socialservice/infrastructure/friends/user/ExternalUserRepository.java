@@ -10,6 +10,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -20,16 +21,15 @@ public class ExternalUserRepository {
         this.client = client;
     }
 
-    public UserResponse getByUsername(Username username) {
+    public Optional<UserResponse> getByUsername(Username username) {
         try {
-            return client.get().uri("/find/{username}", username).retrieve().body(UserResponse.class);
+            UserResponse response = client.get().uri("/find/{username}", username).retrieve().body(UserResponse.class);
+            return Optional.ofNullable(response);
         } catch (
                 HttpClientErrorException exception) {
-            if (exception.getStatusCode() != HttpStatus.NOT_FOUND)
-                throw exception;
-
-            throw new IllegalArgumentException("User with username '%s' not found".formatted(username));
-
+            if (exception.getStatusCode() == HttpStatus.NOT_FOUND)
+                return Optional.empty();
+            throw exception;
         } catch (
                 RestClientException exception) {
             throw new NotReachableException("user-service");

@@ -49,12 +49,14 @@ public class FriendsController {
     @PostMapping("/cancel/{id}")
     public void cancel(@AuthenticationPrincipal final Jwt token, @PathVariable final UUID id) {
         UserId currentUser = UserId.get(token);
-        service.cancelRequest(currentUser, id);
+        UserId otherUser = UserId.from(id);
+        service.cancelRequest(currentUser, otherUser);
     }
 
     @DeleteMapping("/remove/{id}")
     public void remove(@AuthenticationPrincipal final Jwt token, @PathVariable final UUID id) {
         UserId currentUser = UserId.get(token);
-        service.removeFriend(currentUser, id);
+        UserId otherUser = UserId.from(id);
+        service.removeFriend(currentUser, otherUser);
     }
 }

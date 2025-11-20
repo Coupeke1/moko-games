@@ -2,7 +2,8 @@ package be.kdg.team22.socialservice.application.friends;
 
 import be.kdg.team22.socialservice.api.friends.models.FriendModel;
 import be.kdg.team22.socialservice.api.friends.models.FriendsOverviewModel;
-import be.kdg.team22.socialservice.application.friends.exceptions.*;
+import be.kdg.team22.socialservice.application.friends.exceptions.CannotAddException;
+import be.kdg.team22.socialservice.application.friends.exceptions.NotFoundException;
 import be.kdg.team22.socialservice.domain.friends.friendship.Friendship;
 import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipRepository;
 import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipStatus;
@@ -14,8 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Transactional
 @Service
@@ -29,39 +28,24 @@ public class FriendService {
     }
 
     public void sendRequest(UserId user, Username targetUsername) {
-        UserResponse response = userRepository.getByUsername(targetUsername);
-        UserId targetUser = UserId.from(response.id());
+        UserResponse targetUserResponse = userRepository.getByUsername(targetUsername).orElseThrow(targetUsername::notFound);
+        UserId targetUser = UserId.from(targetUserResponse.id());
 
-        if (user.value().equals(targetUser.value()))
+        if (user.equals(targetUser))
             throw new CannotAddException(targetUsername);
 
-        Optional<Friendship> existingFriendship = friendshipRepository.findBetween(user, targetUser);
+        Friendship friendship = friendshipRepository.findBetween(user, targetUser).map(existingFriendship -> {
+            existingFriendship.resetToPending(user, targetUser);
+            return existingFriendship;
+        }).orElseGet(() -> new Friendship(user, targetUser));
 
-        if (existingFriendship.isPresent()) {
-            Friendship existing = existingFriendship.get();
-
-            switch (existing.status()) {
-                case PENDING ->
-                        throw new AlreadyPendingException(existing.id());
-                case ACCEPTED ->
-                        throw new AlreadyFriendsException(targetUsername);
-
-                case REJECTED, CANCELED -> {
-                    existing.resetToPending(user, targetUser);
-                    friendshipRepository.save(existing);
-                    return;
-                }
-            }
-        }
-
-        Friendship friendship = new Friendship(user, targetUser);
         friendshipRepository.save(friendship);
     }
 
-    public void acceptRequest(UserId user, UserId otherUser) {
-        Friendship friendship = friendshipRepository.findBetween(user, otherUser).orElseThrow(NotFoundException::new);
+    public void acceptRequest(UserId currentUser, UserId otherUser) {
+        Friendship friendship = friendshipRepository.findBetween(currentUser, otherUser).orElseThrow(() -> NotFoundException.betweenFriendship(currentUser, otherUser));
 
-        friendship.accept(user);
+        friendship.accept(currentUser);
         friendshipRepository.save(friendship);
     }
 
@@ -72,21 +56,17 @@ public class FriendService {
         friendshipRepository.save(friendship);
     }
 
-    public void removeFriend(UserId user, UUID otherUserId) {
-        UserId otherUser = UserId.from(otherUserId);
-        Friendship friendship = friendshipRepository.findBetween(user, otherUser).orElseThrow(NotFoundException::new);
+    public void removeFriend(UserId currentUser, UserId otherUser) {
+        Friendship friendship = friendshipRepository.findBetween(currentUser, otherUser).orElseThrow(() -> NotFoundException.betweenFriendship(currentUser, otherUser));
 
-        if (friendship.status() != FriendshipStatus.ACCEPTED)
-            throw new CannotRemoveException();
-
+        friendship.checkCanRemove();
         friendshipRepository.delete(friendship);
     }
 
-    public void cancelRequest(UserId user, UUID otherUserId) {
-        UserId otherUser = UserId.from(otherUserId);
-        Friendship friendship = friendshipRepository.findBetween(user, otherUser).orElseThrow(NotFoundException::new);
+    public void cancelRequest(UserId currentUser, UserId otherUser) {
+        Friendship friendship = friendshipRepository.findBetween(currentUser, otherUser).orElseThrow(() -> NotFoundException.betweenFriendship(currentUser, otherUser));
 
-        friendship.cancel(user);
+        friendship.cancel(currentUser);
         friendshipRepository.save(friendship);
     }
 
