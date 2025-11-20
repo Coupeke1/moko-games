@@ -8,6 +8,8 @@ import be.kdg.team22.sessionservice.domain.lobby.exceptions.OwnerNotValidExcepti
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 public class LobbyService {
@@ -36,5 +38,9 @@ public class LobbyService {
     public Lobby findLobby(LobbyId id) {
         return lobbyRepository.findById(id)
                 .orElseThrow(() -> new LobbyNotFoundException(id.value()));
+    }
+
+    public List<Lobby> findAllLobbies() {
+        return lobbyRepository.findAll();
     }
 }
