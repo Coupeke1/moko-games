@@ -5,6 +5,8 @@ import be.kdg.team22.sessionservice.domain.lobby.exceptions.GameNotValidExceptio
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.LobbyCreationException;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.LobbyNotFoundException;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.OwnerNotValidException;
+import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
+import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -24,8 +26,6 @@ class LobbyServiceTest {
     void createLobby_savesLobby_andReturnsIt() {
         GameId gameId = new GameId(UUID.randomUUID());
         PlayerId owner = new PlayerId(UUID.randomUUID());
-
-        Lobby lobby = new Lobby(gameId, owner);
 
         doNothing().when(repo).save(any(Lobby.class));
 
@@ -64,7 +64,7 @@ class LobbyServiceTest {
 
     @Test
     void findLobby_returnsLobby() {
-        LobbyId id = LobbyId.newId();
+        LobbyId id = LobbyId.create();
         Lobby lobby = mock(Lobby.class);
 
         when(repo.findById(id)).thenReturn(Optional.of(lobby));
@@ -74,7 +74,7 @@ class LobbyServiceTest {
 
     @Test
     void findLobby_notFound_throws() {
-        LobbyId id = LobbyId.newId();
+        LobbyId id = LobbyId.create();
 
         when(repo.findById(id)).thenReturn(Optional.empty());
 
@@ -89,5 +89,65 @@ class LobbyServiceTest {
         when(repo.findAll()).thenReturn(list);
 
         assertThat(service.findAllLobbies()).containsExactlyElementsOf(list);
+    }
+
+    // ---------- NIEUWE TESTS VOOR CLOSE & SETTINGS ----------
+
+    @Test
+    void closeLobby_closesAndSaves() {
+        GameId gameId = new GameId(UUID.randomUUID());
+        PlayerId owner = new PlayerId(UUID.randomUUID());
+        Lobby lobby = new Lobby(gameId, owner);
+        LobbyId id = lobby.id();
+
+        when(repo.findById(id)).thenReturn(Optional.of(lobby));
+
+        Lobby result = service.closeLobby(id, owner);
+
+        assertThat(result.status()).isEqualTo(LobbyStatus.CANCELLED);
+        verify(repo).save(lobby);
+    }
+
+    @Test
+    void closeLobby_notFound_throws() {
+        LobbyId id = LobbyId.create();
+        PlayerId owner = new PlayerId(UUID.randomUUID());
+
+        when(repo.findById(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.closeLobby(id, owner))
+                .isInstanceOf(LobbyNotFoundException.class);
+    }
+
+    @Test
+    void updateSettings_updatesAndSaves() {
+        GameId gameId = new GameId(UUID.randomUUID());
+        PlayerId owner = new PlayerId(UUID.randomUUID());
+        Lobby lobby = new Lobby(gameId, owner);
+        LobbyId id = lobby.id();
+
+        when(repo.findById(id)).thenReturn(Optional.of(lobby));
+
+        LobbySettings newSettings =
+                new LobbySettings(new TicTacToeSettings(3), 5);
+
+        Lobby result = service.updateSettings(id, owner, newSettings);
+
+        assertThat(result.settings().maxPlayers()).isEqualTo(5);
+        assertThat(result.settings().gameSettings()).isInstanceOf(TicTacToeSettings.class);
+        verify(repo).save(lobby);
+    }
+
+    @Test
+    void updateSettings_notFound_throws() {
+        LobbyId id = LobbyId.create();
+        PlayerId owner = new PlayerId(UUID.randomUUID());
+        LobbySettings settings =
+                new LobbySettings(new TicTacToeSettings(3), 4);
+
+        when(repo.findById(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.updateSettings(id, owner, settings))
+                .isInstanceOf(LobbyNotFoundException.class);
     }
 }

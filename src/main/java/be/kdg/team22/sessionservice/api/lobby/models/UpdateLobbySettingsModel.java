@@ -1,4 +1,7 @@
 package be.kdg.team22.sessionservice.api.lobby.models;
 
-public record UpdateLobbySettingsModel(int maxPlayers) {
+public record UpdateLobbySettingsModel(
+        int maxPlayers,
+        GameSettingsModel settings
+) {
 }
