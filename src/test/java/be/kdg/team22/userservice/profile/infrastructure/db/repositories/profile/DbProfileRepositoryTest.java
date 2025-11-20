@@ -1,11 +1,13 @@
 package be.kdg.team22.userservice.profile.infrastructure.db.repositories.profile;
 
+import be.kdg.team22.userservice.config.TestcontainersConfig;
 import be.kdg.team22.userservice.profile.infrastructure.db.repositories.profile.jpa.JpaProfileRepository;
 import be.kdg.team22.userservice.profile.infrastructure.db.repositories.profile.jpa.ProfileEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.context.annotation.Import;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -15,7 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
-@ActiveProfiles("test")
+@Import(TestcontainersConfig.class)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class DbProfileRepositoryTest {
     @Autowired
     private JpaProfileRepository jpaRepo;
