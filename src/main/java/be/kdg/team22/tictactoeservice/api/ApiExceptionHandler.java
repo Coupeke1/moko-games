@@ -1,6 +1,8 @@
 package be.kdg.team22.tictactoeservice.api;
 
 import be.kdg.team22.tictactoeservice.domain.NotFoundException;
+import be.kdg.team22.tictactoeservice.domain.game.InvalidGameIdException;
+import be.kdg.team22.tictactoeservice.domain.player.InvalidPlayerIdException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -21,6 +23,16 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<String> handleIllegalStateException(IllegalStateException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidPlayerIdException.class)
+    public ResponseEntity<String> handleInvalidPlayerIdException(InvalidPlayerIdException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidGameIdException.class)
+    public ResponseEntity<String> handleInvalidGameIdException(InvalidGameIdException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 }

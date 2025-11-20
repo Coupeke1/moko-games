@@ -1,14 +1,14 @@
-package be.kdg.team22.tictactoeservice.domain;
+package be.kdg.team22.tictactoeservice.domain.game;
 
 import org.jmolecules.ddd.annotation.ValueObject;
-import org.springframework.util.Assert;
 
 import java.util.UUID;
 
 @ValueObject
 public record GameId(UUID id) {
     public GameId {
-        Assert.notNull(id, "Game id must not be null");
+        if (id == null)
+            throw new InvalidGameIdException();
     }
 
     public static GameId create() {
