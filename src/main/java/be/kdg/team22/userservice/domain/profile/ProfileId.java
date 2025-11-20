@@ -19,7 +19,7 @@ public record ProfileId(UUID value) {
     public static ProfileId get(Jwt token) {
         String sub = token.getClaimAsString(StandardClaimNames.SUB);
         if (sub == null)
-            throw new ClaimNotFoundException("sub");
+            throw ClaimNotFoundException.sub();
 
         return create(sub);
     }
