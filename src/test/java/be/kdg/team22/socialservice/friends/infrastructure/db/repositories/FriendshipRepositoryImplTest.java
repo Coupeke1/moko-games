@@ -1,9 +1,12 @@
 package be.kdg.team22.socialservice.friends.infrastructure.db.repositories;
 
-import be.kdg.team22.socialservice.friends.domain.Friendship;
-import be.kdg.team22.socialservice.friends.domain.FriendshipId;
-import be.kdg.team22.socialservice.friends.domain.UserId;
-import be.kdg.team22.socialservice.friends.infrastructure.db.entities.FriendshipEntity;
+import be.kdg.team22.socialservice.domain.friends.friendship.Friendship;
+import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipId;
+import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipStatus;
+import be.kdg.team22.socialservice.domain.friends.user.UserId;
+import be.kdg.team22.socialservice.infrastructure.friends.friendship.db.entities.FriendshipEntity;
+import be.kdg.team22.socialservice.infrastructure.friends.friendship.db.repositories.FriendshipJpaRepository;
+import be.kdg.team22.socialservice.infrastructure.friends.friendship.db.repositories.FriendshipRepositoryImpl;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -25,7 +28,7 @@ class FriendshipRepositoryImplTest {
                 id,
                 requester,
                 receiver,
-                be.kdg.team22.socialservice.friends.domain.FriendshipStatus.PENDING,
+                FriendshipStatus.PENDING,
                 Instant.now(),
                 Instant.now()
         );

@@ -1,5 +1,9 @@
 package be.kdg.team22.socialservice.friends.domain;
 
+import be.kdg.team22.socialservice.domain.friends.friendship.Friendship;
+import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipId;
+import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipStatus;
+import be.kdg.team22.socialservice.domain.friends.user.UserId;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -31,7 +35,7 @@ class FriendshipTest {
         UserId receiver = user(UUID.randomUUID());
 
         Friendship f = new Friendship(
-                FriendshipId.newId(), requester, receiver,
+                FriendshipId.create(), requester, receiver,
                 Instant.now(), Instant.now(), FriendshipStatus.PENDING
         );
 
@@ -46,7 +50,7 @@ class FriendshipTest {
         UserId other = user(UUID.randomUUID());
 
         Friendship f = new Friendship(
-                FriendshipId.newId(), requester, receiver,
+                FriendshipId.create(), requester, receiver,
                 Instant.now(), Instant.now(), FriendshipStatus.PENDING
         );
 
@@ -60,7 +64,7 @@ class FriendshipTest {
         UserId receiver = user(UUID.randomUUID());
 
         Friendship f = new Friendship(
-                FriendshipId.newId(), requester, receiver,
+                FriendshipId.create(), requester, receiver,
                 Instant.now(), Instant.now(), FriendshipStatus.PENDING
         );
 
@@ -74,7 +78,7 @@ class FriendshipTest {
         UserId receiver = user(UUID.randomUUID());
 
         Friendship f = new Friendship(
-                FriendshipId.newId(), requester, receiver,
+                FriendshipId.create(), requester, receiver,
                 Instant.now(), Instant.now(), FriendshipStatus.PENDING
         );
 
