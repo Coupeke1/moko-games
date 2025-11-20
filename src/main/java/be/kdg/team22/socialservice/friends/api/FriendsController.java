@@ -4,7 +4,7 @@ import be.kdg.team22.socialservice.friends.api.models.AddFriendRequestModel;
 import be.kdg.team22.socialservice.friends.api.models.FriendsOverviewModel;
 import be.kdg.team22.socialservice.friends.application.FriendService;
 import be.kdg.team22.socialservice.friends.domain.UserId;
-
+import be.kdg.team22.socialservice.friends.domain.Username;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -27,18 +27,19 @@ public class FriendsController {
         return friendService.getOverview(currentUser);
     }
 
-    @PostMapping("/add")
+    @PostMapping
     public void addFriend(@AuthenticationPrincipal Jwt jwt,
                           @RequestBody AddFriendRequestModel request) {
         UserId currentUser = UserId.get(jwt);
-        friendService.sendFriendRequest(currentUser, request.username());
+        friendService.sendFriendRequest(currentUser, new Username(request.username()));
     }
 
     @PostMapping("/accept/{id}")
     public void accept(@AuthenticationPrincipal Jwt jwt,
                        @PathVariable UUID id) {
         UserId currentUser = UserId.get(jwt);
-        friendService.acceptRequest(currentUser, id);
+        UserId other = UserId.from(id);
+        friendService.acceptRequest(currentUser, other);
     }
 
     @PostMapping("/reject/{id}")

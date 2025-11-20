@@ -2,16 +2,12 @@ package be.kdg.team22.socialservice.friends.application;
 
 import be.kdg.team22.socialservice.friends.api.models.FriendModel;
 import be.kdg.team22.socialservice.friends.api.models.FriendsOverviewModel;
-import be.kdg.team22.socialservice.friends.domain.Friendship;
-import be.kdg.team22.socialservice.friends.domain.FriendshipRepository;
-import be.kdg.team22.socialservice.friends.domain.FriendshipStatus;
-import be.kdg.team22.socialservice.friends.domain.UserId;
+import be.kdg.team22.socialservice.friends.domain.*;
 import be.kdg.team22.socialservice.friends.infrastructure.http.UserClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Transactional
@@ -26,40 +22,25 @@ public class FriendService {
         this.userClient = userClient;
     }
 
-    public void sendFriendRequest(UserId currentUser, String targetUsername) {
-        UserClient.UserResponse targetUserResponse = userClient.getByUsername(targetUsername);
+    public void sendFriendRequest(UserId currentUser, Username targetUsername) {
+        UserClient.UserResponse targetUserResponse = userClient.getByUsername(targetUsername)
+                .orElseThrow(targetUsername::notFound);
         UserId targetUser = UserId.from(targetUserResponse.id());
 
-        if (currentUser.value().equals(targetUser.value())) {
-            throw new IllegalArgumentException("Cannot add yourself as a friend");
-        }
+        Friendship friendship = friendshipRepository.findBetween(currentUser, targetUser)
+                .map(existingFriendship -> {
+                    existingFriendship.resetToPending(currentUser, targetUser);
+                    return existingFriendship;
+                })
+                .orElseGet(() -> new Friendship(currentUser, targetUser));
 
-        Optional<Friendship> existingFriendship = friendshipRepository.findBetween(currentUser, targetUser);
-
-        if (existingFriendship.isPresent()) {
-            Friendship existing = existingFriendship.get();
-
-            switch (existing.status()) {
-                case PENDING -> throw new IllegalStateException("Friend request already pending");
-                case ACCEPTED -> throw new IllegalStateException("You are already friends");
-
-                case REJECTED, CANCELED -> {
-                    existing.resetToPending(currentUser, targetUser);
-                    friendshipRepository.save(existing);
-                    return;
-                }
-            }
-        }
-
-        Friendship friendship = new Friendship(currentUser, targetUser);
         friendshipRepository.save(friendship);
     }
 
-    public void acceptRequest(UserId currentUser, UUID otherUserId) {
-        UserId other = UserId.from(otherUserId);
+    public void acceptRequest(UserId currentUser, UserId otherUser) {
 
-        Friendship friendship = friendshipRepository.findBetween(currentUser, other)
-                .orElseThrow(() -> new IllegalArgumentException("No friendship found"));
+        Friendship friendship = friendshipRepository.findBetween(currentUser, otherUser)
+                .orElseThrow(() -> NotFoundException.betweenFriendship(currentUser, otherUser));
 
         friendship.accept(currentUser);
 
@@ -70,7 +51,7 @@ public class FriendService {
         UserId other = UserId.from(otherUserId);
 
         Friendship friendship = friendshipRepository.findBetween(other, currentUser)
-                .orElseThrow(() -> new IllegalArgumentException("No friendship found"));
+                .orElseThrow(() -> NotFoundException.betweenFriendship(currentUser, other));
 
         friendship.reject(currentUser);
 
@@ -81,11 +62,9 @@ public class FriendService {
         UserId other = UserId.from(otherUserId);
 
         Friendship friendship = friendshipRepository.findBetween(currentUser, other)
-                .orElseThrow(() -> new IllegalArgumentException("No friendship found"));
+                .orElseThrow(() -> NotFoundException.betweenFriendship(currentUser, other));
 
-        if (friendship.status() != FriendshipStatus.ACCEPTED) {
-            throw new IllegalStateException("Cannot remove non-friend relationship");
-        }
+        friendship.checkCanRemove();
 
         friendshipRepository.delete(friendship);
     }
@@ -93,7 +72,7 @@ public class FriendService {
     public void cancelRequest(UserId currentUser, UUID otherUserId) {
         UserId other = UserId.from(otherUserId);
         Friendship friendship = friendshipRepository.findBetween(currentUser, other)
-                .orElseThrow(() -> new IllegalArgumentException("No friendship found"));
+                .orElseThrow(() -> NotFoundException.betweenFriendship(currentUser, other));
 
         friendship.cancel(currentUser);
 

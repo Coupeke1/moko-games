@@ -72,7 +72,7 @@ class FriendsControllerTest {
     @Test
     void addFriend_callsServiceWithCorrectUsername() throws Exception {
         mockMvc.perform(
-                        post("/api/friends/add")
+                        post("/api/friends")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {"username": "piet"}

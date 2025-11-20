@@ -1,11 +1,13 @@
 package be.kdg.team22.socialservice.friends.infrastructure.http;
 
+import be.kdg.team22.socialservice.friends.domain.Username;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -21,15 +23,15 @@ public class UserClient {
 
     public record UserResponse(UUID id, String username) { }
 
-    public UserResponse getByUsername(String username) {
+    public Optional<UserResponse> getByUsername(Username username) {
         try {
-            return restClient.get()
+            return Optional.ofNullable(restClient.get()
                     .uri("/find/{username}", username)
                     .retrieve()
-                    .body(UserResponse.class);
+                    .body(UserResponse.class));
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                throw new IllegalArgumentException("User with username '%s' not found".formatted(username));
+                return Optional.empty();
             }
             throw e;
         } catch (RestClientException e) {

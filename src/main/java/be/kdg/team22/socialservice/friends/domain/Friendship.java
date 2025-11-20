@@ -3,8 +3,8 @@ package be.kdg.team22.socialservice.friends.domain;
 import java.time.Instant;
 import java.util.Objects;
 
-public class Friendship {
 
+public class Friendship {
     private final FriendshipId id;
     private UserId requester;
     private UserId receiver;
@@ -34,6 +34,9 @@ public class Friendship {
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
         this.status = FriendshipStatus.PENDING;
+        if (requester.equals(receiver)) {
+            throw new IllegalArgumentException("Cannot add yourself as a friend");
+        }
     }
 
     public void accept(UserId actingUser) {
@@ -56,6 +59,12 @@ public class Friendship {
         this.updatedAt = Instant.now();
     }
 
+    public void checkCanRemove() {
+        if (status != FriendshipStatus.ACCEPTED) {
+            throw new IllegalStateException("Cannot remove non-friend relationship");
+        }
+    }
+
     public void cancel(UserId actingUser) {
         if (!actingUser.value().equals(requester.value()))
             throw new IllegalStateException("Only requester can cancel this request");
@@ -67,10 +76,16 @@ public class Friendship {
     }
 
     public void resetToPending(UserId requester, UserId receiver) {
-        this.requester = requester;
-        this.receiver = receiver;
-        this.status = FriendshipStatus.PENDING;
-        this.updatedAt = Instant.now();
+        switch (status) {
+            case PENDING -> throw new IllegalStateException("Friend request already pending");
+            case ACCEPTED -> throw new IllegalStateException("You are already friends");
+            case REJECTED, CANCELED -> {
+                this.requester = requester;
+                this.receiver = receiver;
+                this.status = FriendshipStatus.PENDING;
+                this.updatedAt = Instant.now();
+            }
+        }
     }
 
     public FriendshipId id() {
