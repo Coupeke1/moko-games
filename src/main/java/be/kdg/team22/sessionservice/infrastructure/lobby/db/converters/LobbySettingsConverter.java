@@ -1,6 +1,7 @@
 package be.kdg.team22.sessionservice.infrastructure.lobby.db.converters;
 
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
+import be.kdg.team22.sessionservice.infrastructure.lobby.db.exceptions.SettingsConversionException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;
@@ -16,7 +17,7 @@ public class LobbySettingsConverter implements AttributeConverter<LobbySettings,
         try {
             return mapper.writeValueAsString(attribute);
         } catch (Exception e) {
-            throw new IllegalStateException("Could not serialize LobbySettings", e);
+            throw SettingsConversionException.serializationError(attribute.getClass(), e);
         }
     }
 
@@ -26,7 +27,7 @@ public class LobbySettingsConverter implements AttributeConverter<LobbySettings,
             return mapper.readValue(dbData, new TypeReference<>() {
             });
         } catch (Exception e) {
-            throw new IllegalStateException("Could not deserialize LobbySettings", e);
+            throw SettingsConversionException.deserializationError(dbData, e);
         }
     }
 }

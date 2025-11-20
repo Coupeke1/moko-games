@@ -1,6 +1,7 @@
 package be.kdg.team22.sessionservice.api.lobby;
 
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.*;
+import be.kdg.team22.sessionservice.infrastructure.lobby.db.exceptions.SettingsConversionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -33,7 +34,6 @@ public class ExceptionController {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-
     @ExceptionHandler({
             CannotJoinClosedLobbyException.class,
             PlayerAlreadyInLobbyException.class,
@@ -48,8 +48,19 @@ public class ExceptionController {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(SettingsConversionException.class)
+    public ResponseEntity<String> handleSettingsConversion(final SettingsConversionException exception) {
+        return new ResponseEntity<>(
+                "Settings conversion error: " + exception.getMessage(),
+                HttpStatus.INTERNAL_SERVER_ERROR
+        );
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleUnknown(final Exception exception) {
-        return new ResponseEntity<>("Internal server error: " + exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(
+                "Internal server error: " + exception.getMessage(),
+                HttpStatus.INTERNAL_SERVER_ERROR
+        );
     }
 }
