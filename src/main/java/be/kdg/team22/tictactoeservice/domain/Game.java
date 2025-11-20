@@ -9,12 +9,20 @@ public class Game {
     private GameStatus status;
     private Player currentPlayer;
 
-    public Game(int requestedSize) {
+    private Game(int requestedSize) {
         this.id = GameId.create();
         this.board = Board.create(requestedSize);
         this.status = GameStatus.IN_PROGRESS;
 
         this.currentPlayer = Player.X;
+    }
+
+    public static Game create(int minSize, int maxSize, int size) {
+        if (size < minSize || size > maxSize) {
+            throw new IllegalArgumentException("Board size must be between " + minSize + " and " + maxSize);
+        }
+
+        return new Game(size);
     }
 
     public GameId getId() {

@@ -19,11 +19,7 @@ public class GameService {
     }
 
     public Game startGame(int requestedSize) {
-        if (requestedSize < boardConfig.getMinSize() || requestedSize > boardConfig.getMaxSize()) {
-            throw new IllegalArgumentException("Board size must be between " + boardConfig.getMinSize() + " and " + boardConfig.getMaxSize());
-        }
-
-        Game game = new Game(requestedSize);
+        Game game = Game.create(boardConfig.getMinSize(),  boardConfig.getMaxSize(), requestedSize);
         gameRepository.save(game);
         return game;
     }
