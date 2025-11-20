@@ -36,14 +36,16 @@ Authorization: Bearer {{owner_token}}
 Content-Type: application/json
 
 {
-  "gameId": "00000000-0000-0000-0000-000000000005"
+  "gameId": "00000000-0000-0000-0000-000000000005",
+  "maxPlayers": 4,
+  "boardSize": 3
 }
 
 > {%
     client.global.set("lobby_id", response.body.id);
 %}
 
-###
+
 ### 4) GET Lobby by ID
 GET http://localhost:8081/api/lobbies/{{lobby_id}}
 Authorization: Bearer {{owner_token}}
@@ -55,7 +57,9 @@ Authorization: Bearer {{owner_token}}
 Content-Type: application/json
 
 {
-  "gameId": null
+  "gameId": null,
+  "maxPlayers": 4,
+  "boardSize": 3
 }
 
 
@@ -74,41 +78,36 @@ POST http://localhost:8081/api/lobbies/{{lobby_id}}/close
 Authorization: Bearer {{owner_token}}
 
 
-### 9) PUT /settings – update maxPlayers (owner only)
+### 9) PUT /settings – update TicTacToe settings (owner only)
 PUT http://localhost:8081/api/lobbies/{{lobby_id}}/settings
 Authorization: Bearer {{owner_token}}
 Content-Type: application/json
 
 {
-  "maxPlayers": 5
+  "maxPlayers": 5,
+  "settings": {
+    "type": "ticTacToe",
+    "boardSize": 4
+  }
 }
 
 
-### 10) INVALID - Update settings on CLOSED lobby (400)
-PUT http://localhost:8081/api/lobbies/{{lobby_id}}/settings
-Authorization: Bearer {{owner_token}}
-Content-Type: application/json
-
-{
-  "maxPlayers": 3
-}
-
-
-### 11) INVALID - Non-owner (kaj) tries to close lobby (403/400 depending on domain rule)
-POST http://localhost:8081/api/lobbies/{{lobby_id}}/close
-Authorization: Bearer {{other_token}}
-
-
-### 12) INVALID - Non-owner (kaj) tries to update settings (403/400)
+### 10) INVALID - Non-owner (kaj) tries to update settings
 PUT http://localhost:8081/api/lobbies/{{lobby_id}}/settings
 Authorization: Bearer {{other_token}}
 Content-Type: application/json
 
 {
-  "maxPlayers": 8
+  "maxPlayers": 6,
+  "settings": {
+    "type": "ticTacToe",
+    "boardSize": 3
+  }
 }
 
 
-### 13) GET All Lobbies
+### 11) GET All Lobbies
 GET http://localhost:8081/api/lobbies
 Authorization: Bearer {{owner_token}}
+
+###

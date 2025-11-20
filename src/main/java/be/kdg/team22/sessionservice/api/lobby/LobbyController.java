@@ -1,15 +1,13 @@
 package be.kdg.team22.sessionservice.api.lobby;
 
-import be.kdg.team22.sessionservice.api.lobby.models.*;
+import be.kdg.team22.sessionservice.api.lobby.models.CreateLobbyModel;
+import be.kdg.team22.sessionservice.api.lobby.models.LobbyResponseModel;
+import be.kdg.team22.sessionservice.api.lobby.models.UpdateLobbySettingsModel;
 import be.kdg.team22.sessionservice.application.lobby.LobbyService;
 import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
 import be.kdg.team22.sessionservice.domain.lobby.PlayerId;
-import be.kdg.team22.sessionservice.domain.lobby.settings.CheckersSettings;
-import be.kdg.team22.sessionservice.domain.lobby.settings.GameSettings;
-import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
-import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -68,13 +66,12 @@ public class LobbyController {
 
     @PutMapping("/{id}/settings")
     public ResponseEntity<LobbyResponseModel> updateSettings(
-            @PathVariable UUID id,
-            @RequestBody UpdateLobbySettingsModel model,
-            @AuthenticationPrincipal Jwt jwt
+            @PathVariable final UUID id,
+            @RequestBody final UpdateLobbySettingsModel model,
+            @AuthenticationPrincipal final Jwt jwt
     ) {
         PlayerId actingUser = PlayerId.get(jwt);
-        LobbySettings settings = toDomainSettings(model);
-        Lobby lobby = service.updateSettings(LobbyId.from(id), actingUser, settings);
+        Lobby lobby = service.updateSettings(LobbyId.from(id), actingUser, model);
         return ResponseEntity.ok(toResponseModel(lobby));
     }
 
@@ -93,18 +90,5 @@ public class LobbyController {
                 lobby.status(),
                 lobby.createdAt()
         );
-    }
-
-    private LobbySettings toDomainSettings(UpdateLobbySettingsModel model) {
-        if (model == null || model.settings() == null) {
-            throw new IllegalArgumentException("settings cannot be null");
-        }
-
-        GameSettings gameSettings = switch (model.settings()) {
-            case TicTacToeSettingsModel ttt -> new TicTacToeSettings(ttt.boardSize());
-            case CheckersSettingsModel chk -> new CheckersSettings(chk.boardSize(), chk.flyingKings());
-        };
-
-        return new LobbySettings(gameSettings, model.maxPlayers());
     }
 }

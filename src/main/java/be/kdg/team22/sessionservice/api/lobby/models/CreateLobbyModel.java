@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public record CreateLobbyModel(
         UUID gameId,
-        Integer boardSize,
-        Integer maxPlayers
+        Integer maxPlayers,
+        Integer boardSize
 ) {
 }

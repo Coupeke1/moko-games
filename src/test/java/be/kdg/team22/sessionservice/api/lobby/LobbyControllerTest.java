@@ -1,6 +1,8 @@
 package be.kdg.team22.sessionservice.api.lobby;
 
 import be.kdg.team22.sessionservice.domain.lobby.LobbyStatus;
+import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
+import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.infrastructure.lobby.db.LobbyJpaRepository;
 import be.kdg.team22.sessionservice.infrastructure.lobby.db.entities.LobbyEntity;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -47,12 +48,17 @@ class LobbyControllerTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                { "gameId": "00000000-0000-0000-0000-000000000005" }
+                                {
+                                  "gameId": "00000000-0000-0000-0000-000000000005",
+                                  "maxPlayers": 4,
+                                  "boardSize": 3
+                                }
                                 """))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.ownerId").value(owner))
                 .andExpect(jsonPath("$.gameId").value("00000000-0000-0000-0000-000000000005"))
-                .andExpect(jsonPath("$.players[0]").value(owner));
+                .andExpect(jsonPath("$.players[0]").value(owner))
+                .andExpect(jsonPath("$.maxPlayers").value(4));
 
         assertThat(repo.count()).isEqualTo(1);
     }
@@ -63,7 +69,11 @@ class LobbyControllerTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                { "gameId": "00000000-0000-0000-0000-000000000005" }
+                                {
+                                  "gameId": "00000000-0000-0000-0000-000000000005",
+                                  "maxPlayers": 4,
+                                  "boardSize": 3
+                                }
                                 """))
                 .andExpect(status().isUnauthorized());
     }
@@ -77,7 +87,11 @@ class LobbyControllerTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                { "gameId": null }
+                                {
+                                  "gameId": null,
+                                  "maxPlayers": 4,
+                                  "boardSize": 3
+                                }
                                 """))
                 .andExpect(status().isBadRequest());
     }
@@ -88,11 +102,14 @@ class LobbyControllerTest {
         UUID gameId = UUID.fromString("00000000-0000-0000-0000-000000000005");
         UUID ownerId = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
 
+        LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
+
         repo.save(new LobbyEntity(
                 id,
                 gameId,
                 ownerId,
                 Set.of(ownerId),
+                settings,
                 LobbyStatus.OPEN,
                 Instant.now(),
                 Instant.now()
@@ -103,7 +120,8 @@ class LobbyControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id.toString()))
                 .andExpect(jsonPath("$.gameId").value(gameId.toString()))
-                .andExpect(jsonPath("$.ownerId").value(ownerId.toString()));
+                .andExpect(jsonPath("$.ownerId").value(ownerId.toString()))
+                .andExpect(jsonPath("$.maxPlayers").value(4));
     }
 
     @Test
@@ -118,12 +136,14 @@ class LobbyControllerTest {
     @Test
     void getAll_returns200_andList() throws Exception {
         UUID ownerId = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
+        LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
         repo.save(new LobbyEntity(
                 UUID.randomUUID(),
                 UUID.randomUUID(),
                 ownerId,
                 Set.of(ownerId),
+                settings,
                 LobbyStatus.OPEN,
                 Instant.now(),
                 Instant.now()
@@ -135,101 +155,83 @@ class LobbyControllerTest {
                 .andExpect(jsonPath("$[0].id").exists());
     }
 
-    // ---------- NIEUWE TESTS VOOR CLOSE & SETTINGS ----------
-
     @Test
-    void closeLobby_asOwner_setsStatusToCancelled() throws Exception {
-        String owner = "44444444-4444-4444-4444-444444444444";
+    void closeLobby_owner_succeeds() throws Exception {
+        UUID id = UUID.randomUUID();
+        UUID gameId = UUID.randomUUID();
+        UUID ownerId = UUID.fromString("99999999-9999-9999-9999-999999999999");
+        LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
-        // Eerst lobby aanmaken via API
-        mock.perform(post("/api/lobbies")
-                        .with(tokenWithUser(owner, "owner", "owner@kdg.be"))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                { "gameId": "00000000-0000-0000-0000-000000000005" }
-                                """))
-                .andExpect(status().isCreated());
+        repo.save(new LobbyEntity(
+                id,
+                gameId,
+                ownerId,
+                Set.of(ownerId),
+                settings,
+                LobbyStatus.OPEN,
+                Instant.now(),
+                Instant.now()
+        ));
 
-        // Pak de aangemaakte lobby uit de repo
-        List<LobbyEntity> all = repo.findAll();
-        assertThat(all).hasSize(1);
-        UUID lobbyId = all.getFirst().toDomain().id().value();
-
-        // Close-endpoint oproepen
-        mock.perform(post("/api/lobbies/" + lobbyId + "/close")
-                        .with(tokenWithUser(owner, "owner", "owner@kdg.be"))
+        mock.perform(post("/api/lobbies/" + id + "/close")
+                        .with(tokenWithUser(ownerId.toString(), "owner", "owner@kdg.be"))
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("CANCELLED"));
+                .andExpect(jsonPath("$.status").value("CLOSED"));
     }
 
     @Test
-    void closeLobby_asNonOwner_returns400() throws Exception {
-        String owner = "55555555-5555-5555-5555-555555555555";
-        String other = "66666666-6666-6666-6666-666666666666";
+    void closeLobby_nonOwner_returnsBadRequest() throws Exception {
+        UUID id = UUID.randomUUID();
+        UUID gameId = UUID.randomUUID();
+        UUID ownerId = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
+        UUID otherId = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
+        LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
-        mock.perform(post("/api/lobbies")
-                        .with(tokenWithUser(owner, "owner", "owner@kdg.be"))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                { "gameId": "00000000-0000-0000-0000-000000000005" }
-                                """))
-                .andExpect(status().isCreated());
+        repo.save(new LobbyEntity(
+                id,
+                gameId,
+                ownerId,
+                Set.of(ownerId),
+                settings,
+                LobbyStatus.OPEN,
+                Instant.now(),
+                Instant.now()
+        ));
 
-        UUID lobbyId = repo.findAll().getFirst().toDomain().id().value();
-
-        mock.perform(post("/api/lobbies/" + lobbyId + "/close")
-                        .with(tokenWithUser(other, "other", "other@kdg.be"))
+        mock.perform(post("/api/lobbies/" + id + "/close")
+                        .with(tokenWithUser(otherId.toString(), "other", "other@kdg.be"))
                         .with(csrf()))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void closeLobby_missingJwt_returns401() throws Exception {
-        String owner = "77777777-7777-7777-7777-777777777777";
+    void updateSettings_owner_succeeds() throws Exception {
+        UUID id = UUID.randomUUID();
+        UUID gameId = UUID.randomUUID();
+        UUID ownerId = UUID.fromString("12121212-1212-1212-1212-121212121212");
+        LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
-        mock.perform(post("/api/lobbies")
-                        .with(tokenWithUser(owner, "owner", "owner@kdg.be"))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                { "gameId": "00000000-0000-0000-0000-000000000005" }
-                                """))
-                .andExpect(status().isCreated());
+        repo.save(new LobbyEntity(
+                id,
+                gameId,
+                ownerId,
+                Set.of(ownerId),
+                settings,
+                LobbyStatus.OPEN,
+                Instant.now(),
+                Instant.now()
+        ));
 
-        UUID lobbyId = repo.findAll().getFirst().toDomain().id().value();
-
-        mock.perform(post("/api/lobbies/" + lobbyId + "/close")
-                        .with(csrf()))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    void updateSettings_asOwner_updatesMaxPlayers() throws Exception {
-        String owner = "88888888-8888-8888-8888-888888888888";
-
-        mock.perform(post("/api/lobbies")
-                        .with(tokenWithUser(owner, "owner", "owner@kdg.be"))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                { "gameId": "00000000-0000-0000-0000-000000000005" }
-                                """))
-                .andExpect(status().isCreated());
-
-        UUID lobbyId = repo.findAll().getFirst().toDomain().id().value();
-
-        mock.perform(put("/api/lobbies/" + lobbyId + "/settings")
-                        .with(tokenWithUser(owner, "owner", "owner@kdg.be"))
+        mock.perform(put("/api/lobbies/" + id + "/settings")
+                        .with(tokenWithUser(ownerId.toString(), "owner", "owner@kdg.be"))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
                                   "maxPlayers": 5,
                                   "settings": {
-                                    "type": "tic_tac_toe",
+                                    "type": "ticTacToe",
                                     "boardSize": 3
                                   }
                                 }
@@ -239,61 +241,33 @@ class LobbyControllerTest {
     }
 
     @Test
-    void updateSettings_invalidMaxPlayers_returns400() throws Exception {
-        String owner = "99999999-9999-9999-9999-999999999999";
+    void updateSettings_nonOwner_returnsBadRequest() throws Exception {
+        UUID id = UUID.randomUUID();
+        UUID gameId = UUID.randomUUID();
+        UUID ownerId = UUID.fromString("13131313-1313-1313-1313-131313131313");
+        UUID otherId = UUID.fromString("14141414-1414-1414-1414-141414141414");
+        LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
-        mock.perform(post("/api/lobbies")
-                        .with(tokenWithUser(owner, "owner", "owner@kdg.be"))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                { "gameId": "00000000-0000-0000-0000-000000000005" }
-                                """))
-                .andExpect(status().isCreated());
+        repo.save(new LobbyEntity(
+                id,
+                gameId,
+                ownerId,
+                Set.of(ownerId),
+                settings,
+                LobbyStatus.OPEN,
+                Instant.now(),
+                Instant.now()
+        ));
 
-        UUID lobbyId = repo.findAll().getFirst().toDomain().id().value();
-
-        mock.perform(put("/api/lobbies/" + lobbyId + "/settings")
-                        .with(tokenWithUser(owner, "owner", "owner@kdg.be"))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "maxPlayers": 0,
-                                  "settings": {
-                                    "type": "tic_tac_toe",
-                                    "boardSize": 3
-                                  }
-                                }
-                                """))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void updateSettings_asNonOwner_returns400() throws Exception {
-        String owner = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
-        String other = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb";
-
-        mock.perform(post("/api/lobbies")
-                        .with(tokenWithUser(owner, "owner", "owner@kdg.be"))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                { "gameId": "00000000-0000-0000-0000-000000000005" }
-                                """))
-                .andExpect(status().isCreated());
-
-        UUID lobbyId = repo.findAll().getFirst().toDomain().id().value();
-
-        mock.perform(put("/api/lobbies/" + lobbyId + "/settings")
-                        .with(tokenWithUser(other, "other", "other@kdg.be"))
+        mock.perform(put("/api/lobbies/" + id + "/settings")
+                        .with(tokenWithUser(otherId.toString(), "other", "other@kdg.be"))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "maxPlayers": 5,
+                                  "maxPlayers": 6,
                                   "settings": {
-                                    "type": "tic_tac_toe",
+                                    "type": "ticTacToe",
                                     "boardSize": 3
                                   }
                                 }

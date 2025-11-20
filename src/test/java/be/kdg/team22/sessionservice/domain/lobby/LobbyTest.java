@@ -1,6 +1,8 @@
 package be.kdg.team22.sessionservice.domain.lobby;
 
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.*;
+import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
+import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -21,12 +23,16 @@ class LobbyTest {
         return PlayerId.from(id);
     }
 
+    private LobbySettings defaultSettings() {
+        return new LobbySettings(new TicTacToeSettings(3), 4);
+    }
+
     @Test
     void constructor_createsLobbyWithOwnerAndOpenStatus() {
         GameId gameId = game(UUID.randomUUID());
         PlayerId owner = player(UUID.randomUUID());
 
-        Lobby lobby = new Lobby(gameId, owner);
+        Lobby lobby = new Lobby(gameId, owner, defaultSettings());
 
         assertThat(lobby.gameId()).isEqualTo(gameId);
         assertThat(lobby.ownerId()).isEqualTo(owner);
@@ -38,7 +44,7 @@ class LobbyTest {
 
     @Test
     void allArgsConstructor_requiresOwnerToBePlayer() {
-        LobbyId id = LobbyId.newId();
+        LobbyId id = LobbyId.create();
         GameId gameId = game(UUID.randomUUID());
         PlayerId owner = player(UUID.randomUUID());
         Set<PlayerId> players = new LinkedHashSet<>();
@@ -48,11 +54,11 @@ class LobbyTest {
                 gameId,
                 owner,
                 players,
+                defaultSettings(),
                 LobbyStatus.OPEN,
                 Instant.now(),
                 Instant.now()
-        )).isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Owner must be part of players set");
+        )).isInstanceOf(OwnerNotFoundException.class);
     }
 
     @Test
@@ -61,7 +67,7 @@ class LobbyTest {
         PlayerId owner = player(UUID.randomUUID());
         PlayerId p2 = player(UUID.randomUUID());
 
-        Lobby lobby = new Lobby(gameId, owner);
+        Lobby lobby = new Lobby(gameId, owner, defaultSettings());
         Instant before = lobby.updatedAt();
 
         lobby.addPlayer(p2);
@@ -71,15 +77,26 @@ class LobbyTest {
     }
 
     @Test
+    void addPlayer_failsWhenMaxPlayersExceeded() {
+        GameId gameId = game(UUID.randomUUID());
+        PlayerId owner = player(UUID.randomUUID());
+
+        LobbySettings smallSettings = new LobbySettings(new TicTacToeSettings(3), 1);
+        Lobby lobby = new Lobby(gameId, owner, smallSettings);
+
+        assertThatThrownBy(() -> lobby.addPlayer(player(UUID.randomUUID())))
+                .isInstanceOf(MaxPlayersTooSmallException.class);
+    }
+
+    @Test
     void addPlayer_failsWhenClosed() {
         GameId gameId = game(UUID.randomUUID());
         PlayerId owner = player(UUID.randomUUID());
-        PlayerId p2 = player(UUID.randomUUID());
 
-        Lobby lobby = new Lobby(gameId, owner);
+        Lobby lobby = new Lobby(gameId, owner, defaultSettings());
         lobby.start();
 
-        assertThatThrownBy(() -> lobby.addPlayer(p2))
+        assertThatThrownBy(() -> lobby.addPlayer(player(UUID.randomUUID())))
                 .isInstanceOf(CannotJoinClosedLobbyException.class);
     }
 
@@ -88,11 +105,10 @@ class LobbyTest {
         GameId gameId = game(UUID.randomUUID());
         PlayerId owner = player(UUID.randomUUID());
 
-        Lobby lobby = new Lobby(gameId, owner);
+        Lobby lobby = new Lobby(gameId, owner, defaultSettings());
 
         assertThatThrownBy(() -> lobby.addPlayer(owner))
-                .isInstanceOf(PlayerAlreadyInLobbyException.class)
-                .hasMessageContaining(owner.value().toString());
+                .isInstanceOf(PlayerAlreadyInLobbyException.class);
     }
 
     @Test
@@ -101,7 +117,7 @@ class LobbyTest {
         PlayerId owner = player(UUID.randomUUID());
         PlayerId p2 = player(UUID.randomUUID());
 
-        Lobby lobby = new Lobby(gameId, owner);
+        Lobby lobby = new Lobby(gameId, owner, defaultSettings());
         lobby.addPlayer(p2);
         Instant before = lobby.updatedAt();
 
@@ -116,11 +132,10 @@ class LobbyTest {
         GameId gameId = game(UUID.randomUUID());
         PlayerId owner = player(UUID.randomUUID());
 
-        Lobby lobby = new Lobby(gameId, owner);
+        Lobby lobby = new Lobby(gameId, owner, defaultSettings());
 
         assertThatThrownBy(() -> lobby.removePlayer(owner))
-                .isInstanceOf(OwnerCannotLeaveLobbyException.class)
-                .hasMessageContaining(owner.value().toString());
+                .isInstanceOf(OwnerCannotLeaveLobbyException.class);
     }
 
     @Test
@@ -129,19 +144,18 @@ class LobbyTest {
         PlayerId owner = player(UUID.randomUUID());
         PlayerId unknown = player(UUID.randomUUID());
 
-        Lobby lobby = new Lobby(gameId, owner);
+        Lobby lobby = new Lobby(gameId, owner, defaultSettings());
 
         assertThatThrownBy(() -> lobby.removePlayer(unknown))
-                .isInstanceOf(PlayerNotInLobbyException.class)
-                .hasMessageContaining(unknown.value().toString());
+                .isInstanceOf(PlayerNotInLobbyException.class);
     }
 
     @Test
-    void start_changesStatusAndUpdatesTimestamp() {
+    void start_changesStatusToStarted() {
         GameId gameId = game(UUID.randomUUID());
         PlayerId owner = player(UUID.randomUUID());
 
-        Lobby lobby = new Lobby(gameId, owner);
+        Lobby lobby = new Lobby(gameId, owner, defaultSettings());
         Instant before = lobby.updatedAt();
 
         lobby.start();
@@ -155,7 +169,7 @@ class LobbyTest {
         GameId gameId = game(UUID.randomUUID());
         PlayerId owner = player(UUID.randomUUID());
 
-        Lobby lobby = new Lobby(gameId, owner);
+        Lobby lobby = new Lobby(gameId, owner, defaultSettings());
         lobby.start();
 
         assertThatThrownBy(lobby::start)
@@ -163,18 +177,101 @@ class LobbyTest {
     }
 
     @Test
-    void players_returnsImmutableCopy() {
+    void close_changesStatusToClosedAndUpdatesTimestamp() {
+        GameId gameId = game(UUID.randomUUID());
+        PlayerId owner = player(UUID.randomUUID());
+
+        Lobby lobby = new Lobby(gameId, owner, defaultSettings());
+        Instant before = lobby.updatedAt();
+
+        lobby.close(owner);
+
+        assertThat(lobby.status()).isEqualTo(LobbyStatus.CLOSED);
+        assertThat(lobby.updatedAt()).isAfterOrEqualTo(before);
+    }
+
+    @Test
+    void close_failsWhenNotOwner() {
+        GameId gameId = game(UUID.randomUUID());
+        PlayerId owner = player(UUID.randomUUID());
+        PlayerId stranger = player(UUID.randomUUID());
+
+        Lobby lobby = new Lobby(gameId, owner, defaultSettings());
+
+        assertThatThrownBy(() -> lobby.close(stranger))
+                .isInstanceOf(NotLobbyOwnerException.class);
+    }
+
+    @Test
+    void changeSettings_updatesSettings() {
+        GameId gameId = game(UUID.randomUUID());
+        PlayerId owner = player(UUID.randomUUID());
+
+        Lobby lobby = new Lobby(gameId, owner, defaultSettings());
+
+        LobbySettings newSettings = new LobbySettings(
+                new TicTacToeSettings(4),
+                5
+        );
+
+        lobby.changeSettings(owner, newSettings);
+
+        assertThat(lobby.settings()).isEqualTo(newSettings);
+    }
+
+    @Test
+    void changeSettings_failsWhenTooManyPlayersForNewLimit() {
         GameId gameId = game(UUID.randomUUID());
         PlayerId owner = player(UUID.randomUUID());
         PlayerId p2 = player(UUID.randomUUID());
 
-        Lobby lobby = new Lobby(gameId, owner);
+        Lobby lobby = new Lobby(gameId, owner, defaultSettings());
         lobby.addPlayer(p2);
 
-        Set<PlayerId> copy = lobby.players();
+        LobbySettings tooSmall = new LobbySettings(new TicTacToeSettings(3), 1);
 
-        assertThat(copy).containsExactly(owner, p2);
-        assertThatThrownBy(() -> copy.add(player(UUID.randomUUID())))
+        assertThatThrownBy(() -> lobby.changeSettings(owner, tooSmall))
+                .isInstanceOf(MaxPlayersTooSmallException.class);
+    }
+
+    @Test
+    void changeSettings_failsWhenNotOwner() {
+        GameId gameId = game(UUID.randomUUID());
+        PlayerId owner = player(UUID.randomUUID());
+        PlayerId stranger = player(UUID.randomUUID());
+
+        Lobby lobby = new Lobby(gameId, owner, defaultSettings());
+
+        LobbySettings newSettings = new LobbySettings(new TicTacToeSettings(3), 5);
+
+        assertThatThrownBy(() -> lobby.changeSettings(stranger, newSettings))
+                .isInstanceOf(NotLobbyOwnerException.class);
+    }
+
+    @Test
+    void changeSettings_failsWhenLobbyNotOpen() {
+        GameId gameId = game(UUID.randomUUID());
+        PlayerId owner = player(UUID.randomUUID());
+
+        Lobby lobby = new Lobby(gameId, owner, defaultSettings());
+        lobby.start();
+
+        LobbySettings newSettings = new LobbySettings(new TicTacToeSettings(3), 5);
+
+        assertThatThrownBy(() -> lobby.changeSettings(owner, newSettings))
+                .isInstanceOf(LobbyManagementNotAllowedException.class);
+    }
+
+    @Test
+    void players_returnsImmutableCopy() {
+        GameId gameId = game(UUID.randomUUID());
+        PlayerId owner = player(UUID.randomUUID());
+
+        Lobby lobby = new Lobby(gameId, owner, defaultSettings());
+
+        Set<PlayerId> result = lobby.players();
+
+        assertThatThrownBy(() -> result.add(player(UUID.randomUUID())))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
 }

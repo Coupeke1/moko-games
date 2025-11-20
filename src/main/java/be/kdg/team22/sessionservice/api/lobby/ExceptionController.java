@@ -63,4 +63,9 @@ public class ExceptionController {
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
     }
+
+    @ExceptionHandler(LobbySettingsInvalidException.class)
+    public ResponseEntity<String> handleLobbySettingsInvalid(final LobbySettingsInvalidException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }
