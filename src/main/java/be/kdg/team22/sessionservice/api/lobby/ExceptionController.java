@@ -18,14 +18,9 @@ public class ExceptionController {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    // 400 Bad Request (Application errors)
+    // 400 Bad Request – Application-level fouten (use-case)
     @ExceptionHandler(GameNotValidException.class)
     public ResponseEntity<String> handleGameInvalid(final GameNotValidException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgument(final IllegalArgumentException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
@@ -39,7 +34,12 @@ public class ExceptionController {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    // 400 Bad Request (from domain)
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgument(final IllegalArgumentException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    // 400 Bad Request – Domain-level fouten (business rules)
     @ExceptionHandler({
             CannotJoinClosedLobbyException.class,
             PlayerAlreadyInLobbyException.class,
@@ -51,7 +51,7 @@ public class ExceptionController {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    // 500 Internal Server Error (fallback)
+    // 500 Internal Server Error – fallback
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleUnknown(final Exception exception) {
         return new ResponseEntity<>("Internal server error: " + exception.getMessage(),

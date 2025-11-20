@@ -40,6 +40,24 @@ public class LobbyEntity {
     protected LobbyEntity() {
     }
 
+    public LobbyEntity(
+            UUID id,
+            UUID gameId,
+            UUID ownerId,
+            Set<UUID> playerIds,
+            LobbyStatus status,
+            Instant createdAt,
+            Instant updatedAt
+    ) {
+        this.id = id;
+        this.gameId = gameId;
+        this.ownerId = ownerId;
+        this.playerIds = playerIds;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
     public static LobbyEntity fromDomain(Lobby lobby) {
         LobbyEntity e = new LobbyEntity();
         e.id = lobby.id().value();
@@ -64,3 +82,4 @@ public class LobbyEntity {
         );
     }
 }
+
