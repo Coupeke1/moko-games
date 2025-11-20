@@ -60,7 +60,7 @@ Authorization: Bearer {{mathias_token}}
 # 3) SOCIAL-SERVICE — SEND FRIEND REQUEST
 
 ### Mathias → Kaj: send friend request
-POST http://localhost:8083/api/friends/add
+POST http://localhost:8083/api/friends
 Authorization: Bearer {{mathias_token}}
 Content-Type: application/json
 
@@ -107,7 +107,7 @@ DELETE http://localhost:8083/api/friends/remove/{{kaj_id}}
 Authorization: Bearer {{mathias_token}}
 
 ### Mathias sends new request
-POST http://localhost:8083/api/friends/add
+POST http://localhost:8083/api/friends
 Authorization: Bearer {{mathias_token}}
 Content-Type: application/json
 
@@ -123,7 +123,7 @@ Authorization: Bearer {{kaj_token}}
 # 8) TEST CANCEL FLOW
 
 ### Mathias sends again
-POST http://localhost:8083/api/friends/add
+POST http://localhost:8083/api/friends
 Authorization: Bearer {{mathias_token}}
 Content-Type: application/json
 

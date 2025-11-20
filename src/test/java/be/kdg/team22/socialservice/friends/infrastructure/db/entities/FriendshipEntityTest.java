@@ -1,9 +1,10 @@
 package be.kdg.team22.socialservice.friends.infrastructure.db.entities;
 
-import be.kdg.team22.socialservice.friends.domain.Friendship;
-import be.kdg.team22.socialservice.friends.domain.FriendshipId;
-import be.kdg.team22.socialservice.friends.domain.FriendshipStatus;
-import be.kdg.team22.socialservice.friends.domain.UserId;
+import be.kdg.team22.socialservice.domain.friends.friendship.Friendship;
+import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipId;
+import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipStatus;
+import be.kdg.team22.socialservice.domain.friends.user.UserId;
+import be.kdg.team22.socialservice.infrastructure.friends.friendship.db.entities.FriendshipEntity;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -15,7 +16,7 @@ class FriendshipEntityTest {
 
     @Test
     void fromDomain_convertsCorrectly() {
-        FriendshipId id = FriendshipId.newId();
+        FriendshipId id = FriendshipId.create();
         UserId requester = UserId.from(UUID.randomUUID());
         UserId receiver = UserId.from(UUID.randomUUID());
         Instant created = Instant.now();

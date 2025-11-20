@@ -1,12 +1,11 @@
 package be.kdg.team22.socialservice.friends.api;
 
-import be.kdg.team22.socialservice.friends.api.models.FriendModel;
-import be.kdg.team22.socialservice.friends.api.models.FriendsOverviewModel;
-import be.kdg.team22.socialservice.friends.application.FriendService;
-import be.kdg.team22.socialservice.friends.domain.UserId;
+import be.kdg.team22.socialservice.api.friends.models.FriendModel;
+import be.kdg.team22.socialservice.api.friends.models.FriendsOverviewModel;
+import be.kdg.team22.socialservice.application.friends.FriendService;
+import be.kdg.team22.socialservice.domain.friends.user.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -72,7 +71,7 @@ class FriendsControllerTest {
     @Test
     void addFriend_callsServiceWithCorrectUsername() throws Exception {
         mockMvc.perform(
-                        post("/api/friends/add")
+                        post("/api/friends")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {"username": "piet"}
