@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,24 +27,30 @@ public class GameServiceTest {
     @InjectMocks
     private GameService gameService;
 
+    private Player playerX;
+    private Player playerO;
+    private List<Player> players;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
         when(boardConfig.getMinSize()).thenReturn(3);
         when(boardConfig.getMaxSize()).thenReturn(10);
+
+        playerX = new Player(PlayerId.create(), PlayerRole.X);
+        playerO = new Player(PlayerId.create(), PlayerRole.O);
+        players = List.of(playerX, playerO);
     }
 
     @Test
     void shouldStartGameWithSize3x3() {
         // Arrange
-        PlayerId playerXId = new PlayerId(UUID.randomUUID());
-        PlayerId playerOId = new PlayerId(UUID.randomUUID());
-        Game expectedGame = new Game(3, playerXId, playerOId);
+        Game expectedGame = Game.create(boardConfig.getMinSize(), boardConfig.getMaxSize(), 3, players);
         doNothing().when(gameRepository).save(expectedGame);
 
         // Act
-        Game game = gameService.startGame(3, playerXId, playerOId);
+        Game game = gameService.startGame(3, playerX.id(), playerO.id());
 
         // Asset
         assertNotNull(game);
@@ -54,7 +61,7 @@ public class GameServiceTest {
     @Test
     void shouldStartGameWithSize4x4() {
         // Arrange
-        Game expectedGame = new Game(4, PlayerId.create(), PlayerId.create());
+        Game expectedGame = Game.create(boardConfig.getMinSize(), boardConfig.getMaxSize(), 4, players);
         doNothing().when(gameRepository).save(expectedGame);
 
         // Act
@@ -69,7 +76,7 @@ public class GameServiceTest {
     @Test
     void shouldStartGameWithSize5x5() {
         // Arrange
-        Game expectedGame = new Game(5, PlayerId.create(), PlayerId.create());
+        Game expectedGame = Game.create(boardConfig.getMinSize(), boardConfig.getMaxSize(), 5, players);
         doNothing().when(gameRepository).save(expectedGame);
 
         // Act
@@ -92,14 +99,8 @@ public class GameServiceTest {
     }
 
     @Test
-    void shouldThrowWhenNonUniquePlayerIds() {
-        UUID playerId = UUID.randomUUID();
-        assertThrows(IllegalArgumentException.class, () -> gameService.startGame(4, new PlayerId(playerId), new PlayerId(playerId)));
-    }
-
-    @Test
     void shouldGetExistingGame() {
-        Game storedGame = new Game(5,  new PlayerId(UUID.randomUUID()), new PlayerId(UUID.randomUUID()));
+        Game storedGame = Game.create(boardConfig.getMinSize(), boardConfig.getMaxSize(), 5, players);
 
         when(gameRepository.findById(storedGame.getId())).thenReturn(Optional.of(storedGame));
 
@@ -120,7 +121,7 @@ public class GameServiceTest {
     @Test
     void shouldResetExistingFinishedGame() throws NoSuchFieldException, IllegalAccessException {
         // Arrange
-        Game storedGame = spy(new Game(3,  new PlayerId(UUID.randomUUID()), new PlayerId(UUID.randomUUID())));
+        Game storedGame = spy(Game.create(boardConfig.getMinSize(), boardConfig.getMaxSize(), 3, players));
 
         Field statusField = Game.class.getDeclaredField("status");
         statusField.setAccessible(true);
@@ -141,7 +142,7 @@ public class GameServiceTest {
     @Test
     void shouldThrowWhenResettingInProgressGame() {
         // Arrange
-        Game storedGame = spy(new Game(3, PlayerId.create(), PlayerId.create()));
+        Game storedGame = spy(Game.create(boardConfig.getMinSize(), boardConfig.getMaxSize(), 3, players));
         GameId gameId = storedGame.getId();
         when(gameRepository.findById(gameId)).thenReturn(Optional.of(storedGame));
 

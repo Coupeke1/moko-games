@@ -5,14 +5,14 @@ import org.jmolecules.ddd.annotation.ValueObject;
 @ValueObject
 public class Board {
     private final int size;
-    private final Player[][] grid;
+    private final PlayerRole[][] grid;
 
     private Board(int size) {
         this.size = size;
-        this.grid = new Player[size][size];
+        this.grid = new PlayerRole[size][size];
     }
 
-    private Board(int size, Player[][] grid) {
+    private Board(int size, PlayerRole[][] grid) {
         this.size = size;
         this.grid = grid;
     }
@@ -25,12 +25,12 @@ public class Board {
         return size;
     }
 
-    public Player getCell(int row, int col) {
+    public PlayerRole getCell(int row, int col) {
         return grid[row][col];
     }
 
-    public Board setCell(int row, int col, Player cell) {
-        Player[][] newGrid = new Player[size][size];
+    public Board setCell(int row, int col, PlayerRole cell) {
+        PlayerRole[][] newGrid = new PlayerRole[size][size];
         for (int i = 0; i < newGrid.length; i++) {
             for (int j = 0; j < newGrid[i].length; j++) {
                 newGrid[i][j] = cell;
@@ -40,7 +40,7 @@ public class Board {
         return  new Board(size, newGrid);
     }
 
-    public Player[][] getGrid() {
+    public PlayerRole[][] getGrid() {
         return grid;
     }
 }

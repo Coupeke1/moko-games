@@ -1,6 +1,6 @@
 package be.kdg.team22.tictactoeservice.api;
 
-import be.kdg.team22.tictactoeservice.api.models.PlayersModel;
+import be.kdg.team22.tictactoeservice.api.models.PlayerIdsModel;
 import be.kdg.team22.tictactoeservice.domain.Game;
 import be.kdg.team22.tictactoeservice.domain.GameId;
 import be.kdg.team22.tictactoeservice.domain.GameStatus;
@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.lang.reflect.Field;
+import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -32,18 +33,18 @@ public class GameControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    PlayersModel playersModel;
+    PlayerIdsModel playerIdsModel;
 
     @BeforeEach
     public void setup() {
-        playersModel = new PlayersModel(UUID.randomUUID(), UUID.randomUUID());
+        playerIdsModel = new PlayerIdsModel(UUID.randomUUID(), UUID.randomUUID());
     }
 
     @Test
     void shouldCreateGameWithDefaultSize() throws Exception {
         mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(playersModel)))
+                        .content(objectMapper.writeValueAsString(playerIdsModel)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.board.length()").value(3))
@@ -56,7 +57,7 @@ public class GameControllerIntegrationTest {
 
         mockMvc.perform(post("/api/games?size=5")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(playersModel)))
+                        .content(objectMapper.writeValueAsString(playerIdsModel)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.board.length()").value(5))
@@ -67,7 +68,7 @@ public class GameControllerIntegrationTest {
     void shouldRejectInvalidSize() throws Exception {
         mockMvc.perform(post("/api/games?size=1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(playersModel)))
+                        .content(objectMapper.writeValueAsString(playerIdsModel)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -75,21 +76,21 @@ public class GameControllerIntegrationTest {
     void shouldCreateGameWithCorrectPlayers() throws Exception {
         UUID playerXId = UUID.randomUUID();
         UUID playerOId = UUID.randomUUID();
-        playersModel = new PlayersModel(playerXId, playerOId);
+        playerIdsModel = new PlayerIdsModel(playerXId, playerOId);
         mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(playersModel)))
+                        .content(objectMapper.writeValueAsString(playerIdsModel)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.playerXId").value(playerXId.toString()))
-                .andExpect(jsonPath("$.playerOId").value(playerOId.toString()));
+                .andExpect(jsonPath("$.players[0].id.id").value(playerXId.toString()))
+                .andExpect(jsonPath("$.players[1].id.id").value(playerOId.toString()));
     }
 
     @Test
     void shouldRejectWithMissingPlayers() throws Exception {
-        PlayersModel playerXModel = new PlayersModel(UUID.randomUUID(), null);
-        PlayersModel playerOModel = new PlayersModel(null, UUID.randomUUID());
-        PlayersModel noPlayersModel = new PlayersModel(null, null);
+        PlayerIdsModel playerXModel = new PlayerIdsModel(UUID.randomUUID(), null);
+        PlayerIdsModel playerOModel = new PlayerIdsModel(null, UUID.randomUUID());
+        PlayerIdsModel noPlayersModel = new PlayerIdsModel(null, null);
 
         mockMvc.perform(post("/api/games?playerXId=%s")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -115,7 +116,7 @@ public class GameControllerIntegrationTest {
         // Create Game
         String body = mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(playersModel)))
+                        .content(objectMapper.writeValueAsString(playerIdsModel)))
                 .andReturn().getResponse().getContentAsString();
 
         String id = extractId(body);
@@ -136,7 +137,7 @@ public class GameControllerIntegrationTest {
     void shouldResetFinishedGame() throws Exception {
         String createResponse = mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(playersModel)))
+                        .content(objectMapper.writeValueAsString(playerIdsModel)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
@@ -151,7 +152,7 @@ public class GameControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id))
                 .andExpect(jsonPath("$.board.length()").value(3))
-                .andExpect(jsonPath("$.currentPlayer").value("X"))
+                .andExpect(jsonPath("$.currentRole").value("X"))
                 .andExpect(jsonPath("$.status").value("IN_PROGRESS"));
     }
 
@@ -159,7 +160,7 @@ public class GameControllerIntegrationTest {
     void shouldreturnbadrequestforunfinshedGame() throws Exception {
         String createResponse = mockMvc.perform(post("/api/games?size=3")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(playersModel)))
+                        .content(objectMapper.writeValueAsString(playerIdsModel)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 

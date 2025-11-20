@@ -1,7 +1,7 @@
 package be.kdg.team22.tictactoeservice.api;
 
 import be.kdg.team22.tictactoeservice.api.models.GameModel;
-import be.kdg.team22.tictactoeservice.api.models.PlayersModel;
+import be.kdg.team22.tictactoeservice.api.models.PlayerIdsModel;
 import be.kdg.team22.tictactoeservice.application.GameService;
 import be.kdg.team22.tictactoeservice.domain.Game;
 import be.kdg.team22.tictactoeservice.domain.GameId;
@@ -23,7 +23,7 @@ public class GameRestController {
     @PostMapping({"/", ""})
     public ResponseEntity<GameModel> createGame(
             @RequestParam(defaultValue = "3") int size,
-            @RequestBody PlayersModel players
+            @RequestBody PlayerIdsModel players
     ) {
         Game game = service.startGame(size, new PlayerId(players.playerXId()), new PlayerId(players.playerOId()));
         GameModel model = GameModel.fromDomain(game);

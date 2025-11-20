@@ -2,30 +2,48 @@ package be.kdg.team22.tictactoeservice.domain;
 
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 @AggregateRoot
 public class Game {
     private final GameId id;
     private Board board;
     private GameStatus status;
-    private PlayerId playerXId;
-    private PlayerId playerOId;
-    private Player currentPlayer;
+    private final List<Player> players;
+    private PlayerRole currentRole;
 
-    private Game(int requestedSize, PlayerId playerXId, PlayerId playerOId) {
+    private Game(int requestedSize, List<Player> players) {
         this.id = GameId.create();
         this.board = Board.create(requestedSize);
         this.status = GameStatus.IN_PROGRESS;
-        this.playerXId = playerXId;
-        this.playerOId = playerOId;
-        this.currentPlayer = Player.X;
+        this.players = players;
+        this.currentRole = PlayerRole.X;
     }
 
-    public static Game create(int minSize, int maxSize, int size, PlayerId playerXId, PlayerId playerOId) {
+    public static Game create(int minSize, int maxSize, int size, List<Player> players) {
         if (size < minSize || size > maxSize) {
             throw new IllegalArgumentException("Board size must be between " + minSize + " and " + maxSize);
         }
 
-        return new Game(size, playerXId, playerOId);
+        if (players.size() < 2) {
+            throw new IllegalArgumentException("There must be at least 2 players");
+        }
+
+        List<PlayerId> playerIds = players.stream().map(Player::id).toList();
+        Set<PlayerId> uniquePlayerIds = new HashSet<>(playerIds);
+        if (uniquePlayerIds.size() != players.size()) {
+            throw new IllegalArgumentException("All players must be unique");
+        }
+
+        List<PlayerRole> playerRoles = players.stream().map(Player::role).toList();
+        Set<PlayerRole> uniquePlayerRoles = new HashSet<>(playerRoles);
+        if (uniquePlayerRoles.size() != players.size()) {
+            throw new IllegalArgumentException("All players must have a different role");
+        }
+
+        return new Game(size, players);
     }
 
     public GameId getId() {
@@ -40,16 +58,12 @@ public class Game {
         return status;
     }
 
-    public PlayerId getPlayerXId() {
-        return playerXId;
+    public List<Player> getPlayers() {
+        return players;
     }
 
-    public PlayerId getPlayerOId() {
-        return playerOId;
-    }
-
-    public Player getCurrentPlayer() {
-        return currentPlayer;
+    public PlayerRole getCurrentRole() {
+        return currentRole;
     }
 
     public void reset() {
@@ -59,6 +73,6 @@ public class Game {
         this.status = GameStatus.IN_PROGRESS;
         this.board = Board.create(this.board.getSize());
 
-        this.currentPlayer = Player.X;
+        this.currentRole = players.getFirst().role();
     }
 }
