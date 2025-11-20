@@ -3,7 +3,6 @@ package be.kdg.team22.sessionservice.api.lobby;
 import be.kdg.team22.sessionservice.api.lobby.models.CreateLobbyModel;
 import be.kdg.team22.sessionservice.api.lobby.models.LobbyResponseModel;
 import be.kdg.team22.sessionservice.application.lobby.LobbyService;
-import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.PlayerId;
 import org.springframework.http.HttpStatus;
@@ -27,24 +26,26 @@ public class LobbyController {
         this.lobbyService = lobbyService;
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<LobbyResponseModel> create(@RequestBody CreateLobbyModel model) {
-        Lobby lobby = lobbyService.createLobby(new GameId(model.gameId()), new PlayerId(model.ownerId())
-        );
+
+        Lobby lobby = lobbyService.createLobby(model.gameId(), model.ownerId());
 
         Set<UUID> players = lobby.players()
                 .stream()
                 .map(PlayerId::value)
                 .collect(Collectors.toSet());
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new LobbyResponseModel(
-                        lobby.id().value(),
-                        lobby.gameId().value(),
-                        lobby.ownerId().value(),
-                        players,
-                        lobby.status().name(),
-                        lobby.createdAt()
-                ));
+        LobbyResponseModel response = new LobbyResponseModel(
+                lobby.id().value(),
+                lobby.gameId().value(),
+                lobby.ownerId().value(),
+                players,
+                lobby.status().name(),
+                lobby.createdAt()
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
 }
