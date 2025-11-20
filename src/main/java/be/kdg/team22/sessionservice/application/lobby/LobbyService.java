@@ -8,9 +8,8 @@ import be.kdg.team22.sessionservice.domain.lobby.exceptions.OwnerNotValidExcepti
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
+@Transactional
 public class LobbyService {
 
     private final LobbyRepository lobbyRepository;
@@ -19,14 +18,10 @@ public class LobbyService {
         this.lobbyRepository = lobbyRepository;
     }
 
-    @Transactional
-    public Lobby createLobby(UUID rawGameId, UUID rawOwnerId) {
+    public Lobby createLobby(GameId gameId, PlayerId ownerId) {
 
-        if (rawGameId == null) throw new GameNotValidException(null);
-        if (rawOwnerId == null) throw new OwnerNotValidException(null);
-
-        GameId gameId = GameId.from(rawGameId);
-        PlayerId ownerId = PlayerId.from(rawOwnerId);
+        if (gameId == null) throw new GameNotValidException(null);
+        if (ownerId == null) throw new OwnerNotValidException(null);
 
         try {
             Lobby lobby = new Lobby(gameId, ownerId);

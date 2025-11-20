@@ -1,0 +1,88 @@
+### 1) JWT Token ophalen uit Keycloak
+POST http://localhost:8180/realms/moko/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = password &
+client_id = session-service &
+client_secret = hWzsxSaXWJtEtPkrhIoLByKFEMVuczUu &
+username = mathias &
+password = loginmathias &
+scope = openid
+
+> {%
+    client.global.set("access_token", response.body.access_token);
+%}
+
+
+### 2) POST Create Lobby
+POST http://localhost:8081/api/lobbies
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "gameId": "00000000-0000-0000-0000-000000000005"
+}
+
+
+### 3) GET Lobby by ID
+# Plak hieronder een echte lobbyId uit request 2
+GET http://localhost:8081/api/lobbies/REPLACE-WITH-LOBBY-ID
+Authorization: Bearer {{access_token}}
+
+
+### 4) INVALID - Missing GameId (400)
+POST http://localhost:8081/api/lobbies
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "gameId": null,
+  "ownerId": "00000000-0000-0000-0000-000000000001"
+}
+
+
+### 5) INVALID - Missing OwnerId (400)
+POST http://localhost:8081/api/lobbies
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "gameId": "00000000-0000-0000-0000-000000000005",
+  "ownerId": null
+}
+
+
+### 6) GET Lobby - Not Found (404)
+GET http://localhost:8081/api/lobbies/11111111-1111-1111-1111-111111111111
+Authorization: Bearer {{access_token}}
+
+
+### 7) INVALID - Join closed lobby (400)
+POST http://localhost:8081/api/lobbies/REPLACE-WITH-LOBBY-ID/join
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "playerId": "00000000-0000-0000-0000-000000000010"
+}
+
+
+### 8) INVALID - Player already in lobby (400)
+POST http://localhost:8081/api/lobbies/REPLACE-WITH-LOBBY-ID/join
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "playerId": "00000000-0000-0000-0000-000000000001"
+}
+
+
+### 9) INVALID - Owner cannot leave lobby (400)
+POST http://localhost:8081/api/lobbies/REPLACE-WITH-LOBBY-ID/leave
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "playerId": "00000000-0000-0000-0000-000000000001"
+}
+

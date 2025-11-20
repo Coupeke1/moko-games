@@ -3,10 +3,13 @@ package be.kdg.team22.sessionservice.api.lobby;
 import be.kdg.team22.sessionservice.api.lobby.models.CreateLobbyModel;
 import be.kdg.team22.sessionservice.api.lobby.models.LobbyResponseModel;
 import be.kdg.team22.sessionservice.application.lobby.LobbyService;
+import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.PlayerId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,9 +30,16 @@ public class LobbyController {
     }
 
     @PostMapping
-    public ResponseEntity<LobbyResponseModel> create(@RequestBody CreateLobbyModel model) {
-
-        Lobby lobby = lobbyService.createLobby(model.gameId(), model.ownerId());
+    public ResponseEntity<LobbyResponseModel> create(
+            @RequestBody CreateLobbyModel model,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        PlayerId ownerId = PlayerId.get(jwt);
+        GameId gameId = new GameId(model.gameId());
+        Lobby lobby = lobbyService.createLobby(
+                gameId,
+                ownerId
+        );
 
         Set<UUID> players = lobby.players()
                 .stream()
