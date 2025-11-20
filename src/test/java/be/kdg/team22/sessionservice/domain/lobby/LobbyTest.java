@@ -1,6 +1,6 @@
 package be.kdg.team22.sessionservice.domain.lobby;
 
-import be.kdg.team22.sessionservice.domain.lobby.exceptions.domain.*;
+import be.kdg.team22.sessionservice.domain.lobby.exceptions.*;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;

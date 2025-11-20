@@ -1,58 +1,48 @@
 package be.kdg.team22.sessionservice.domain.lobby;
 
-import be.kdg.team22.sessionservice.domain.lobby.exceptions.domain.*;
+import be.kdg.team22.sessionservice.domain.lobby.exceptions.*;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
 import java.time.Instant;
 import java.util.LinkedHashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @AggregateRoot
 public class Lobby {
-
     private final LobbyId id;
-    private final GameId gameId;
-    private final PlayerId ownerId;
+    private final GameId game;
+    private final PlayerId owner;
     private final Set<PlayerId> players;
     private final Instant createdAt;
     private Instant updatedAt;
     private LobbyStatus status;
 
-    public Lobby(LobbyId id,
-                 GameId gameId,
-                 PlayerId ownerId,
-                 Set<PlayerId> players,
-                 LobbyStatus status,
-                 Instant createdAt,
-                 Instant updatedAt) {
+    public Lobby(final LobbyId id, final GameId game, final PlayerId owner, final Set<PlayerId> players, final LobbyStatus status, final Instant createdAt, final Instant updatedAt) {
+        this.id = id;
+        this.game = game;
+        this.owner = owner;
+        this.players = players;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
 
-        this.id = Objects.requireNonNull(id);
-        this.gameId = Objects.requireNonNull(gameId);
-        this.ownerId = Objects.requireNonNull(ownerId);
-        this.players = Objects.requireNonNull(players);
-        this.status = Objects.requireNonNull(status);
-        this.createdAt = Objects.requireNonNull(createdAt);
-        this.updatedAt = Objects.requireNonNull(updatedAt);
-
-        if (!players.contains(ownerId)) {
-            throw new IllegalArgumentException("Owner must be part of players set");
-        }
+        if (!players.contains(owner))
+            throw new OwnerNotFoundException(owner.value());
     }
 
-    public Lobby(GameId gameId, PlayerId ownerId) {
-        this.id = LobbyId.newId();
-        this.gameId = Objects.requireNonNull(gameId);
-        this.ownerId = Objects.requireNonNull(ownerId);
+    public Lobby(final GameId game, final PlayerId owner) {
+        this.id = LobbyId.create();
+        this.game = game;
+        this.owner = owner;
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
         this.status = LobbyStatus.OPEN;
 
         this.players = new LinkedHashSet<>();
-        this.players.add(ownerId);
+        this.players.add(owner);
     }
 
-    public void addPlayer(PlayerId playerId) {
+    public void addPlayer(final PlayerId playerId) {
         if (status != LobbyStatus.OPEN)
             throw new CannotJoinClosedLobbyException();
 
@@ -63,9 +53,9 @@ public class Lobby {
         updatedAt = Instant.now();
     }
 
-    public void removePlayer(PlayerId playerId) {
-        if (playerId.equals(ownerId))
-            throw new OwnerCannotLeaveLobbyException(ownerId.value());
+    public void removePlayer(final PlayerId playerId) {
+        if (playerId.equals(owner))
+            throw new OwnerCannotLeaveLobbyException(owner.value());
 
         if (!players.contains(playerId))
             throw new PlayerNotInLobbyException(playerId.value());
@@ -87,11 +77,11 @@ public class Lobby {
     }
 
     public GameId gameId() {
-        return gameId;
+        return game;
     }
 
     public PlayerId ownerId() {
-        return ownerId;
+        return owner;
     }
 
     public LobbyStatus status() {
