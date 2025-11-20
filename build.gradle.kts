@@ -38,7 +38,7 @@ dependencies {
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:rabbitmq")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("org.jmolecules.integrations:jmolecules-starter-ddd:0.29.0")
+    implementation("org.jmolecules.integrations:jmolecules-starter-ddd:0.29.0")
 }
 
 tasks.withType<Test> {

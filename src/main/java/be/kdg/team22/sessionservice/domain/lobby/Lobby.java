@@ -1,5 +1,6 @@
 package be.kdg.team22.sessionservice.domain.lobby;
 
+import be.kdg.team22.sessionservice.domain.lobby.exceptions.domain.*;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
 import java.time.Instant;
@@ -13,10 +14,10 @@ public class Lobby {
     private final LobbyId id;
     private final GameId gameId;
     private final PlayerId ownerId;
-    private final Instant createdAt;
     private final Set<PlayerId> players;
+    private final Instant createdAt;
     private Instant updatedAt;
-    private final LobbyStatus status;
+    private LobbyStatus status;
 
     public Lobby(LobbyId id,
                  GameId gameId,
@@ -35,7 +36,7 @@ public class Lobby {
         this.updatedAt = Objects.requireNonNull(updatedAt);
 
         if (!players.contains(ownerId)) {
-            throw new IllegalArgumentException("Owner must be a player in the lobby");
+            throw new IllegalArgumentException("Owner must be part of players set");
         }
     }
 
@@ -53,10 +54,10 @@ public class Lobby {
 
     public void addPlayer(PlayerId playerId) {
         if (status != LobbyStatus.OPEN)
-            throw new IllegalStateException("Cannot join a non-open lobby");
+            throw new CannotJoinClosedLobbyException();
 
         if (players.contains(playerId))
-            throw new IllegalStateException("Player already in lobby");
+            throw new PlayerAlreadyInLobbyException(playerId.value());
 
         players.add(playerId);
         updatedAt = Instant.now();
@@ -64,9 +65,20 @@ public class Lobby {
 
     public void removePlayer(PlayerId playerId) {
         if (playerId.equals(ownerId))
-            throw new IllegalStateException("Owner cannot leave their own lobby");
+            throw new OwnerCannotLeaveLobbyException(ownerId.value());
+
+        if (!players.contains(playerId))
+            throw new PlayerNotInLobbyException(playerId.value());
 
         players.remove(playerId);
+        updatedAt = Instant.now();
+    }
+
+    public void start() {
+        if (status != LobbyStatus.OPEN)
+            throw new LobbyAlreadyStartedException();
+
+        status = LobbyStatus.STARTED;
         updatedAt = Instant.now();
     }
 
@@ -82,10 +94,6 @@ public class Lobby {
         return ownerId;
     }
 
-    public Set<PlayerId> players() {
-        return Set.copyOf(players);
-    }
-
     public LobbyStatus status() {
         return status;
     }
@@ -96,5 +104,9 @@ public class Lobby {
 
     public Instant updatedAt() {
         return updatedAt;
+    }
+
+    public Set<PlayerId> players() {
+        return Set.copyOf(players);
     }
 }
