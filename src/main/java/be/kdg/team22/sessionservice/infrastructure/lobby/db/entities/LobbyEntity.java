@@ -1,6 +1,8 @@
 package be.kdg.team22.sessionservice.infrastructure.lobby.db.entities;
 
 import be.kdg.team22.sessionservice.domain.lobby.*;
+import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
+import be.kdg.team22.sessionservice.infrastructure.lobby.db.converters.LobbySettingsConverter;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -8,10 +10,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-
 @Entity
 @Table(name = "lobbies")
 public class LobbyEntity {
+
     @Id
     private UUID id;
 
@@ -26,6 +28,10 @@ public class LobbyEntity {
     @Column(name = "player_id", nullable = false)
     private Set<UUID> playerIds;
 
+    @Convert(converter = LobbySettingsConverter.class)
+    @Column(name = "settings", nullable = false, columnDefinition = "TEXT")
+    private LobbySettings settings;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private LobbyStatus status;
@@ -39,30 +45,49 @@ public class LobbyEntity {
     protected LobbyEntity() {
     }
 
-    public LobbyEntity(final UUID id, final UUID gameId, final UUID ownerId, final Set<UUID> playerIds, final LobbyStatus status, final Instant createdAt, final Instant updatedAt) {
+    public LobbyEntity(
+            final UUID id,
+            final UUID gameId,
+            final UUID ownerId,
+            final Set<UUID> playerIds,
+            final LobbySettings settings,
+            final LobbyStatus status,
+            final Instant createdAt,
+            final Instant updatedAt
+    ) {
         this.id = id;
         this.gameId = gameId;
         this.ownerId = ownerId;
         this.playerIds = playerIds;
+        this.settings = settings;
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
     public static LobbyEntity fromDomain(final Lobby lobby) {
-        LobbyEntity e = new LobbyEntity();
-        e.id = lobby.id().value();
-        e.gameId = lobby.gameId().value();
-        e.ownerId = lobby.ownerId().value();
-        e.playerIds = lobby.players().stream().map(PlayerId::value).collect(Collectors.toSet());
-        e.status = lobby.status();
-        e.createdAt = lobby.createdAt();
-        e.updatedAt = lobby.updatedAt();
-        return e;
+        return new LobbyEntity(
+                lobby.id().value(),
+                lobby.gameId().value(),
+                lobby.ownerId().value(),
+                lobby.players().stream().map(PlayerId::value).collect(Collectors.toSet()),
+                lobby.settings(),
+                lobby.status(),
+                lobby.createdAt(),
+                lobby.updatedAt()
+        );
     }
 
     public Lobby toDomain() {
-        return new Lobby(LobbyId.from(id), GameId.from(gameId), PlayerId.from(ownerId), playerIds.stream().map(PlayerId::from).collect(Collectors.toSet()), status, createdAt, updatedAt);
+        return new Lobby(
+                LobbyId.from(id),
+                GameId.from(gameId),
+                PlayerId.from(ownerId),
+                playerIds.stream().map(PlayerId::from).collect(Collectors.toSet()),
+                settings,
+                status,
+                createdAt,
+                updatedAt
+        );
     }
 }
-

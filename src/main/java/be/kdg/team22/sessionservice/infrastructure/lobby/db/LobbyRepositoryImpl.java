@@ -11,9 +11,10 @@ import java.util.Optional;
 
 @Repository
 public class LobbyRepositoryImpl implements LobbyRepository {
+
     private final LobbyJpaRepository repository;
 
-    public LobbyRepositoryImpl(LobbyJpaRepository repository) {
+    public LobbyRepositoryImpl(final LobbyJpaRepository repository) {
         this.repository = repository;
     }
 

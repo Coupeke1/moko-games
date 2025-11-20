@@ -1,11 +1,7 @@
 package be.kdg.team22.sessionservice.domain.lobby;
 
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.*;
-import be.kdg.team22.sessionservice.domain.lobby.exceptions.domain.LobbyManagementNotAllowedException;
-import be.kdg.team22.sessionservice.domain.lobby.exceptions.domain.MaxPlayersTooSmallException;
-import be.kdg.team22.sessionservice.domain.lobby.exceptions.domain.NotLobbyOwnerException;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
-import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
 import java.time.Instant;
@@ -49,18 +45,17 @@ public class Lobby {
             throw new MaxPlayersTooSmallException(players.size(), settings.maxPlayers());
     }
 
-    public Lobby(final GameId game, final PlayerId owner) {
+    public Lobby(final GameId game, final PlayerId owner, final LobbySettings settings) {
         this.id = LobbyId.create();
         this.game = game;
         this.owner = owner;
+        this.settings = settings;
         this.status = LobbyStatus.OPEN;
         this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
+        this.updatedAt = this.createdAt;
 
         this.players = new LinkedHashSet<>();
         this.players.add(owner);
-
-        this.settings = new LobbySettings(new TicTacToeSettings(3), 4);
     }
 
     public void addPlayer(final PlayerId playerId) {
@@ -96,14 +91,14 @@ public class Lobby {
         updatedAt = Instant.now();
     }
 
-    public void close(PlayerId actingUser) {
+    public void close(final PlayerId actingUser) {
         ensureOwner(actingUser);
         ensureManageable();
-        status = LobbyStatus.CANCELLED;
+        status = LobbyStatus.CLOSED;
         updatedAt = Instant.now();
     }
 
-    public void changeSettings(PlayerId actingUser, LobbySettings newSettings) {
+    public void changeSettings(final PlayerId actingUser, final LobbySettings newSettings) {
         ensureOwner(actingUser);
         ensureManageable();
 
@@ -114,7 +109,7 @@ public class Lobby {
         this.updatedAt = Instant.now();
     }
 
-    private void ensureOwner(PlayerId actingUser) {
+    private void ensureOwner(final PlayerId actingUser) {
         if (!owner.equals(actingUser))
             throw new NotLobbyOwnerException(actingUser.value());
     }

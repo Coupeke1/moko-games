@@ -1,4 +1,4 @@
-package be.kdg.team22.sessionservice.domain.lobby.exceptions.domain;
+package be.kdg.team22.sessionservice.domain.lobby.exceptions;
 
 public class MaxPlayersTooSmallException extends RuntimeException {
     public MaxPlayersTooSmallException(int currentPlayers, int maxPlayers) {

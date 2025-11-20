@@ -2,5 +2,9 @@ package be.kdg.team22.sessionservice.api.lobby.models;
 
 import java.util.UUID;
 
-public record CreateLobbyModel(UUID gameId) {
+public record CreateLobbyModel(
+        UUID gameId,
+        Integer boardSize,
+        Integer maxPlayers
+) {
 }
