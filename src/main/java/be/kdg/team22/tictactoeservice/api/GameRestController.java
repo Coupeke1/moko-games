@@ -20,8 +20,11 @@ public class GameRestController {
     }
 
     @PostMapping({"/", ""})
-    public ResponseEntity<GameModel> createGame(@RequestParam(defaultValue = "3") int size, @RequestParam UUID playerXId, @RequestParam UUID playerOId) {
-        Game game = service.startGame(size, new PlayerId(playerXId), new PlayerId(playerOId));//TODO: inject player ids with keycloak
+    public ResponseEntity<GameModel> createGame(
+            @RequestParam(defaultValue = "3") int size,
+            @RequestParam UUID playerXId,
+            @RequestParam UUID playerOId) {
+        Game game = service.startGame(size, new PlayerId(playerXId), new PlayerId(playerOId));
         GameModel model = GameModel.fromDomain(game);
 
         return ResponseEntity.ok(model);

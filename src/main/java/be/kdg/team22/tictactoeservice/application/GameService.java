@@ -19,12 +19,16 @@ public class GameService {
         this.gameRepository = gameRepository;
     }
 
-    public Game startGame(int requestedSize, PlayerId playerXId, PlayerId PlayerOId) {
+    public Game startGame(int requestedSize, PlayerId playerXId, PlayerId playerOId) {
         if (requestedSize < boardConfig.getMinSize() || requestedSize > boardConfig.getMaxSize()) {
             throw new IllegalArgumentException("Board size must be between " + boardConfig.getMinSize() + " and " + boardConfig.getMaxSize());
         }
 
-        Game game = new Game(requestedSize, playerXId, PlayerOId);
+        if (playerXId.equals(playerOId)) {
+            throw new IllegalArgumentException("Player X and Player O must have different IDs");
+        }
+
+        Game game = new Game(requestedSize, playerXId, playerOId);
         gameRepository.save(game);
         return game;
     }
