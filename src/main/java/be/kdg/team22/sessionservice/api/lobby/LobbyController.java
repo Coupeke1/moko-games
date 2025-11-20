@@ -2,11 +2,9 @@ package be.kdg.team22.sessionservice.api.lobby;
 
 import be.kdg.team22.sessionservice.api.lobby.models.CreateLobbyModel;
 import be.kdg.team22.sessionservice.api.lobby.models.LobbyResponseModel;
+import be.kdg.team22.sessionservice.api.lobby.models.UpdateLobbySettingsModel;
 import be.kdg.team22.sessionservice.application.lobby.LobbyService;
-import be.kdg.team22.sessionservice.domain.lobby.GameId;
-import be.kdg.team22.sessionservice.domain.lobby.Lobby;
-import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
-import be.kdg.team22.sessionservice.domain.lobby.PlayerId;
+import be.kdg.team22.sessionservice.domain.lobby.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -50,8 +48,42 @@ public class LobbyController {
         return ResponseEntity.ok(response);
     }
 
-    private LobbyResponseModel toResponseModel(final Lobby lobby) {
-        Set<UUID> players = lobby.players().stream().map(PlayerId::value).collect(Collectors.toSet());
-        return new LobbyResponseModel(lobby.id().value(), lobby.gameId().value(), lobby.ownerId().value(), players, lobby.status(), lobby.createdAt());
+    @PostMapping("/{id}/close")
+    public ResponseEntity<LobbyResponseModel> close(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        PlayerId actingUser = PlayerId.get(jwt);
+        Lobby lobby = lobbyService.closeLobby(LobbyId.from(id), actingUser);
+        return ResponseEntity.ok(toResponseModel(lobby));
+    }
+
+    @PutMapping("/{id}/settings")
+    public ResponseEntity<LobbyResponseModel> updateSettings(
+            @PathVariable UUID id,
+            @RequestBody UpdateLobbySettingsModel model,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        PlayerId actingUser = PlayerId.get(jwt);
+        LobbySettings settings = new LobbySettings(model.maxPlayers());
+        Lobby lobby = lobbyService.updateSettings(LobbyId.from(id), actingUser, settings);
+        return ResponseEntity.ok(toResponseModel(lobby));
+    }
+
+    private LobbyResponseModel toResponseModel(finalLobby lobby) {
+        Set<UUID> players = lobby.players()
+                .stream()
+                .map(PlayerId::value)
+                .collect(Collectors.toSet());
+
+        return new LobbyResponseModel(
+                lobby.id().value(),
+                lobby.gameId().value(),
+                lobby.ownerId().value(),
+                players,
+                lobby.settings().maxPlayers(),
+                lobby.status(),
+                lobby.createdAt()
+        );
     }
 }

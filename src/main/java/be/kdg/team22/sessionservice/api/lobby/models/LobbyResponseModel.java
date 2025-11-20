@@ -10,6 +10,8 @@ public record LobbyResponseModel(UUID id,
                                  UUID gameId,
                                  UUID ownerId,
                                  Set<UUID> players,
-                                 LobbyStatus status,
-                                 Instant createdAt) {
+                                 int maxPlayers,
+        LobbyStatus status,
+        Instant createdAt
+) {
 }

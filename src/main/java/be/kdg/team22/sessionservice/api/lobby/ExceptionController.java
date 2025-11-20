@@ -33,7 +33,17 @@ public class ExceptionController {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({CannotJoinClosedLobbyException.class, PlayerAlreadyInLobbyException.class, OwnerCannotLeaveLobbyException.class, PlayerNotInLobbyException.class, LobbyAlreadyStartedException.class})
+
+    @ExceptionHandler({
+            CannotJoinClosedLobbyException.class,
+            PlayerAlreadyInLobbyException.class,
+            OwnerCannotLeaveLobbyException.class,
+            PlayerNotInLobbyException.class,
+            LobbyAlreadyStartedException.class,
+            NotLobbyOwnerException.class,
+            LobbyManagementNotAllowedException.class,
+            MaxPlayersTooSmallException.class
+    })
     public ResponseEntity<String> handleDomainErrors(final RuntimeException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }

@@ -1,11 +1,13 @@
 package be.kdg.team22.sessionservice.domain.lobby;
 
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.ClaimNotFoundException;
+import org.jmolecules.ddd.annotation.ValueObject;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.UUID;
 
+@ValueObject
 public record PlayerId(UUID value) {
     public PlayerId {
         if (value == null)

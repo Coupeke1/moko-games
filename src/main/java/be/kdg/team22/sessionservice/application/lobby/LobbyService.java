@@ -36,4 +36,18 @@ public class LobbyService {
     public List<Lobby> findAllLobbies() {
         return repository.findAll();
     }
+
+    public Lobby closeLobby(LobbyId id, PlayerId actingUser) {
+        Lobby lobby = findLobby(id);
+        lobby.close(actingUser);
+        lobbyRepository.save(lobby);
+        return lobby;
+    }
+
+    public Lobby updateSettings(LobbyId id, PlayerId actingUser, LobbySettings newSettings) {
+        Lobby lobby = findLobby(id);
+        lobby.changeSettings(actingUser, newSettings);
+        lobbyRepository.save(lobby);
+        return lobby;
+    }
 }

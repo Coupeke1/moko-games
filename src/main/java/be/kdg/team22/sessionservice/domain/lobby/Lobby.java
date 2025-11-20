@@ -1,6 +1,11 @@
 package be.kdg.team22.sessionservice.domain.lobby;
 
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.*;
+import be.kdg.team22.sessionservice.domain.lobby.exceptions.domain.LobbyManagementNotAllowedException;
+import be.kdg.team22.sessionservice.domain.lobby.exceptions.domain.MaxPlayersTooSmallException;
+import be.kdg.team22.sessionservice.domain.lobby.exceptions.domain.NotLobbyOwnerException;
+import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
+import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
 import java.time.Instant;
@@ -16,30 +21,46 @@ public class Lobby {
     private final Instant createdAt;
     private Instant updatedAt;
     private LobbyStatus status;
+    private LobbySettings settings;
 
-    public Lobby(final LobbyId id, final GameId game, final PlayerId owner, final Set<PlayerId> players, final LobbyStatus status, final Instant createdAt, final Instant updatedAt) {
+    public Lobby(
+            final LobbyId id,
+            final GameId game,
+            final PlayerId owner,
+            final Set<PlayerId> players,
+            final LobbySettings settings,
+            final LobbyStatus status,
+            final Instant createdAt,
+            final Instant updatedAt
+    ) {
         this.id = id;
         this.game = game;
         this.owner = owner;
         this.players = players;
+        this.settings = settings;
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
 
         if (!players.contains(owner))
             throw new OwnerNotFoundException(owner.value());
+
+        if (players.size() > settings.maxPlayers())
+            throw new MaxPlayersTooSmallException(players.size(), settings.maxPlayers());
     }
 
     public Lobby(final GameId game, final PlayerId owner) {
         this.id = LobbyId.create();
         this.game = game;
         this.owner = owner;
+        this.status = LobbyStatus.OPEN;
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
-        this.status = LobbyStatus.OPEN;
 
         this.players = new LinkedHashSet<>();
         this.players.add(owner);
+
+        this.settings = new LobbySettings(new TicTacToeSettings(3), 4);
     }
 
     public void addPlayer(final PlayerId playerId) {
@@ -48,6 +69,9 @@ public class Lobby {
 
         if (players.contains(playerId))
             throw new PlayerAlreadyInLobbyException(playerId.value());
+
+        if (players.size() >= settings.maxPlayers())
+            throw new MaxPlayersTooSmallException(players.size(), settings.maxPlayers());
 
         players.add(playerId);
         updatedAt = Instant.now();
@@ -72,6 +96,34 @@ public class Lobby {
         updatedAt = Instant.now();
     }
 
+    public void close(PlayerId actingUser) {
+        ensureOwner(actingUser);
+        ensureManageable();
+        status = LobbyStatus.CANCELLED;
+        updatedAt = Instant.now();
+    }
+
+    public void changeSettings(PlayerId actingUser, LobbySettings newSettings) {
+        ensureOwner(actingUser);
+        ensureManageable();
+
+        if (players.size() > newSettings.maxPlayers())
+            throw new MaxPlayersTooSmallException(players.size(), newSettings.maxPlayers());
+
+        this.settings = newSettings;
+        this.updatedAt = Instant.now();
+    }
+
+    private void ensureOwner(PlayerId actingUser) {
+        if (!owner.equals(actingUser))
+            throw new NotLobbyOwnerException(actingUser.value());
+    }
+
+    private void ensureManageable() {
+        if (status != LobbyStatus.OPEN)
+            throw new LobbyManagementNotAllowedException(status);
+    }
+
     public LobbyId id() {
         return id;
     }
@@ -86,6 +138,10 @@ public class Lobby {
 
     public LobbyStatus status() {
         return status;
+    }
+
+    public LobbySettings settings() {
+        return settings;
     }
 
     public Instant createdAt() {
