@@ -54,13 +54,11 @@ public class GameServiceTest {
     @Test
     void shouldStartGameWithSize4x4() {
         // Arrange
-        PlayerId playerXId = new PlayerId(UUID.randomUUID());
-        PlayerId playerOId = new PlayerId(UUID.randomUUID());
-        Game expectedGame = new Game(4, playerXId, playerOId);
+        Game expectedGame = new Game(4, PlayerId.create(), PlayerId.create());
         doNothing().when(gameRepository).save(expectedGame);
 
         // Act
-        Game game = gameService.startGame(4,  playerXId, playerOId);
+        Game game = gameService.startGame(4,  PlayerId.create(), PlayerId.create());
 
         // Asset
         assertNotNull(game);
@@ -71,13 +69,11 @@ public class GameServiceTest {
     @Test
     void shouldStartGameWithSize5x5() {
         // Arrange
-        PlayerId playerXId = new PlayerId(UUID.randomUUID());
-        PlayerId playerOId = new PlayerId(UUID.randomUUID());
-        Game expectedGame = new Game(5, playerXId, playerOId);
+        Game expectedGame = new Game(5, PlayerId.create(), PlayerId.create());
         doNothing().when(gameRepository).save(expectedGame);
 
         // Act
-        Game game = gameService.startGame(5, playerXId, playerOId);
+        Game game = gameService.startGame(5, PlayerId.create(), PlayerId.create());
 
         // Asset
         assertNotNull(game);
@@ -93,6 +89,12 @@ public class GameServiceTest {
     @Test
     void shouldThrowWhenToBig() {
         assertThrows(IllegalArgumentException.class, () -> gameService.startGame(11, new PlayerId(UUID.randomUUID()), new PlayerId(UUID.randomUUID())));
+    }
+
+    @Test
+    void shouldThrowWhenNonUniquePlayerIds() {
+        UUID playerId = UUID.randomUUID();
+        assertThrows(IllegalArgumentException.class, () -> gameService.startGame(4, new PlayerId(playerId), new PlayerId(playerId)));
     }
 
     @Test
@@ -139,7 +141,7 @@ public class GameServiceTest {
     @Test
     void shouldThrowWhenResettingInProgressGame() {
         // Arrange
-        Game storedGame = spy(new Game(3, new PlayerId(UUID.randomUUID()), new PlayerId(UUID.randomUUID())));
+        Game storedGame = spy(new Game(3, PlayerId.create(), PlayerId.create()));
         GameId gameId = storedGame.getId();
         when(gameRepository.findById(gameId)).thenReturn(Optional.of(storedGame));
 
