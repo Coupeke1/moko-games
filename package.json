@@ -8,8 +8,8 @@
         "build": "tsc -b && vite build",
         "lint": "eslint .",
         "preview": "vite preview",
-        "test": "vitest run --reporter junit",
-        "test:watch": "vitest"
+        "test": "vitest run --config vitest.config.ts --reporter junit",
+        "test:watch": "vitest --config vitest.config.ts"
     },
     "dependencies": {
         "@tailwindcss/vite": "^4.1.17",

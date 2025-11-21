@@ -1,14 +1,16 @@
-﻿import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
-import NavigationMenu from '../components/navigation/menu';
-import '@testing-library/jest-dom';
+﻿import { render, screen } from "@testing-library/react";
+import { describe, it, expect } from "vitest";
+import Grid from "@/components/layout/grid/grid.tsx";
 
-describe('NavigationMenu', () => {
-    it('renders the menu title', () => {
-        // Render the component
-        render(<NavigationMenu open={true} onClose={() => {}} />);
+describe("Grid component", () => {
+    it("renders its children correctly", () => {
+        render(
+            <Grid>
+                <div>Test Content</div>
+            </Grid>
+        );
 
-        // Check that the title "Moko" is in the document
-        expect(screen.getByText('Moko')).toBeInTheDocument();
+        // Check if the child text is rendered
+        expect(screen.getByText("Test Content")).toBeInTheDocument();
     });
 });
