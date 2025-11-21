@@ -7,6 +7,8 @@ import be.kdg.team22.sessionservice.domain.lobby.settings.CheckersSettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.GameSettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
+import be.kdg.team22.sessionservice.infrastructure.lobby.db.users.ExternalUserRepository;
+import be.kdg.team22.sessionservice.infrastructure.lobby.db.users.UserResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,14 +18,18 @@ import java.util.List;
 @Transactional
 public class LobbyService {
     private final LobbyRepository repository;
+    private final ExternalUserRepository externalUserRepository;
 
-    public LobbyService(final LobbyRepository repository) {
+    public LobbyService(final LobbyRepository repository, ExternalUserRepository externalUserRepository) {
         this.repository = repository;
+        this.externalUserRepository = externalUserRepository;
     }
 
-    public Lobby createLobby(GameId gameId, PlayerId ownerId, CreateLobbyModel model) {
+    public Lobby createLobby(GameId gameId, PlayerId ownerId, CreateLobbyModel model, String token) {
+        UserResponse owner = externalUserRepository.getById(ownerId.value(), token);
+        LobbyPlayer ownerPlayer = new LobbyPlayer(owner.id(), owner.username());
         LobbySettings settings = mapToDomainSettings(model.settings(), model.maxPlayers());
-        Lobby lobby = new Lobby(gameId, ownerId, settings);
+        Lobby lobby = new Lobby(gameId, ownerPlayer, settings);
         repository.save(lobby);
         return lobby;
     }
@@ -54,12 +60,6 @@ public class LobbyService {
         lobby.changeSettings(actingUser, newSettings);
         repository.save(lobby);
         return lobby;
-    }
-
-    public List<Lobby> getLobbiesInvitingUser(PlayerId userId) {
-        return repository.findAll().stream()
-                .filter(l -> l.isInvited(userId))
-                .toList();
     }
 
     private LobbySettings mapToDomainSettings(GameSettingsModel model, Integer maxPlayers) {

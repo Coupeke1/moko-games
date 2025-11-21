@@ -43,7 +43,7 @@ public class LobbyController {
         PlayerId ownerId = PlayerId.get(token);
         GameId gameId = new GameId(model.gameId());
 
-        Lobby lobby = service.createLobby(gameId, ownerId, model);
+        Lobby lobby = service.createLobby(gameId, ownerId, model, token.getTokenValue());
         return ResponseEntity.status(HttpStatus.CREATED).body(toResponseModel(lobby));
     }
 

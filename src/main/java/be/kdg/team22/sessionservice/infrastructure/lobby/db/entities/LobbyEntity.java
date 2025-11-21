@@ -6,6 +6,7 @@ import be.kdg.team22.sessionservice.infrastructure.lobby.db.converters.LobbySett
 import jakarta.persistence.*;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -111,10 +112,10 @@ public class LobbyEntity {
 
     public Lobby toDomain() {
 
-        Set<PlayerId> domainPlayers =
+        List<LobbyPlayer> domainPlayers =
                 players.stream()
-                        .map(p -> PlayerId.from(p.getId()))
-                        .collect(Collectors.toSet());
+                        .map(p -> new LobbyPlayer(p.getId(), p.getUsername()))
+                        .collect(Collectors.toList());
 
         Set<PlayerId> invited =
                 invitedPlayerIds.stream()
