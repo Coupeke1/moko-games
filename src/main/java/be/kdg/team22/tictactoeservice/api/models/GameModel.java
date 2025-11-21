@@ -5,14 +5,14 @@ import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
 import be.kdg.team22.tictactoeservice.domain.player.Player;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerRole;
 
-import java.util.List;
+import java.util.TreeSet;
 import java.util.UUID;
 
 public record GameModel(
         UUID id,
         PlayerRole[][] board,
         GameStatus status,
-        List<Player> players,
+        TreeSet<Player> players,
         PlayerRole currentRole
 ) {
     public static GameModel fromDomain(Game game) {

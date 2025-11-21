@@ -1,9 +1,15 @@
 package be.kdg.team22.tictactoeservice.domain.player;
 
 public enum PlayerRole {
-    X, O;
+    X(0), O(1);
 
-    public PlayerRole getOpposite() {
-        return this == X ? O : X;
+    private final int order;
+
+    PlayerRole(int order) {
+        this.order = order;
+    }
+
+    public int order() {
+        return order;
     }
 }

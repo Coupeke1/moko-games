@@ -1,28 +1,29 @@
 package be.kdg.team22.tictactoeservice.domain.game;
 
+import be.kdg.team22.tictactoeservice.domain.NotFoundException;
 import be.kdg.team22.tictactoeservice.domain.player.Player;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerRole;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @AggregateRoot
 public class Game {
     private final GameId id;
     private Board board;
     private GameStatus status;
-    private final List<Player> players;
+    private final TreeSet<Player> players;
     private PlayerRole currentRole;
 
-    private Game(int requestedSize, List<Player> players) {
+    private Game(int requestedSize, List<Player> unsortedPlayers) {
         this.id = GameId.create();
         this.board = Board.create(requestedSize);
         this.status = GameStatus.IN_PROGRESS;
-        this.players = players;
-        this.currentRole = PlayerRole.X;
+        this.players = new TreeSet<>(Comparator.comparing((Player player) ->
+                player.role().order()));
+        this.players.addAll(unsortedPlayers);
+        this.currentRole = unsortedPlayers.getFirst().role();
     }
 
     public static Game create(int minSize, int maxSize, int size, List<Player> players) {
@@ -46,7 +47,9 @@ public class Game {
             throw new IllegalArgumentException("All players must have a different role");
         }
 
-        return new Game(size, players);
+        return new Game(size, players.stream()
+                .sorted(Comparator.comparing(p -> p.role().order()))
+                .toList());
     }
 
     public GameId getId() {
@@ -61,7 +64,7 @@ public class Game {
         return status;
     }
 
-    public List<Player> getPlayers() {
+    public TreeSet<Player> getPlayers() {
         return players;
     }
 
@@ -77,5 +80,21 @@ public class Game {
         this.board = Board.create(this.board.getSize());
 
         this.currentRole = PlayerRole.X;
+    }
+
+    public Player nextPlayer() {
+        Player currentPlayer = players.stream()
+                .filter(p -> p.role() == currentRole)
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("No player found with current role: " + currentRole));
+
+        List<Player> playerList = new ArrayList<>(players);
+        int currentIndex = playerList.indexOf(currentPlayer);
+        int nextIndex = (currentIndex + 1) % playerList.size();
+
+        Player nextPlayer = playerList.get(nextIndex);
+        currentRole = nextPlayer.role();
+
+        return nextPlayer;
     }
 }
