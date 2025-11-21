@@ -1,6 +1,5 @@
 import CartPage from "@/routes/cart/cart"
 import ChatPage from "@/routes/chat/chat"
-import FriendsPage from "@/routes/friends/friends"
 import LibraryPage from "@/routes/library/library"
 import NotificationsPage from "@/routes/notifications/notifications"
 import ProfilePage from "@/routes/profile/profile"
@@ -18,7 +17,6 @@ function App() {
                 <Route path="/profile" element={<ProfilePage />} />
 
                 <Route path="/notifications" element={<NotificationsPage />} />
-                <Route path="/friends" element={<FriendsPage />} />
                 <Route path="/chat" element={<ChatPage />} />
                 <Route path="/cart" element={<CartPage />} />
             </Routes>
