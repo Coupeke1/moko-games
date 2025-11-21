@@ -1,5 +1,6 @@
 package be.kdg.team22.tictactoeservice.api;
 
+import be.kdg.team22.tictactoeservice.api.models.MoveModel;
 import be.kdg.team22.tictactoeservice.api.models.PlayersModel;
 import be.kdg.team22.tictactoeservice.domain.game.Game;
 import be.kdg.team22.tictactoeservice.domain.game.GameId;
@@ -91,8 +92,8 @@ public class GameControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(model)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.players[?(@.role == 'X')].id.id").value(playerXUuid.toString()))
-                .andExpect(jsonPath("$.players[?(@.role == 'O')].id.id").value(playerOUuid.toString()));
+                .andExpect(jsonPath("$.players[?(@.role == 'X')].id.value").value(playerXUuid.toString()))
+                .andExpect(jsonPath("$.players[?(@.role == 'O')].id.value").value(playerOUuid.toString()));
     }
 
     @Test
@@ -187,5 +188,48 @@ public class GameControllerIntegrationTest {
         Field statusField = Game.class.getDeclaredField("status");
         statusField.setAccessible(true);
         statusField.set(game, status);
+    }
+
+    @Test
+    void shouldMakeValidMove() throws Exception {
+        String createResponse = mockMvc.perform(post("/api/games")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(model)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        String gameId = extractId(createResponse);
+        Game game = repository.findById(GameId.fromString(gameId)).orElseThrow();
+
+        MoveModel moveModel = new MoveModel(game.id().value(), game.currentPlayer().id().value(), 0, 1);
+
+        mockMvc.perform(post("/api/games/" + gameId + "/move")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(moveModel)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(gameId))
+                .andExpect(jsonPath("$.board[0][1]").value(game.players().first().role().toString()))
+                .andExpect(jsonPath("$.currentRole").value(game.players().stream().toList().get(1).role().toString()))
+                .andReturn().getResponse().getContentAsString();
+    }
+
+    @Test
+    void shouldReturnBadRequestForInvalidMove() throws Exception {
+        String createResponse = mockMvc.perform(post("/api/games")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(model)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        String gameId = extractId(createResponse);
+        Game game = repository.findById(GameId.fromString(gameId)).orElseThrow();
+
+        MoveModel moveModel = new MoveModel(game.id().value(), game.currentPlayer().id().value(), -1, 1);
+
+        mockMvc.perform(post("/api/games/" + gameId + "/move")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(moveModel)))
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
     }
 }

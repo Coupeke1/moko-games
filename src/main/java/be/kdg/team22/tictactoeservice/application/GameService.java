@@ -3,6 +3,7 @@ package be.kdg.team22.tictactoeservice.application;
 import be.kdg.team22.tictactoeservice.config.BoardSizeProperties;
 import be.kdg.team22.tictactoeservice.domain.game.Game;
 import be.kdg.team22.tictactoeservice.domain.game.GameId;
+import be.kdg.team22.tictactoeservice.domain.game.Move;
 import be.kdg.team22.tictactoeservice.domain.player.Player;
 import be.kdg.team22.tictactoeservice.repository.GameRepository;
 import org.springframework.stereotype.Service;
@@ -36,10 +37,10 @@ public class GameService {
         return game;
     }
 
-    public Player nextPlayer(final GameId id) {
+    public Game requestMove(final GameId id, final Move move) {
         Game game = getGame(id);
-        Player nextPlayer = game.nextPlayer();
+        game.requestMove(move);
         repository.save(game);
-        return nextPlayer;
+        return game;
     }
 }
