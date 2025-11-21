@@ -7,6 +7,7 @@ import be.kdg.team22.tictactoeservice.domain.player.PlayerRole;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @AggregateRoot
 public class Game {
@@ -14,6 +15,7 @@ public class Game {
     private Board board;
     private GameStatus status;
     private final TreeSet<Player> players;
+    private final Map<PlayerId, List<Move>> moveHistory;
     private PlayerRole currentRole;
 
     private Game(final int requestedSize, final List<Player> players) {
@@ -24,6 +26,7 @@ public class Game {
                 player.role().order()));
         this.players.addAll(players);
         this.currentRole = this.players.getFirst().role();
+        moveHistory = players.stream().collect(Collectors.toMap(Player::id, p -> new ArrayList<>()));
     }
 
     public static Game create(final int minSize, final int maxSize, final int size, final List<Player> players) {
@@ -88,6 +91,7 @@ public class Game {
         }
 
         board = board.setCell(move.row(), move.col(), currentRole);
+        moveHistory.get(move.playerId()).add(move);
         nextPlayer();
     }
 
@@ -105,6 +109,10 @@ public class Game {
 
     public TreeSet<Player> players() {
         return players;
+    }
+
+    public Map<PlayerId, List<Move>> moveHistory() {
+        return moveHistory;
     }
 
     public PlayerRole currentRole() {

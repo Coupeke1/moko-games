@@ -143,4 +143,18 @@ public class GameTest {
         game.requestMove(new Move(game.id(), game.players().first().id(), 1, 1));
         assertThrows(CellOccupiedException.class, () -> game.requestMove(new Move(game.id(), game.currentPlayer().id(), 1, 1)));
     }
+
+    @Test
+    void moveHistoryShouldBeSaved() {
+        PlayerId playerXId = game.players().first().id();
+        PlayerId playerOId = game.players().stream().toList().get(1).id();
+        Move move = new Move(game.id(), playerXId, 1, 1);
+        game.requestMove(move);
+        game.requestMove(new Move(game.id(), playerOId, 1, 2));
+        game.requestMove(new Move(game.id(), playerXId, 2, 1));
+        assertEquals(2, game.moveHistory().size());
+        assertEquals(2, game.moveHistory().get(playerXId).size());
+        assertEquals(1, game.moveHistory().get(playerOId).size());
+        assertEquals(move, game.moveHistory().get(playerXId).getFirst());
+    }
 }

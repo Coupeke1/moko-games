@@ -11,13 +11,21 @@ public record MoveModel(UUID gameId,
                         int row,
                         int col
 ) {
-
     public Move to() {
         return new Move(
                 new GameId(gameId),
                 new PlayerId(playerId),
                 row,
                 col
+        );
+    }
+
+    public static MoveModel from(Move move) {
+        return new MoveModel(
+                move.gameId().value(),
+                move.playerId().value(),
+                move.row(),
+                move.col()
         );
     }
 }
