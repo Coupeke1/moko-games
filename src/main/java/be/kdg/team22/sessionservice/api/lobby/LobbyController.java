@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/lobbies")
 public class LobbyController {
-
     private final LobbyService service;
 
     public LobbyController(final LobbyService service) {

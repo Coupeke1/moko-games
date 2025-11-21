@@ -13,4 +13,3 @@ public record LobbySettings(GameSettings gameSettings, int maxPlayers) {
             throw new IllegalArgumentException("gameSettings cannot be null");
     }
 }
-

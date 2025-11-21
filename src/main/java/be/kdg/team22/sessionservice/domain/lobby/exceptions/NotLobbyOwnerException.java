@@ -4,6 +4,9 @@ import java.util.UUID;
 
 public class NotLobbyOwnerException extends RuntimeException {
     public NotLobbyOwnerException(UUID actingUserId) {
-        super("Only the lobby owner can manage the lobby (user " + actingUserId + ")");
+        super(String.format(
+                "Only the lobby owner can manage the lobby (user %s)",
+                actingUserId
+        ));
     }
 }
