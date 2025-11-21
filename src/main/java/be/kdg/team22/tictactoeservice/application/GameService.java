@@ -1,7 +1,6 @@
 package be.kdg.team22.tictactoeservice.application;
 
 import be.kdg.team22.tictactoeservice.config.BoardSizeProperties;
-import be.kdg.team22.tictactoeservice.domain.NotFoundException;
 import be.kdg.team22.tictactoeservice.domain.game.Game;
 import be.kdg.team22.tictactoeservice.domain.game.GameId;
 import be.kdg.team22.tictactoeservice.domain.player.Player;
@@ -12,36 +11,35 @@ import java.util.List;
 
 @Service
 public class GameService {
+    private final GameRepository repository;
+    private final BoardSizeProperties config;
 
-    private final GameRepository gameRepository;
-    private final BoardSizeProperties boardConfig;
-
-    public GameService(BoardSizeProperties boardConfig, GameRepository gameRepository) {
-        this.boardConfig = boardConfig;
-        this.gameRepository = gameRepository;
+    public GameService(final GameRepository repository, final BoardSizeProperties config) {
+        this.repository = repository;
+        this.config = config;
     }
 
-    public Game startGame(int requestedSize, List<Player> players) {
-        Game game = Game.create(boardConfig.getMinSize(), boardConfig.getMaxSize(), requestedSize, players);
-        gameRepository.save(game);
+    public Game startGame(final int requestedSize, final List<Player> players) {
+        Game game = Game.create(config.minSize(), config.maxSize(), requestedSize, players);
+        repository.save(game);
         return game;
     }
 
-    public Game getGame(GameId id) {
-        return gameRepository.findById(id).orElseThrow(() -> new NotFoundException("Game with id " + id.id() + " not found"));
+    public Game getGame(final GameId id) {
+        return repository.findById(id).orElseThrow(id::notFound);
     }
 
-    public Game resetGame(GameId id) {
+    public Game resetGame(final GameId id) {
         Game game = getGame(id);
         game.reset();
-        gameRepository.save(game);
+        repository.save(game);
         return game;
     }
 
     public Player nextPlayer(GameId id) {
         Game game = getGame(id);
         Player nextPlayer = game.nextPlayer();
-        gameRepository.save(game);
+        repository.save(game);
         return nextPlayer;
     }
 }

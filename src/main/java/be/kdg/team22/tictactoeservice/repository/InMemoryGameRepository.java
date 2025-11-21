@@ -14,7 +14,7 @@ public class InMemoryGameRepository implements GameRepository {
 
     @Override
     public void save(Game game) {
-        games.put(game.getId(), game);
+        games.put(game.id(), game);
     }
 
     @Override

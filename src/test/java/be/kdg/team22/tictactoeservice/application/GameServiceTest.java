@@ -1,10 +1,12 @@
 package be.kdg.team22.tictactoeservice.application;
 
 import be.kdg.team22.tictactoeservice.config.BoardSizeProperties;
-import be.kdg.team22.tictactoeservice.domain.NotFoundException;
 import be.kdg.team22.tictactoeservice.domain.game.Game;
 import be.kdg.team22.tictactoeservice.domain.game.GameId;
 import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
+import be.kdg.team22.tictactoeservice.domain.game.exceptions.BoardSizeException;
+import be.kdg.team22.tictactoeservice.domain.game.exceptions.GameResetException;
+import be.kdg.team22.tictactoeservice.domain.game.exceptions.NotFoundException;
 import be.kdg.team22.tictactoeservice.domain.player.Player;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerRole;
@@ -25,13 +27,13 @@ import static org.mockito.Mockito.*;
 
 public class GameServiceTest {
     @Mock
-    private GameRepository gameRepository;
+    private GameRepository repository;
 
     @Mock
-    private BoardSizeProperties boardConfig;
+    private BoardSizeProperties config;
 
     @InjectMocks
-    private GameService gameService;
+    private GameService service;
 
     private Player playerX;
     private Player playerO;
@@ -41,8 +43,8 @@ public class GameServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        when(boardConfig.getMinSize()).thenReturn(3);
-        when(boardConfig.getMaxSize()).thenReturn(10);
+        when(config.minSize()).thenReturn(3);
+        when(config.maxSize()).thenReturn(10);
 
         playerX = new Player(PlayerId.create(), PlayerRole.X);
         playerO = new Player(PlayerId.create(), PlayerRole.O);
@@ -52,64 +54,64 @@ public class GameServiceTest {
     @Test
     void shouldStartGameWithSize3x3() {
         // Arrange
-        Game expectedGame = Game.create(boardConfig.getMinSize(), boardConfig.getMaxSize(), 3, players);
-        doNothing().when(gameRepository).save(expectedGame);
+        Game expectedGame = Game.create(config.minSize(), config.maxSize(), 3, players);
+        doNothing().when(repository).save(expectedGame);
 
         // Act
-        Game game = gameService.startGame(3, List.of(playerX, playerO));
+        Game game = service.startGame(3, List.of(playerX, playerO));
 
         // Asset
         assertNotNull(game);
-        assertEquals(3, game.getBoard().getSize());
-        verify(gameRepository).save(any(Game.class));
+        assertEquals(3, game.board().size());
+        verify(repository).save(any(Game.class));
     }
 
     @Test
     void shouldStartGameWithSize4x4() {
         // Arrange
-        Game expectedGame = Game.create(boardConfig.getMinSize(), boardConfig.getMaxSize(), 4, players);
-        doNothing().when(gameRepository).save(expectedGame);
+        Game expectedGame = Game.create(config.minSize(), config.maxSize(), 4, players);
+        doNothing().when(repository).save(expectedGame);
         // Act
-        Game game = gameService.startGame(4, players);
+        Game game = service.startGame(4, players);
 
         // Asset
         assertNotNull(game);
-        assertEquals(4, game.getBoard().getSize());
-        verify(gameRepository).save(any(Game.class));
+        assertEquals(4, game.board().size());
+        verify(repository).save(any(Game.class));
     }
 
     @Test
     void shouldStartGameWithSize5x5() {
         // Arrange
-        Game expectedGame = Game.create(boardConfig.getMinSize(), boardConfig.getMaxSize(), 5, players);
-        doNothing().when(gameRepository).save(expectedGame);
+        Game expectedGame = Game.create(config.minSize(), config.maxSize(), 5, players);
+        doNothing().when(repository).save(expectedGame);
 
         // Act
-        Game game = gameService.startGame(5, players);
+        Game game = service.startGame(5, players);
 
         // Asset
         assertNotNull(game);
-        assertEquals(5, game.getBoard().getSize());
-        verify(gameRepository).save(any(Game.class));
+        assertEquals(5, game.board().size());
+        verify(repository).save(any(Game.class));
     }
 
     @Test
     void shouldThrowWhenTooSmall() {
-        assertThrows(IllegalArgumentException.class, () -> gameService.startGame(2, players));
+        assertThrows(BoardSizeException.class, () -> service.startGame(2, players));
     }
 
     @Test
     void shouldThrowWhenTooBig() {
-        assertThrows(IllegalArgumentException.class, () -> gameService.startGame(11, players));
+        assertThrows(BoardSizeException.class, () -> service.startGame(11, players));
     }
 
     @Test
     void shouldGetExistingGame() {
-        Game storedGame = Game.create(boardConfig.getMinSize(), boardConfig.getMaxSize(), 5, players);
+        Game storedGame = Game.create(config.minSize(), config.maxSize(), 5, players);
 
-        when(gameRepository.findById(storedGame.getId())).thenReturn(Optional.of(storedGame));
+        when(repository.findById(storedGame.id())).thenReturn(Optional.of(storedGame));
 
-        Game game = gameService.getGame(storedGame.getId());
+        Game game = service.getGame(storedGame.id());
 
         assertEquals(storedGame, game);
     }
@@ -118,49 +120,49 @@ public class GameServiceTest {
     void shouldThrowWhenGameNotFound() {
         GameId id = new GameId(UUID.randomUUID());
 
-        when(gameRepository.findById(id)).thenReturn(Optional.empty());
+        when(repository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> gameService.getGame(id));
+        assertThrows(NotFoundException.class, () -> service.getGame(id));
     }
 
     @Test
     void shouldResetExistingFinishedGame() throws NoSuchFieldException, IllegalAccessException {
         // Arrange
-        Game storedGame = spy(Game.create(boardConfig.getMinSize(), boardConfig.getMaxSize(), 3, players));
+        Game storedGame = spy(Game.create(config.minSize(), config.maxSize(), 3, players));
 
         Field statusField = Game.class.getDeclaredField("status");
         statusField.setAccessible(true);
         statusField.set(storedGame, GameStatus.WON);
 
-        GameId gameId = storedGame.getId();
-        when(gameRepository.findById(gameId)).thenReturn(Optional.of(storedGame));
+        GameId gameId = storedGame.id();
+        when(repository.findById(gameId)).thenReturn(Optional.of(storedGame));
 
         // Act
-        Game result = gameService.resetGame(gameId);
+        Game result = service.resetGame(gameId);
 
         // Assert
         verify(storedGame).reset();
-        verify(gameRepository).save(storedGame);
+        verify(repository).save(storedGame);
         assertEquals(storedGame, result);
     }
 
     @Test
     void shouldThrowWhenResettingInProgressGame() {
         // Arrange
-        Game storedGame = spy(Game.create(boardConfig.getMinSize(), boardConfig.getMaxSize(), 3, players));
-        GameId gameId = storedGame.getId();
-        when(gameRepository.findById(gameId)).thenReturn(Optional.of(storedGame));
+        Game storedGame = spy(Game.create(config.minSize(), config.maxSize(), 3, players));
+        GameId gameId = storedGame.id();
+        when(repository.findById(gameId)).thenReturn(Optional.of(storedGame));
 
         // Assert
-        assertThrows(IllegalStateException.class, () -> gameService.resetGame(gameId));
+        assertThrows(GameResetException.class, () -> service.resetGame(gameId));
     }
 
     @Test
     void shouldThrowWhenResettingUnknownGame() {
         GameId id = GameId.create();
-        when(gameRepository.findById(id)).thenReturn(Optional.empty());
+        when(repository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> gameService.resetGame(id));
+        assertThrows(NotFoundException.class, () -> service.resetGame(id));
     }
 
     @Test

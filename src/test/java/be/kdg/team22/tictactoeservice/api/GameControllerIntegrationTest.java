@@ -28,15 +28,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class GameControllerIntegrationTest {
-
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    private GameRepository gameRepository;
+    private GameRepository repository;
     @Autowired
     private ObjectMapper objectMapper;
 
-    PlayersModel playersModel;
+    PlayersModel model;
 
     @BeforeEach
     public void setup() {
@@ -44,14 +43,14 @@ public class GameControllerIntegrationTest {
                 UUID.randomUUID(), PlayerRole.X,
                 UUID.randomUUID(), PlayerRole.O
         );
-        playersModel = new PlayersModel(playerMap);
+        model = new PlayersModel(playerMap);
     }
 
     @Test
     void shouldCreateGameWithDefaultSize() throws Exception {
         mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(playersModel)))
+                        .content(objectMapper.writeValueAsString(model)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.board.length()").value(3))
@@ -64,7 +63,7 @@ public class GameControllerIntegrationTest {
 
         mockMvc.perform(post("/api/games?size=5")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(playersModel)))
+                        .content(objectMapper.writeValueAsString(model)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.board.length()").value(5))
@@ -75,7 +74,7 @@ public class GameControllerIntegrationTest {
     void shouldRejectInvalidSize() throws Exception {
         mockMvc.perform(post("/api/games?size=1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(playersModel)))
+                        .content(objectMapper.writeValueAsString(model)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -83,13 +82,13 @@ public class GameControllerIntegrationTest {
     void shouldCreateGameWithCorrectPlayers() throws Exception {
         UUID playerXUuid = UUID.randomUUID();
         UUID playerOUuid = UUID.randomUUID();
-        playersModel = new PlayersModel(Map.of(
+        model = new PlayersModel(Map.of(
                 playerXUuid, PlayerRole.X,
                 playerOUuid, PlayerRole.O
         ));
         mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(playersModel)))
+                        .content(objectMapper.writeValueAsString(model)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.players[?(@.role == 'X')].id.id").value(playerXUuid.toString()))
@@ -120,7 +119,7 @@ public class GameControllerIntegrationTest {
         // Create Game
         String body = mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(playersModel)))
+                        .content(objectMapper.writeValueAsString(model)))
                 .andReturn().getResponse().getContentAsString();
 
         String id = extractId(body);
@@ -141,16 +140,16 @@ public class GameControllerIntegrationTest {
     void shouldResetFinishedGame() throws Exception {
         String createResponse = mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(playersModel)))
+                        .content(objectMapper.writeValueAsString(model)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
         String id = extractId(createResponse);
 
 
-        Game game = gameRepository.findById(GameId.fromString(id)).orElseThrow();
+        Game game = repository.findById(GameId.fromString(id)).orElseThrow();
         setGameStatus(game, GameStatus.WON);
-        gameRepository.save(game);
+        repository.save(game);
 
         mockMvc.perform(post("/api/games/" + id + "/reset"))
                 .andExpect(status().isOk())
@@ -164,7 +163,7 @@ public class GameControllerIntegrationTest {
     void shouldreturnbadrequestforunfinshedGame() throws Exception {
         String createResponse = mockMvc.perform(post("/api/games?size=3")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(playersModel)))
+                        .content(objectMapper.writeValueAsString(model)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 

@@ -1,14 +1,16 @@
 package be.kdg.team22.tictactoeservice.domain.game;
 
+import be.kdg.team22.tictactoeservice.domain.game.exceptions.GameIdException;
+import be.kdg.team22.tictactoeservice.domain.game.exceptions.NotFoundException;
 import org.jmolecules.ddd.annotation.ValueObject;
 
 import java.util.UUID;
 
 @ValueObject
-public record GameId(UUID id) {
+public record GameId(UUID value) {
     public GameId {
-        if (id == null)
-            throw new InvalidGameIdException();
+        if (value == null)
+            throw new GameIdException();
     }
 
     public static GameId create() {
@@ -17,5 +19,9 @@ public record GameId(UUID id) {
 
     public static GameId fromString(String id) {
         return new GameId(UUID.fromString(id));
+    }
+
+    public NotFoundException notFound() {
+        throw new NotFoundException(value);
     }
 }
