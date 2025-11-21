@@ -1,27 +1,29 @@
 package be.kdg.team22.tictactoeservice.config;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "board")
 public class BoardSizeProperties {
+    @Value("${board.min-size}")
     private int minSize;
+
+    @Value("${board.max-size}")
     private int maxSize;
 
-    public int getMinSize() {
+    public int minSize() {
         return minSize;
     }
 
-    public void setMinSize(int minSize) {
+    public void setMinSize(final int minSize) {
         this.minSize = minSize;
     }
 
-    public int getMaxSize() {
+    public int maxSize() {
         return maxSize;
     }
 
-    public void setMaxSize(int maxSize) {
+    public void setMaxSize(final int maxSize) {
         this.maxSize = maxSize;
     }
 }

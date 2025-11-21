@@ -17,11 +17,11 @@ public record GameModel(
 ) {
     public static GameModel fromDomain(Game game) {
         return new GameModel(
-                game.getId().id(),
-                game.getBoard().getGrid(),
-                game.getStatus(),
-                game.getPlayers(),
-                game.getCurrentRole()
+                game.id().value(),
+                game.board().grid(),
+                game.status(),
+                game.players(),
+                game.currentRole()
         );
     }
 }
