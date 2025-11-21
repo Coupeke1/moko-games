@@ -65,7 +65,7 @@ package:
       BASE_TAG="temp-build"
 
       # Build once
-      docker build
+    - docker build
         --build-arg CI_COMMIT_SHA="$CI_COMMIT_SHA"
         --build-arg CI_PIPELINE_CREATED_AT="$CI_PIPELINE_CREATED_AT"
         --build-arg CI_COMMIT_REF_NAME="$CI_COMMIT_REF_NAME"
@@ -74,6 +74,7 @@ package:
         -t $CI_REGISTRY_IMAGE:$BASE_TAG .
 
       # Determine which tags to apply
+    - |
       TAGS=()
       if [[ -n "$CI_COMMIT_TAG" ]]; then
         TAGS+=("$CI_COMMIT_TAG" "latest")
@@ -84,7 +85,7 @@ package:
       fi
 
       # Tag and push
-      for t in "${TAGS[@]}"; do
+    - for t in "${TAGS[@]}"; do
         docker tag $CI_REGISTRY_IMAGE:$BASE_TAG $CI_REGISTRY_IMAGE:$t
         docker push $CI_REGISTRY_IMAGE:$t
       done
