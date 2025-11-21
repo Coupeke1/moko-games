@@ -25,8 +25,8 @@ public class LobbyEntity {
 
     @ElementCollection
     @CollectionTable(name = "lobby_players", joinColumns = @JoinColumn(name = "lobby_id"))
-    @Column(name = "player_id", nullable = false)
-    private Set<UUID> playerIds;
+    private Set<LobbyPlayerEmbed> players;
+
     @ElementCollection
     @CollectionTable(name = "lobby_invited_players", joinColumns = @JoinColumn(name = "lobby_id"))
     @Column(name = "invited_player_id", nullable = false)
@@ -53,7 +53,7 @@ public class LobbyEntity {
             final UUID id,
             final UUID gameId,
             final UUID ownerId,
-            final Set<UUID> playerIds,
+            final Set<LobbyPlayerEmbed> players,
             final Set<UUID> invitedPlayerIds,
             final LobbySettings settings,
             final LobbyStatus status,
@@ -63,7 +63,7 @@ public class LobbyEntity {
         this.id = id;
         this.gameId = gameId;
         this.ownerId = ownerId;
-        this.playerIds = playerIds;
+        this.players = players;
         this.invitedPlayerIds = invitedPlayerIds;
         this.settings = settings;
         this.status = status;
@@ -72,17 +72,18 @@ public class LobbyEntity {
     }
 
     public static LobbyEntity fromDomain(final Lobby lobby) {
+
+        Set<LobbyPlayerEmbed> mappedPlayers =
+                lobby.players().stream()
+                        .map(p -> new LobbyPlayerEmbed(p.id(), p.username()))
+                        .collect(Collectors.toSet());
+
         return new LobbyEntity(
                 lobby.id().value(),
                 lobby.gameId().value(),
                 lobby.ownerId().value(),
-
-                lobby.players().stream()
-                        .map(LobbyPlayer::id)
-                        .collect(Collectors.toSet()),
-
+                mappedPlayers,
                 lobby.invitedPlayers(),
-
                 lobby.settings(),
                 lobby.status(),
                 lobby.createdAt(),
@@ -91,15 +92,16 @@ public class LobbyEntity {
     }
 
     public Lobby toDomain() {
+        Set<PlayerId> domainPlayers =
+                players.stream()
+                        .map(p -> PlayerId.from(p.getId()))
+                        .collect(Collectors.toSet());
+
         return new Lobby(
                 LobbyId.from(id),
                 GameId.from(gameId),
                 PlayerId.from(ownerId),
-
-                playerIds.stream()
-                        .map(PlayerId::from)
-                        .collect(Collectors.toSet()),
-
+                domainPlayers,
                 settings,
                 status,
                 createdAt,
