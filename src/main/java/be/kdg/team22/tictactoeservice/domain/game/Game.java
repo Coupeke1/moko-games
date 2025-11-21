@@ -1,5 +1,6 @@
 package be.kdg.team22.tictactoeservice.domain.game;
 
+import be.kdg.team22.tictactoeservice.domain.game.exceptions.*;
 import be.kdg.team22.tictactoeservice.domain.player.Player;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerRole;
@@ -17,7 +18,7 @@ public class Game {
     private final List<Player> players;
     private PlayerRole currentRole;
 
-    private Game(int requestedSize, List<Player> players) {
+    private Game(final int requestedSize, final List<Player> players) {
         this.id = GameId.create();
         this.board = Board.create(requestedSize);
         this.status = GameStatus.IN_PROGRESS;
@@ -25,57 +26,54 @@ public class Game {
         this.currentRole = PlayerRole.X;
     }
 
-    public static Game create(int minSize, int maxSize, int size, List<Player> players) {
-        if (size < minSize || size > maxSize) {
-            throw new IllegalArgumentException("Board size must be between " + minSize + " and " + maxSize);
-        }
+    public static Game create(final int minSize, final int maxSize, final int size, final List<Player> players) {
+        if (size < minSize || size > maxSize)
+            throw new BoardSizeException(minSize, maxSize);
 
-        if (players.size() < 2) {
-            throw new IllegalArgumentException("There must be at least 2 players");
-        }
+        if (players.size() < 2)
+            throw new GameSizeException();
 
         List<PlayerId> playerIds = players.stream().map(Player::id).toList();
         Set<PlayerId> uniquePlayerIds = new HashSet<>(playerIds);
-        if (uniquePlayerIds.size() != players.size()) {
-            throw new IllegalArgumentException("All players must be unique");
-        }
+        if (uniquePlayerIds.size() != players.size())
+            throw new UniquePlayersException();
+
 
         List<PlayerRole> playerRoles = players.stream().map(Player::role).toList();
         Set<PlayerRole> uniquePlayerRoles = new HashSet<>(playerRoles);
-        if (uniquePlayerRoles.size() != players.size()) {
-            throw new IllegalArgumentException("All players must have a different role");
-        }
+        if (uniquePlayerRoles.size() != players.size())
+            throw new PlayerRolesException();
 
         return new Game(size, players);
     }
 
-    public GameId getId() {
+    public void reset() {
+        if (status == GameStatus.IN_PROGRESS)
+            throw new GameResetException();
+
+        this.status = GameStatus.IN_PROGRESS;
+        this.board = Board.create(this.board.size());
+
+        this.currentRole = PlayerRole.X;
+    }
+
+    public GameId id() {
         return id;
     }
 
-    public Board getBoard() {
+    public Board board() {
         return board;
     }
 
-    public GameStatus getStatus() {
+    public GameStatus status() {
         return status;
     }
 
-    public List<Player> getPlayers() {
+    public List<Player> players() {
         return players;
     }
 
-    public PlayerRole getCurrentRole() {
+    public PlayerRole currentRole() {
         return currentRole;
-    }
-
-    public void reset() {
-        if (status == GameStatus.IN_PROGRESS)
-            throw new IllegalStateException("Cannot reset GameStatus when status is IN_PROGRESS");
-
-        this.status = GameStatus.IN_PROGRESS;
-        this.board = Board.create(this.board.getSize());
-
-        this.currentRole = PlayerRole.X;
     }
 }

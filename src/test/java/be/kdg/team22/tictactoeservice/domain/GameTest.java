@@ -2,6 +2,10 @@ package be.kdg.team22.tictactoeservice.domain;
 
 import be.kdg.team22.tictactoeservice.domain.game.Game;
 import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
+import be.kdg.team22.tictactoeservice.domain.game.exceptions.GameResetException;
+import be.kdg.team22.tictactoeservice.domain.game.exceptions.GameSizeException;
+import be.kdg.team22.tictactoeservice.domain.game.exceptions.PlayerRolesException;
+import be.kdg.team22.tictactoeservice.domain.game.exceptions.UniquePlayersException;
 import be.kdg.team22.tictactoeservice.domain.player.Player;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerRole;
@@ -28,16 +32,15 @@ public class GameTest {
 
     @Test
     void shouldHaveInitialStateCorrect() {
-        assertNotNull(game.getId());
-        assertEquals(GameStatus.IN_PROGRESS, game.getStatus());
-        assertEquals(PlayerRole.X, game.getCurrentRole());
-        assertEquals(3, game.getBoard().getSize());
+        assertNotNull(game.id());
+        assertEquals(GameStatus.IN_PROGRESS, game.status());
+        assertEquals(PlayerRole.X, game.currentRole());
+        assertEquals(3, game.board().size());
     }
 
     @Test
     void resetShouldThrowIfInProgress() {
-        IllegalStateException exception = assertThrows(IllegalStateException.class, game::reset);
-        assertEquals("Cannot reset GameStatus when status is IN_PROGRESS", exception.getMessage());
+        assertThrows(GameResetException.class, () -> game.reset());
     }
 
     @Test
@@ -48,16 +51,16 @@ public class GameTest {
 
         game.reset();
 
-        assertEquals(GameStatus.IN_PROGRESS, game.getStatus());
-        assertEquals(PlayerRole.X, game.getCurrentRole());
-        assertEquals(3, game.getBoard().getSize());
-        assertNotNull(game.getBoard());
+        assertEquals(GameStatus.IN_PROGRESS, game.status());
+        assertEquals(PlayerRole.X, game.currentRole());
+        assertEquals(3, game.board().size());
+        assertNotNull(game.board());
     }
 
     @Test
     void createShouldThrowWhenTooFewPlayers() {
         Player playerX = new Player(PlayerId.create(), PlayerRole.X);
-        assertThrows(IllegalArgumentException.class, () -> Game.create(minSize, maxSize, 3, List.of(playerX)));
+        assertThrows(GameSizeException.class, () -> Game.create(minSize, maxSize, 3, List.of(playerX)));
     }
 
     @Test
@@ -65,13 +68,13 @@ public class GameTest {
         UUID uuid = UUID.randomUUID();
         Player playerX = new Player(new PlayerId(uuid), PlayerRole.X);
         Player playerO = new Player(new PlayerId(uuid), PlayerRole.O);
-        assertThrows(IllegalArgumentException.class, () -> Game.create(minSize, maxSize, 3, List.of(playerX, playerO)));
+        assertThrows(UniquePlayersException.class, () -> Game.create(minSize, maxSize, 3, List.of(playerX, playerO)));
     }
 
     @Test
     void createShouldThrowWhenNonUniquePlayerRoles() {
         Player playerX = new Player(PlayerId.create(), PlayerRole.X);
         Player playerX2 = new Player(PlayerId.create(), PlayerRole.X);
-        assertThrows(IllegalArgumentException.class, () -> Game.create(minSize, maxSize, 4, List.of(playerX, playerX2)));
+        assertThrows(PlayerRolesException.class, () -> Game.create(minSize, maxSize, 4, List.of(playerX, playerX2)));
     }
 }

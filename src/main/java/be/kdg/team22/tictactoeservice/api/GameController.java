@@ -16,20 +16,20 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/games")
-public class GameRestController {
+public class GameController {
     private final GameService service;
 
-    public GameRestController(GameService service) {
+    public GameController(GameService service) {
         this.service = service;
     }
 
     @PostMapping({"/", ""})
-    public ResponseEntity<GameModel> createGame(
-            @RequestParam(defaultValue = "3") int size,
-            @RequestBody PlayersModel playersModel
-    ) {
+    public ResponseEntity<GameModel> createGame(@RequestParam(defaultValue = "3") final int size, @RequestBody final PlayersModel playersModel) {
         List<Player> players = new ArrayList<>();
-        playersModel.players().forEach((playerId, playerRole) -> players.add(new Player(new PlayerId(playerId), playerRole)));
+        playersModel.players().forEach((playerId, playerRole) -> {
+            players.add(new Player(new PlayerId(playerId), playerRole));
+        });
+
         Game game = service.startGame(size, players);
         GameModel model = GameModel.fromDomain(game);
 
@@ -37,7 +37,7 @@ public class GameRestController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GameModel> getGame(@PathVariable UUID id) {
+    public ResponseEntity<GameModel> getGame(@PathVariable final UUID id) {
         Game game = service.getGame(new GameId(id));
         GameModel model = GameModel.fromDomain(game);
 
@@ -45,7 +45,7 @@ public class GameRestController {
     }
 
     @PostMapping("/{id}/reset")
-    public ResponseEntity<GameModel> resetGame(@PathVariable UUID id) {
+    public ResponseEntity<GameModel> resetGame(@PathVariable final UUID id) {
         Game game = service.resetGame(new GameId(id));
         GameModel model = GameModel.fromDomain(game);
 
