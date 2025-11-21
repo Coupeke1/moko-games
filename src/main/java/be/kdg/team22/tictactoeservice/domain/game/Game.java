@@ -44,9 +44,7 @@ public class Game {
         if (uniquePlayerRoles.size() != players.size())
             throw new PlayerRolesException();
 
-        return new Game(size, players.stream()
-                .sorted(Comparator.comparing(p -> p.role().order()))
-                .toList());
+        return new Game(size, players);
     }
 
     public void reset() {
