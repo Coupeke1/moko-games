@@ -10,4 +10,14 @@ export default defineConfig({
             '@': path.resolve(__dirname, './src'),
         },
     },
+    test: {
+        globals: true,
+        environment: 'jsdom',
+        setupFiles: './src/setupTests.ts',
+        include: ['src/**/*.{test,spec}.{js,ts,jsx,tsx}'],
+        reporters: ['default', 'junit'],
+        outputFile: {
+            junit: 'test-results/vitest-report.xml'
+        }
+    }
 })
