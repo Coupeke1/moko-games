@@ -17,7 +17,7 @@ export default function Input({ label, type = "text", disabled, required, value,
             required={required}
             disabled={disabled}
             placeholder={label}
-            className="rounded-lg bg-bg-2 h-10 px-3 placeholder:text-fg-2"
+            className="rounded-lg bg-bg-2 w-full h-10 px-3 placeholder:text-fg-2"
             value={value} onChange={onChange}
         >
             {children && (

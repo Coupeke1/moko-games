@@ -1,8 +1,7 @@
-import Column from "@/components/layout/column"
-import { Gap } from "@/components/layout/gap"
 import NavigationBar from "@/components/navigation/bar"
 import Footer from "@/components/navigation/footer"
 import type { ReactNode } from "react"
+import { Gap } from "./gap"
 
 interface Props {
     children: ReactNode
@@ -16,7 +15,7 @@ export default function Page({ children }: Props) {
                     <NavigationBar />
                 </section>
 
-                <section className="flex flex-col mx-auto max-w-2xl w-full">
+                <section className={`flex flex-col ${Gap.Medium} mx-auto max-w-2xl w-full`}>
                     {children}
                 </section>
             </section>
