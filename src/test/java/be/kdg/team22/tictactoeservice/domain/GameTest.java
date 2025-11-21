@@ -74,4 +74,29 @@ public class GameTest {
         Player playerX2 = new Player(PlayerId.create(), PlayerRole.X);
         assertThrows(IllegalArgumentException.class, () -> Game.create(minSize, maxSize, 4, List.of(playerX, playerX2)));
     }
+
+    @Test
+    void initialRoleShouldBeFirstPlayersRole() {
+        assertEquals(PlayerRole.X, game.getCurrentRole());
+        assertEquals(PlayerRole.X, game.getPlayers().first().role());
+    }
+
+    @Test
+    void nextPlayerShouldGoToNextRole() {
+        assertEquals(PlayerRole.X, game.getCurrentRole());
+        assertEquals(PlayerRole.O, game.nextPlayer().role());
+        assertEquals(PlayerRole.O, game.getCurrentRole());
+    }
+
+    @Test
+    void nextPlayerShouldWrapAroundToFirstPlayer() throws NoSuchFieldException, IllegalAccessException {
+        Field currentRoleField = Game.class.getDeclaredField("currentRole");
+        currentRoleField.setAccessible(true);
+        currentRoleField.set(game, PlayerRole.O);
+
+
+        assertEquals(PlayerRole.O, game.getCurrentRole());
+        assertEquals(PlayerRole.X, game.nextPlayer().role());
+        assertEquals(PlayerRole.X, game.getCurrentRole());
+    }
 }

@@ -162,4 +162,21 @@ public class GameServiceTest {
 
         assertThrows(NotFoundException.class, () -> gameService.resetGame(id));
     }
+
+    @Test
+    void shouldReturnNextPlayer() {
+        //Arrange
+        Game game = Game.create(boardConfig.getMinSize(), boardConfig.getMaxSize(), 3, players);
+
+        GameId gameId = game.getId();
+        when(gameRepository.findById(gameId)).thenReturn(Optional.of(game));
+
+        //Act
+        Player nextPlayer = gameService.nextPlayer(gameId);
+
+        //Assert
+        assertNotNull(nextPlayer);
+        assertEquals(playerO, nextPlayer);
+        assertEquals(PlayerRole.O, nextPlayer.role());
+    }
 }
