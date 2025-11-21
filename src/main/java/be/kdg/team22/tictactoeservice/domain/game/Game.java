@@ -16,14 +16,14 @@ public class Game {
     private final TreeSet<Player> players;
     private PlayerRole currentRole;
 
-    private Game(final int requestedSize, final List<Player> unsortedPlayers) {
+    private Game(final int requestedSize, final List<Player> players) {
         this.id = GameId.create();
         this.board = Board.create(requestedSize);
         this.status = GameStatus.IN_PROGRESS;
         this.players = new TreeSet<>(Comparator.comparing((Player player) ->
                 player.role().order()));
-        this.players.addAll(unsortedPlayers);
-        this.currentRole = unsortedPlayers.getFirst().role();
+        this.players.addAll(players);
+        this.currentRole = players.getFirst().role();
     }
 
     public static Game create(final int minSize, final int maxSize, final int size, final List<Player> players) {
