@@ -5,10 +5,13 @@ import NotificationsPage from "@/routes/notifications/notifications"
 import ProfilePage from "@/routes/profile/profile"
 import StorePage from "@/routes/store/store"
 import { BrowserRouter, Navigate, Route, Routes } from "react-router"
+import Auth from "@/components/auth"
 
 function App() {
     return (
         <BrowserRouter>
+            <Auth />
+
             <Routes>
                 <Route path="/" element={<Navigate to="/store" />} />
 

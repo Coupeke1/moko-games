@@ -1,7 +1,6 @@
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
-import { GridSize } from "@/components/layout/grid/size";
 import Page from "@/components/layout/page";
 import Section from "@/components/section";
 import AchievementCard from "@/routes/profile/components/achievement-card";

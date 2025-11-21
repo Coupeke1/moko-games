@@ -4,6 +4,7 @@ import Row from "@/components/layout/row";
 import NavigationButton from "@/components/navigation/button";
 import NavigationLink from "@/components/navigation/link";
 import NavigationMenu from "@/components/navigation/menu";
+import { useAuthStore } from "@/stores/auth-store";
 import { useState } from "react";
 import { Link as RouterLink } from "react-router";
 
@@ -11,6 +12,8 @@ export default function NavigationBar() {
     const [open, setOpen] = useState(false);
     const toggle = () => setOpen(!open);
     const close = () => setOpen(false);
+
+    const { authenticated } = useAuthStore();
 
     return (
         <>
