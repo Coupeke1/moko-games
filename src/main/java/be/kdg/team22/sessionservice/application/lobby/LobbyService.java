@@ -1,9 +1,14 @@
 package be.kdg.team22.sessionservice.application.lobby;
 
+import be.kdg.team22.sessionservice.api.lobby.models.*;
 import be.kdg.team22.sessionservice.domain.lobby.*;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.GameNotValidException;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.LobbyNotFoundException;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.OwnerNotValidException;
+import be.kdg.team22.sessionservice.domain.lobby.settings.CheckersSettings;
+import be.kdg.team22.sessionservice.domain.lobby.settings.GameSettings;
+import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
+import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,13 +23,13 @@ public class LobbyService {
         this.repository = repository;
     }
 
-    public Lobby createLobby(final GameId gameId, final PlayerId ownerId) {
-        if (gameId == null)
-            throw new GameNotValidException(null);
-        if (ownerId == null)
-            throw new OwnerNotValidException(null);
+    public Lobby createLobby(GameId gameId, PlayerId ownerId, CreateLobbyModel model) {
+        if (gameId == null) throw new GameNotValidException(null);
+        if (ownerId == null) throw new OwnerNotValidException(null);
 
-        Lobby lobby = new Lobby(gameId, ownerId);
+        LobbySettings settings = mapToDomainSettings(model.settings(), model.maxPlayers());
+
+        Lobby lobby = new Lobby(gameId, ownerId, settings);
         repository.save(lobby);
         return lobby;
     }
@@ -35,5 +40,37 @@ public class LobbyService {
 
     public List<Lobby> findAllLobbies() {
         return repository.findAll();
+    }
+
+    public Lobby closeLobby(final LobbyId id, final PlayerId actingUser) {
+        Lobby lobby = findLobby(id);
+        lobby.close(actingUser);
+        repository.save(lobby);
+        return lobby;
+    }
+
+    public Lobby updateSettings(
+            final LobbyId id,
+            final PlayerId actingUser,
+            final UpdateLobbySettingsModel model
+    ) {
+        Lobby lobby = findLobby(id);
+
+        LobbySettings newSettings = mapToDomainSettings(model.settings(), model.maxPlayers());
+
+        lobby.changeSettings(actingUser, newSettings);
+        repository.save(lobby);
+        return lobby;
+    }
+
+    private LobbySettings mapToDomainSettings(GameSettingsModel model, Integer maxPlayers) {
+        int resolvedMaxPlayers = maxPlayers != null ? maxPlayers : 4;
+
+        GameSettings gameSettings = switch (model) {
+            case TicTacToeSettingsModel t -> new TicTacToeSettings(t.boardSize());
+            case CheckersSettingsModel c -> new CheckersSettings(c.boardSize(), c.flyingKings());
+        };
+
+        return new LobbySettings(gameSettings, resolvedMaxPlayers);
     }
 }
