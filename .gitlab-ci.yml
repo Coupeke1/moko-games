@@ -65,7 +65,7 @@ package:
       BASE_TAG="temp-build"
 
       # Build once
-      docker build \
+      docker build
         --build-arg CI_COMMIT_SHA="$CI_COMMIT_SHA"
         --build-arg CI_PIPELINE_CREATED_AT="$CI_PIPELINE_CREATED_AT"
         --build-arg CI_COMMIT_REF_NAME="$CI_COMMIT_REF_NAME"
