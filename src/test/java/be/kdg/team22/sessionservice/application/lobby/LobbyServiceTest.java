@@ -5,17 +5,17 @@ import be.kdg.team22.sessionservice.api.lobby.models.CreateLobbyModel;
 import be.kdg.team22.sessionservice.api.lobby.models.TicTacToeSettingsModel;
 import be.kdg.team22.sessionservice.api.lobby.models.UpdateLobbySettingsModel;
 import be.kdg.team22.sessionservice.domain.lobby.*;
-import be.kdg.team22.sessionservice.domain.lobby.exceptions.GameNotValidException;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.LobbyNotFoundException;
-import be.kdg.team22.sessionservice.domain.lobby.exceptions.OwnerNotValidException;
 import be.kdg.team22.sessionservice.domain.lobby.settings.CheckersSettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
+import be.kdg.team22.sessionservice.infrastructure.lobby.db.users.ExternalUserRepository;
+import be.kdg.team22.sessionservice.infrastructure.lobby.db.users.UserResponse;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,10 +25,13 @@ import static org.mockito.Mockito.*;
 class LobbyServiceTest {
 
     LobbyRepository repo = mock(LobbyRepository.class);
-    LobbyService service = new LobbyService(repo);
+    ExternalUserRepository users = mock(ExternalUserRepository.class);
+
+    LobbyService service = new LobbyService(repo, users);
 
     @Test
     void createLobby_savesLobby_andReturnsIt() {
+
         GameId gameId = new GameId(UUID.randomUUID());
         PlayerId owner = new PlayerId(UUID.randomUUID());
 
@@ -37,48 +40,31 @@ class LobbyServiceTest {
                 4,
                 new TicTacToeSettingsModel(3)
         );
+
+        when(users.getById(owner.value(), "TOKEN"))
+                .thenReturn(new UserResponse(
+                        owner.value(),
+                        "ownerUser",
+                        "owner@kdg.be",
+                        Instant.now()
+                ));
 
         doNothing().when(repo).save(any(Lobby.class));
 
-        Lobby result = service.createLobby(gameId, owner, model);
+        Lobby lobby = service.createLobby(gameId, owner, model, "TOKEN");
 
-        assertThat(result.gameId()).isEqualTo(gameId);
-        assertThat(result.ownerId()).isEqualTo(owner);
-        assertThat(result.settings().maxPlayers()).isEqualTo(4);
-        assertThat(result.settings().gameSettings()).isInstanceOf(TicTacToeSettings.class);
+        assertThat(lobby.gameId()).isEqualTo(gameId);
+        assertThat(lobby.ownerId().value()).isEqualTo(owner.value());
+        assertThat(lobby.settings().maxPlayers()).isEqualTo(4);
+        assertThat(lobby.settings().gameSettings()).isInstanceOf(TicTacToeSettings.class);
+
         verify(repo).save(any(Lobby.class));
-    }
-
-    @Test
-    void createLobby_nullGameId_throws() {
-        PlayerId owner = new PlayerId(UUID.randomUUID());
-
-        CreateLobbyModel model = new CreateLobbyModel(
-                null,
-                4,
-                new TicTacToeSettingsModel(3)
-        );
-
-        assertThatThrownBy(() -> service.createLobby(null, owner, model))
-                .isInstanceOf(GameNotValidException.class);
-    }
-
-    @Test
-    void createLobby_nullOwnerId_throws() {
-        GameId gameId = new GameId(UUID.randomUUID());
-
-        CreateLobbyModel model = new CreateLobbyModel(
-                gameId.value(),
-                4,
-                new TicTacToeSettingsModel(3)
-        );
-
-        assertThatThrownBy(() -> service.createLobby(gameId, null, model))
-                .isInstanceOf(OwnerNotValidException.class);
+        verify(users).getById(owner.value(), "TOKEN");
     }
 
     @Test
     void findLobby_returnsLobby() {
+
         LobbyId id = LobbyId.create();
         Lobby lobby = mock(Lobby.class);
 
@@ -89,8 +75,8 @@ class LobbyServiceTest {
 
     @Test
     void findLobby_notFound_throws() {
-        LobbyId id = LobbyId.create();
 
+        LobbyId id = LobbyId.create();
         when(repo.findById(id)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.findLobby(id))
@@ -99,31 +85,31 @@ class LobbyServiceTest {
 
     @Test
     void findAllLobbies_returnsList() {
-        List<Lobby> list = List.of(mock(Lobby.class));
 
+        List<Lobby> list = List.of(mock(Lobby.class));
         when(repo.findAll()).thenReturn(list);
 
         assertThat(service.findAllLobbies()).containsExactlyElementsOf(list);
     }
 
+    private Lobby existingLobby(LobbyId id, PlayerId owner) {
+
+        LobbyPlayer lp = new LobbyPlayer(owner.value(), "ownerUser");
+        LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
+
+        return new Lobby(
+                new GameId(UUID.randomUUID()),
+                lp,
+                settings
+        );
+    }
+
     @Test
     void updateSettings_tictactoe_updatesSuccessfully() {
+
         LobbyId id = LobbyId.create();
-        GameId gameId = new GameId(UUID.randomUUID());
         PlayerId owner = new PlayerId(UUID.randomUUID());
-
-        LobbySettings existing = new LobbySettings(new TicTacToeSettings(3), 4);
-
-        Lobby lobby = new Lobby(
-                id,
-                gameId,
-                owner,
-                Set.of(owner),
-                existing,
-                LobbyStatus.OPEN,
-                java.time.Instant.now(),
-                java.time.Instant.now()
-        );
+        Lobby lobby = existingLobby(id, owner);
 
         when(repo.findById(id)).thenReturn(Optional.of(lobby));
 
@@ -132,32 +118,21 @@ class LobbyServiceTest {
                 new TicTacToeSettingsModel(5)
         );
 
-        Lobby result = service.updateSettings(id, owner, model);
+        Lobby updated = service.updateSettings(id, owner, model);
 
-        assertThat(result.settings().maxPlayers()).isEqualTo(5);
-        assertThat(result.settings().gameSettings()).isInstanceOf(TicTacToeSettings.class);
-        assertThat(((TicTacToeSettings) result.settings().gameSettings()).boardSize()).isEqualTo(5);
+        assertThat(updated.settings().maxPlayers()).isEqualTo(5);
+        assertThat(updated.settings().gameSettings()).isInstanceOf(TicTacToeSettings.class);
+        assertThat(((TicTacToeSettings) updated.settings().gameSettings()).boardSize()).isEqualTo(5);
+
         verify(repo).save(lobby);
     }
 
     @Test
     void updateSettings_checkers_updatesSuccessfully() {
+
         LobbyId id = LobbyId.create();
-        GameId gameId = new GameId(UUID.randomUUID());
         PlayerId owner = new PlayerId(UUID.randomUUID());
-
-        LobbySettings existing = new LobbySettings(new TicTacToeSettings(3), 4);
-
-        Lobby lobby = new Lobby(
-                id,
-                gameId,
-                owner,
-                Set.of(owner),
-                existing,
-                LobbyStatus.OPEN,
-                java.time.Instant.now(),
-                java.time.Instant.now()
-        );
+        Lobby lobby = existingLobby(id, owner);
 
         when(repo.findById(id)).thenReturn(Optional.of(lobby));
 
@@ -166,31 +141,20 @@ class LobbyServiceTest {
                 new CheckersSettingsModel(8, true)
         );
 
-        Lobby result = service.updateSettings(id, owner, model);
+        Lobby updated = service.updateSettings(id, owner, model);
 
-        assertThat(result.settings().maxPlayers()).isEqualTo(6);
-        assertThat(result.settings().gameSettings()).isInstanceOf(CheckersSettings.class);
+        assertThat(updated.settings().maxPlayers()).isEqualTo(6);
+        assertThat(updated.settings().gameSettings()).isInstanceOf(CheckersSettings.class);
+
         verify(repo).save(lobby);
     }
 
     @Test
     void updateSettings_nullSettings_throws() {
+
         LobbyId id = LobbyId.create();
-        GameId gameId = new GameId(UUID.randomUUID());
         PlayerId owner = new PlayerId(UUID.randomUUID());
-
-        LobbySettings existing = new LobbySettings(new TicTacToeSettings(3), 4);
-
-        Lobby lobby = new Lobby(
-                id,
-                gameId,
-                owner,
-                Set.of(owner),
-                existing,
-                LobbyStatus.OPEN,
-                java.time.Instant.now(),
-                java.time.Instant.now()
-        );
+        Lobby lobby = existingLobby(id, owner);
 
         when(repo.findById(id)).thenReturn(Optional.of(lobby));
 

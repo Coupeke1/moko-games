@@ -1,69 +1,98 @@
 package be.kdg.team22.sessionservice.api.lobby;
 
-import be.kdg.team22.sessionservice.domain.lobby.LobbyStatus;
+import be.kdg.team22.sessionservice.api.lobby.models.LobbyInviteModel;
+import be.kdg.team22.sessionservice.application.lobby.LobbyInviteQueryService;
+import be.kdg.team22.sessionservice.application.lobby.LobbyPlayerService;
+import be.kdg.team22.sessionservice.application.lobby.LobbyService;
+import be.kdg.team22.sessionservice.domain.lobby.*;
+import be.kdg.team22.sessionservice.domain.lobby.exceptions.GameNotValidException;
+import be.kdg.team22.sessionservice.domain.lobby.exceptions.LobbyNotFoundException;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
-import be.kdg.team22.sessionservice.infrastructure.lobby.db.LobbyJpaRepository;
-import be.kdg.team22.sessionservice.infrastructure.lobby.db.entities.LobbyEntity;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
-import static be.kdg.team22.sessionservice.utils.Token.tokenWithUser;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@WebMvcTest(LobbyController.class)
 class LobbyControllerTest {
 
+    private static final UUID GAME_ID =
+            UUID.fromString("00000000-0000-0000-0000-000000000005");
     @Autowired
-    private MockMvc mock;
+    private MockMvc mockMvc;
+    @MockitoBean
+    private LobbyService lobbyService;
+    @MockitoBean
+    private LobbyPlayerService playerService;
 
-    @Autowired
-    private LobbyJpaRepository repo;
+    @MockitoBean
+    private LobbyInviteQueryService inviteQueryService;
 
-    @BeforeEach
-    void setup() {
-        repo.deleteAll();
+    private static org.springframework.test.web.servlet.request.RequestPostProcessor jwtFor(
+            String sub, String username, String email) {
+
+        return jwt().jwt(builder -> {
+            builder.subject(sub);
+            builder.claim("preferred_username", username);
+            builder.claim("email", email);
+        });
     }
 
-    private LobbyEntity lobbyEntity(
-            UUID id,
-            UUID gameId,
-            UUID ownerId,
-            Set<UUID> players,
-            LobbySettings settings
-    ) {
-        return new LobbyEntity(
-                id,
-                gameId,
-                ownerId,
-                players,
+    private Lobby sampleLobby(UUID lobbyId, UUID ownerId) {
+        LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
+        LobbyPlayer ownerPlayer = new LobbyPlayer(ownerId, "owner");
+
+        return new Lobby(
+                LobbyId.from(lobbyId),
+                GameId.from(GAME_ID),
+                PlayerId.from(ownerId),
+                List.of(ownerPlayer),
+                Set.of(),
                 settings,
                 LobbyStatus.OPEN,
-                Instant.now(),
-                Instant.now()
+                Instant.parse("2024-01-01T00:00:00Z"),
+                Instant.parse("2024-01-01T00:00:00Z")
         );
     }
 
     @Test
+    @DisplayName("POST /api/lobbies – creates lobby and returns 201")
     void createLobby_createsRecord_andReturns201() throws Exception {
-        String owner = "11111111-1111-1111-1111-111111111111";
+        String ownerId = "11111111-1111-1111-1111-111111111111";
+        UUID lobbyId = UUID.randomUUID();
 
-        mock.perform(post("/api/lobbies")
-                        .with(tokenWithUser(owner, "user", "user@kdg.be"))
+        Lobby lobby = sampleLobby(lobbyId, UUID.fromString(ownerId));
+
+        when(lobbyService.createLobby(
+                any(GameId.class),
+                any(PlayerId.class),
+                any(),
+                anyString()
+        )).thenReturn(lobby);
+
+        mockMvc.perform(post("/api/lobbies")
+                        .with(jwtFor(ownerId, "user", "user@kdg.be"))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -77,19 +106,29 @@ class LobbyControllerTest {
                                 }
                                 """))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.ownerId").value(owner))
-                .andExpect(jsonPath("$.gameId").value("00000000-0000-0000-0000-000000000005"))
-                .andExpect(jsonPath("$.players[0]").value(owner))
+                .andExpect(jsonPath("$.ownerId").value(ownerId))
+                .andExpect(jsonPath("$.gameId").value(GAME_ID.toString()))
                 .andExpect(jsonPath("$.maxPlayers").value(4))
                 .andExpect(jsonPath("$.settings.type").value("ticTacToe"))
                 .andExpect(jsonPath("$.settings.boardSize").value(3));
 
-        assertThat(repo.count()).isEqualTo(1);
+        ArgumentCaptor<GameId> gameIdCaptor = ArgumentCaptor.forClass(GameId.class);
+        ArgumentCaptor<PlayerId> ownerCaptor = ArgumentCaptor.forClass(PlayerId.class);
+        verify(lobbyService).createLobby(
+                gameIdCaptor.capture(),
+                ownerCaptor.capture(),
+                any(),
+                anyString()
+        );
+
+        assertThat(gameIdCaptor.getValue().value()).isEqualTo(GAME_ID);
+        assertThat(ownerCaptor.getValue().value().toString()).isEqualTo(ownerId);
     }
 
     @Test
+    @DisplayName("POST /api/lobbies – missing JWT returns 401")
     void createLobby_missingJwt_returns401() throws Exception {
-        mock.perform(post("/api/lobbies")
+        mockMvc.perform(post("/api/lobbies")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -106,11 +145,15 @@ class LobbyControllerTest {
     }
 
     @Test
+    @DisplayName("POST /api/lobbies – invalid gameId returns 400 (GameNotValidException)")
     void createLobby_invalidGameId_returns400() throws Exception {
-        String owner = "22222222-2222-2222-2222-222222222222";
+        String ownerId = "22222222-2222-2222-2222-222222222222";
 
-        mock.perform(post("/api/lobbies")
-                        .with(tokenWithUser(owner, "user", "user@kdg.be"))
+        when(lobbyService.createLobby(any(), any(), any(), anyString()))
+                .thenThrow(new GameNotValidException(null));
+
+        mockMvc.perform(post("/api/lobbies")
+                        .with(jwtFor(ownerId, "user", "user@kdg.be"))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -127,20 +170,19 @@ class LobbyControllerTest {
     }
 
     @Test
+    @DisplayName("GET /api/lobbies/{id} – returns lobby when found")
     void getLobbyById_returnsCorrectLobby() throws Exception {
-        UUID id = UUID.randomUUID();
-        UUID gameId = UUID.fromString("00000000-0000-0000-0000-000000000005");
+        UUID lobbyId = UUID.randomUUID();
         UUID ownerId = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
+        Lobby lobby = sampleLobby(lobbyId, ownerId);
 
-        LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
+        when(lobbyService.findLobby(LobbyId.from(lobbyId))).thenReturn(lobby);
 
-        repo.save(lobbyEntity(id, gameId, ownerId, Set.of(ownerId), settings));
-
-        mock.perform(get("/api/lobbies/" + id)
-                        .with(tokenWithUser(ownerId.toString(), "owner", "owner@kdg.be")))
+        mockMvc.perform(get("/api/lobbies/{id}", lobbyId)
+                        .with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(id.toString()))
-                .andExpect(jsonPath("$.gameId").value(gameId.toString()))
+                .andExpect(jsonPath("$.id").value(lobbyId.toString()))
+                .andExpect(jsonPath("$.gameId").value(GAME_ID.toString()))
                 .andExpect(jsonPath("$.ownerId").value(ownerId.toString()))
                 .andExpect(jsonPath("$.maxPlayers").value(4))
                 .andExpect(jsonPath("$.settings.type").value("ticTacToe"))
@@ -148,66 +190,91 @@ class LobbyControllerTest {
     }
 
     @Test
+    @DisplayName("GET /api/lobbies/{id} – returns 404 when not found")
     void getLobbyById_returns404IfNotFound() throws Exception {
-        mock.perform(get("/api/lobbies/ffffffff-ffff-ffff-ffff-ffffffffffff")
-                        .with(tokenWithUser("33333333-3333-3333-3333-333333333333", "user", "user@kdg.be")))
+        UUID unknownId = UUID.fromString("ffffffff-ffff-ffff-ffff-ffffffffffff");
+
+        when(lobbyService.findLobby(LobbyId.from(unknownId)))
+                .thenThrow(new LobbyNotFoundException(unknownId));
+
+        mockMvc.perform(get("/api/lobbies/{id}", unknownId)
+                        .with(jwtFor("33333333-3333-3333-3333-333333333333",
+                                "user", "user@kdg.be")))
                 .andExpect(status().isNotFound());
     }
 
     @Test
+    @DisplayName("GET /api/lobbies – returns list of lobbies")
     void getAll_returns200_andList() throws Exception {
         UUID ownerId = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
-        LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
+        Lobby lobby = sampleLobby(UUID.randomUUID(), ownerId);
 
-        repo.save(lobbyEntity(UUID.randomUUID(), UUID.randomUUID(), ownerId, Set.of(ownerId), settings));
+        when(lobbyService.findAllLobbies()).thenReturn(List.of(lobby));
 
-        mock.perform(get("/api/lobbies")
-                        .with(tokenWithUser(ownerId.toString(), "user", "user@kdg.be")))
+        mockMvc.perform(get("/api/lobbies")
+                        .with(jwtFor(ownerId.toString(), "user", "user@kdg.be")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").exists());
+                .andExpect(jsonPath("$[0].id").value(lobby.id().value().toString()));
     }
 
     @Test
+    @DisplayName("POST /api/lobbies/{id}/close – owner can close lobby")
     void closeLobby_owner_succeeds() throws Exception {
-        UUID id = UUID.randomUUID();
+        UUID lobbyId = UUID.randomUUID();
         UUID ownerId = UUID.fromString("99999999-9999-9999-9999-999999999999");
-        LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
+        Lobby lobby = sampleLobby(lobbyId, ownerId);
 
-        repo.save(lobbyEntity(id, UUID.randomUUID(), ownerId, Set.of(ownerId), settings));
+        Lobby closedLobby = new Lobby(
+                lobby.id(),
+                lobby.gameId(),
+                lobby.ownerId(),
+                List.copyOf(lobby.players()),
+                lobby.invitedPlayers(),
+                lobby.settings(),
+                LobbyStatus.CLOSED,
+                lobby.createdAt(),
+                Instant.parse("2024-01-02T00:00:00Z")
+        );
 
-        mock.perform(post("/api/lobbies/" + id + "/close")
-                        .with(tokenWithUser(ownerId.toString(), "owner", "owner@kdg.be"))
+        when(lobbyService.closeLobby(LobbyId.from(lobbyId), PlayerId.from(ownerId)))
+                .thenReturn(closedLobby);
+
+        mockMvc.perform(post("/api/lobbies/{id}/close", lobbyId)
+                        .with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be"))
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("CLOSED"));
     }
 
     @Test
-    void closeLobby_nonOwner_returnsBadRequest() throws Exception {
-        UUID id = UUID.randomUUID();
-        UUID ownerId = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
-        UUID otherId = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
-        LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
-
-        repo.save(lobbyEntity(id, UUID.randomUUID(), ownerId, Set.of(ownerId), settings));
-
-        mock.perform(post("/api/lobbies/" + id + "/close")
-                        .with(tokenWithUser(otherId.toString(), "other", "other@kdg.be"))
-                        .with(csrf()))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
+    @DisplayName("PUT /api/lobbies/{id}/settings – owner can update settings")
     void updateSettings_owner_succeeds() throws Exception {
-        UUID id = UUID.randomUUID();
+        UUID lobbyId = UUID.randomUUID();
         UUID ownerId = UUID.fromString("12121212-1212-1212-1212-121212121212");
 
-        LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
+        Lobby lobby = sampleLobby(lobbyId, ownerId);
 
-        repo.save(lobbyEntity(id, UUID.randomUUID(), ownerId, Set.of(ownerId), settings));
+        LobbySettings newSettings = new LobbySettings(new TicTacToeSettings(4), 5);
+        Lobby updated = new Lobby(
+                lobby.id(),
+                lobby.gameId(),
+                lobby.ownerId(),
+                List.copyOf(lobby.players()),
+                lobby.invitedPlayers(),
+                newSettings,
+                lobby.status(),
+                lobby.createdAt(),
+                Instant.parse("2024-01-03T00:00:00Z")
+        );
 
-        mock.perform(put("/api/lobbies/" + id + "/settings")
-                        .with(tokenWithUser(ownerId.toString(), "owner", "owner@kdg.be"))
+        when(lobbyService.updateSettings(
+                eq(LobbyId.from(lobbyId)),
+                eq(PlayerId.from(ownerId)),
+                any()
+        )).thenReturn(updated);
+
+        mockMvc.perform(put("/api/lobbies/{id}/settings", lobbyId)
+                        .with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be"))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -225,28 +292,202 @@ class LobbyControllerTest {
     }
 
     @Test
-    void updateSettings_nonOwner_returnsBadRequest() throws Exception {
-        UUID id = UUID.randomUUID();
-        UUID ownerId = UUID.fromString("13131313-1313-1313-1313-131313131313");
-        UUID otherId = UUID.fromString("14141414-1414-1414-1414-141414141414");
+    @DisplayName("POST /api/lobbies/{lobbyId}/invite/{playerId} – calls playerService.invitePlayer")
+    void inviteSinglePlayer_callsService() throws Exception {
+        UUID lobbyId = UUID.randomUUID();
+        UUID ownerId = UUID.fromString("aaaaaaaa-0000-0000-0000-000000000000");
+        UUID targetId = UUID.fromString("bbbbbbbb-0000-0000-0000-000000000000");
 
-        LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
+        doNothing().when(playerService).invitePlayer(
+                any(PlayerId.class),
+                any(LobbyId.class),
+                any(PlayerId.class),
+                any(Jwt.class)
+        );
 
-        repo.save(lobbyEntity(id, UUID.randomUUID(), ownerId, Set.of(ownerId), settings));
+        mockMvc.perform(post("/api/lobbies/{lobbyId}/invite/{playerId}", lobbyId, targetId)
+                        .with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be"))
+                        .with(csrf()))
+                .andExpect(status().isOk());
 
-        mock.perform(put("/api/lobbies/" + id + "/settings")
-                        .with(tokenWithUser(otherId.toString(), "other", "other@kdg.be"))
+        verify(playerService).invitePlayer(
+                eq(PlayerId.from(ownerId)),
+                eq(LobbyId.from(lobbyId)),
+                eq(PlayerId.from(targetId)),
+                any(Jwt.class)
+        );
+    }
+
+    @Test
+    @DisplayName("POST /api/lobbies/{lobbyId}/invite – calls playerService.invitePlayers")
+    void inviteMultiplePlayers_callsService() throws Exception {
+        UUID lobbyId = UUID.randomUUID();
+        UUID ownerId = UUID.fromString("cccccccc-0000-0000-0000-000000000000");
+        UUID p1 = UUID.fromString("dddddddd-0000-0000-0000-000000000000");
+        UUID p2 = UUID.fromString("eeeeeeee-0000-0000-0000-000000000000");
+
+        doNothing().when(playerService).invitePlayers(
+                any(PlayerId.class),
+                any(LobbyId.class),
+                anyList(),
+                any(Jwt.class)
+        );
+
+        String body = """
+                {
+                  "playerIds": [
+                    "%s",
+                    "%s"
+                  ]
+                }
+                """.formatted(p1, p2);
+
+        mockMvc.perform(post("/api/lobbies/{lobbyId}/invite", lobbyId)
+                        .with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be"))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "maxPlayers": 6,
-                                  "settings": {
-                                    "type": "ticTacToe",
-                                    "boardSize": 3
-                                  }
-                                }
-                                """))
+                        .content(body))
+                .andExpect(status().isOk());
+
+        ArgumentCaptor<List<PlayerId>> idsCaptor = ArgumentCaptor.forClass(List.class);
+
+        verify(playerService).invitePlayers(
+                eq(PlayerId.from(ownerId)),
+                eq(LobbyId.from(lobbyId)),
+                idsCaptor.capture(),
+                any(Jwt.class)
+        );
+
+        List<UUID> capturedIds = idsCaptor.getValue().stream()
+                .map(PlayerId::value)
+                .collect(Collectors.toList());
+
+        assertThat(capturedIds).containsExactlyInAnyOrder(p1, p2);
+    }
+
+    @Test
+    @DisplayName("POST /api/lobbies/{lobbyId}/players/{playerId} – acceptInvite happy path")
+    void acceptInvite_succeeds() throws Exception {
+        UUID lobbyId = UUID.randomUUID();
+        UUID playerId = UUID.fromString("99999999-0000-0000-0000-000000000000");
+
+        doNothing().when(playerService)
+                .acceptInvite(eq(PlayerId.from(playerId)), eq(LobbyId.from(lobbyId)), anyString());
+
+        mockMvc.perform(post("/api/lobbies/{lobbyId}/players/{playerId}", lobbyId, playerId)
+                        .with(jwtFor(playerId.toString(), "kaj", "kaj@kdg.be"))
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        verify(playerService).acceptInvite(
+                eq(PlayerId.from(playerId)),
+                eq(LobbyId.from(lobbyId)),
+                anyString()
+        );
+    }
+
+    @Test
+    @DisplayName("POST /api/lobbies/{lobbyId}/players/{playerId} – id mismatch returns 400")
+    void acceptInvite_idMismatch_returnsBadRequest() throws Exception {
+        UUID lobbyId = UUID.randomUUID();
+        UUID pathPlayerId = UUID.fromString("aaaaaaaa-0000-0000-0000-000000000000");
+        UUID tokenSub = UUID.fromString("bbbbbbbb-0000-0000-0000-000000000000");
+
+        mockMvc.perform(post("/api/lobbies/{lobbyId}/players/{playerId}", lobbyId, pathPlayerId)
+                        .with(jwtFor(tokenSub.toString(), "other", "other@kdg.be"))
+                        .with(csrf()))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("DELETE /api/lobbies/{lobbyId}/players/{playerId} – calls playerService.removePlayer")
+    void removePlayer_callsService() throws Exception {
+        UUID lobbyId = UUID.randomUUID();
+        UUID ownerId = UUID.fromString("12121212-0000-0000-0000-000000000000");
+        UUID targetId = UUID.fromString("13131313-0000-0000-0000-000000000000");
+
+        doNothing().when(playerService)
+                .removePlayer(any(PlayerId.class), any(LobbyId.class), any(PlayerId.class));
+
+        mockMvc.perform(delete("/api/lobbies/{lobbyId}/players/{playerId}", lobbyId, targetId)
+                        .with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be"))
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        verify(playerService).removePlayer(
+                eq(PlayerId.from(ownerId)),
+                eq(LobbyId.from(lobbyId)),
+                eq(PlayerId.from(targetId))
+        );
+    }
+
+    @Test
+    @DisplayName("DELETE /api/lobbies/{lobbyId}/players – calls playerService.removePlayers")
+    void removePlayers_callsService() throws Exception {
+        UUID lobbyId = UUID.randomUUID();
+        UUID ownerId = UUID.fromString("14141414-0000-0000-0000-000000000000");
+        UUID t1 = UUID.fromString("15151515-0000-0000-0000-000000000000");
+        UUID t2 = UUID.fromString("16161616-0000-0000-0000-000000000000");
+
+        doNothing().when(playerService)
+                .removePlayers(any(PlayerId.class), any(LobbyId.class), anyList());
+
+        String body = """
+                {
+                  "playerIds": [
+                    "%s",
+                    "%s"
+                  ]
+                }
+                """.formatted(t1, t2);
+
+        mockMvc.perform(delete("/api/lobbies/{lobbyId}/players", lobbyId)
+                        .with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be"))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isOk());
+
+        verify(playerService).removePlayers(
+                eq(PlayerId.from(ownerId)),
+                eq(LobbyId.from(lobbyId)),
+                argThat(list -> list.stream()
+                        .map(PlayerId::value)
+                        .collect(Collectors.toSet())
+                        .containsAll(Set.of(t1, t2)))
+        );
+    }
+
+    @Test
+    @DisplayName("GET /api/lobbies/invited – returns invites for current user")
+    void getInvited_returnsInvites() throws Exception {
+        UUID userId = UUID.fromString("17171717-0000-0000-0000-000000000000");
+        UUID lobbyId = UUID.randomUUID();
+
+        UUID invitedBy = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
+
+        LobbyInviteModel invite = new LobbyInviteModel(
+                lobbyId,
+                GAME_ID,
+                "Checkers",
+                invitedBy,
+                "mathias",
+                Set.of(),
+                Set.of(),
+                4,
+                "OPEN",
+                Instant.parse("2024-01-01T00:00:00Z")
+        );
+
+        when(inviteQueryService.getInvitesForUser(
+                eq(PlayerId.from(userId)),
+                anyString()
+        )).thenReturn(List.of(invite));
+
+        mockMvc.perform(get("/api/lobbies/invited")
+                        .with(jwtFor(userId.toString(), "kaj", "kaj@kdg.be")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].lobbyId").value(lobbyId.toString()))
+                .andExpect(jsonPath("$[0].invitedByUsername").value("mathias"));
     }
 }

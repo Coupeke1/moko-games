@@ -62,17 +62,15 @@ public class LobbyEntity {
     protected LobbyEntity() {
     }
 
-    public LobbyEntity(
-            final UUID id,
-            final UUID gameId,
-            final UUID ownerId,
-            final Set<LobbyPlayerEmbed> players,
-            final Set<UUID> invitedPlayerIds,
-            final LobbySettings settings,
-            final LobbyStatus status,
-            final Instant createdAt,
-            final Instant updatedAt
-    ) {
+    public LobbyEntity(UUID id,
+                       UUID gameId,
+                       UUID ownerId,
+                       Set<LobbyPlayerEmbed> players,
+                       Set<UUID> invitedPlayerIds,
+                       LobbySettings settings,
+                       LobbyStatus status,
+                       Instant createdAt,
+                       Instant updatedAt) {
         this.id = id;
         this.gameId = gameId;
         this.ownerId = ownerId;
@@ -133,5 +131,29 @@ public class LobbyEntity {
                 createdAt,
                 updatedAt
         );
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public UUID getGameId() {
+        return gameId;
+    }
+
+    public UUID getOwnerId() {
+        return ownerId;
+    }
+
+    public Set<LobbyPlayerEmbed> getPlayers() {
+        return players;
+    }
+
+    public LobbySettings getSettings() {
+        return settings;
+    }
+
+    public LobbyStatus getStatus() {
+        return status;
     }
 }
