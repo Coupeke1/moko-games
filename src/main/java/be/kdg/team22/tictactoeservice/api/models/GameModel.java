@@ -17,7 +17,8 @@ public record GameModel(
         GameStatus status,
         TreeSet<Player> players,
         Map<UUID, List<MoveModel>> moveHistory,
-        PlayerRole currentRole
+        PlayerRole currentRole,
+        UUID winner
 ) {
     public static GameModel from(Game game) {
         return new GameModel(
@@ -31,7 +32,8 @@ public record GameModel(
                                 entry -> entry.getValue().stream()
                                         .map(MoveModel::from).toList()
                         )),
-                game.currentRole()
+                game.currentRole(),
+                game.winner() == null ? null : game.winner().value()
         );
     }
 }

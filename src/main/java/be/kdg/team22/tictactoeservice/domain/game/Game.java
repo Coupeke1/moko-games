@@ -17,16 +17,18 @@ public class Game {
     private final TreeSet<Player> players;
     private final Map<PlayerId, List<Move>> moveHistory;
     private PlayerRole currentRole;
+    private PlayerId winner;
 
     private Game(final int requestedSize, final List<Player> players) {
-        this.id = GameId.create();
-        this.board = Board.create(requestedSize);
-        this.status = GameStatus.IN_PROGRESS;
+        id = GameId.create();
+        board = Board.create(requestedSize);
+        status = GameStatus.IN_PROGRESS;
         this.players = new TreeSet<>(Comparator.comparing((Player player) ->
                 player.role().order()));
         this.players.addAll(players);
-        this.currentRole = this.players.getFirst().role();
         moveHistory = players.stream().collect(Collectors.toMap(Player::id, p -> new ArrayList<>()));
+        currentRole = this.players.getFirst().role();
+        winner = null;
     }
 
     public static Game create(final int minSize, final int maxSize, final int size, final List<Player> players) {
@@ -92,7 +94,15 @@ public class Game {
 
         board = board.setCell(move.row(), move.col(), currentRole);
         moveHistory.get(move.playerId()).add(move);
-        nextPlayer();
+
+        status = board.checkWinner(move.row(), move.col(), currentRole);
+        if (status == GameStatus.WON) {
+            winner = move.playerId();
+        }
+
+        if (status == GameStatus.IN_PROGRESS) {
+            nextPlayer();
+        }
     }
 
     public GameId id() {
@@ -131,5 +141,9 @@ public class Game {
                 .map(Player::role)
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException(id.value()));
+    }
+
+    public PlayerId winner() {
+        return winner;
     }
 }
