@@ -23,21 +23,21 @@ public class ExternalUserRepository {
     public UserResponse getById(UUID id) {
         try {
             UserResponse response = client.get()
-                    // TODO: pad aanpassen aan jullie user-service
-                    .uri("/{id}", id)
+                    .uri("/api/profiles/{id}", id)
                     .retrieve()
                     .body(UserResponse.class);
 
-            if (response == null) {
+            if (response == null)
                 throw new UserNotFoundException(id);
-            }
 
             return response;
+
         } catch (HttpClientErrorException ex) {
-            if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
+            if (ex.getStatusCode() == HttpStatus.NOT_FOUND)
                 throw new UserNotFoundException(id);
-            }
+
             throw ex;
+
         } catch (RestClientException ex) {
             throw ServiceNotReachableException.userServiceNotReachable();
         }

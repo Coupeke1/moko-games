@@ -22,17 +22,20 @@ public class ExternalFriendsRepository {
 
     public List<UUID> getFriendIds(UUID ownerId) {
         try {
-            FriendsResponse response = client.get()
-                    // TODO: pad aanpassen aan jullie echte endpoint
-                    .uri("/friends/{ownerId}", ownerId)
+            FriendsOverviewResponse response = client.get()
+                    .uri("/api/friends")
                     .retrieve()
-                    .body(FriendsResponse.class);
+                    .body(FriendsOverviewResponse.class);
 
-            return response == null ? List.of() : response.friendIds();
+            if (response == null) return List.of();
+
+            return response.friends()
+                    .stream()
+                    .map(FriendsResponse::userId)
+                    .toList();
+
         } catch (HttpClientErrorException ex) {
-            if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
-                return List.of();
-            }
+            if (ex.getStatusCode() == HttpStatus.NOT_FOUND) return List.of();
             throw ex;
         } catch (RestClientException ex) {
             throw ServiceNotReachableException.socialServiceNotReachable();
