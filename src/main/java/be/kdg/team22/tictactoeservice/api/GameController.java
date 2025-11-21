@@ -1,6 +1,7 @@
 package be.kdg.team22.tictactoeservice.api;
 
 import be.kdg.team22.tictactoeservice.api.models.GameModel;
+import be.kdg.team22.tictactoeservice.api.models.MoveModel;
 import be.kdg.team22.tictactoeservice.api.models.PlayersModel;
 import be.kdg.team22.tictactoeservice.application.GameService;
 import be.kdg.team22.tictactoeservice.domain.game.Game;
@@ -26,12 +27,11 @@ public class GameController {
     @PostMapping({"/", ""})
     public ResponseEntity<GameModel> createGame(@RequestParam(defaultValue = "3") final int size, @RequestBody final PlayersModel playersModel) {
         List<Player> players = new ArrayList<>();
-        playersModel.players().forEach((playerId, playerRole) -> {
-            players.add(new Player(new PlayerId(playerId), playerRole));
-        });
+        playersModel.players().forEach((playerId, playerRole) ->
+                players.add(new Player(new PlayerId(playerId), playerRole)));
 
         Game game = service.startGame(size, players);
-        GameModel model = GameModel.fromDomain(game);
+        GameModel model = GameModel.from(game);
 
         return ResponseEntity.ok(model);
     }
@@ -39,7 +39,7 @@ public class GameController {
     @GetMapping("/{id}")
     public ResponseEntity<GameModel> getGame(@PathVariable final UUID id) {
         Game game = service.getGame(new GameId(id));
-        GameModel model = GameModel.fromDomain(game);
+        GameModel model = GameModel.from(game);
 
         return ResponseEntity.ok(model);
     }
@@ -47,7 +47,15 @@ public class GameController {
     @PostMapping("/{id}/reset")
     public ResponseEntity<GameModel> resetGame(@PathVariable final UUID id) {
         Game game = service.resetGame(new GameId(id));
-        GameModel model = GameModel.fromDomain(game);
+        GameModel model = GameModel.from(game);
+
+        return ResponseEntity.ok(model);
+    }
+
+    @PostMapping("/{id}/move")
+    public ResponseEntity<GameModel> requestMove(@PathVariable final UUID id, @RequestBody final MoveModel moveModel) {
+        Game game = service.requestMove(new GameId(id), moveModel.to());
+        GameModel model = GameModel.from(game);
 
         return ResponseEntity.ok(model);
     }

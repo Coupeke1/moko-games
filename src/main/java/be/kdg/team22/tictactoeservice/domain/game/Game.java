@@ -58,19 +58,36 @@ public class Game {
     }
 
     public Player nextPlayer() {
-        Player currentPlayer = players.stream()
-                .filter(p -> p.role() == currentRole)
-                .findFirst()
-                .orElseThrow(() -> new RoleUnfulfilledException(currentRole));
-
+        Player currentPlayer = currentPlayer();
         List<Player> playerList = new ArrayList<>(players);
         int currentIndex = playerList.indexOf(currentPlayer);
-        int nextIndex = (currentIndex + 1) % playerList.size();
 
+        int nextIndex = (currentIndex + 1) % playerList.size();
         Player nextPlayer = playerList.get(nextIndex);
         currentRole = nextPlayer.role();
 
         return nextPlayer;
+    }
+
+    public void requestMove(final Move move) {
+        if (move.row() < 0 || move.col() < 0
+                || move.row() > board.size() || move.col() > board.size()) {
+            throw new InvalidCellException(board.size());
+        }
+
+        if (board.cell(move.row(), move.col()) != null) {
+            throw new CellOccupiedException(move.row(), move.col());
+        }
+
+        if (status != GameStatus.IN_PROGRESS) {
+            throw new GameNotInProgressException();
+        }
+
+        if (!currentPlayer().id().equals(move.playerId())) {
+            throw new NotPlayersTurnException(currentPlayer().id().value());
+        }
+
+        currentRole = roleOfPlayer(move.playerId());
     }
 
     public GameId id() {
@@ -91,5 +108,19 @@ public class Game {
 
     public PlayerRole currentRole() {
         return currentRole;
+    }
+
+    public Player currentPlayer() {
+        return players.stream()
+                .filter(p -> p.role() == currentRole)
+                .findFirst()
+                .orElseThrow(() -> new RoleUnfulfilledException(currentRole));
+    }
+
+    public PlayerRole roleOfPlayer(PlayerId id) {
+        return players.stream().filter(p -> p.id().equals(id))
+                .map(Player::role)
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException(id.value()));
     }
 }

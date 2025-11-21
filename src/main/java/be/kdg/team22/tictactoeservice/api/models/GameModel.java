@@ -15,7 +15,7 @@ public record GameModel(
         TreeSet<Player> players,
         PlayerRole currentRole
 ) {
-    public static GameModel fromDomain(Game game) {
+    public static GameModel from(Game game) {
         return new GameModel(
                 game.id().value(),
                 game.board().grid(),

@@ -1,0 +1,9 @@
+package be.kdg.team22.tictactoeservice.domain.game;
+
+import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
+
+public record Move(GameId gameId,
+                   PlayerId playerId,
+                   int row,
+                   int col) {
+}

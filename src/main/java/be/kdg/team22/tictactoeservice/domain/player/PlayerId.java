@@ -6,9 +6,9 @@ import org.jmolecules.ddd.annotation.ValueObject;
 import java.util.UUID;
 
 @ValueObject
-public record PlayerId(UUID id) {
+public record PlayerId(UUID value) {
     public PlayerId {
-        if (id == null)
+        if (value == null)
             throw new InvalidPlayerException();
     }
 
