@@ -6,4 +6,8 @@ public class PlayerAlreadyInLobbyException extends RuntimeException {
     public PlayerAlreadyInLobbyException(UUID playerId) {
         super(String.format("Player '%s' is already in the lobby", playerId));
     }
+
+    public PlayerAlreadyInLobbyException(UUID playerId, UUID lobbyId) {
+        super(String.format("Player '%s' is already in lobby '%s'", playerId, lobbyId));
+    }
 }

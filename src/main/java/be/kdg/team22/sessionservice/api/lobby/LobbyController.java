@@ -1,6 +1,7 @@
 package be.kdg.team22.sessionservice.api.lobby;
 
 import be.kdg.team22.sessionservice.api.lobby.models.*;
+import be.kdg.team22.sessionservice.application.lobby.LobbyPlayerService;
 import be.kdg.team22.sessionservice.application.lobby.LobbyService;
 import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
@@ -21,10 +22,16 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/lobbies")
 public class LobbyController {
-    private final LobbyService service;
 
-    public LobbyController(final LobbyService service) {
+    private final LobbyService service;
+    private final LobbyPlayerService playerService;
+
+    public LobbyController(
+            LobbyService service,
+            LobbyPlayerService playerService
+    ) {
         this.service = service;
+        this.playerService = playerService;
     }
 
     @PostMapping
@@ -72,6 +79,59 @@ public class LobbyController {
         PlayerId actingUser = PlayerId.get(jwt);
         Lobby lobby = service.updateSettings(LobbyId.from(id), actingUser, model);
         return ResponseEntity.ok(toResponseModel(lobby));
+    }
+
+    @PostMapping("/{lobbyId}/invite/{playerId}")
+    public void invitePlayer(
+            @PathVariable UUID lobbyId,
+            @PathVariable UUID playerId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        UUID ownerId = UUID.fromString(jwt.getSubject());
+        playerService.invitePlayer(ownerId, lobbyId, playerId);
+    }
+
+    @PostMapping("/{lobbyId}/invite")
+    public void invitePlayers(
+            @PathVariable UUID lobbyId,
+            @RequestBody InvitePlayersRequestModel request,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        UUID ownerId = UUID.fromString(jwt.getSubject());
+        playerService.invitePlayers(ownerId, lobbyId, request.playerIds());
+    }
+
+    @PostMapping("/{lobbyId}/players/{playerId}")
+    public void acceptInvite(
+            @PathVariable UUID lobbyId,
+            @PathVariable UUID playerId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        UUID actingUser = UUID.fromString(jwt.getSubject());
+        if (!actingUser.equals(playerId)) {
+            throw new IllegalArgumentException("Authenticated user does not match playerId in path.");
+        }
+        playerService.acceptInvite(actingUser, lobbyId);
+    }
+
+    @DeleteMapping("/{lobbyId}/players/{playerId}")
+    public void removePlayer(
+            @PathVariable UUID lobbyId,
+            @PathVariable UUID playerId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        UUID ownerId = UUID.fromString(jwt.getSubject());
+        playerService.removePlayer(ownerId, lobbyId, playerId);
+    }
+
+    @DeleteMapping("/{lobbyId}/players")
+    public void removePlayers(
+            @PathVariable UUID lobbyId,
+            @RequestBody RemovePlayersRequestModel request,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        UUID ownerId = UUID.fromString(jwt.getSubject());
+        playerService.removePlayers(ownerId, lobbyId, request.playerIds());
     }
 
     private LobbyResponseModel toResponseModel(final Lobby lobby) {

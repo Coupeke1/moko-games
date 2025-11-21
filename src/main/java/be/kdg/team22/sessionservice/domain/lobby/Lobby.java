@@ -5,10 +5,7 @@ import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
 import java.time.Instant;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @AggregateRoot
 public class Lobby {
@@ -122,6 +119,104 @@ public class Lobby {
             throw new LobbyManagementNotAllowedException(status);
     }
 
+    public void invitePlayer(UUID actingUserId, UUID targetPlayerId) {
+        ensureOwner(actingUserId);
+        ensureModifiable();
+
+        if (isInLobby(targetPlayerId)) {
+            throw new PlayerAlreadyInLobbyException(targetPlayerId, id.value());
+        }
+
+        invitedPlayerIds.add(targetPlayerId);
+    }
+
+    public void invitePlayers(UUID actingUserId, Collection<UUID> targetPlayerIds) {
+        ensureOwner(actingUserId);
+        ensureModifiable();
+
+        for (UUID targetId : targetPlayerIds) {
+            if (!isInLobby(targetId)) {
+                invitedPlayerIds.add(targetId);
+            }
+        }
+    }
+
+    public void acceptInvite(LobbyPlayer player) {
+        ensureModifiable();
+
+        UUID playerId = player.id();
+        if (!invitedPlayerIds.contains(playerId)) {
+            throw new InviteNotFoundException(id.value(), playerId);
+        }
+
+        if (isFull()) {
+            throw new LobbyFullException(id.value());
+        }
+
+        if (isInLobby(playerId)) {
+            throw new PlayerAlreadyInLobbyException(playerId, id.value());
+        }
+
+        invitedPlayerIds.remove(playerId);
+        players.add(player);
+    }
+
+    public void removePlayer(UUID actingUserId, UUID playerId) {
+        ensureOwner(actingUserId);
+        ensureModifiable();
+
+        if (playerId.equals(owner.value())) {
+            throw new CannotRemoveOwnerException(id.value());
+        }
+
+        boolean removed = players.removeIf(p -> p.id().equals(playerId));
+        if (!removed) {
+            throw new PlayerNotInLobbyException(playerId, id.value());
+        }
+    }
+
+    public void removePlayers(UUID actingUserId, Collection<UUID> playerIds) {
+        ensureOwner(actingUserId);
+        ensureModifiable();
+
+        if (playerIds.contains(owner.value())) {
+            throw new CannotRemoveOwnerException(id.value());
+        }
+
+        Set<UUID> toRemove = new HashSet<>(playerIds);
+        List<LobbyPlayer> remaining = players.stream()
+                .filter(p -> !toRemove.contains(p.id()))
+                .toList();
+
+
+        players.clear();
+        players.addAll(remaining);
+    }
+
+    private boolean isInLobby(UUID playerId) {
+        return players.stream().anyMatch(p -> p.id().equals(playerId));
+    }
+
+    private boolean isFull() {
+        return players.size() >= settings.maxPlayers();
+    }
+
+    private void ensureOwner(UUID actingUserId) {
+        if (!owner.value().equals(actingUserId)) {
+            throw new NotLobbyOwnerException(actingUserId);
+        }
+    }
+
+    private void ensureModifiable() {
+        if (status == LobbyStatus.CLOSED || status == LobbyStatus.STARTED) {
+            throw new LobbyStateInvalidException(id.value(), status.name());
+        }
+    }
+
+    public boolean isInvited(UUID playerId) {
+        return invitedPlayerIds.contains(playerId);
+    }
+
     public LobbyId id() {
         return id;
     }
@@ -150,7 +245,7 @@ public class Lobby {
         return updatedAt;
     }
 
-    public Set<PlayerId> players() {
+    public Set<LobbyPlayer> players() {
         return Set.copyOf(players);
     }
 }
