@@ -9,7 +9,7 @@ interface Props {
 
 export default function Select({ label, disabled, required, value, onChange, options }: Props) {
     return (
-        <section className="relative flex items-center">
+        <section className="relative flex items-center min-w-32 w-full">
             <section className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -28,7 +28,7 @@ export default function Select({ label, disabled, required, value, onChange, opt
                 required={required}
                 value={value}
                 onChange={onChange}
-                className="rounded-lg bg-bg-2 h-10 px-3 appearance-none w-full pl-10 text-fg-2"
+                className="rounded-lg bg-bg-2 w-full h-10 px-3 appearance-none pl-10 text-fg-2"
             >
                 <option value="" disabled>
                     {label}
