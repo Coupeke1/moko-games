@@ -3,7 +3,7 @@ package be.kdg.team22.tictactoeservice.domain.game.exceptions;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerRole;
 
 public class RoleUnfulfilledException extends RuntimeException {
-    public RoleUnfulfilledException(PlayerRole role) {
+    public RoleUnfulfilledException(final PlayerRole role) {
         super(String.format("Role '%s' is not assigned in the current game", role.toString()));
     }
 

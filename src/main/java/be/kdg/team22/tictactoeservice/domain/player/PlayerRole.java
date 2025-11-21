@@ -5,7 +5,7 @@ public enum PlayerRole {
 
     private final int order;
 
-    PlayerRole(int order) {
+    PlayerRole(final int order) {
         this.order = order;
     }
 

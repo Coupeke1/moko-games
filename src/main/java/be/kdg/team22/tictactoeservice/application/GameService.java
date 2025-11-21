@@ -36,7 +36,7 @@ public class GameService {
         return game;
     }
 
-    public Player nextPlayer(GameId id) {
+    public Player nextPlayer(final GameId id) {
         Game game = getGame(id);
         Player nextPlayer = game.nextPlayer();
         repository.save(game);
