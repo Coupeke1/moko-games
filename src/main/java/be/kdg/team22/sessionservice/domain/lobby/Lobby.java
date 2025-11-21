@@ -6,14 +6,17 @@ import org.jmolecules.ddd.annotation.AggregateRoot;
 
 import java.time.Instant;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @AggregateRoot
 public class Lobby {
     private final LobbyId id;
     private final GameId game;
     private final PlayerId owner;
-    private final Set<PlayerId> players;
+    private final List<LobbyPlayer> players;
+    private final Set<UUID> invitedPlayerIds;
     private final Instant createdAt;
     private Instant updatedAt;
     private LobbyStatus status;
