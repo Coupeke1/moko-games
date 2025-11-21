@@ -61,18 +61,33 @@ package:
     - echo "Building Docker image..."
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - |
-      TAG=$CI_COMMIT_REF_SLUG
+      # Base image tag for build
+      BASE_TAG="temp-build"
+
+      # Build once
+      docker build \
+        --build-arg CI_COMMIT_SHA="$CI_COMMIT_SHA"
+        --build-arg CI_PIPELINE_CREATED_AT="$CI_PIPELINE_CREATED_AT"
+        --build-arg CI_COMMIT_REF_NAME="$CI_COMMIT_REF_NAME"
+        --build-arg CI_COMMIT_TAG="$CI_COMMIT_TAG"
+        --build-arg CI_PIPELINE_ID="$CI_PIPELINE_ID"
+        -t $CI_REGISTRY_IMAGE:$BASE_TAG .
+
+      # Determine which tags to apply
+      TAGS=()
       if [[ -n "$CI_COMMIT_TAG" ]]; then
-        TAG=$CI_COMMIT_TAG
+        TAGS+=("$CI_COMMIT_TAG" "latest")
+      elif [[ "$CI_COMMIT_BRANCH" == "main" ]]; then
+        TAGS+=("main-latest")
+      else
+        TAGS+=("$CI_COMMIT_REF_SLUG")
       fi
-    - docker build
-      --build-arg CI_COMMIT_SHA="$CI_COMMIT_SHA"
-      --build-arg CI_PIPELINE_CREATED_AT="$CI_PIPELINE_CREATED_AT"
-      --build-arg CI_COMMIT_REF_NAME="$CI_COMMIT_REF_NAME"
-      --build-arg CI_COMMIT_TAG="$CI_COMMIT_TAG"
-      --build-arg CI_PIPELINE_ID="$CI_PIPELINE_ID"
-      -t $CI_REGISTRY_IMAGE:$TAG .
-    - docker push $CI_REGISTRY_IMAGE:$TAG
+
+      # Tag and push
+      for t in "${TAGS[@]}"; do
+        docker tag $CI_REGISTRY_IMAGE:$BASE_TAG $CI_REGISTRY_IMAGE:$t
+        docker push $CI_REGISTRY_IMAGE:$t
+      done
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
