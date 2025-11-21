@@ -1,5 +1,6 @@
 export const Justify = {
     None: "",
+    Stretch: "justify-stretch",
     Center: "justify-center",
     Between: "justify-between",
     Start: "justify-start",

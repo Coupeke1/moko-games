@@ -1,7 +1,7 @@
 import Grid from "@/components/layout/grid/grid";
 import Page from "@/components/layout/page";
 import SearchBar from "@/routes/library/components/search-bar";
-import LibraryCard from "@/routes/library/components/library-card";
+import LibraryCard from "@/routes/library/components/card";
 
 export default function LibraryPage() {
     return (
