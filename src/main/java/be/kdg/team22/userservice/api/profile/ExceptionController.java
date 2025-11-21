@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class ExceptionController {
 
     @ExceptionHandler({ClaimNotFoundException.class, NotFoundException.class})
-    public ResponseEntity<String> handleClaimNotFound(final ClaimNotFoundException exception) {
+    public ResponseEntity<String> handleNotFound(final RuntimeException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
