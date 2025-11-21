@@ -17,7 +17,7 @@ install:
   stage: install
   image: $NODE_IMAGE
   script:
-    - npm ci
+    - npm i
   artifacts:
     paths:
       - node_modules/
@@ -41,7 +41,7 @@ test:
   stage: test
   image: $NODE_IMAGE
   script:
-    - npm test -- --ci --watchAll=false
+    - npm run test
   artifacts:
     when: always
     reports:
