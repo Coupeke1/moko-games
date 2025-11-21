@@ -35,4 +35,11 @@ public class GameService {
         repository.save(game);
         return game;
     }
+
+    public Player nextPlayer(final GameId id) {
+        Game game = getGame(id);
+        Player nextPlayer = game.nextPlayer();
+        repository.save(game);
+        return nextPlayer;
+    }
 }
