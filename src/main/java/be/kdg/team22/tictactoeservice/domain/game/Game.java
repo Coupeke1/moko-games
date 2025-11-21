@@ -23,7 +23,7 @@ public class Game {
         this.players = new TreeSet<>(Comparator.comparing((Player player) ->
                 player.role().order()));
         this.players.addAll(players);
-        this.currentRole = players.getFirst().role();
+        this.currentRole = this.players.getFirst().role();
     }
 
     public static Game create(final int minSize, final int maxSize, final int size, final List<Player> players) {
@@ -70,15 +70,6 @@ public class Game {
     }
 
     public void requestMove(final Move move) {
-        if (move.row() < 0 || move.col() < 0
-                || move.row() > board.size() || move.col() > board.size()) {
-            throw new InvalidCellException(board.size());
-        }
-
-        if (board.cell(move.row(), move.col()) != null) {
-            throw new CellOccupiedException(move.row(), move.col());
-        }
-
         if (status != GameStatus.IN_PROGRESS) {
             throw new GameNotInProgressException();
         }
@@ -87,7 +78,17 @@ public class Game {
             throw new NotPlayersTurnException(currentPlayer().id().value());
         }
 
-        currentRole = roleOfPlayer(move.playerId());
+        if (move.row() < 0 || move.col() < 0
+                || move.row() >= board.size() || move.col() >= board.size()) {
+            throw new InvalidCellException(board.size());
+        }
+
+        if (board.cell(move.row(), move.col()) != null) {
+            throw new CellOccupiedException(move.row(), move.col());
+        }
+
+        board = board.setCell(move.row(), move.col(), currentRole);
+        nextPlayer();
     }
 
     public GameId id() {

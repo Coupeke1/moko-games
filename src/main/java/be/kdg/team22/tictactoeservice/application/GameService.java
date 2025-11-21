@@ -40,14 +40,7 @@ public class GameService {
     public Game requestMove(final GameId id, final Move move) {
         Game game = getGame(id);
         game.requestMove(move);
-        nextPlayer(id);
-        return game;
-    }
-
-    public Player nextPlayer(final GameId id) {
-        Game game = getGame(id);
-        Player nextPlayer = game.nextPlayer();
         repository.save(game);
-        return nextPlayer;
+        return game;
     }
 }

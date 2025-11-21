@@ -3,8 +3,6 @@ package be.kdg.team22.tictactoeservice.domain.game;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerRole;
 import org.jmolecules.ddd.annotation.ValueObject;
 
-import java.util.Arrays;
-
 @ValueObject
 public class Board {
     private final int size;
@@ -25,14 +23,13 @@ public class Board {
     }
 
     public Board setCell(final int row, final int col, final PlayerRole cell) {
-        PlayerRole[][] grid = new PlayerRole[size][size];
-
-        for (PlayerRole[] playerRoles : grid) {
-            Arrays.fill(playerRoles, cell);
+        PlayerRole[][] newGrid = new PlayerRole[size][size];
+        for (int i = 0; i < size; i++) {
+            System.arraycopy(this.grid[i], 0, newGrid[i], 0, size);
         }
 
-        grid[row][col] = cell;
-        return new Board(size, grid);
+        newGrid[row][col] = cell;
+        return new Board(size, newGrid);
     }
 
     public int size() {

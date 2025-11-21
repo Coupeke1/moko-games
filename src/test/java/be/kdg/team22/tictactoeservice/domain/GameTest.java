@@ -2,10 +2,8 @@ package be.kdg.team22.tictactoeservice.domain;
 
 import be.kdg.team22.tictactoeservice.domain.game.Game;
 import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
-import be.kdg.team22.tictactoeservice.domain.game.exceptions.GameResetException;
-import be.kdg.team22.tictactoeservice.domain.game.exceptions.GameSizeException;
-import be.kdg.team22.tictactoeservice.domain.game.exceptions.PlayerRolesException;
-import be.kdg.team22.tictactoeservice.domain.game.exceptions.UniquePlayersException;
+import be.kdg.team22.tictactoeservice.domain.game.Move;
+import be.kdg.team22.tictactoeservice.domain.game.exceptions.*;
 import be.kdg.team22.tictactoeservice.domain.player.Player;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerRole;
@@ -101,5 +99,48 @@ public class GameTest {
         assertEquals(PlayerRole.O, game.currentRole());
         assertEquals(PlayerRole.X, game.nextPlayer().role());
         assertEquals(PlayerRole.X, game.currentRole());
+    }
+
+    @Test
+    void roleOfPlayerShouldReturnCorrectRoleWhenPresent() {
+        Player playerO = game.players().stream().filter(p -> p.role().equals(PlayerRole.O)).findFirst().get();
+
+        assertEquals(playerO.role(), game.roleOfPlayer(playerO.id()));
+        assertEquals(PlayerRole.O, game.roleOfPlayer(playerO.id()));
+    }
+
+    @Test
+    void roleOfPlayerShouldThrowWhenNotPresent() {
+        assertThrows(NotFoundException.class, () -> game.roleOfPlayer(PlayerId.create()));
+    }
+
+    @Test
+    void requestMoveShouldThrowWhenNotInProgress() throws NoSuchFieldException, IllegalAccessException {
+        Field statusField = Game.class.getDeclaredField("status");
+        statusField.setAccessible(true);
+        statusField.set(game, GameStatus.WON);
+
+        assertThrows(GameNotInProgressException.class, () -> game.requestMove(new Move(game.id(), game.players().first().id(), 1, 1)));
+    }
+
+    @Test
+    void requestMoveShouldThrowWhenNotPlayersTurn() {
+        assertThrows(NotPlayersTurnException.class, () -> game.requestMove(new Move(game.id(), game.players().stream().toList().get(1).id(), 1, 1)));
+    }
+
+    @Test
+    void requestMoveShouldThrowWhenInvalidCellPos() {
+        assertThrows(InvalidCellException.class, () -> game.requestMove(new Move(game.id(), game.players().first().id(), -1, 1)));
+        assertThrows(InvalidCellException.class, () -> game.requestMove(new Move(game.id(), game.players().first().id(), 1, -1)));
+        assertThrows(InvalidCellException.class, () -> game.requestMove(new Move(game.id(), game.players().first().id(), game.board().size(), 1)));
+        assertThrows(InvalidCellException.class, () -> game.requestMove(new Move(game.id(), game.players().first().id(), 1, game.board().size())));
+        assertThrows(InvalidCellException.class, () -> game.requestMove(new Move(game.id(), game.players().first().id(), game.board().size() + 1, 1)));
+        assertThrows(InvalidCellException.class, () -> game.requestMove(new Move(game.id(), game.players().first().id(), 1, game.board().size() + 1)));
+    }
+
+    @Test
+    void requestMoveShouldThrowWhenCellAlreadyOccupied() {
+        game.requestMove(new Move(game.id(), game.players().first().id(), 1, 1));
+        assertThrows(CellOccupiedException.class, () -> game.requestMove(new Move(game.id(), game.currentPlayer().id(), 1, 1)));
     }
 }

@@ -9,7 +9,19 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class ApiExceptionHandler {
-    @ExceptionHandler({BoardSizeException.class, GameResetException.class, GameSizeException.class, PlayerRolesException.class, UniquePlayersException.class, InvalidPlayerException.class})
+    @ExceptionHandler({
+            BoardSizeException.class,
+            CellOccupiedException.class,
+            GameIdException.class,
+            GameNotInProgressException.class,
+            GameResetException.class,
+            GameSizeException.class,
+            InvalidCellException.class,
+            NotPlayersTurnException.class,
+            PlayerRolesException.class,
+            RoleUnfulfilledException.class,
+            UniquePlayersException.class,
+            InvalidPlayerException.class})
     public ResponseEntity<String> handleDomainErrors(final RuntimeException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
