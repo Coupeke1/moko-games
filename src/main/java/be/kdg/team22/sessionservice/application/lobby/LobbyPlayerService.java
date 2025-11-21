@@ -1,20 +1,17 @@
 package be.kdg.team22.sessionservice.application.lobby;
 
-import be.kdg.team22.sessionservice.domain.lobby.Lobby;
-import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
-import be.kdg.team22.sessionservice.domain.lobby.LobbyPlayer;
-import be.kdg.team22.sessionservice.domain.lobby.LobbyRepository;
+import be.kdg.team22.sessionservice.domain.lobby.*;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.LobbyNotFoundException;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.PlayerNotFriendException;
 import be.kdg.team22.sessionservice.infrastructure.lobby.db.friends.ExternalFriendsRepository;
 import be.kdg.team22.sessionservice.infrastructure.lobby.db.users.ExternalUserRepository;
 import be.kdg.team22.sessionservice.infrastructure.lobby.db.users.UserResponse;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -34,70 +31,69 @@ public class LobbyPlayerService {
         this.userRepository = userRepository;
     }
 
-    public void invitePlayer(UUID ownerId, UUID lobbyId, UUID targetPlayerId) {
-        Lobby lobby = lobbyRepository.findById(new LobbyId(lobbyId))
-                .orElseThrow(() -> new LobbyNotFoundException(lobbyId));
+    public void invitePlayer(PlayerId owner, LobbyId lobbyId, PlayerId target, Jwt token) {
+        Lobby lobby = lobbyRepository.findById(lobbyId)
+                .orElseThrow(() -> new LobbyNotFoundException(lobbyId.value()));
 
-        ensureFriend(ownerId, targetPlayerId);
+        ensureFriend(owner, target, token);
 
-        lobby.invitePlayer(ownerId, targetPlayerId);
+        lobby.invitePlayer(owner, target);
         lobbyRepository.save(lobby);
     }
 
-    public void invitePlayers(UUID ownerId, UUID lobbyId, List<UUID> targetPlayerIds) {
-        Lobby lobby = lobbyRepository.findById(new LobbyId(lobbyId))
-                .orElseThrow(() -> new LobbyNotFoundException(lobbyId));
+    public void invitePlayers(PlayerId owner, LobbyId lobbyId, List<PlayerId> targets, Jwt token) {
+        Lobby lobby = lobbyRepository.findById(lobbyId)
+                .orElseThrow(() -> new LobbyNotFoundException(lobbyId.value()));
 
-        List<UUID> friendIds = friendsRepository.getFriendIds(ownerId);
-        Set<UUID> friendSet = Set.copyOf(friendIds);
+        List<PlayerId> friends = friendsRepository.getFriendIds(token).stream()
+                .map(PlayerId::from)
+                .toList();
 
-        boolean allAreFriends = friendSet.containsAll(targetPlayerIds);
-        if (!allAreFriends) {
-            throw new PlayerNotFriendException(ownerId, findFirstNonFriend(targetPlayerIds, friendSet));
+        Set<PlayerId> friendSet = Set.copyOf(friends);
+
+        for (PlayerId t : targets) {
+            if (!friendSet.contains(t)) {
+                throw new PlayerNotFriendException(owner, t.value());
+            }
         }
 
-        lobby.invitePlayers(ownerId, targetPlayerIds);
+        lobby.invitePlayers(owner, targets);
         lobbyRepository.save(lobby);
     }
 
-    public void acceptInvite(UUID currentUserId, UUID lobbyId) {
-        Lobby lobby = lobbyRepository.findById(new LobbyId(lobbyId))
-                .orElseThrow(() -> new LobbyNotFoundException(lobbyId));
+    public void acceptInvite(PlayerId userId, LobbyId lobbyId, String token) {
+        Lobby lobby = lobbyRepository.findById(lobbyId)
+                .orElseThrow(() -> new LobbyNotFoundException(lobbyId.value()));
 
-        UserResponse user = userRepository.getById(currentUserId);
-        LobbyPlayer player = new LobbyPlayer(user.id(), user.username());
+        UserResponse response = userRepository.getById(userId.value(), token);
+        LobbyPlayer domainPlayer = new LobbyPlayer(response.id(), response.username());
 
-        lobby.acceptInvite(player);
+        lobby.acceptInvite(domainPlayer);
         lobbyRepository.save(lobby);
     }
 
-    public void removePlayer(UUID ownerId, UUID lobbyId, UUID targetPlayerId) {
-        Lobby lobby = lobbyRepository.findById(new LobbyId(lobbyId))
-                .orElseThrow(() -> new LobbyNotFoundException(lobbyId));
+    public void removePlayer(PlayerId owner, LobbyId lobbyId, PlayerId target) {
+        Lobby lobby = lobbyRepository.findById(lobbyId)
+                .orElseThrow(() -> new LobbyNotFoundException(lobbyId.value()));
 
-        lobby.removePlayer(ownerId, targetPlayerId);
+        lobby.removePlayer(owner, target);
         lobbyRepository.save(lobby);
     }
 
-    public void removePlayers(UUID ownerId, UUID lobbyId, List<UUID> targetPlayerIds) {
-        Lobby lobby = lobbyRepository.findById(new LobbyId(lobbyId))
-                .orElseThrow(() -> new LobbyNotFoundException(lobbyId));
+    public void removePlayers(PlayerId owner, LobbyId lobbyId, List<PlayerId> ids) {
+        Lobby lobby = lobbyRepository.findById(lobbyId)
+                .orElseThrow(() -> new LobbyNotFoundException(lobbyId.value()));
 
-        lobby.removePlayers(ownerId, targetPlayerIds);
+        lobby.removePlayers(owner, ids);
         lobbyRepository.save(lobby);
     }
 
-    private void ensureFriend(UUID ownerId, UUID targetPlayerId) {
-        List<UUID> friendIds = friendsRepository.getFriendIds(ownerId);
-        if (!friendIds.contains(targetPlayerId)) {
-            throw new PlayerNotFriendException(ownerId, targetPlayerId);
-        }
-    }
+    private void ensureFriend(PlayerId owner, PlayerId target, Jwt token) {
+        List<PlayerId> friends = friendsRepository.getFriendIds(token).stream()
+                .map(PlayerId::from)
+                .toList();
 
-    private UUID findFirstNonFriend(List<UUID> candidates, Set<UUID> friendSet) {
-        return candidates.stream()
-                .filter(id -> !friendSet.contains(id))
-                .findFirst()
-                .orElseThrow();
+        if (!friends.contains(target))
+            throw new PlayerNotFriendException(owner, target.value());
     }
 }

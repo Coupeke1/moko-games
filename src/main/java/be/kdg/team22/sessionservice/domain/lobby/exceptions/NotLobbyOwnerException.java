@@ -1,12 +1,12 @@
 package be.kdg.team22.sessionservice.domain.lobby.exceptions;
 
-import java.util.UUID;
+import be.kdg.team22.sessionservice.domain.lobby.PlayerId;
 
 public class NotLobbyOwnerException extends RuntimeException {
-    public NotLobbyOwnerException(UUID actingUserId) {
+    public NotLobbyOwnerException(PlayerId actingUserId) {
         super(String.format(
                 "Only the lobby owner can manage the lobby (user %s)",
-                actingUserId
+                actingUserId.value()
         ));
     }
 }

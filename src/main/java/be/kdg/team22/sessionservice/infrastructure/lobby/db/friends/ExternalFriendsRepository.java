@@ -3,6 +3,7 @@ package be.kdg.team22.sessionservice.infrastructure.lobby.db.friends;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.ServiceNotReachableException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
@@ -20,10 +21,11 @@ public class ExternalFriendsRepository {
         this.client = client;
     }
 
-    public List<UUID> getFriendIds(UUID ownerId) {
+    public List<UUID> getFriendIds(Jwt accessToken) {
         try {
             FriendsOverviewResponse response = client.get()
                     .uri("/api/friends")
+                    .header("Authorization", "Bearer " + accessToken.getTokenValue())
                     .retrieve()
                     .body(FriendsOverviewResponse.class);
 

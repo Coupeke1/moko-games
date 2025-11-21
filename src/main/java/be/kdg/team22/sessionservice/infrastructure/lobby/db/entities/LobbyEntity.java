@@ -78,12 +78,17 @@ public class LobbyEntity {
                         .map(p -> new LobbyPlayerEmbed(p.id(), p.username()))
                         .collect(Collectors.toSet());
 
+        Set<UUID> mappedInvited =
+                lobby.invitedPlayers().stream()
+                        .map(PlayerId::value)
+                        .collect(Collectors.toSet());
+
         return new LobbyEntity(
                 lobby.id().value(),
                 lobby.gameId().value(),
                 lobby.ownerId().value(),
                 mappedPlayers,
-                lobby.invitedPlayers(),
+                mappedInvited,
                 lobby.settings(),
                 lobby.status(),
                 lobby.createdAt(),
@@ -91,10 +96,17 @@ public class LobbyEntity {
         );
     }
 
+
     public Lobby toDomain() {
+
         Set<PlayerId> domainPlayers =
                 players.stream()
                         .map(p -> PlayerId.from(p.getId()))
+                        .collect(Collectors.toSet());
+
+        Set<PlayerId> invited =
+                invitedPlayerIds.stream()
+                        .map(PlayerId::from)
                         .collect(Collectors.toSet());
 
         return new Lobby(

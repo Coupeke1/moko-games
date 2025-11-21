@@ -2,9 +2,7 @@ package be.kdg.team22.sessionservice.application.lobby;
 
 import be.kdg.team22.sessionservice.api.lobby.models.*;
 import be.kdg.team22.sessionservice.domain.lobby.*;
-import be.kdg.team22.sessionservice.domain.lobby.exceptions.GameNotValidException;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.LobbyNotFoundException;
-import be.kdg.team22.sessionservice.domain.lobby.exceptions.OwnerNotValidException;
 import be.kdg.team22.sessionservice.domain.lobby.settings.CheckersSettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.GameSettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
@@ -24,18 +22,15 @@ public class LobbyService {
     }
 
     public Lobby createLobby(GameId gameId, PlayerId ownerId, CreateLobbyModel model) {
-        if (gameId == null) throw new GameNotValidException(null);
-        if (ownerId == null) throw new OwnerNotValidException(null);
-
         LobbySettings settings = mapToDomainSettings(model.settings(), model.maxPlayers());
-
         Lobby lobby = new Lobby(gameId, ownerId, settings);
         repository.save(lobby);
         return lobby;
     }
 
     public Lobby findLobby(final LobbyId id) {
-        return repository.findById(id).orElseThrow(() -> new LobbyNotFoundException(id.value()));
+        return repository.findById(id)
+                .orElseThrow(() -> new LobbyNotFoundException(id.value()));
     }
 
     public List<Lobby> findAllLobbies() {
@@ -55,12 +50,16 @@ public class LobbyService {
             final UpdateLobbySettingsModel model
     ) {
         Lobby lobby = findLobby(id);
-
         LobbySettings newSettings = mapToDomainSettings(model.settings(), model.maxPlayers());
-
         lobby.changeSettings(actingUser, newSettings);
         repository.save(lobby);
         return lobby;
+    }
+
+    public List<Lobby> getLobbiesInvitingUser(PlayerId userId) {
+        return repository.findAll().stream()
+                .filter(l -> l.isInvited(userId))
+                .toList();
     }
 
     private LobbySettings mapToDomainSettings(GameSettingsModel model, Integer maxPlayers) {

@@ -20,10 +20,11 @@ public class ExternalUserRepository {
         this.client = client;
     }
 
-    public UserResponse getById(UUID id) {
+    public UserResponse getById(UUID id, String accessToken) {
         try {
             UserResponse response = client.get()
                     .uri("/api/profiles/{id}", id)
+                    .header("Authorization", "Bearer " + accessToken)
                     .retrieve()
                     .body(UserResponse.class);
 
