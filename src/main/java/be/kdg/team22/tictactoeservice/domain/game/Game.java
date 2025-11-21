@@ -56,7 +56,23 @@ public class Game {
         this.status = GameStatus.IN_PROGRESS;
         this.board = Board.create(this.board.size());
 
-        this.currentRole = PlayerRole.X;
+        this.currentRole = players.first().role();
+    }
+
+    public Player nextPlayer() {
+        Player currentPlayer = players.stream()
+                .filter(p -> p.role() == currentRole)
+                .findFirst()
+                .orElseThrow(() -> new RoleUnfulfilledException(currentRole));
+
+        List<Player> playerList = new ArrayList<>(players);
+        int currentIndex = playerList.indexOf(currentPlayer);
+        int nextIndex = (currentIndex + 1) % playerList.size();
+
+        Player nextPlayer = playerList.get(nextIndex);
+        currentRole = nextPlayer.role();
+
+        return nextPlayer;
     }
 
     public GameId id() {
@@ -77,31 +93,5 @@ public class Game {
 
     public PlayerRole currentRole() {
         return currentRole;
-    }
-
-    public void reset() {
-        if (status == GameStatus.IN_PROGRESS)
-            throw new IllegalStateException("Cannot reset GameStatus when status is IN_PROGRESS");
-
-        this.status = GameStatus.IN_PROGRESS;
-        this.board = Board.create(this.board.getSize());
-
-        this.currentRole = PlayerRole.X;
-    }
-
-    public Player nextPlayer() {
-        Player currentPlayer = players.stream()
-                .filter(p -> p.role() == currentRole)
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("No player found with current role: " + currentRole));
-
-        List<Player> playerList = new ArrayList<>(players);
-        int currentIndex = playerList.indexOf(currentPlayer);
-        int nextIndex = (currentIndex + 1) % playerList.size();
-
-        Player nextPlayer = playerList.get(nextIndex);
-        currentRole = nextPlayer.role();
-
-        return nextPlayer;
     }
 }

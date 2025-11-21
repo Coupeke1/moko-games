@@ -80,15 +80,15 @@ public class GameTest {
 
     @Test
     void initialRoleShouldBeFirstPlayersRole() {
-        assertEquals(PlayerRole.X, game.getCurrentRole());
-        assertEquals(PlayerRole.X, game.getPlayers().first().role());
+        assertEquals(PlayerRole.X, game.currentRole());
+        assertEquals(PlayerRole.X, game.players().first().role());
     }
 
     @Test
     void nextPlayerShouldGoToNextRole() {
-        assertEquals(PlayerRole.X, game.getCurrentRole());
+        assertEquals(PlayerRole.X, game.currentRole());
         assertEquals(PlayerRole.O, game.nextPlayer().role());
-        assertEquals(PlayerRole.O, game.getCurrentRole());
+        assertEquals(PlayerRole.O, game.currentRole());
     }
 
     @Test
@@ -98,8 +98,8 @@ public class GameTest {
         currentRoleField.set(game, PlayerRole.O);
 
 
-        assertEquals(PlayerRole.O, game.getCurrentRole());
+        assertEquals(PlayerRole.O, game.currentRole());
         assertEquals(PlayerRole.X, game.nextPlayer().role());
-        assertEquals(PlayerRole.X, game.getCurrentRole());
+        assertEquals(PlayerRole.X, game.currentRole());
     }
 }

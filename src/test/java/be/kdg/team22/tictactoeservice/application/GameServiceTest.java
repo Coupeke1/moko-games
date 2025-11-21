@@ -168,13 +168,13 @@ public class GameServiceTest {
     @Test
     void shouldReturnNextPlayer() {
         //Arrange
-        Game game = Game.create(boardConfig.getMinSize(), boardConfig.getMaxSize(), 3, players);
+        Game game = Game.create(config.minSize(), config.maxSize(), 3, players);
 
-        GameId gameId = game.getId();
-        when(gameRepository.findById(gameId)).thenReturn(Optional.of(game));
+        GameId gameId = game.id();
+        when(repository.findById(gameId)).thenReturn(Optional.of(game));
 
         //Act
-        Player nextPlayer = gameService.nextPlayer(gameId);
+        Player nextPlayer = service.nextPlayer(gameId);
 
         //Assert
         assertNotNull(nextPlayer);
