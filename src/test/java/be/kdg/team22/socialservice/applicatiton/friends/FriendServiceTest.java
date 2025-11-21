@@ -1,15 +1,15 @@
-package be.kdg.team22.socialservice.friends.application;
+package be.kdg.team22.socialservice.applicatiton.friends;
 
 import be.kdg.team22.socialservice.api.friends.models.FriendModel;
 import be.kdg.team22.socialservice.api.friends.models.FriendsOverviewModel;
 import be.kdg.team22.socialservice.application.friends.FriendService;
 import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.CannotAddException;
 import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.CannotRemoveException;
-import be.kdg.team22.socialservice.application.friends.exceptions.NotFoundException;
 import be.kdg.team22.socialservice.domain.friends.friendship.Friendship;
 import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipId;
 import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipRepository;
 import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipStatus;
+import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.NotFoundException;
 import be.kdg.team22.socialservice.domain.friends.user.UserId;
 import be.kdg.team22.socialservice.domain.friends.user.Username;
 import be.kdg.team22.socialservice.infrastructure.friends.user.ExternalUserRepository;
@@ -202,6 +202,7 @@ class FriendServiceTest {
 
         Friendship friendship = mock(Friendship.class);
         when(friendship.status()).thenReturn(FriendshipStatus.PENDING);
+        doCallRealMethod().when(friendship).checkCanRemove();
 
         when(friendshipRepository.findBetween(currentUser, otherUser)).thenReturn(Optional.of(friendship));
 

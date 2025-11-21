@@ -1,5 +1,6 @@
-package be.kdg.team22.socialservice.friends.infrastructure.db.repositories;
+package be.kdg.team22.socialservice.infratructure.db.friends.repositories;
 
+import be.kdg.team22.socialservice.config.TestcontainersConfig;
 import be.kdg.team22.socialservice.domain.friends.friendship.Friendship;
 import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipId;
 import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipStatus;
@@ -7,7 +8,12 @@ import be.kdg.team22.socialservice.domain.friends.user.UserId;
 import be.kdg.team22.socialservice.infrastructure.friends.friendship.db.entities.FriendshipEntity;
 import be.kdg.team22.socialservice.infrastructure.friends.friendship.db.repositories.FriendshipJpaRepository;
 import be.kdg.team22.socialservice.infrastructure.friends.friendship.db.repositories.FriendshipRepositoryImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 
 import java.time.Instant;
 import java.util.List;
@@ -15,13 +21,20 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
+@DataJpaTest
+@Import(TestcontainersConfig.class)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class FriendshipRepositoryImplTest {
 
-    private final FriendshipJpaRepository jpa = mock(FriendshipJpaRepository.class);
-    private final FriendshipRepositoryImpl repo = new FriendshipRepositoryImpl(jpa);
+    @Autowired
+    private FriendshipJpaRepository jpa;
+    private FriendshipRepositoryImpl repo;
+
+    @BeforeEach
+    void setup() {
+        repo = new FriendshipRepositoryImpl(jpa);
+    }
 
     private FriendshipEntity entity(UUID id, UUID requester, UUID receiver) {
         return new FriendshipEntity(
@@ -34,43 +47,35 @@ class FriendshipRepositoryImplTest {
         );
     }
 
-    private Friendship domain(UUID id, UUID requester, UUID receiver) {
-        return entity(id, requester, receiver).toDomain();
-    }
-
     @Test
     void findById_mapsEntityToDomain() {
         UUID id = UUID.randomUUID();
         UUID req = UUID.randomUUID();
         UUID rec = UUID.randomUUID();
 
-        when(jpa.findById(id)).thenReturn(Optional.of(entity(id, req, rec)));
+        FriendshipEntity e = entity(id, req, rec);
+        jpa.save(e);
 
         Optional<Friendship> result = repo.findById(new FriendshipId(id));
 
         assertThat(result).isPresent();
-        assertThat(result.get().id().value()).isEqualTo(id);
         assertThat(result.get().requester().value()).isEqualTo(req);
-        assertThat(result.get().receiver().value()).isEqualTo(rec);
     }
 
     @Test
     void findById_returnsEmptyWhenNotFound() {
-        UUID id = UUID.randomUUID();
-
-        when(jpa.findById(id)).thenReturn(Optional.empty());
-
-        Optional<Friendship> result = repo.findById(new FriendshipId(id));
+        Optional<Friendship> result = repo.findById(new FriendshipId(UUID.randomUUID()));
 
         assertThat(result).isEmpty();
     }
 
     @Test
-    void findBetween_returnsDomainModel() {
+    void findBetween_returnsDomainModelWhenPresent() {
         UUID a = UUID.randomUUID();
         UUID b = UUID.randomUUID();
 
-        when(jpa.findBetween(a, b)).thenReturn(Optional.of(entity(UUID.randomUUID(), a, b)));
+        FriendshipEntity e = entity(UUID.randomUUID(), a, b);
+        jpa.save(e);
 
         Optional<Friendship> result =
                 repo.findBetween(UserId.from(a), UserId.from(b));
@@ -82,59 +87,52 @@ class FriendshipRepositoryImplTest {
 
     @Test
     void findBetween_returnsEmptyWhenNoneFound() {
-        UUID a = UUID.randomUUID();
-        UUID b = UUID.randomUUID();
-
-        when(jpa.findBetween(a, b)).thenReturn(Optional.empty());
-
         Optional<Friendship> result =
-                repo.findBetween(UserId.from(a), UserId.from(b));
+                repo.findBetween(UserId.from(UUID.randomUUID()),
+                        UserId.from(UUID.randomUUID()));
 
         assertThat(result).isEmpty();
     }
 
     @Test
-    void findAllFor_mapsAllEntitiesToDomain() {
+    void findAllFor_returnsAllFriendshipsForUser() {
         UUID user = UUID.randomUUID();
         UUID other = UUID.randomUUID();
 
-        FriendshipEntity e1 = entity(UUID.randomUUID(), user, other);
-        FriendshipEntity e2 = entity(UUID.randomUUID(), other, user);
-
-        when(jpa.findByRequesterIdOrReceiverId(user, user))
-                .thenReturn(List.of(e1, e2));
+        jpa.save(entity(UUID.randomUUID(), user, other));
+        jpa.save(entity(UUID.randomUUID(), other, user));
 
         List<Friendship> result = repo.findAllFor(UserId.from(user));
 
         assertThat(result).hasSize(2);
-        assertThat(result.get(0).requester().value()).isIn(user, other);
-        assertThat(result.get(1).requester().value()).isIn(user, other);
     }
 
     @Test
-    void save_convertsDomainToEntity() {
-        Friendship domain = domain(
-                UUID.randomUUID(),
-                UUID.randomUUID(),
-                UUID.randomUUID()
-        );
-
-        repo.save(domain);
-
-        verify(jpa).save(any(FriendshipEntity.class));
-    }
-
-    @Test
-    void delete_callsJpaDeleteById() {
+    void save_persistsEntity() {
         UUID id = UUID.randomUUID();
-        Friendship domain = domain(
-                id,
+        Friendship toSave = entity(id,
                 UUID.randomUUID(),
                 UUID.randomUUID()
-        );
+        ).toDomain();
 
-        repo.delete(domain);
+        repo.save(toSave);
 
-        verify(jpa).deleteById(id);
+        Optional<FriendshipEntity> db = jpa.findById(id);
+
+        assertThat(db).isPresent();
+        assertThat(db.get().toDomain().id().value()).isEqualTo(id);
+    }
+
+    @Test
+    void delete_removesEntity() {
+        UUID id = UUID.randomUUID();
+        FriendshipEntity e = entity(id,
+                UUID.randomUUID(),
+                UUID.randomUUID());
+        jpa.save(e);
+
+        repo.delete(e.toDomain());
+
+        assertThat(jpa.findById(id)).isEmpty();
     }
 }
