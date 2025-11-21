@@ -1,4 +1,4 @@
-﻿variables:
+variables:
   NODE_IMAGE: "node:20-alpine"
   DOCKER_IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
 
