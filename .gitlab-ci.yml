@@ -61,10 +61,10 @@ package:
     - echo "Building Docker image..."
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - |
-      # Base image tag for build
+      # Base tag for temporary build
       BASE_TAG="temp-build"
 
-      # Build once
+      # Build the image once
     - docker build
         --build-arg CI_COMMIT_SHA="$CI_COMMIT_SHA"
         --build-arg CI_PIPELINE_CREATED_AT="$CI_PIPELINE_CREATED_AT"
@@ -73,19 +73,24 @@ package:
         --build-arg CI_PIPELINE_ID="$CI_PIPELINE_ID"
         -t $CI_REGISTRY_IMAGE:$BASE_TAG .
 
-      # Determine which tags to apply
+      # Determine tags to apply
     - |
-      TAGS=()
-      if [[ -n "$CI_COMMIT_TAG" ]]; then
-        TAGS+=("$CI_COMMIT_TAG" "latest")
-      elif [[ "$CI_COMMIT_BRANCH" == "main" ]]; then
-        TAGS+=("main-latest")
+      TAGS=""
+      if [ -n "$CI_COMMIT_TAG" ]; then
+        # Tagged release
+        TAGS="$CI_COMMIT_TAG latest"
+      elif [ "$CI_COMMIT_BRANCH" = "main" ]; then
+        # Latest main branch build
+        TAGS="main-latest"
       else
-        TAGS+=("$CI_COMMIT_REF_SLUG")
+        # Feature/MR branch
+        TAGS="branch-$CI_COMMIT_REF_SLUG"
       fi
 
       # Tag and push
-    - for t in "${TAGS[@]}"; do
+    - | 
+      for t in $TAGS; do
+        echo "Tagging and pushing: $t"
         docker tag $CI_REGISTRY_IMAGE:$BASE_TAG $CI_REGISTRY_IMAGE:$t
         docker push $CI_REGISTRY_IMAGE:$t
       done
