@@ -3,10 +3,7 @@ package be.kdg.team22.sessionservice.api.lobby;
 import be.kdg.team22.sessionservice.api.lobby.models.*;
 import be.kdg.team22.sessionservice.application.lobby.LobbyPlayerService;
 import be.kdg.team22.sessionservice.application.lobby.LobbyService;
-import be.kdg.team22.sessionservice.domain.lobby.GameId;
-import be.kdg.team22.sessionservice.domain.lobby.Lobby;
-import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
-import be.kdg.team22.sessionservice.domain.lobby.PlayerId;
+import be.kdg.team22.sessionservice.domain.lobby.*;
 import be.kdg.team22.sessionservice.domain.lobby.settings.CheckersSettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import org.springframework.http.HttpStatus;
@@ -145,7 +142,9 @@ public class LobbyController {
                 lobby.id().value(),
                 lobby.gameId().value(),
                 lobby.ownerId().value(),
-                lobby.players().stream().map(PlayerId::value).collect(Collectors.toSet()),
+                lobby.players().stream()
+                        .map(LobbyPlayer::id)
+                        .collect(Collectors.toSet()),
                 lobby.settings().maxPlayers(),
                 lobby.status(),
                 lobby.createdAt(),

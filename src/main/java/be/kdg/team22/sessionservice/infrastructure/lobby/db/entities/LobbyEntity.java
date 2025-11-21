@@ -27,6 +27,10 @@ public class LobbyEntity {
     @CollectionTable(name = "lobby_players", joinColumns = @JoinColumn(name = "lobby_id"))
     @Column(name = "player_id", nullable = false)
     private Set<UUID> playerIds;
+    @ElementCollection
+    @CollectionTable(name = "lobby_invited_players", joinColumns = @JoinColumn(name = "lobby_id"))
+    @Column(name = "invited_player_id", nullable = false)
+    private Set<UUID> invitedPlayerIds;
 
     @Convert(converter = LobbySettingsConverter.class)
     @Column(name = "settings", nullable = false, columnDefinition = "TEXT")
@@ -50,6 +54,7 @@ public class LobbyEntity {
             final UUID gameId,
             final UUID ownerId,
             final Set<UUID> playerIds,
+            final Set<UUID> invitedPlayerIds,
             final LobbySettings settings,
             final LobbyStatus status,
             final Instant createdAt,
@@ -59,6 +64,7 @@ public class LobbyEntity {
         this.gameId = gameId;
         this.ownerId = ownerId;
         this.playerIds = playerIds;
+        this.invitedPlayerIds = invitedPlayerIds;
         this.settings = settings;
         this.status = status;
         this.createdAt = createdAt;
@@ -70,7 +76,13 @@ public class LobbyEntity {
                 lobby.id().value(),
                 lobby.gameId().value(),
                 lobby.ownerId().value(),
-                lobby.players().stream().map(PlayerId::value).collect(Collectors.toSet()),
+
+                lobby.players().stream()
+                        .map(LobbyPlayer::id)
+                        .collect(Collectors.toSet()),
+
+                lobby.invitedPlayers(),
+
                 lobby.settings(),
                 lobby.status(),
                 lobby.createdAt(),
@@ -83,7 +95,11 @@ public class LobbyEntity {
                 LobbyId.from(id),
                 GameId.from(gameId),
                 PlayerId.from(ownerId),
-                playerIds.stream().map(PlayerId::from).collect(Collectors.toSet()),
+
+                playerIds.stream()
+                        .map(PlayerId::from)
+                        .collect(Collectors.toSet()),
+
                 settings,
                 status,
                 createdAt,
