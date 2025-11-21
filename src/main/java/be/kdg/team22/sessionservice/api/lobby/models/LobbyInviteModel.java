@@ -8,11 +8,12 @@ public record LobbyInviteModel(
         UUID lobbyId,
         UUID gameId,
         String gameName,
-        UUID ownerId,
-        String ownerUsername,
+        UUID invitedById,
+        String invitedByUsername,
         Set<PlayerSummaryModel> players,
+        Set<PlayerSummaryModel> invited,
         int maxPlayers,
         String status,
-        Instant createdAt
+        Instant invitedAt
 ) {
 }

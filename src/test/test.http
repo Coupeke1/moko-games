@@ -32,7 +32,7 @@ scope = openid
 
 ### 3) POST Create Lobby
 POST http://localhost:8081/api/lobbies
-Authorization: Bearer {{other_token}}
+Authorization: Bearer {{owner_token}}
 Content-Type: application/json
 
 {
@@ -147,7 +147,7 @@ GET http://localhost:8081/api/lobbies/invited
 Authorization: Bearer {{other_token}}
 
 ### 16) Accept Invite
-POST http://localhost:8081/api/lobbies/{{lobby_id}}/players/{{other_user_id}}
+POST http://localhost:8081/api/lobbies/{{lobby_id}}/players/bd169114-8834-4a40-983f-59b4d8bc1334
 Authorization: Bearer {{other_token}}
 
 
@@ -157,7 +157,7 @@ Authorization: Bearer {{other_token}}
 
 
 ### 18) Owner removes player
-DELETE http://localhost:8081/api/lobbies/{{lobby_id}}/players/{{other_user_id}}
+DELETE http://localhost:8081/api/lobbies/{{lobby_id}}/players/bd169114-8834-4a40-983f-59b4d8bc1334
 Authorization: Bearer {{owner_token}}
 
 

@@ -24,11 +24,23 @@ public class LobbyEntity {
     private UUID ownerId;
 
     @ElementCollection
-    @CollectionTable(name = "lobby_players", joinColumns = @JoinColumn(name = "lobby_id"))
+    @CollectionTable(
+            name = "lobby_players",
+            schema = "session_service",
+            joinColumns = @JoinColumn(name = "lobby_id")
+    )
+    @AttributeOverrides({
+            @AttributeOverride(name = "id", column = @Column(name = "player_id", nullable = false)),
+            @AttributeOverride(name = "username", column = @Column(name = "username", nullable = false))
+    })
     private Set<LobbyPlayerEmbed> players;
 
     @ElementCollection
-    @CollectionTable(name = "lobby_invited_players", joinColumns = @JoinColumn(name = "lobby_id"))
+    @CollectionTable(
+            name = "lobby_invited_players",
+            schema = "session_service",
+            joinColumns = @JoinColumn(name = "lobby_id")
+    )
     @Column(name = "invited_player_id", nullable = false)
     private Set<UUID> invitedPlayerIds;
 
@@ -114,6 +126,7 @@ public class LobbyEntity {
                 GameId.from(gameId),
                 PlayerId.from(ownerId),
                 domainPlayers,
+                invited,
                 settings,
                 status,
                 createdAt,
