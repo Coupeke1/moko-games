@@ -1,4 +1,4 @@
-package be.kdg.team22.socialservice.friends.api;
+package be.kdg.team22.socialservice.api.friends;
 
 import be.kdg.team22.socialservice.api.friends.models.FriendModel;
 import be.kdg.team22.socialservice.api.friends.models.FriendsOverviewModel;
@@ -7,8 +7,7 @@ import be.kdg.team22.socialservice.domain.friends.user.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -19,15 +18,17 @@ import java.util.UUID;
 import static be.kdg.team22.socialservice.testutils.JwtTestUtils.jwtWithUser;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@WebMvcTest(FriendsController.class)
 class FriendsControllerTest {
 
     private static final String USER_ID = "11111111-1111-1111-1111-111111111111";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -83,13 +84,13 @@ class FriendsControllerTest {
 
     @Test
     void addFriend_withoutJwtShouldReturn401() throws Exception {
-        mockMvc.perform(
-                post("/api/friends/add")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {"username": "piet"}
-                                """)
-        ).andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/friends")
+                        .with(jwt().jwt(jwt -> jwt.claim("sub", USER_ID)
+                                .claim("preferred_username", "jan"))))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/friends"))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -105,7 +106,8 @@ class FriendsControllerTest {
 
     @Test
     void acceptFriend_withoutJwtShouldReturn401() throws Exception {
-        mockMvc.perform(post("/api/friends/accept/{id}", UUID.randomUUID()))
+        mockMvc.perform(post("/api/friends/accept/{id}", UUID.randomUUID())
+                        .with(csrf()))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -122,7 +124,8 @@ class FriendsControllerTest {
 
     @Test
     void rejectFriend_withoutJwtShouldReturn401() throws Exception {
-        mockMvc.perform(post("/api/friends/reject/{id}", UUID.randomUUID()))
+        mockMvc.perform(post("/api/friends/reject/{id}", UUID.randomUUID())
+                        .with(csrf()))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -139,7 +142,8 @@ class FriendsControllerTest {
 
     @Test
     void cancelFriendRequest_withoutJwtShouldReturn401() throws Exception {
-        mockMvc.perform(post("/api/friends/cancel/{id}", UUID.randomUUID()))
+        mockMvc.perform(post("/api/friends/cancel/{id}", UUID.randomUUID())
+                        .with(csrf()))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -156,7 +160,8 @@ class FriendsControllerTest {
 
     @Test
     void removeFriend_withoutJwtShouldReturn401() throws Exception {
-        mockMvc.perform(delete("/api/friends/remove/{id}", UUID.randomUUID()))
+        mockMvc.perform(delete("/api/friends/remove/{id}", UUID.randomUUID())
+                        .with(csrf()))
                 .andExpect(status().isUnauthorized());
     }
 
