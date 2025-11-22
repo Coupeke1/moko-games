@@ -1,7 +1,7 @@
 package be.kdg.team22.socialservice.domain.friends.friendship;
 
-import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.CannotRemoveException;
 import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.CannotAcceptException;
+import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.CannotRemoveException;
 import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.NoMatchingUsersException;
 import be.kdg.team22.socialservice.domain.friends.user.UserId;
 import org.jmolecules.ddd.annotation.AggregateRoot;
@@ -17,7 +17,7 @@ public class Friendship {
     private Instant updatedAt;
     private FriendshipStatus status;
 
-    public Friendship(FriendshipId id, UserId requester, UserId receiver, Instant createdAt, Instant updatedAt, FriendshipStatus status) {
+    public Friendship(final FriendshipId id, final UserId requester, final UserId receiver, final Instant createdAt, final Instant updatedAt, final FriendshipStatus status) {
         this.id = id;
         this.requester = requester;
         this.receiver = receiver;
@@ -26,32 +26,32 @@ public class Friendship {
         this.status = status;
     }
 
-    public Friendship(UserId requester, UserId receiver) {
+    public Friendship(final UserId requester, final UserId receiver) {
         this(FriendshipId.create(), requester, receiver, Instant.now(), Instant.now(), FriendshipStatus.PENDING);
     }
 
-    public void accept(UserId user) {
+    public void accept(final UserId user) {
         checkBeforeChanging(user);
 
         this.status = FriendshipStatus.ACCEPTED;
         this.updatedAt = Instant.now();
     }
 
-    public void reject(UserId user) {
+    public void reject(final UserId user) {
         checkBeforeChanging(user);
 
         this.status = FriendshipStatus.REJECTED;
         this.updatedAt = Instant.now();
     }
 
-    public void cancel(UserId user) {
+    public void cancel(final UserId user) {
         checkBeforeChanging(user);
 
         this.status = FriendshipStatus.CANCELED;
         this.updatedAt = Instant.now();
     }
 
-    public void resetToPending(UserId requester, UserId receiver) {
+    public void resetToPending(final UserId requester, final UserId receiver) {
         if (!requester.equals(this.requester) || !receiver.equals(this.receiver)) {
             throw new NoMatchingUsersException();
         }
@@ -60,14 +60,13 @@ public class Friendship {
         this.updatedAt = Instant.now();
     }
 
-    public boolean involves(UserId user) {
+    public boolean involves(final UserId user) {
         return requester.value().equals(user.value()) || receiver.value().equals(user.value());
     }
 
-    public UserId otherSide(UserId user) {
+    public UserId otherSide(final UserId user) {
         if (requester.value().equals(user.value()))
             return receiver;
-
         if (receiver.value().equals(user.value()))
             return requester;
 
@@ -77,14 +76,16 @@ public class Friendship {
     public void checkCanRemove() {
         if (status == FriendshipStatus.ACCEPTED)
             return;
+
         throw new CannotRemoveException();
     }
 
-    private void checkBeforeChanging(UserId user) {
+    private void checkBeforeChanging(final UserId user) {
         boolean isRequesterOrReceiver = user.value().equals(requester.value()) || user.value().equals(receiver.value());
 
-        if (!isRequesterOrReceiver || status != FriendshipStatus.PENDING)
+        if (!isRequesterOrReceiver || status != FriendshipStatus.PENDING) {
             throw new CannotAcceptException();
+        }
     }
 
     public FriendshipId id() {

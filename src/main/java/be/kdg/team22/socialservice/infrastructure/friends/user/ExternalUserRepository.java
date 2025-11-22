@@ -21,7 +21,7 @@ public class ExternalUserRepository {
         this.client = client;
     }
 
-    public Optional<UserResponse> getByUsername(Username username) {
+    public Optional<UserResponse> getByUsername(final Username username) {
         try {
             UserResponse response = client.get().uri("/find/{username}", username).retrieve().body(UserResponse.class);
             return Optional.ofNullable(response);
@@ -36,7 +36,7 @@ public class ExternalUserRepository {
         }
     }
 
-    public UserResponse getById(UUID id) {
+    public UserResponse getById(final UUID id) {
         try {
             return client.get().uri("/{id}", id).retrieve().body(UserResponse.class);
         } catch (

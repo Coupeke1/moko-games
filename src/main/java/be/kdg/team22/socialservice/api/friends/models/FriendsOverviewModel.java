@@ -5,5 +5,4 @@ import java.util.List;
 public record FriendsOverviewModel(
         List<FriendModel> friends,
         List<FriendModel> incoming,
-        List<FriendModel> outgoing) {
-}
+        List<FriendModel> outgoing) {}

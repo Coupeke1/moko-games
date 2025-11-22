@@ -1,20 +1,19 @@
 package be.kdg.team22.socialservice.domain.friends.user;
 
-import be.kdg.team22.socialservice.domain.friends.user.exceptions.InvalidUsernameException;
 import be.kdg.team22.socialservice.domain.friends.user.exceptions.NotFoundException;
 
-public record Username(String username) {
-    public Username {
-        if (username == null)
-            throw new InvalidUsernameException();
+public record Username(String value) {
+    public static Username create(String value) {
+        return new Username(value.trim());
     }
 
     public NotFoundException notFound() {
-        return new NotFoundException(username);
+        throw new NotFoundException(value);
     }
 
+    @SuppressWarnings("NullableProblems")
     @Override
     public String toString() {
-        return username;
+        return value.trim();
     }
 }

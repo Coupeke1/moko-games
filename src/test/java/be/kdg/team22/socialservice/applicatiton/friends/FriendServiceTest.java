@@ -244,20 +244,20 @@ class FriendServiceTest {
 
         assertThat(overview.friends()).hasSize(1);
         FriendModel friendModel = overview.friends().getFirst();
-        assertThat(friendModel.userId()).isEqualTo(friend.value());
+        assertThat(friendModel.id()).isEqualTo(friend.value());
         assertThat(friendModel.username()).isEqualTo("friendUser");
         assertThat(friendModel.status()).isEqualTo(FriendshipStatus.ACCEPTED.name());
 
         // incoming (PENDING where current == receiver)
         assertThat(overview.incoming()).hasSize(1);
         FriendModel incomingModel = overview.incoming().getFirst();
-        assertThat(incomingModel.userId()).isEqualTo(incoming.value());
+        assertThat(incomingModel.id()).isEqualTo(incoming.value());
         assertThat(incomingModel.username()).isEqualTo("incomingUser");
         assertThat(incomingModel.status()).isEqualTo(FriendshipStatus.PENDING.name());
 
         assertThat(overview.outgoing()).hasSize(1);
         FriendModel outgoingModel = overview.outgoing().getFirst();
-        assertThat(outgoingModel.userId()).isEqualTo(outgoing.value());
+        assertThat(outgoingModel.id()).isEqualTo(outgoing.value());
         assertThat(outgoingModel.username()).isEqualTo("outgoingUser");
         assertThat(outgoingModel.status()).isEqualTo(FriendshipStatus.PENDING.name());
 

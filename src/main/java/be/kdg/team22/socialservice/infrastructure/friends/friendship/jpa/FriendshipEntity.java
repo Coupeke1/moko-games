@@ -1,4 +1,4 @@
-package be.kdg.team22.socialservice.infrastructure.friends.friendship;
+package be.kdg.team22.socialservice.infrastructure.friends.friendship.jpa;
 
 import be.kdg.team22.socialservice.domain.friends.friendship.Friendship;
 import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipId;
@@ -33,7 +33,7 @@ public class FriendshipEntity {
     protected FriendshipEntity() {
     }
 
-    public FriendshipEntity(UUID id, UUID requesterId, UUID receiverId, FriendshipStatus status, Instant createdAt, Instant updatedAt) {
+    public FriendshipEntity(final UUID id, final UUID requesterId, final UUID receiverId, final FriendshipStatus status, final Instant createdAt, final Instant updatedAt) {
         this.id = id;
         this.requesterId = requesterId;
         this.receiverId = receiverId;
@@ -42,11 +42,11 @@ public class FriendshipEntity {
         this.updatedAt = updatedAt;
     }
 
-    public static FriendshipEntity fromDomain(Friendship friendship) {
+    public static FriendshipEntity from(final Friendship friendship) {
         return new FriendshipEntity(friendship.id().value(), friendship.requester().value(), friendship.receiver().value(), friendship.status(), friendship.createdAt(), friendship.updatedAt());
     }
 
-    public Friendship toDomain() {
+    public Friendship to() {
         return new Friendship(new FriendshipId(id), UserId.from(requesterId), UserId.from(receiverId), createdAt, updatedAt, status);
     }
 }

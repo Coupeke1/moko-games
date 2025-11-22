@@ -5,9 +5,9 @@ import be.kdg.team22.socialservice.domain.friends.friendship.Friendship;
 import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipId;
 import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipStatus;
 import be.kdg.team22.socialservice.domain.friends.user.UserId;
-import be.kdg.team22.socialservice.infrastructure.friends.friendship.FriendshipEntity;
-import be.kdg.team22.socialservice.infrastructure.friends.friendship.JpaFriendshipRepository;
-import be.kdg.team22.socialservice.infrastructure.friends.friendship.db.repositories.FriendshipRepositoryImpl;
+import be.kdg.team22.socialservice.infrastructure.friends.friendship.jpa.FriendshipEntity;
+import be.kdg.team22.socialservice.infrastructure.friends.friendship.jpa.JpaFriendshipRepository;
+import be.kdg.team22.socialservice.infrastructure.friends.friendship.DbFriendshipRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,15 +25,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @Import(TestcontainersConfig.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class FriendshipRepositoryImplTest {
+class DbFriendshipRepositoryTest {
 
     @Autowired
     private JpaFriendshipRepository jpa;
-    private FriendshipRepositoryImpl repo;
+    private DbFriendshipRepository repo;
 
     @BeforeEach
     void setup() {
-        repo = new FriendshipRepositoryImpl(jpa);
+        repo = new DbFriendshipRepository(jpa);
     }
 
     private FriendshipEntity entity(UUID id, UUID requester, UUID receiver) {
@@ -113,14 +113,14 @@ class FriendshipRepositoryImplTest {
         Friendship toSave = entity(id,
                 UUID.randomUUID(),
                 UUID.randomUUID()
-        ).toDomain();
+        ).to();
 
         repo.save(toSave);
 
         Optional<FriendshipEntity> db = jpa.findById(id);
 
         assertThat(db).isPresent();
-        assertThat(db.get().toDomain().id().value()).isEqualTo(id);
+        assertThat(db.get().to().id().value()).isEqualTo(id);
     }
 
     @Test
@@ -131,7 +131,7 @@ class FriendshipRepositoryImplTest {
                 UUID.randomUUID());
         jpa.save(e);
 
-        repo.delete(e.toDomain());
+        repo.delete(e.to());
 
         assertThat(jpa.findById(id)).isEmpty();
     }
