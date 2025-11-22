@@ -29,6 +29,7 @@ public class ProfileEntity {
 
     public ProfileEntity(final UUID id, final String username, final Instant createdAt) {
         this.id = id;
+        this.username = username;
         this.createdAt = createdAt;
     }
 

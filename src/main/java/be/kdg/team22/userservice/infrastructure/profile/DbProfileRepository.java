@@ -15,22 +15,22 @@ import java.util.Optional;
 public class DbProfileRepository implements ProfileRepository {
     private final JpaProfileRepository repository;
 
-    public DbProfileRepository(JpaProfileRepository repository) {
+    public DbProfileRepository(final JpaProfileRepository repository) {
         this.repository = repository;
     }
 
     @Override
-    public Optional<Profile> findById(ProfileId id) {
+    public Optional<Profile> findById(final ProfileId id) {
         return repository.findById(id.value()).map(ProfileEntity::to);
     }
 
     @Override
-    public Optional<Profile> findByUsername(ProfileName username) {
+    public Optional<Profile> findByUsername(final ProfileName username) {
         return repository.findByUsername(username.value()).map(ProfileEntity::to);
     }
 
     @Override
-    public void save(Profile profile) {
+    public void save(final Profile profile) {
         ProfileEntity entity = ProfileEntity.from(profile);
         repository.save(entity);
     }
