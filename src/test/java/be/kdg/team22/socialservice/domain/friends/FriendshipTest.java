@@ -15,7 +15,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class FriendshipTest {
-
     private UserId user(UUID id) {
         return UserId.from(id);
     }

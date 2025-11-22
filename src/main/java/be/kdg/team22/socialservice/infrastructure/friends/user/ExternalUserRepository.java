@@ -1,5 +1,6 @@
 package be.kdg.team22.socialservice.infrastructure.friends.user;
 
+import be.kdg.team22.socialservice.domain.friends.user.UserId;
 import be.kdg.team22.socialservice.domain.friends.user.Username;
 import be.kdg.team22.socialservice.domain.friends.user.exceptions.NotFoundException;
 import be.kdg.team22.socialservice.domain.friends.user.exceptions.NotReachableException;
@@ -44,7 +45,7 @@ public class ExternalUserRepository {
             if (exception.getStatusCode() != HttpStatus.NOT_FOUND)
                 throw exception;
 
-            throw new NotFoundException(id);
+            throw new NotFoundException(UserId.from(id));
         } catch (
                 RestClientException exception) {
             throw new NotReachableException("user-service");

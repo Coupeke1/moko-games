@@ -1,10 +1,9 @@
-package be.kdg.team22.socialservice.infratructure.db.friends.entities;
+package be.kdg.team22.socialservice.infrastructure.friends.friendship.jpa;
 
 import be.kdg.team22.socialservice.domain.friends.friendship.Friendship;
 import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipId;
 import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipStatus;
 import be.kdg.team22.socialservice.domain.friends.user.UserId;
-import be.kdg.team22.socialservice.infrastructure.friends.friendship.jpa.FriendshipEntity;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -13,7 +12,6 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FriendshipEntityTest {
-
     @Test
     void from_convertsCorrectly() {
         FriendshipId id = FriendshipId.create();

@@ -1,4 +1,4 @@
-package be.kdg.team22.socialservice.infratructure.db.friends.repositories;
+package be.kdg.team22.socialservice.infrastructure.friends.friendship;
 
 import be.kdg.team22.socialservice.config.TestcontainersConfig;
 import be.kdg.team22.socialservice.domain.friends.friendship.Friendship;
@@ -7,7 +7,6 @@ import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipStatus;
 import be.kdg.team22.socialservice.domain.friends.user.UserId;
 import be.kdg.team22.socialservice.infrastructure.friends.friendship.jpa.FriendshipEntity;
 import be.kdg.team22.socialservice.infrastructure.friends.friendship.jpa.JpaFriendshipRepository;
-import be.kdg.team22.socialservice.infrastructure.friends.friendship.DbFriendshipRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(TestcontainersConfig.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class DbFriendshipRepositoryTest {
-
     @Autowired
     private JpaFriendshipRepository jpa;
     private DbFriendshipRepository repo;
