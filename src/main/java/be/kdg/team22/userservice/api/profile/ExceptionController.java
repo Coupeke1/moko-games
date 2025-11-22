@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class ExceptionController {
-
     @ExceptionHandler({ClaimNotFoundException.class, NotFoundException.class})
     public ResponseEntity<String> handleNotFound(final RuntimeException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);

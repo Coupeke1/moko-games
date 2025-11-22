@@ -1,4 +1,4 @@
-package be.kdg.team22.userservice.infrastructure.db.repositories.jpa;
+package be.kdg.team22.userservice.infrastructure.profile.jpa;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

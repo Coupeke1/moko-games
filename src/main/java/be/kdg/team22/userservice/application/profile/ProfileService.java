@@ -18,34 +18,22 @@ public class ProfileService {
         this.repository = repository;
     }
 
-    public Profile getOrCreate(Jwt token) {
+    public Profile getOrCreate(final Jwt token) {
         ProfileId id = ProfileId.get(token);
-
         String username = getUsername(token);
-        String email = getEmail(token);
 
         return repository.findById(id).orElseGet(() -> {
-            Profile profile = new Profile(id, username, email);
+            Profile profile = new Profile(id, username);
             repository.save(profile);
             return profile;
         });
     }
 
-    public Profile update(Jwt token, String username, String email) {
-        ProfileId id = ProfileId.get(token);
-        Profile profile = repository.findById(id).orElseThrow(id::notFound);
-
-        profile.update(username, email);
-        repository.save(profile);
-
-        return profile;
-    }
-
-    public Profile getById(ProfileId id) {
+    public Profile getById(final ProfileId id) {
         return repository.findById(id).orElseThrow(id::notFound);
     }
 
-    public Profile getByUsername(String username) {
+    public Profile getByUsername(final String username) {
         return repository.findByUsername(username).orElseThrow(() -> new NotFoundException(username));
     }
 
@@ -57,12 +45,5 @@ public class ProfileService {
             return token.getClaimAsString("username");
 
         throw ClaimNotFoundException.username();
-    }
-
-    private String getEmail(Jwt token) {
-        if (!token.hasClaim("email"))
-            throw ClaimNotFoundException.email();
-
-        return token.getClaimAsString("email");
     }
 }

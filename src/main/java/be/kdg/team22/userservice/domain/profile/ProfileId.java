@@ -12,10 +12,6 @@ public record ProfileId(UUID value) {
         return new ProfileId(UUID.fromString(value));
     }
 
-    public static ProfileId from(UUID uuid) {
-        return new ProfileId(uuid);
-    }
-
     public static ProfileId get(Jwt token) {
         String sub = token.getClaimAsString(StandardClaimNames.SUB);
         if (sub == null)
