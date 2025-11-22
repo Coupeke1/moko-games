@@ -26,8 +26,9 @@ class DbProfileRepositoryTest {
     @Test
     void saveAndLoadProfile() {
         UUID id = UUID.randomUUID();
+        String username = "existing-user";
 
-        ProfileEntity entity = new ProfileEntity(id, Instant.now());
+        ProfileEntity entity = new ProfileEntity(id, username, Instant.now());
         repository.save(entity);
 
         Optional<ProfileEntity> loaded = repository.findById(id);

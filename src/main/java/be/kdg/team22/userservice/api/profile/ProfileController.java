@@ -4,6 +4,7 @@ import be.kdg.team22.userservice.api.profile.models.ProfileModel;
 import be.kdg.team22.userservice.application.profile.ProfileService;
 import be.kdg.team22.userservice.domain.profile.Profile;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
+import be.kdg.team22.userservice.domain.profile.ProfileName;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -39,7 +40,7 @@ public class ProfileController {
 
     @GetMapping("/find/{username}")
     public ResponseEntity<ProfileModel> getByUsername(@PathVariable final String username) {
-        Profile profile = service.getByUsername(username);
+        Profile profile = service.getByUsername(new ProfileName(username));
         return ResponseEntity.ok(ProfileModel.from(profile));
     }
 }

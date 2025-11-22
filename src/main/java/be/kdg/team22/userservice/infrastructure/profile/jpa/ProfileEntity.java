@@ -2,6 +2,7 @@ package be.kdg.team22.userservice.infrastructure.profile.jpa;
 
 import be.kdg.team22.userservice.domain.profile.Profile;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
+import be.kdg.team22.userservice.domain.profile.ProfileName;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -32,10 +33,10 @@ public class ProfileEntity {
     }
 
     public static ProfileEntity from(final Profile profile) {
-        return new ProfileEntity(profile.id().value(), profile.username(), profile.createdAt());
+        return new ProfileEntity(profile.id().value(), profile.username().value(), profile.createdAt());
     }
 
     public Profile to() {
-        return new Profile(new ProfileId(id), username, createdAt);
+        return new Profile(new ProfileId(id), new ProfileName(username), createdAt);
     }
 }

@@ -2,9 +2,9 @@ package be.kdg.team22.userservice.application.profile;
 
 import be.kdg.team22.userservice.domain.profile.Profile;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
+import be.kdg.team22.userservice.domain.profile.ProfileName;
 import be.kdg.team22.userservice.domain.profile.ProfileRepository;
 import be.kdg.team22.userservice.domain.profile.exceptions.ClaimNotFoundException;
-import be.kdg.team22.userservice.domain.profile.exceptions.NotFoundException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +20,7 @@ public class ProfileService {
 
     public Profile getOrCreate(final Jwt token) {
         ProfileId id = ProfileId.get(token);
-        String username = getUsername(token);
+        ProfileName username = getUsername(token);
 
         return repository.findById(id).orElseGet(() -> {
             Profile profile = new Profile(id, username);
@@ -33,16 +33,16 @@ public class ProfileService {
         return repository.findById(id).orElseThrow(id::notFound);
     }
 
-    public Profile getByUsername(final String username) {
-        return repository.findByUsername(username).orElseThrow(() -> new NotFoundException(username));
+    public Profile getByUsername(final ProfileName username) {
+        return repository.findByUsername(username).orElseThrow(username::notFound);
     }
 
-    private String getUsername(Jwt token) {
+    private ProfileName getUsername(Jwt token) {
         if (token.hasClaim("preferred_username"))
-            return token.getClaimAsString("preferred_username");
+            return new ProfileName(token.getClaimAsString("preferred_username"));
 
         if (token.hasClaim("username"))
-            return token.getClaimAsString("username");
+            return new ProfileName(token.getClaimAsString("username"));
 
         throw ClaimNotFoundException.username();
     }

@@ -2,6 +2,7 @@ package be.kdg.team22.userservice.infrastructure.profile;
 
 import be.kdg.team22.userservice.domain.profile.Profile;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
+import be.kdg.team22.userservice.domain.profile.ProfileName;
 import be.kdg.team22.userservice.domain.profile.ProfileRepository;
 import be.kdg.team22.userservice.infrastructure.profile.jpa.JpaProfileRepository;
 import be.kdg.team22.userservice.infrastructure.profile.jpa.ProfileEntity;
@@ -24,8 +25,8 @@ public class DbProfileRepository implements ProfileRepository {
     }
 
     @Override
-    public Optional<Profile> findByUsername(String username) {
-        return repository.findByUsername(username).map(ProfileEntity::to);
+    public Optional<Profile> findByUsername(ProfileName username) {
+        return repository.findByUsername(username.value()).map(ProfileEntity::to);
     }
 
     @Override

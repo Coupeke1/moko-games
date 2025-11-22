@@ -7,16 +7,16 @@ import java.time.Instant;
 @AggregateRoot
 public class Profile {
     private final ProfileId id;
-    private final String username;
+    private final ProfileName username;
     private final Instant createdAt;
 
-    public Profile(final ProfileId id, final String username, final Instant createdAt) {
+    public Profile(final ProfileId id, final ProfileName username, final Instant createdAt) {
         this.id = id;
         this.username = username;
         this.createdAt = createdAt;
     }
 
-    public Profile(final ProfileId id, final String username) {
+    public Profile(final ProfileId id, final ProfileName username) {
         this(id, username, Instant.now());
     }
 
@@ -24,7 +24,7 @@ public class Profile {
         return id;
     }
 
-    public String username() {
+    public ProfileName username() {
         return username;
     }
 
