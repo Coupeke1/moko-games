@@ -4,7 +4,8 @@ import be.kdg.team22.socialservice.domain.friends.friendship.Friendship;
 import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipId;
 import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipRepository;
 import be.kdg.team22.socialservice.domain.friends.user.UserId;
-import be.kdg.team22.socialservice.infrastructure.friends.friendship.db.entities.FriendshipEntity;
+import be.kdg.team22.socialservice.infrastructure.friends.friendship.JpaFriendshipRepository;
+import be.kdg.team22.socialservice.infrastructure.friends.friendship.FriendshipEntity;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,9 +13,9 @@ import java.util.Optional;
 
 @Repository
 public class FriendshipRepositoryImpl implements FriendshipRepository {
-    private final FriendshipJpaRepository repository;
+    private final JpaFriendshipRepository repository;
 
-    public FriendshipRepositoryImpl(final FriendshipJpaRepository repository) {
+    public FriendshipRepositoryImpl(final JpaFriendshipRepository repository) {
         this.repository = repository;
     }
 

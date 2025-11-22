@@ -5,8 +5,8 @@ import be.kdg.team22.socialservice.domain.friends.friendship.Friendship;
 import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipId;
 import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipStatus;
 import be.kdg.team22.socialservice.domain.friends.user.UserId;
-import be.kdg.team22.socialservice.infrastructure.friends.friendship.db.entities.FriendshipEntity;
-import be.kdg.team22.socialservice.infrastructure.friends.friendship.db.repositories.FriendshipJpaRepository;
+import be.kdg.team22.socialservice.infrastructure.friends.friendship.FriendshipEntity;
+import be.kdg.team22.socialservice.infrastructure.friends.friendship.JpaFriendshipRepository;
 import be.kdg.team22.socialservice.infrastructure.friends.friendship.db.repositories.FriendshipRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class FriendshipRepositoryImplTest {
 
     @Autowired
-    private FriendshipJpaRepository jpa;
+    private JpaFriendshipRepository jpa;
     private FriendshipRepositoryImpl repo;
 
     @BeforeEach

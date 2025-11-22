@@ -1,6 +1,5 @@
-package be.kdg.team22.socialservice.infrastructure.friends.friendship.db.repositories;
+package be.kdg.team22.socialservice.infrastructure.friends.friendship;
 
-import be.kdg.team22.socialservice.infrastructure.friends.friendship.db.entities.FriendshipEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -9,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface FriendshipJpaRepository extends JpaRepository<FriendshipEntity, UUID> {
+public interface JpaFriendshipRepository extends JpaRepository<FriendshipEntity, UUID> {
     @Query("""
                 SELECT f FROM FriendshipEntity f
                 WHERE (f.requesterId = :u1 AND f.receiverId = :u2)
