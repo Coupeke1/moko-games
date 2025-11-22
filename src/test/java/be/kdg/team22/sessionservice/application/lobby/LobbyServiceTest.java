@@ -4,16 +4,19 @@ import be.kdg.team22.sessionservice.api.lobby.models.CheckersSettingsModel;
 import be.kdg.team22.sessionservice.api.lobby.models.CreateLobbyModel;
 import be.kdg.team22.sessionservice.api.lobby.models.TicTacToeSettingsModel;
 import be.kdg.team22.sessionservice.api.lobby.models.UpdateLobbySettingsModel;
-import be.kdg.team22.sessionservice.domain.lobby.*;
+import be.kdg.team22.sessionservice.application.player.PlayerService;
+import be.kdg.team22.sessionservice.domain.lobby.GameId;
+import be.kdg.team22.sessionservice.domain.lobby.Lobby;
+import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
+import be.kdg.team22.sessionservice.domain.lobby.LobbyRepository;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.LobbyNotFoundException;
 import be.kdg.team22.sessionservice.domain.lobby.settings.CheckersSettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
-import be.kdg.team22.sessionservice.infrastructure.lobby.db.users.ExternalUserRepository;
-import be.kdg.team22.sessionservice.infrastructure.lobby.db.users.UserResponse;
+import be.kdg.team22.sessionservice.domain.player.Player;
+import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import org.junit.jupiter.api.Test;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,11 +26,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 class LobbyServiceTest {
-
     LobbyRepository repo = mock(LobbyRepository.class);
-    ExternalUserRepository users = mock(ExternalUserRepository.class);
+    PlayerService playerService = mock(PlayerService.class);
 
-    LobbyService service = new LobbyService(repo, users);
+    LobbyService service = new LobbyService(repo, playerService);
 
     @Test
     void createLobby_savesLobby_andReturnsIt() {
@@ -35,19 +37,9 @@ class LobbyServiceTest {
         GameId gameId = new GameId(UUID.randomUUID());
         PlayerId owner = new PlayerId(UUID.randomUUID());
 
-        CreateLobbyModel model = new CreateLobbyModel(
-                gameId.value(),
-                4,
-                new TicTacToeSettingsModel(3)
-        );
+        CreateLobbyModel model = new CreateLobbyModel(gameId.value(), 4, new TicTacToeSettingsModel(3));
 
-        when(users.getById(owner.value(), "TOKEN"))
-                .thenReturn(new UserResponse(
-                        owner.value(),
-                        "ownerUser",
-                        "owner@kdg.be",
-                        Instant.now()
-                ));
+        when(playerService.findPlayer(owner, "TOKEN")).thenReturn(new Player(owner, "ownerUser", "owner@kdg.be"));
 
         doNothing().when(repo).save(any(Lobby.class));
 
@@ -59,7 +51,7 @@ class LobbyServiceTest {
         assertThat(lobby.settings().gameSettings()).isInstanceOf(TicTacToeSettings.class);
 
         verify(repo).save(any(Lobby.class));
-        verify(users).getById(owner.value(), "TOKEN");
+        verify(playerService).findPlayer(owner, "TOKEN");
     }
 
     @Test
@@ -79,8 +71,7 @@ class LobbyServiceTest {
         LobbyId id = LobbyId.create();
         when(repo.findById(id)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.findLobby(id))
-                .isInstanceOf(LobbyNotFoundException.class);
+        assertThatThrownBy(() -> service.findLobby(id)).isInstanceOf(LobbyNotFoundException.class);
     }
 
     @Test
@@ -93,30 +84,21 @@ class LobbyServiceTest {
     }
 
     private Lobby existingLobby(LobbyId id, PlayerId owner) {
-
-        LobbyPlayer lp = new LobbyPlayer(owner.value(), "ownerUser");
+        Player player = new Player(owner, "ownerUser", "owner@email.com");
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
-        return new Lobby(
-                new GameId(UUID.randomUUID()),
-                lp,
-                settings
-        );
+        return new Lobby(new GameId(UUID.randomUUID()), player, settings);
     }
 
     @Test
     void updateSettings_tictactoe_updatesSuccessfully() {
-
         LobbyId id = LobbyId.create();
         PlayerId owner = new PlayerId(UUID.randomUUID());
         Lobby lobby = existingLobby(id, owner);
 
         when(repo.findById(id)).thenReturn(Optional.of(lobby));
 
-        UpdateLobbySettingsModel model = new UpdateLobbySettingsModel(
-                5,
-                new TicTacToeSettingsModel(5)
-        );
+        UpdateLobbySettingsModel model = new UpdateLobbySettingsModel(5, new TicTacToeSettingsModel(5));
 
         Lobby updated = service.updateSettings(id, owner, model);
 
@@ -136,10 +118,7 @@ class LobbyServiceTest {
 
         when(repo.findById(id)).thenReturn(Optional.of(lobby));
 
-        UpdateLobbySettingsModel model = new UpdateLobbySettingsModel(
-                6,
-                new CheckersSettingsModel(8, true)
-        );
+        UpdateLobbySettingsModel model = new UpdateLobbySettingsModel(6, new CheckersSettingsModel(8, true));
 
         Lobby updated = service.updateSettings(id, owner, model);
 
@@ -158,12 +137,8 @@ class LobbyServiceTest {
 
         when(repo.findById(id)).thenReturn(Optional.of(lobby));
 
-        UpdateLobbySettingsModel model = new UpdateLobbySettingsModel(
-                4,
-                null
-        );
+        UpdateLobbySettingsModel model = new UpdateLobbySettingsModel(4, null);
 
-        assertThatThrownBy(() -> service.updateSettings(id, owner, model))
-                .isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> service.updateSettings(id, owner, model)).isInstanceOf(NullPointerException.class);
     }
 }

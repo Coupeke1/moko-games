@@ -3,6 +3,9 @@ package be.kdg.team22.sessionservice.domain.lobby;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.*;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
+import be.kdg.team22.sessionservice.domain.player.Player;
+import be.kdg.team22.sessionservice.domain.player.PlayerId;
+import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerNotInLobbyException;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -23,8 +26,8 @@ class LobbyTest {
         return PlayerId.from(UUID.randomUUID());
     }
 
-    private LobbyPlayer lp(PlayerId id, String username) {
-        return new LobbyPlayer(id.value(), username);
+    private Player lp(PlayerId id, String username, String email) {
+        return new Player(id, username, email);
     }
 
     private LobbySettings settings(int max) {
@@ -34,7 +37,7 @@ class LobbyTest {
     @Test
     void constructor_createsLobbyWithOwner() {
         PlayerId owner = pid();
-        LobbyPlayer ownerPlayer = lp(owner, "owner");
+        Player ownerPlayer = lp(owner, "owner", "owner@email.com");
 
         Lobby lobby = new Lobby(game(), ownerPlayer, settings(4));
 
@@ -48,68 +51,51 @@ class LobbyTest {
     void fullConstructor_requiresOwnerInPlayers() {
         PlayerId owner = pid();
 
-        List<LobbyPlayer> players = List.of(
-                new LobbyPlayer(UUID.randomUUID(), "p1")
-        );
+        List<Player> players = List.of(new Player(PlayerId.create(), "p1", "p1@test.com"));
 
-        assertThatThrownBy(() ->
-                new Lobby(
-                        LobbyId.create(),
-                        game(),
-                        owner,
-                        players,
-                        Set.of(),
-                        settings(4),
-                        LobbyStatus.OPEN,
-                        Instant.now(),
-                        Instant.now()
-                )
-        ).isInstanceOf(OwnerNotFoundException.class);
+        assertThatThrownBy(() -> new Lobby(LobbyId.create(), game(), owner, players, Set.of(), settings(4), LobbyStatus.OPEN, Instant.now(), Instant.now())).isInstanceOf(OwnerNotFoundException.class);
     }
 
     @Test
     void acceptInvite_addsPlayer() {
         PlayerId owner = pid();
-        LobbyPlayer ownerPlayer = lp(owner, "owner");
+        Player ownerPlayer = lp(owner, "owner", "owner@email.com");
 
         Lobby lobby = new Lobby(game(), ownerPlayer, settings(4));
 
         PlayerId invited = pid();
         lobby.invitePlayer(owner, invited);
 
-        LobbyPlayer invitedPlayer = lp(invited, "jan");
+        Player invitedPlayer = lp(invited, "jan", "jan@email.com");
 
         lobby.acceptInvite(invitedPlayer);
 
-        assertThat(lobby.players().stream().map(LobbyPlayer::id))
-                .contains(invited.value());
+        assertThat(lobby.players().stream().map(Player::id)).contains(invited);
     }
 
     @Test
     void acceptInvite_throwsIfNotInvited() {
-        Lobby lobby = new Lobby(game(), lp(pid(), "owner"), settings(4));
-        LobbyPlayer someone = lp(pid(), "jimmy");
+        Lobby lobby = new Lobby(game(), lp(pid(), "owner", "owner@email.com"), settings(4));
+        Player someone = lp(pid(), "jimmy", "jimmy@email.com");
 
-        assertThatThrownBy(() -> lobby.acceptInvite(someone))
-                .isInstanceOf(InviteNotFoundException.class);
+        assertThatThrownBy(() -> lobby.acceptInvite(someone)).isInstanceOf(InviteNotFoundException.class);
     }
 
     @Test
     void acceptInvite_throwsIfFull() {
         PlayerId owner = pid();
-        Lobby lobby = new Lobby(game(), lp(owner, "owner"), settings(1));
+        Lobby lobby = new Lobby(game(), lp(owner, "owner", "owner@email.com"), settings(1));
 
         PlayerId invited = pid();
         lobby.invitePlayer(owner, invited);
 
-        assertThatThrownBy(() -> lobby.acceptInvite(lp(invited, "p")))
-                .isInstanceOf(LobbyFullException.class);
+        assertThatThrownBy(() -> lobby.acceptInvite(lp(invited, "p", "p@email.com"))).isInstanceOf(LobbyFullException.class);
     }
 
     @Test
     void invitePlayer_ownerCanInvite() {
         PlayerId owner = pid();
-        Lobby lobby = new Lobby(game(), lp(owner, "owner"), settings(4));
+        Lobby lobby = new Lobby(game(), lp(owner, "owner", "owner@email.com"), settings(4));
 
         PlayerId invited = pid();
         lobby.invitePlayer(owner, invited);
@@ -122,11 +108,10 @@ class LobbyTest {
         PlayerId owner = pid();
         PlayerId stranger = pid();
 
-        Lobby lobby = new Lobby(game(), lp(owner, "owner"), settings(4));
+        Lobby lobby = new Lobby(game(), lp(owner, "owner", "owner@email.com"), settings(4));
         PlayerId target = pid();
 
-        assertThatThrownBy(() -> lobby.invitePlayer(stranger, target))
-                .isInstanceOf(NotLobbyOwnerException.class);
+        assertThatThrownBy(() -> lobby.invitePlayer(stranger, target)).isInstanceOf(NotLobbyOwnerException.class);
     }
 
     @Test
@@ -134,38 +119,35 @@ class LobbyTest {
         PlayerId owner = pid();
         PlayerId p2 = pid();
 
-        Lobby lobby = new Lobby(game(), lp(owner, "owner"), settings(4));
+        Lobby lobby = new Lobby(game(), lp(owner, "owner", "owner@email.com"), settings(4));
         lobby.invitePlayer(owner, p2);
-        lobby.acceptInvite(lp(p2, "p2"));
+        lobby.acceptInvite(lp(p2, "p2", "p2@email.com"));
 
         lobby.removePlayer(owner, p2);
 
-        assertThat(lobby.players().stream().map(LobbyPlayer::id))
-                .doesNotContain(p2.value());
+        assertThat(lobby.players().stream().map(Player::id)).doesNotContain(p2);
     }
 
     @Test
     void removePlayer_cannotRemoveOwner() {
         PlayerId owner = pid();
-        Lobby lobby = new Lobby(game(), lp(owner, "owner"), settings(4));
+        Lobby lobby = new Lobby(game(), lp(owner, "owner", "owner@email.com"), settings(4));
 
-        assertThatThrownBy(() -> lobby.removePlayer(owner, owner))
-                .isInstanceOf(CannotRemoveOwnerException.class);
+        assertThatThrownBy(() -> lobby.removePlayer(owner, owner)).isInstanceOf(CannotRemoveOwnerException.class);
     }
 
     @Test
     void removePlayer_throwsIfPlayerNotInLobby() {
         PlayerId owner = pid();
-        Lobby lobby = new Lobby(game(), lp(owner, "owner"), settings(4));
+        Lobby lobby = new Lobby(game(), lp(owner, "owner", "owner@email.com"), settings(4));
 
-        assertThatThrownBy(() -> lobby.removePlayer(owner, pid()))
-                .isInstanceOf(PlayerNotInLobbyException.class);
+        assertThatThrownBy(() -> lobby.removePlayer(owner, pid())).isInstanceOf(PlayerNotInLobbyException.class);
     }
 
     @Test
     void close_changesStatus() {
         PlayerId owner = pid();
-        Lobby lobby = new Lobby(game(), lp(owner, "owner"), settings(4));
+        Lobby lobby = new Lobby(game(), lp(owner, "owner", "owner@email.com"), settings(4));
 
         lobby.close(owner);
 
@@ -177,19 +159,17 @@ class LobbyTest {
         PlayerId owner = pid();
         PlayerId stranger = pid();
 
-        Lobby lobby = new Lobby(game(), lp(owner, "owner"), settings(4));
+        Lobby lobby = new Lobby(game(), lp(owner, "owner", "owner@email.com"), settings(4));
 
-        assertThatThrownBy(() -> lobby.close(stranger))
-                .isInstanceOf(NotLobbyOwnerException.class);
+        assertThatThrownBy(() -> lobby.close(stranger)).isInstanceOf(NotLobbyOwnerException.class);
     }
 
     @Test
     void changeSettings_works() {
         PlayerId owner = pid();
-        Lobby lobby = new Lobby(game(), lp(owner, "owner"), settings(4));
+        Lobby lobby = new Lobby(game(), lp(owner, "owner", "owner@email.com"), settings(4));
 
-        LobbySettings newSettings =
-                new LobbySettings(new TicTacToeSettings(4), 5);
+        LobbySettings newSettings = new LobbySettings(new TicTacToeSettings(4), 5);
 
         lobby.changeSettings(owner, newSettings);
 
@@ -201,22 +181,20 @@ class LobbyTest {
         PlayerId owner = pid();
         PlayerId p2 = pid();
 
-        Lobby lobby = new Lobby(game(), lp(owner, "owner"), settings(4));
+        Lobby lobby = new Lobby(game(), lp(owner, "owner", "owner@email.com"), settings(4));
 
         lobby.invitePlayer(owner, p2);
-        lobby.acceptInvite(lp(p2, "p2"));
+        lobby.acceptInvite(lp(p2, "p2", "p2@email.com"));
 
         LobbySettings tooSmall = settings(1);
 
-        assertThatThrownBy(() -> lobby.changeSettings(owner, tooSmall))
-                .isInstanceOf(MaxPlayersTooSmallException.class);
+        assertThatThrownBy(() -> lobby.changeSettings(owner, tooSmall)).isInstanceOf(MaxPlayersTooSmallException.class);
     }
 
     @Test
     void players_returnsImmutableSet() {
-        Lobby lobby = new Lobby(game(), lp(pid(), "owner"), settings(4));
+        Lobby lobby = new Lobby(game(), lp(pid(), "owner", "owner@email.com"), settings(4));
 
-        assertThatThrownBy(() -> lobby.players().add(lp(pid(), "x")))
-                .isInstanceOf(UnsupportedOperationException.class);
+        assertThatThrownBy(() -> lobby.players().add(lp(pid(), "x", "x@email.com"))).isInstanceOf(UnsupportedOperationException.class);
     }
 }

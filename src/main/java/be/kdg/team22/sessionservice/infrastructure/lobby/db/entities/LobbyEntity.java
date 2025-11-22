@@ -1,7 +1,12 @@
 package be.kdg.team22.sessionservice.infrastructure.lobby.db.entities;
 
-import be.kdg.team22.sessionservice.domain.lobby.*;
+import be.kdg.team22.sessionservice.domain.lobby.GameId;
+import be.kdg.team22.sessionservice.domain.lobby.Lobby;
+import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
+import be.kdg.team22.sessionservice.domain.lobby.LobbyStatus;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
+import be.kdg.team22.sessionservice.domain.player.Player;
+import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.infrastructure.lobby.db.converters.LobbySettingsConverter;
 import jakarta.persistence.*;
 
@@ -14,7 +19,6 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "lobbies")
 public class LobbyEntity {
-
     @Id
     private UUID id;
 
@@ -25,23 +29,12 @@ public class LobbyEntity {
     private UUID ownerId;
 
     @ElementCollection
-    @CollectionTable(
-            name = "lobby_players",
-            schema = "session_service",
-            joinColumns = @JoinColumn(name = "lobby_id")
-    )
-    @AttributeOverrides({
-            @AttributeOverride(name = "id", column = @Column(name = "player_id", nullable = false)),
-            @AttributeOverride(name = "username", column = @Column(name = "username", nullable = false))
-    })
-    private Set<LobbyPlayerEmbed> players;
+    @CollectionTable(name = "lobby_players", schema = "session_service", joinColumns = @JoinColumn(name = "lobby_id"))
+    @AttributeOverrides({@AttributeOverride(name = "id", column = @Column(name = "player_id", nullable = false)), @AttributeOverride(name = "username", column = @Column(name = "username", nullable = false))})
+    private Set<PlayerEmbed> players;
 
     @ElementCollection
-    @CollectionTable(
-            name = "lobby_invited_players",
-            schema = "session_service",
-            joinColumns = @JoinColumn(name = "lobby_id")
-    )
+    @CollectionTable(name = "lobby_invited_players", schema = "session_service", joinColumns = @JoinColumn(name = "lobby_id"))
     @Column(name = "invited_player_id", nullable = false)
     private Set<UUID> invitedPlayerIds;
 
@@ -62,15 +55,7 @@ public class LobbyEntity {
     protected LobbyEntity() {
     }
 
-    public LobbyEntity(UUID id,
-                       UUID gameId,
-                       UUID ownerId,
-                       Set<LobbyPlayerEmbed> players,
-                       Set<UUID> invitedPlayerIds,
-                       LobbySettings settings,
-                       LobbyStatus status,
-                       Instant createdAt,
-                       Instant updatedAt) {
+    public LobbyEntity(UUID id, UUID gameId, UUID ownerId, Set<PlayerEmbed> players, Set<UUID> invitedPlayerIds, LobbySettings settings, LobbyStatus status, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.gameId = gameId;
         this.ownerId = ownerId;
@@ -83,77 +68,41 @@ public class LobbyEntity {
     }
 
     public static LobbyEntity fromDomain(final Lobby lobby) {
+        Set<PlayerEmbed> players = lobby.players().stream().map(player -> new PlayerEmbed(player.id().value(), player.username(), player.email())).collect(Collectors.toSet());
+        Set<UUID> invitedPlayers = lobby.invitedPlayers().stream().map(PlayerId::value).collect(Collectors.toSet());
 
-        Set<LobbyPlayerEmbed> mappedPlayers =
-                lobby.players().stream()
-                        .map(p -> new LobbyPlayerEmbed(p.id(), p.username()))
-                        .collect(Collectors.toSet());
-
-        Set<UUID> mappedInvited =
-                lobby.invitedPlayers().stream()
-                        .map(PlayerId::value)
-                        .collect(Collectors.toSet());
-
-        return new LobbyEntity(
-                lobby.id().value(),
-                lobby.gameId().value(),
-                lobby.ownerId().value(),
-                mappedPlayers,
-                mappedInvited,
-                lobby.settings(),
-                lobby.status(),
-                lobby.createdAt(),
-                lobby.updatedAt()
-        );
+        return new LobbyEntity(lobby.id().value(), lobby.gameId().value(), lobby.ownerId().value(), players, invitedPlayers, lobby.settings(), lobby.status(), lobby.createdAt(), lobby.updatedAt());
     }
 
 
     public Lobby toDomain() {
+        List<Player> players = this.players.stream().map(p -> new Player(PlayerId.from(p.id()), p.username(), p.email())).collect(Collectors.toList());
+        Set<PlayerId> invitedPlayers = invitedPlayerIds.stream().map(PlayerId::from).collect(Collectors.toSet());
 
-        List<LobbyPlayer> domainPlayers =
-                players.stream()
-                        .map(p -> new LobbyPlayer(p.getId(), p.getUsername()))
-                        .collect(Collectors.toList());
-
-        Set<PlayerId> invited =
-                invitedPlayerIds.stream()
-                        .map(PlayerId::from)
-                        .collect(Collectors.toSet());
-
-        return new Lobby(
-                LobbyId.from(id),
-                GameId.from(gameId),
-                PlayerId.from(ownerId),
-                domainPlayers,
-                invited,
-                settings,
-                status,
-                createdAt,
-                updatedAt
-        );
+        return new Lobby(LobbyId.from(id), GameId.from(gameId), PlayerId.from(ownerId), players, invitedPlayers, settings, status, createdAt, updatedAt);
     }
 
-    public UUID getId() {
+    public UUID id() {
         return id;
     }
 
-    public UUID getGameId() {
+    public UUID gameId() {
         return gameId;
     }
 
-    public UUID getOwnerId() {
+    public UUID ownerId() {
         return ownerId;
     }
 
-    public Set<LobbyPlayerEmbed> getPlayers() {
+    public Set<PlayerEmbed> players() {
         return players;
     }
 
-    public LobbySettings getSettings() {
+    public LobbySettings settings() {
         return settings;
     }
 
-    public LobbyStatus getStatus() {
+    public LobbyStatus status() {
         return status;
     }
 }

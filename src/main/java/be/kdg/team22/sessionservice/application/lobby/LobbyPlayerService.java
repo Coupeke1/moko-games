@@ -1,99 +1,81 @@
 package be.kdg.team22.sessionservice.application.lobby;
 
-import be.kdg.team22.sessionservice.domain.lobby.*;
-import be.kdg.team22.sessionservice.domain.lobby.exceptions.LobbyNotFoundException;
-import be.kdg.team22.sessionservice.domain.lobby.exceptions.PlayerNotFriendException;
-import be.kdg.team22.sessionservice.infrastructure.lobby.db.friends.ExternalFriendsRepository;
-import be.kdg.team22.sessionservice.infrastructure.lobby.db.users.ExternalUserRepository;
-import be.kdg.team22.sessionservice.infrastructure.lobby.db.users.UserResponse;
+import be.kdg.team22.sessionservice.application.friends.FriendsService;
+import be.kdg.team22.sessionservice.application.player.PlayerService;
+import be.kdg.team22.sessionservice.domain.lobby.Lobby;
+import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
+import be.kdg.team22.sessionservice.domain.lobby.LobbyRepository;
+import be.kdg.team22.sessionservice.domain.player.Player;
+import be.kdg.team22.sessionservice.domain.player.PlayerId;
+import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerNotFriendException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 @Transactional
 public class LobbyPlayerService {
-
     private final LobbyRepository lobbyRepository;
-    private final ExternalFriendsRepository friendsRepository;
-    private final ExternalUserRepository userRepository;
+    private final FriendsService friendsService;
+    private final PlayerService playerService;
 
-    public LobbyPlayerService(
-            LobbyRepository lobbyRepository,
-            ExternalFriendsRepository friendsRepository,
-            ExternalUserRepository userRepository
-    ) {
+    public LobbyPlayerService(LobbyRepository lobbyRepository, FriendsService friendsService, PlayerService playerService) {
         this.lobbyRepository = lobbyRepository;
-        this.friendsRepository = friendsRepository;
-        this.userRepository = userRepository;
+        this.friendsService = friendsService;
+        this.playerService = playerService;
     }
 
-    public void invitePlayer(PlayerId owner, LobbyId lobbyId, PlayerId target, Jwt token) {
-        Lobby lobby = lobbyRepository.findById(lobbyId)
-                .orElseThrow(() -> new LobbyNotFoundException(lobbyId.value()));
+    public void invitePlayer(PlayerId ownerId, LobbyId lobbyId, PlayerId playerId, Jwt token) {
+        Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
+        ensureFriend(ownerId, playerId, token);
 
-        ensureFriend(owner, target, token);
-
-        lobby.invitePlayer(owner, target);
+        lobby.invitePlayer(ownerId, playerId);
         lobbyRepository.save(lobby);
     }
 
-    public void invitePlayers(PlayerId owner, LobbyId lobbyId, List<PlayerId> targets, Jwt token) {
-        Lobby lobby = lobbyRepository.findById(lobbyId)
-                .orElseThrow(() -> new LobbyNotFoundException(lobbyId.value()));
+    public void invitePlayers(PlayerId ownerId, LobbyId lobbyId, List<PlayerId> playerIds, Jwt token) {
+        Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
+        List<PlayerId> friends = friendsService.findAllFriends(token.getTokenValue());
 
-        List<PlayerId> friends = friendsRepository.getFriendIds(token).stream()
-                .map(PlayerId::from)
-                .toList();
+        for (PlayerId playerId : playerIds) {
+            if (friends.contains(playerId))
+                continue;
 
-        Set<PlayerId> friendSet = Set.copyOf(friends);
-
-        for (PlayerId t : targets) {
-            if (!friendSet.contains(t)) {
-                throw new PlayerNotFriendException(owner, t.value());
-            }
+            throw new PlayerNotFriendException(ownerId, playerId);
         }
 
-        lobby.invitePlayers(owner, targets);
+        lobby.invitePlayers(ownerId, playerIds);
         lobbyRepository.save(lobby);
     }
 
-    public void acceptInvite(PlayerId userId, LobbyId lobbyId, String token) {
-        Lobby lobby = lobbyRepository.findById(lobbyId)
-                .orElseThrow(() -> new LobbyNotFoundException(lobbyId.value()));
+    public void acceptInvite(PlayerId playerId, LobbyId lobbyId, String token) {
+        Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
+        Player player = playerService.findPlayer(playerId, token);
 
-        UserResponse response = userRepository.getById(userId.value(), token);
-        LobbyPlayer domainPlayer = new LobbyPlayer(response.id(), response.username());
-
-        lobby.acceptInvite(domainPlayer);
+        lobby.acceptInvite(player);
         lobbyRepository.save(lobby);
     }
 
-    public void removePlayer(PlayerId owner, LobbyId lobbyId, PlayerId target) {
-        Lobby lobby = lobbyRepository.findById(lobbyId)
-                .orElseThrow(() -> new LobbyNotFoundException(lobbyId.value()));
+    public void removePlayer(PlayerId ownerId, LobbyId lobbyId, PlayerId playerId) {
+        Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
 
-        lobby.removePlayer(owner, target);
+        lobby.removePlayer(ownerId, playerId);
         lobbyRepository.save(lobby);
     }
 
-    public void removePlayers(PlayerId owner, LobbyId lobbyId, List<PlayerId> ids) {
-        Lobby lobby = lobbyRepository.findById(lobbyId)
-                .orElseThrow(() -> new LobbyNotFoundException(lobbyId.value()));
+    public void removePlayers(PlayerId ownerId, LobbyId lobbyId, List<PlayerId> ids) {
+        Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
 
-        lobby.removePlayers(owner, ids);
+        lobby.removePlayers(ownerId, ids);
         lobbyRepository.save(lobby);
     }
 
-    private void ensureFriend(PlayerId owner, PlayerId target, Jwt token) {
-        List<PlayerId> friends = friendsRepository.getFriendIds(token).stream()
-                .map(PlayerId::from)
-                .toList();
+    private void ensureFriend(PlayerId ownerId, PlayerId playerId, Jwt token) {
+        List<PlayerId> friends = friendsService.findAllFriends(token.getTokenValue());
 
-        if (!friends.contains(target))
-            throw new PlayerNotFriendException(owner, target.value());
+        if (!friends.contains(playerId))
+            throw new PlayerNotFriendException(ownerId, playerId);
     }
 }

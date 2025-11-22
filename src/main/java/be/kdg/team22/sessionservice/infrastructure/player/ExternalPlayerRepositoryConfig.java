@@ -1,4 +1,4 @@
-package be.kdg.team22.sessionservice.infrastructure.lobby.db.users;
+package be.kdg.team22.sessionservice.infrastructure.player;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -7,8 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
 
 @Configuration
-class ExternalUserRepositoryConfig {
-
+class ExternalPlayerRepositoryConfig {
     @Bean
     @Qualifier("userService")
     RestClient userServiceClient(

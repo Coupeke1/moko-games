@@ -9,7 +9,6 @@ import jakarta.persistence.Converter;
 
 @Converter
 public class GameSettingsConverter implements AttributeConverter<GameSettings, String> {
-
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @Override
@@ -17,8 +16,7 @@ public class GameSettingsConverter implements AttributeConverter<GameSettings, S
         try {
             return mapper.writeValueAsString(attribute);
         } catch (Exception e) {
-            return SettingsConversionException.serializationError(attribute.getClass(), e)
-                    .toString();
+            return SettingsConversionException.serializationError(attribute.getClass(), e).toString();
         }
     }
 

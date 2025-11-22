@@ -14,6 +14,10 @@ public record GameId(UUID value) {
         return new GameId(uuid);
     }
 
+    public static GameId create() {
+        return new GameId(UUID.randomUUID());
+    }
+
     public static GameId create(String value) {
         return new GameId(UUID.fromString(value));
     }

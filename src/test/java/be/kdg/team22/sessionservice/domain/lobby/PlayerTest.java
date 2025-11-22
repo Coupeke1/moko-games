@@ -1,38 +1,38 @@
 package be.kdg.team22.sessionservice.domain.lobby;
 
+import be.kdg.team22.sessionservice.domain.player.Player;
+import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import org.junit.jupiter.api.Test;
-
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class LobbyPlayerTest {
+class PlayerTest {
 
     @Test
     void validPlayer_createsSuccessfully() {
-        UUID id = UUID.randomUUID();
-        LobbyPlayer p = new LobbyPlayer(id, "mathias");
+        PlayerId playerId = PlayerId.create();
+        Player p = new Player(playerId, "mathias", "mathias@email.com");
 
-        assertThat(p.id()).isEqualTo(id);
+        assertThat(p.id()).isEqualTo(playerId);
         assertThat(p.username()).isEqualTo("mathias");
     }
 
     @Test
     void nullId_throws() {
-        assertThatThrownBy(() -> new LobbyPlayer(null, "john"))
+        assertThatThrownBy(() -> new Player(null, "john", "john@email.com"))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void nullUsername_throws() {
-        assertThatThrownBy(() -> new LobbyPlayer(UUID.randomUUID(), null))
+        assertThatThrownBy(() -> new Player(PlayerId.create(), null, "null@null.null"))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void blankUsername_throws() {
-        assertThatThrownBy(() -> new LobbyPlayer(UUID.randomUUID(), " "))
+        assertThatThrownBy(() -> new Player(PlayerId.create(), " ", "null@null.null"))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

@@ -1,9 +1,9 @@
 package be.kdg.team22.sessionservice.domain.lobby.exceptions;
 
-import java.util.UUID;
+import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
 
 public class LobbyFullException extends RuntimeException {
-    public LobbyFullException(UUID lobbyId) {
-        super(String.format("Lobby '%s' is full", lobbyId));
+    public LobbyFullException(LobbyId id) {
+        super(String.format("Lobby '%s' is full", id.value()));
     }
 }

@@ -1,0 +1,38 @@
+package be.kdg.team22.sessionservice.infrastructure.player;
+
+import be.kdg.team22.sessionservice.domain.player.PlayerId;
+import be.kdg.team22.sessionservice.domain.player.exceptions.NotReachableException;
+import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerNotFoundException;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
+
+import java.util.Optional;
+import java.util.UUID;
+
+@Component
+public class ExternalPlayerRepository {
+    private final RestClient client;
+
+    public ExternalPlayerRepository(@Qualifier("userService") RestClient client) {
+        this.client = client;
+    }
+
+    public Optional<PlayerResponse> getById(final UUID id, final String token) {
+        try {
+            return Optional.ofNullable(client.get().uri("/{id}", id).header("Authorization", "Bearer " + token).retrieve().body(PlayerResponse.class));
+        } catch (
+                HttpClientErrorException exception) {
+            if (exception.getStatusCode() != HttpStatus.NOT_FOUND)
+                throw exception;
+
+            throw new PlayerNotFoundException(new PlayerId(id));
+        } catch (
+                RestClientException exception) {
+            throw new NotReachableException();
+        }
+    }
+}

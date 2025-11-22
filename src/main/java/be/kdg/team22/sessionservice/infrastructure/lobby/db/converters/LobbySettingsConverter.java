@@ -9,7 +9,6 @@ import jakarta.persistence.Converter;
 
 @Converter
 public class LobbySettingsConverter implements AttributeConverter<LobbySettings, String> {
-
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @Override

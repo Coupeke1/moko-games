@@ -2,20 +2,22 @@ package be.kdg.team22.sessionservice.domain.lobby;
 
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.*;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
+import be.kdg.team22.sessionservice.domain.player.Player;
+import be.kdg.team22.sessionservice.domain.player.PlayerId;
+import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerAlreadyInLobbyException;
+import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerNotInLobbyException;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @AggregateRoot
 public class Lobby {
-
     private final LobbyId id;
     private final GameId game;
     private final PlayerId owner;
 
-    private final List<LobbyPlayer> players;
+    private final List<Player> players;
     private final Set<PlayerId> invitedPlayerIds;
 
     private final Instant createdAt;
@@ -24,17 +26,7 @@ public class Lobby {
     private LobbyStatus status;
     private LobbySettings settings;
 
-    public Lobby(
-            LobbyId id,
-            GameId game,
-            PlayerId owner,
-            List<LobbyPlayer> players,
-            Set<PlayerId> invitedPlayers,
-            LobbySettings settings,
-            LobbyStatus status,
-            Instant createdAt,
-            Instant updatedAt
-    ) {
+    public Lobby(LobbyId id, GameId game, PlayerId owner, List<Player> players, Set<PlayerId> invitedPlayers, LobbySettings settings, LobbyStatus status, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.game = game;
         this.owner = owner;
@@ -46,126 +38,121 @@ public class Lobby {
         this.players = new ArrayList<>(players);
         this.invitedPlayerIds = new HashSet<>(invitedPlayers);
 
-        if (players.stream().noneMatch(p -> p.id().equals(owner.value())))
+        if (players.stream().noneMatch(p -> p.id().equals(owner)))
             throw new OwnerNotFoundException(owner.value());
 
         if (players.size() > settings.maxPlayers())
             throw new MaxPlayersTooSmallException(players.size(), settings.maxPlayers());
     }
 
-    public Lobby(
-            GameId game,
-            LobbyPlayer ownerPlayer,
-            LobbySettings settings
-    ) {
+    public Lobby(GameId game, Player owner, LobbySettings settings) {
         this.id = LobbyId.create();
         this.game = game;
-        this.owner = PlayerId.from(ownerPlayer.id());
+        this.owner = owner.id();
         this.settings = settings;
         this.status = LobbyStatus.OPEN;
         this.createdAt = Instant.now();
         this.updatedAt = createdAt;
 
         this.players = new ArrayList<>();
-        this.players.add(ownerPlayer);
+        this.players.add(owner);
 
         this.invitedPlayerIds = new HashSet<>();
     }
 
-    public void acceptInvite(LobbyPlayer player) {
-        PlayerId pid = PlayerId.from(player.id());
+    public void acceptInvite(Player player) {
         ensureModifiable();
 
-        if (!invitedPlayerIds.contains(pid))
-            throw new InviteNotFoundException(id.value(), player.id());
+        if (!invitedPlayerIds.contains(player.id()))
+            throw new InviteNotFoundException(id, player.id());
 
         if (players.size() >= settings.maxPlayers())
-            throw new LobbyFullException(id.value());
+            throw new LobbyFullException(id);
 
-        if (players.stream().anyMatch(p -> p.id().equals(pid.value())))
-            throw new PlayerAlreadyInLobbyException(pid.value(), id.value());
+        if (players.stream().anyMatch(p -> p.id().equals(player.id())))
+            throw new PlayerAlreadyInLobbyException(player.id(), id);
 
-        invitedPlayerIds.remove(pid);
+        invitedPlayerIds.remove(player.id());
         players.add(player);
         updatedAt = Instant.now();
     }
 
-    public void invitePlayer(PlayerId actingUser, PlayerId target) {
-        ensureOwner(actingUser);
+    public void invitePlayer(PlayerId ownerId, PlayerId targetId) {
+        ensureOwner(ownerId);
         ensureModifiable();
 
-        if (players.stream().anyMatch(p -> p.id().equals(target.value())))
-            throw new PlayerAlreadyInLobbyException(target.value(), id.value());
+        if (players.stream().anyMatch(p -> p.id().equals(targetId)))
+            throw new PlayerAlreadyInLobbyException(targetId, id);
 
-        invitedPlayerIds.add(target);
+        invitedPlayerIds.add(targetId);
         updatedAt = Instant.now();
     }
 
-    public void invitePlayers(PlayerId actingUser, Collection<PlayerId> targets) {
-        ensureOwner(actingUser);
+    public void invitePlayers(PlayerId ownerId, Collection<PlayerId> targetIds) {
+        ensureOwner(ownerId);
         ensureModifiable();
 
-        for (PlayerId t : targets) {
-            if (players.stream().noneMatch(p -> p.id().equals(t.value()))) {
-                invitedPlayerIds.add(t);
+        for (PlayerId target : targetIds) {
+            if (players.stream().noneMatch(player -> player.id().equals(target))) {
+                invitedPlayerIds.add(target);
             }
         }
+
         updatedAt = Instant.now();
     }
 
-    public void removePlayer(PlayerId actingUser, PlayerId target) {
-        ensureOwner(actingUser);
+    public void removePlayer(PlayerId ownerId, PlayerId targetId) {
+        ensureOwner(ownerId);
         ensureModifiable();
 
-        if (target.equals(owner))
-            throw new CannotRemoveOwnerException(id.value());
+        if (targetId.equals(this.owner))
+            throw new CannotRemoveOwnerException(id);
 
-        boolean removed = players.removeIf(p -> p.id().equals(target.value()));
+        boolean removed = players.removeIf(player -> player.id().equals(targetId));
         if (!removed)
-            throw new PlayerNotInLobbyException(target, id.value());
+            throw new PlayerNotInLobbyException(targetId, id);
 
         updatedAt = Instant.now();
     }
 
-    public void removePlayers(PlayerId actingUser, Collection<PlayerId> targets) {
-        ensureOwner(actingUser);
+    public void removePlayers(PlayerId ownerId, Collection<PlayerId> targetId) {
+        ensureOwner(ownerId);
         ensureModifiable();
 
-        if (targets.contains(owner))
-            throw new CannotRemoveOwnerException(id.value());
+        if (targetId.contains(this.owner))
+            throw new CannotRemoveOwnerException(id);
 
-        Set<UUID> ids = targets.stream().map(PlayerId::value).collect(Collectors.toSet());
-        players.removeIf(p -> ids.contains(p.id()));
-
+        players.removeIf(player -> targetId.stream().toList().contains(player.id()));
         updatedAt = Instant.now();
     }
 
-    public void close(PlayerId actingUser) {
-        ensureOwner(actingUser);
+    public void close(PlayerId ownerId) {
+        ensureOwner(ownerId);
         ensureModifiable();
+
         status = LobbyStatus.CLOSED;
         updatedAt = Instant.now();
     }
 
-    public void changeSettings(PlayerId actingUser, LobbySettings newSettings) {
-        ensureOwner(actingUser);
+    public void changeSettings(PlayerId ownerId, LobbySettings settings) {
+        ensureOwner(ownerId);
         ensureModifiable();
 
-        if (players.size() > newSettings.maxPlayers())
-            throw new MaxPlayersTooSmallException(players.size(), newSettings.maxPlayers());
+        if (players.size() > settings.maxPlayers())
+            throw new MaxPlayersTooSmallException(players.size(), settings.maxPlayers());
 
-        settings = newSettings;
+        this.settings = settings;
         updatedAt = Instant.now();
     }
 
-    private void ensureOwner(PlayerId actingUser) {
-        if (!owner.equals(actingUser))
-            throw new NotLobbyOwnerException(actingUser);
+    private void ensureOwner(PlayerId ownerId) {
+        if (!owner.equals(ownerId))
+            throw new NotLobbyOwnerException(ownerId);
     }
 
     private void ensureModifiable() {
         if (status == LobbyStatus.CLOSED || status == LobbyStatus.STARTED)
-            throw new LobbyStateInvalidException(id.value(), status.name());
+            throw new LobbyStateInvalidException(id, status.name());
     }
 
     public boolean isInvited(PlayerId id) {
@@ -200,7 +187,7 @@ public class Lobby {
         return updatedAt;
     }
 
-    public Set<LobbyPlayer> players() {
+    public Set<Player> players() {
         return Set.copyOf(players);
     }
 

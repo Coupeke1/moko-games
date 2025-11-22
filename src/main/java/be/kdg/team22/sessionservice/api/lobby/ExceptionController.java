@@ -1,6 +1,8 @@
 package be.kdg.team22.sessionservice.api.lobby;
 
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.*;
+import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerAlreadyInLobbyException;
+import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerNotInLobbyException;
 import be.kdg.team22.sessionservice.infrastructure.lobby.db.exceptions.SettingsConversionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

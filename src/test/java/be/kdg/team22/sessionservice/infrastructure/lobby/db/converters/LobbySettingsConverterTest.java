@@ -16,7 +16,7 @@ class LobbySettingsConverterTest {
     void serializeAndDeserialize_roundTrip_works() {
         LobbySettings original =
                 new LobbySettings(new TicTacToeSettings(3), 4);
-
+oll
         String json = converter.convertToDatabaseColumn(original);
         LobbySettings reconstructed = converter.convertToEntityAttribute(json);
 
