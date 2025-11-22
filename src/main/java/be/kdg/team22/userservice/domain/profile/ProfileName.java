@@ -8,7 +8,7 @@ public record ProfileName(String value) {
     }
 
     public NotFoundException notFound() {
-        throw new NotFoundException(value);
+        throw new NotFoundException(this);
     }
 
     @SuppressWarnings("NullableProblems")

@@ -12,6 +12,10 @@ public record ProfileId(UUID value) {
         return new ProfileId(UUID.fromString(value));
     }
 
+    public static ProfileId from(UUID value) {
+        return new ProfileId(value);
+    }
+
     public static ProfileId get(Jwt token) {
         String sub = token.getClaimAsString(StandardClaimNames.SUB);
         if (sub == null)
@@ -21,6 +25,6 @@ public record ProfileId(UUID value) {
     }
 
     public NotFoundException notFound() {
-        throw new NotFoundException(value);
+        throw new NotFoundException(this);
     }
 }
