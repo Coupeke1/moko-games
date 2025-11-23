@@ -12,7 +12,7 @@ import java.util.UUID;
 public record PlayerId(UUID value) {
     public PlayerId {
         if (value == null)
-            throw new IllegalArgumentException("ID cannot be null");
+            throw new IllegalArgumentException("PlayerId cannot be null");
     }
 
     public static PlayerId from(UUID value) {

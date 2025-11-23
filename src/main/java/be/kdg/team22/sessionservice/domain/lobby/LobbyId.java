@@ -9,7 +9,7 @@ import java.util.UUID;
 public record LobbyId(UUID value) {
     public LobbyId {
         if (value == null)
-            throw new IllegalArgumentException("ID cannot be null");
+            throw new IllegalArgumentException("LobbyId cannot be null");
     }
 
     public static LobbyId from(UUID value) {

@@ -12,7 +12,7 @@ import java.util.UUID;
 public record FriendId(UUID value) {
     public FriendId {
         if (value == null)
-            throw new IllegalArgumentException("ID cannot be null");
+            throw new IllegalArgumentException("FriendId cannot be null");
     }
 
     public static FriendId from(UUID value) {

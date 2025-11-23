@@ -26,7 +26,7 @@ public class ExternalFriendsRepository {
             if (response == null)
                 return List.of();
 
-            return response.friends().stream().map(FriendsResponse::userId).toList();
+            return response.friends().stream().map(FriendsResponse::id).toList();
         } catch (
                 HttpClientErrorException exception) {
             if (exception.getStatusCode() == HttpStatus.NOT_FOUND)
