@@ -1,10 +1,10 @@
 package be.kdg.team22.socialservice.infrastructure.friends.friendship;
 
 import be.kdg.team22.socialservice.config.TestcontainersConfig;
-import be.kdg.team22.socialservice.domain.friends.friendship.Friendship;
-import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipId;
-import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipStatus;
-import be.kdg.team22.socialservice.domain.friends.user.UserId;
+import be.kdg.team22.socialservice.domain.friendship.Friendship;
+import be.kdg.team22.socialservice.domain.friendship.FriendshipId;
+import be.kdg.team22.socialservice.domain.friendship.FriendshipStatus;
+import be.kdg.team22.socialservice.domain.user.UserId;
 import be.kdg.team22.socialservice.infrastructure.friends.friendship.jpa.FriendshipEntity;
 import be.kdg.team22.socialservice.infrastructure.friends.friendship.jpa.JpaFriendshipRepository;
 import org.junit.jupiter.api.BeforeEach;

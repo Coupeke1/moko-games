@@ -1,6 +1,6 @@
-package be.kdg.team22.socialservice.domain.friends.friendship.exceptions;
+package be.kdg.team22.socialservice.domain.friendship.exceptions;
 
-import be.kdg.team22.socialservice.domain.friends.user.Username;
+import be.kdg.team22.socialservice.domain.user.Username;
 
 public class CannotAddException extends RuntimeException {
     public CannotAddException(Username username) {

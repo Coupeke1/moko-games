@@ -3,7 +3,7 @@ package be.kdg.team22.socialservice.api.friends;
 import be.kdg.team22.socialservice.api.friends.models.FriendModel;
 import be.kdg.team22.socialservice.api.friends.models.FriendsOverviewModel;
 import be.kdg.team22.socialservice.application.friends.FriendService;
-import be.kdg.team22.socialservice.domain.friends.user.UserId;
+import be.kdg.team22.socialservice.domain.user.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

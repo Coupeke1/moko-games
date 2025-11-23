@@ -1,4 +1,4 @@
-package be.kdg.team22.socialservice.domain.friends.friendship;
+package be.kdg.team22.socialservice.domain.friendship;
 
 public enum FriendshipStatus {
     PENDING,

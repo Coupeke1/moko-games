@@ -1,9 +1,9 @@
-package be.kdg.team22.socialservice.domain.friends.friendship;
+package be.kdg.team22.socialservice.domain.friendship;
 
-import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.CannotAcceptException;
-import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.CannotRemoveException;
-import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.NoMatchingUsersException;
-import be.kdg.team22.socialservice.domain.friends.user.UserId;
+import be.kdg.team22.socialservice.domain.friendship.exceptions.CannotAcceptException;
+import be.kdg.team22.socialservice.domain.friendship.exceptions.CannotRemoveException;
+import be.kdg.team22.socialservice.domain.friendship.exceptions.NoMatchingUsersException;
+import be.kdg.team22.socialservice.domain.user.UserId;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
 import java.time.Instant;

@@ -1,9 +1,9 @@
 package be.kdg.team22.socialservice.infrastructure.friends.user;
 
-import be.kdg.team22.socialservice.domain.friends.user.UserId;
-import be.kdg.team22.socialservice.domain.friends.user.Username;
-import be.kdg.team22.socialservice.domain.friends.user.exceptions.NotFoundException;
-import be.kdg.team22.socialservice.domain.friends.user.exceptions.NotReachableException;
+import be.kdg.team22.socialservice.domain.user.UserId;
+import be.kdg.team22.socialservice.domain.user.Username;
+import be.kdg.team22.socialservice.domain.user.exceptions.UserNotFoundException;
+import be.kdg.team22.socialservice.domain.user.exceptions.NotReachableException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -45,7 +45,7 @@ public class ExternalUserRepository {
             if (exception.getStatusCode() != HttpStatus.NOT_FOUND)
                 throw exception;
 
-            throw new NotFoundException(UserId.from(id));
+            throw new UserNotFoundException(UserId.from(id));
         } catch (
                 RestClientException exception) {
             throw new NotReachableException("user-service");

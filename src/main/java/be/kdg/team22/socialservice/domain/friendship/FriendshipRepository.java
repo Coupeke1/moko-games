@@ -1,6 +1,6 @@
-package be.kdg.team22.socialservice.domain.friends.friendship;
+package be.kdg.team22.socialservice.domain.friendship;
 
-import be.kdg.team22.socialservice.domain.friends.user.UserId;
+import be.kdg.team22.socialservice.domain.user.UserId;
 
 import java.util.List;
 import java.util.Optional;

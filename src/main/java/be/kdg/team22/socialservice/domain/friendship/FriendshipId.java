@@ -1,6 +1,6 @@
-package be.kdg.team22.socialservice.domain.friends.friendship;
+package be.kdg.team22.socialservice.domain.friendship;
 
-import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.NotFoundException;
+import be.kdg.team22.socialservice.domain.friendship.exceptions.FriendshipNotFoundException;
 
 import java.util.UUID;
 
@@ -22,7 +22,7 @@ public record FriendshipId(UUID value) {
         return new FriendshipId(value);
     }
 
-    public NotFoundException notFound() {
-        throw new NotFoundException(value);
+    public FriendshipNotFoundException notFound() {
+        throw new FriendshipNotFoundException(value);
     }
 }

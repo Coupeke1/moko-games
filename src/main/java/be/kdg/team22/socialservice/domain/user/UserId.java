@@ -1,7 +1,7 @@
-package be.kdg.team22.socialservice.domain.friends.user;
+package be.kdg.team22.socialservice.domain.user;
 
-import be.kdg.team22.socialservice.domain.friends.user.exceptions.NotAuthenticatedException;
-import be.kdg.team22.socialservice.domain.friends.user.exceptions.NotFoundException;
+import be.kdg.team22.socialservice.domain.user.exceptions.NotAuthenticatedException;
+import be.kdg.team22.socialservice.domain.user.exceptions.UserNotFoundException;
 import org.jmolecules.ddd.annotation.ValueObject;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -31,7 +31,7 @@ public record UserId(UUID value) {
         return create(sub);
     }
 
-    public NotFoundException notFound() {
-        throw new NotFoundException(this);
+    public UserNotFoundException notFound() {
+        throw new UserNotFoundException(this);
     }
 }

@@ -1,6 +1,6 @@
-package be.kdg.team22.socialservice.domain.friends.user;
+package be.kdg.team22.socialservice.domain.user;
 
-import be.kdg.team22.socialservice.domain.friends.user.exceptions.NotFoundException;
+import be.kdg.team22.socialservice.domain.user.exceptions.UserNotFoundException;
 import org.jmolecules.ddd.annotation.ValueObject;
 
 @ValueObject
@@ -9,8 +9,8 @@ public record Username(String value) {
         return new Username(value.trim());
     }
 
-    public NotFoundException notFound() {
-        throw new NotFoundException(value);
+    public UserNotFoundException notFound() {
+        throw new UserNotFoundException(value);
     }
 
     @SuppressWarnings("NullableProblems")

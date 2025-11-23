@@ -2,13 +2,13 @@ package be.kdg.team22.socialservice.application.friends;
 
 import be.kdg.team22.socialservice.api.friends.models.FriendModel;
 import be.kdg.team22.socialservice.api.friends.models.FriendsOverviewModel;
-import be.kdg.team22.socialservice.domain.friends.friendship.Friendship;
-import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipRepository;
-import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipStatus;
-import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.CannotAddException;
-import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.NotFoundException;
-import be.kdg.team22.socialservice.domain.friends.user.UserId;
-import be.kdg.team22.socialservice.domain.friends.user.Username;
+import be.kdg.team22.socialservice.domain.friendship.Friendship;
+import be.kdg.team22.socialservice.domain.friendship.FriendshipRepository;
+import be.kdg.team22.socialservice.domain.friendship.FriendshipStatus;
+import be.kdg.team22.socialservice.domain.friendship.exceptions.CannotAddException;
+import be.kdg.team22.socialservice.domain.friendship.exceptions.FriendshipNotFoundException;
+import be.kdg.team22.socialservice.domain.user.UserId;
+import be.kdg.team22.socialservice.domain.user.Username;
 import be.kdg.team22.socialservice.infrastructure.friends.user.ExternalUserRepository;
 import be.kdg.team22.socialservice.infrastructure.friends.user.UserResponse;
 import org.springframework.stereotype.Service;
@@ -43,28 +43,28 @@ public class FriendService {
     }
 
     public void acceptRequest(final UserId userId, final UserId targetId) {
-        Friendship friendship = friendshipRepository.findBetween(userId, targetId).orElseThrow(() -> NotFoundException.betweenFriendship(userId, targetId));
+        Friendship friendship = friendshipRepository.findBetween(userId, targetId).orElseThrow(() -> FriendshipNotFoundException.betweenFriendship(userId, targetId));
 
         friendship.accept(userId);
         friendshipRepository.save(friendship);
     }
 
     public void rejectRequest(final UserId userId, final UserId targetId) {
-        Friendship friendship = friendshipRepository.findBetween(userId, targetId).orElseThrow(() -> NotFoundException.betweenFriendship(userId, targetId));
+        Friendship friendship = friendshipRepository.findBetween(userId, targetId).orElseThrow(() -> FriendshipNotFoundException.betweenFriendship(userId, targetId));
 
         friendship.reject(userId);
         friendshipRepository.save(friendship);
     }
 
     public void removeFriend(final UserId userId, final UserId targetId) {
-        Friendship friendship = friendshipRepository.findBetween(userId, targetId).orElseThrow(() -> NotFoundException.betweenFriendship(userId, targetId));
+        Friendship friendship = friendshipRepository.findBetween(userId, targetId).orElseThrow(() -> FriendshipNotFoundException.betweenFriendship(userId, targetId));
 
         friendship.checkCanRemove();
         friendshipRepository.delete(friendship);
     }
 
     public void cancelRequest(final UserId userId, final UserId targetId) {
-        Friendship friendship = friendshipRepository.findBetween(userId, targetId).orElseThrow(() -> NotFoundException.betweenFriendship(userId, targetId));
+        Friendship friendship = friendshipRepository.findBetween(userId, targetId).orElseThrow(() -> FriendshipNotFoundException.betweenFriendship(userId, targetId));
 
         friendship.cancel(userId);
         friendshipRepository.save(friendship);
