@@ -7,6 +7,7 @@ import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
+import be.kdg.team22.sessionservice.domain.player.PlayerName;
 import be.kdg.team22.sessionservice.infrastructure.player.ExternalPlayerRepository;
 import be.kdg.team22.sessionservice.infrastructure.player.PlayerResponse;
 import org.junit.jupiter.api.Test;
@@ -43,22 +44,22 @@ class LobbyInviteQueryServiceTest {
 
         PlayerId owner = new PlayerId(UUID.randomUUID());
 
-        Player ownerPlayer = new Player(owner, "ownerUser", "owner@email.com");
+        Player ownerPlayer = new Player(owner, new PlayerName("owner"));
 
-        Player player1 = new Player(PlayerId.create(), "p1", "p1@email.com");
-        Player player2 = new Player(PlayerId.create(), "p2", "p2@email.com");
+        Player player1 = new Player(PlayerId.create(), new PlayerName("p1"));
+        Player player2 = new Player(PlayerId.create(), new PlayerName("p2"));
 
         PlayerId invited1 = new PlayerId(UUID.randomUUID());
 
         Lobby lobby = new Lobby(GameId.create(), ownerPlayer, null);
 
-        when(userRepo.getById(player1.id().value(), token)).thenReturn(Optional.of(new PlayerResponse(player1.id().value(), "p1", "p1@mail.com")));
+        when(userRepo.getById(player1.id().value(), token)).thenReturn(Optional.of(new PlayerResponse(player1.id().value(), player1.username().value())));
 
-        when(userRepo.getById(player2.id().value(), token)).thenReturn(Optional.of(new PlayerResponse(player2.id().value(), "p2", "p2@mail.com")));
+        when(userRepo.getById(player2.id().value(), token)).thenReturn(Optional.of(new PlayerResponse(player2.id().value(), player2.username().value())));
 
-        when(userRepo.getById(invited1.value(), token)).thenReturn(Optional.of(new PlayerResponse(invited1.value(), "inv1", "inv1@mail.com")));
+        when(userRepo.getById(invited1.value(), token)).thenReturn(Optional.of(new PlayerResponse(invited1.value(), "invited1")));
 
-        when(userRepo.getById(invitedUser.value(), token)).thenReturn(Optional.of(new PlayerResponse(invitedUser.value(), "inv2", "inv2@mail.com")));
+        when(userRepo.getById(invitedUser.value(), token)).thenReturn(Optional.of(new PlayerResponse(invitedUser.value(), "invited2")));
 
         List<Lobby> result = service.getInvitesForPlayer(invitedUser);
 
@@ -110,7 +111,7 @@ class LobbyInviteQueryServiceTest {
         when(invitedLobby.status()).thenReturn(LobbyStatus.OPEN);
         when(invitedLobby.createdAt()).thenReturn(Instant.now());
 
-        when(userRepo.getById(any(), any())).thenReturn(Optional.of(new PlayerResponse(UUID.randomUUID(), "dummy", "d@mail.com")));
+        when(userRepo.getById(any(), any())).thenReturn(Optional.of(new PlayerResponse(UUID.randomUUID(), "dummy")));
 
         List<Lobby> result = service.getInvitesForPlayer(user);
         assertThat(result).hasSize(1);
@@ -130,6 +131,6 @@ class LobbyInviteQueryServiceTest {
     }
 
     private PlayerSummaryModel toPlayerModel(final Player player) {
-        return new PlayerSummaryModel(player.id().value(), player.username());
+        return new PlayerSummaryModel(player.id().value(), player.username().value());
     }
 }

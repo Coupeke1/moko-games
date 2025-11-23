@@ -15,7 +15,9 @@ import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
+import be.kdg.team22.sessionservice.domain.player.PlayerName;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,11 +41,11 @@ class LobbyServiceTest {
 
         CreateLobbyModel model = new CreateLobbyModel(gameId.value(), 4, new TicTacToeSettingsModel(3));
 
-        when(playerService.findPlayer(owner, "TOKEN")).thenReturn(new Player(owner, "ownerUser", "owner@kdg.be"));
+        when(playerService.findPlayer(owner, Jwt.withTokenValue("TOKEN").build())).thenReturn(new Player(owner, new PlayerName("owner")));
 
         doNothing().when(repo).save(any(Lobby.class));
 
-        Lobby lobby = service.createLobby(gameId, owner, model, "TOKEN");
+        Lobby lobby = service.createLobby(gameId, owner, model, Jwt.withTokenValue("TOKEN").build());
 
         assertThat(lobby.gameId()).isEqualTo(gameId);
         assertThat(lobby.ownerId().value()).isEqualTo(owner.value());
@@ -51,7 +53,7 @@ class LobbyServiceTest {
         assertThat(lobby.settings().gameSettings()).isInstanceOf(TicTacToeSettings.class);
 
         verify(repo).save(any(Lobby.class));
-        verify(playerService).findPlayer(owner, "TOKEN");
+        verify(playerService).findPlayer(owner, Jwt.withTokenValue("TOKEN").build());
     }
 
     @Test
@@ -84,7 +86,7 @@ class LobbyServiceTest {
     }
 
     private Lobby existingLobby(LobbyId id, PlayerId owner) {
-        Player player = new Player(owner, "ownerUser", "owner@email.com");
+        Player player = new Player(owner, new PlayerName("owner"));
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
         return new Lobby(new GameId(UUID.randomUUID()), player, settings);

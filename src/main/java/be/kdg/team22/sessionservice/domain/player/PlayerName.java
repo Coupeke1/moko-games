@@ -13,8 +13,8 @@ public record PlayerName(String value) {
         return new PlayerName(value);
     }
 
-    public NotFoundException notFound() {
-        throw new NotFoundException(value);
+    public PlayerNotFoundException notFound() {
+        throw new PlayerNotFoundException(value);
     }
 
     @SuppressWarnings("NullableProblems")

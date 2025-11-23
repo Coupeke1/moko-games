@@ -1,6 +1,5 @@
-package be.kdg.team22.sessionservice.infrastructure.lobby.db;
+package be.kdg.team22.sessionservice.infrastructure.lobby.jpa;
 
-import be.kdg.team22.sessionservice.infrastructure.lobby.db.entities.LobbyEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;

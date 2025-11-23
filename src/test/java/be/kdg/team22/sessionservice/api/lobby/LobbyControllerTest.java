@@ -13,6 +13,7 @@ import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
+import be.kdg.team22.sessionservice.domain.player.PlayerName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -63,7 +64,7 @@ class LobbyControllerTest {
 
     private Lobby sampleLobby(UUID lobbyId, UUID ownerId) {
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
-        Player ownerPlayer = new Player(PlayerId.from(ownerId), "owner", "owner@email.com");
+        Player ownerPlayer = new Player(PlayerId.from(ownerId), new PlayerName("owner"));
 
         return new Lobby(LobbyId.from(lobbyId), GameId.from(GAME_ID), PlayerId.from(ownerId), List.of(ownerPlayer), Set.of(), settings, LobbyStatus.OPEN, Instant.parse("2024-01-01T00:00:00Z"), Instant.parse("2024-01-01T00:00:00Z"));
     }
@@ -76,7 +77,7 @@ class LobbyControllerTest {
 
         Lobby lobby = sampleLobby(lobbyId, UUID.fromString(ownerId));
 
-        when(lobbyService.createLobby(any(GameId.class), any(PlayerId.class), any(), anyString())).thenReturn(lobby);
+        when(lobbyService.createLobby(any(GameId.class), any(PlayerId.class), any(), Jwt.withTokenValue(anyString()).build())).thenReturn(lobby);
 
         mockMvc.perform(post("/api/lobbies").with(jwtFor(ownerId, "user", "user@kdg.be")).with(csrf()).contentType(MediaType.APPLICATION_JSON).content("""
                 {
@@ -91,7 +92,7 @@ class LobbyControllerTest {
 
         ArgumentCaptor<GameId> gameIdCaptor = ArgumentCaptor.forClass(GameId.class);
         ArgumentCaptor<PlayerId> ownerCaptor = ArgumentCaptor.forClass(PlayerId.class);
-        verify(lobbyService).createLobby(gameIdCaptor.capture(), ownerCaptor.capture(), any(), anyString());
+        verify(lobbyService).createLobby(gameIdCaptor.capture(), ownerCaptor.capture(), any(), Jwt.withTokenValue(anyString()).build());
 
         assertThat(gameIdCaptor.getValue().value()).isEqualTo(GAME_ID);
         assertThat(ownerCaptor.getValue().value().toString()).isEqualTo(ownerId);
@@ -117,7 +118,7 @@ class LobbyControllerTest {
     void createLobby_invalidGameId_returns400() throws Exception {
         String ownerId = "22222222-2222-2222-2222-222222222222";
 
-        when(lobbyService.createLobby(any(), any(), any(), anyString())).thenThrow(new GameNotValidException(null));
+        when(lobbyService.createLobby(any(), any(), any(), Jwt.withTokenValue(anyString()).build())).thenThrow(new GameNotValidException(null));
 
         mockMvc.perform(post("/api/lobbies").with(jwtFor(ownerId, "user", "user@kdg.be")).with(csrf()).contentType(MediaType.APPLICATION_JSON).content("""
                 {
@@ -248,11 +249,11 @@ class LobbyControllerTest {
         UUID lobbyId = UUID.randomUUID();
         UUID playerId = UUID.fromString("99999999-0000-0000-0000-000000000000");
 
-        doNothing().when(playerService).acceptInvite(eq(PlayerId.from(playerId)), eq(LobbyId.from(lobbyId)), anyString());
+        doNothing().when(playerService).acceptInvite(eq(PlayerId.from(playerId)), eq(LobbyId.from(lobbyId)), Jwt.withTokenValue(anyString()).build());
 
         mockMvc.perform(post("/api/lobbies/{lobbyId}/players/{playerId}", lobbyId, playerId).with(jwtFor(playerId.toString(), "kaj", "kaj@kdg.be")).with(csrf())).andExpect(status().isOk());
 
-        verify(playerService).acceptInvite(eq(PlayerId.from(playerId)), eq(LobbyId.from(lobbyId)), anyString());
+        verify(playerService).acceptInvite(eq(PlayerId.from(playerId)), eq(LobbyId.from(lobbyId)), Jwt.withTokenValue(anyString()).build());
     }
 
     @Test

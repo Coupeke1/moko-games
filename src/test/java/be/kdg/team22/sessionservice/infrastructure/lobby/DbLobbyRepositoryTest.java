@@ -1,4 +1,4 @@
-package be.kdg.team22.sessionservice.infrastructure.lobby.db;
+package be.kdg.team22.sessionservice.infrastructure.lobby;
 
 import be.kdg.team22.sessionservice.config.TestcontainersConfig;
 import be.kdg.team22.sessionservice.domain.lobby.GameId;
@@ -7,8 +7,9 @@ import be.kdg.team22.sessionservice.domain.lobby.LobbyStatus;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
-import be.kdg.team22.sessionservice.infrastructure.lobby.db.entities.LobbyEntity;
-import be.kdg.team22.sessionservice.infrastructure.lobby.db.entities.PlayerEmbed;
+import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.LobbyEntity;
+import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.LobbyJpaRepository;
+import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.PlayerEmbed;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -41,7 +42,7 @@ class DbLobbyRepositoryTest {
                 id.value(),
                 gameId.value(),
                 ownerId.value(),
-                Set.of(new PlayerEmbed(ownerId.value(), "ownerUser", "owner@email.com")),
+                Set.of(new PlayerEmbed(ownerId.value(), "ownerUser")),
                 Set.of(),
                 settings,
                 LobbyStatus.OPEN,

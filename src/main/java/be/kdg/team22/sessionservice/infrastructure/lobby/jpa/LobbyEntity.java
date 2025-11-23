@@ -1,4 +1,4 @@
-package be.kdg.team22.sessionservice.infrastructure.lobby.db.entities;
+package be.kdg.team22.sessionservice.infrastructure.lobby.jpa;
 
 import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
@@ -8,7 +8,7 @@ import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.domain.player.PlayerName;
-import be.kdg.team22.sessionservice.infrastructure.lobby.db.converters.LobbySettingsConverter;
+import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.converters.LobbySettingsConverter;
 import jakarta.persistence.*;
 
 import java.time.Instant;

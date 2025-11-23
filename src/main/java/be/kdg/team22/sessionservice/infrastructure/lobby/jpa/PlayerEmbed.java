@@ -1,4 +1,4 @@
-package be.kdg.team22.sessionservice.infrastructure.lobby.db.entities;
+package be.kdg.team22.sessionservice.infrastructure.lobby.jpa;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

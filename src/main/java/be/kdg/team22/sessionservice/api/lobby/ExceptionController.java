@@ -4,7 +4,7 @@ import be.kdg.team22.sessionservice.domain.lobby.exceptions.*;
 import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerAlreadyInLobbyException;
 import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerNotFoundException;
 import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerNotInLobbyException;
-import be.kdg.team22.sessionservice.infrastructure.lobby.db.exceptions.SettingsConversionException;
+import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.exceptions.SettingsConversionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

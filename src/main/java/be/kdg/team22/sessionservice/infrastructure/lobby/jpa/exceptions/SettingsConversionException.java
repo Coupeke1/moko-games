@@ -1,4 +1,4 @@
-package be.kdg.team22.sessionservice.infrastructure.lobby.db.exceptions;
+package be.kdg.team22.sessionservice.infrastructure.lobby.jpa.exceptions;
 
 public class SettingsConversionException extends RuntimeException {
 
