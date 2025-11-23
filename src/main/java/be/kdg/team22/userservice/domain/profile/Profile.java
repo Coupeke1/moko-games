@@ -7,36 +7,25 @@ import java.time.Instant;
 @AggregateRoot
 public class Profile {
     private final ProfileId id;
-    private String username;
-    private String email;
+    private final ProfileName username;
     private final Instant createdAt;
 
-    public Profile(ProfileId id, String username, String email, Instant createdAt) {
+    public Profile(final ProfileId id, final ProfileName username, final Instant createdAt) {
         this.id = id;
         this.username = username;
-        this.email = email;
         this.createdAt = createdAt;
     }
 
-    public Profile(ProfileId id, String username, String email) {
-        this(id, username, email, Instant.now());
-    }
-
-    public void update(final String username, final String email) {
-        this.username = username;
-        this.email = email;
+    public Profile(final ProfileId id, final ProfileName username) {
+        this(id, username, Instant.now());
     }
 
     public ProfileId id() {
         return id;
     }
 
-    public String username() {
+    public ProfileName username() {
         return username;
-    }
-
-    public String email() {
-        return email;
     }
 
     public Instant createdAt() {

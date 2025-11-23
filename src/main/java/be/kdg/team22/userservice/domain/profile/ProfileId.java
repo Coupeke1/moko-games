@@ -1,7 +1,7 @@
 package be.kdg.team22.userservice.domain.profile;
 
 import be.kdg.team22.userservice.domain.profile.exceptions.ClaimNotFoundException;
-import be.kdg.team22.userservice.domain.profile.exceptions.NotFoundException;
+import be.kdg.team22.userservice.domain.profile.exceptions.ProfileNotFoundException;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.jwt.Jwt;
 
@@ -12,8 +12,8 @@ public record ProfileId(UUID value) {
         return new ProfileId(UUID.fromString(value));
     }
 
-    public static ProfileId from(UUID uuid) {
-        return new ProfileId(uuid);
+    public static ProfileId from(UUID value) {
+        return new ProfileId(value);
     }
 
     public static ProfileId get(Jwt token) {
@@ -24,7 +24,7 @@ public record ProfileId(UUID value) {
         return create(sub);
     }
 
-    public NotFoundException notFound() {
-        throw new NotFoundException(value);
+    public ProfileNotFoundException notFound() {
+        throw new ProfileNotFoundException(this);
     }
 }

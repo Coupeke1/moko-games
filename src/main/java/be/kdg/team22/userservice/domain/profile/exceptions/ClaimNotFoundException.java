@@ -12,8 +12,4 @@ public class ClaimNotFoundException extends RuntimeException {
     public static ClaimNotFoundException username() {
         return new ClaimNotFoundException("username");
     }
-
-    public static ClaimNotFoundException email() {
-        return new ClaimNotFoundException("email");
-    }
 }

@@ -1,16 +1,18 @@
 package be.kdg.team22.userservice.api.profile;
 
-import be.kdg.team22.userservice.api.profile.models.EditProfileModel;
 import be.kdg.team22.userservice.api.profile.models.ProfileModel;
 import be.kdg.team22.userservice.application.profile.ProfileService;
 import be.kdg.team22.userservice.domain.profile.Profile;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
-import jakarta.validation.Valid;
+import be.kdg.team22.userservice.domain.profile.ProfileName;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
@@ -25,14 +27,8 @@ public class ProfileController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<ProfileModel> getMyProfile(@AuthenticationPrincipal final Jwt jwt) {
-        Profile profile = service.getOrCreate(jwt);
-        return ResponseEntity.ok(ProfileModel.from(profile));
-    }
-
-    @PatchMapping("/me")
-    public ResponseEntity<ProfileModel> updateMyProfile(@AuthenticationPrincipal final Jwt jwt, @Valid @RequestBody final EditProfileModel body) {
-        Profile profile = service.update(jwt, body.username(), body.email());
+    public ResponseEntity<ProfileModel> getMyProfile(@AuthenticationPrincipal final Jwt token) {
+        Profile profile = service.getOrCreate(token);
         return ResponseEntity.ok(ProfileModel.from(profile));
     }
 
@@ -44,7 +40,7 @@ public class ProfileController {
 
     @GetMapping("/find/{username}")
     public ResponseEntity<ProfileModel> getByUsername(@PathVariable final String username) {
-        Profile profile = service.getByUsername(username);
+        Profile profile = service.getByUsername(new ProfileName(username));
         return ResponseEntity.ok(ProfileModel.from(profile));
     }
 }

@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface ProfileRepository {
     Optional<Profile> findById(ProfileId id);
 
-    Optional<Profile> findByUsername(String username);
+    Optional<Profile> findByUsername(ProfileName username);
 
     void save(Profile profile);
 
