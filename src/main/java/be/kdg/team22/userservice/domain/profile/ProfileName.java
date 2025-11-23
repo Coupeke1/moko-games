@@ -1,14 +1,14 @@
 package be.kdg.team22.userservice.domain.profile;
 
-import be.kdg.team22.userservice.domain.profile.exceptions.NotFoundException;
+import be.kdg.team22.userservice.domain.profile.exceptions.ProfileNotFoundException;
 
 public record ProfileName(String value) {
     public static ProfileName create(String value) {
         return new ProfileName(value.trim());
     }
 
-    public NotFoundException notFound() {
-        throw new NotFoundException(this);
+    public ProfileNotFoundException notFound() {
+        throw new ProfileNotFoundException(this);
     }
 
     @SuppressWarnings("NullableProblems")
