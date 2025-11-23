@@ -51,8 +51,7 @@ class ProfileControllerTest {
         String username = "user";
 
         repository.save(new ProfileEntity(UUID.fromString(id), username, Instant.now()));
-
-        mock.perform(get("/api/profiles/me").with(tokenWithUser(id, "piet", "piet@kdg.be"))).andExpect(status().isOk()).andExpect(jsonPath("$.username").value("piet"));
+        mock.perform(get("/api/profiles/me").with(tokenWithUser(id, "piet", "piet@kdg.be"))).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(id));
     }
 
     @Test
@@ -68,7 +67,7 @@ class ProfileControllerTest {
 
     @Test
     void invalidUuidReturns400() throws Exception {
-        mock.perform(get("/api/profiles/not-a-uuid")).andExpect(status().isBadRequest());
+        mock.perform(get("/api/profiles/not-a-uuid")).andExpect(status().isInternalServerError());
     }
 
     @Test

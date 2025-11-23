@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Import(TestcontainersConfig.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class DbProfileRepositoryTest {
-
     @Autowired
     private JpaProfileRepository repository;
 

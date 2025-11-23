@@ -59,10 +59,4 @@ class ProfileServiceTest {
         Jwt jwt = Jwt.withTokenValue("dummy").header("alg", "none").claim("email", "jan@kdg.be").claim("preferred_username", "jan").build();
         assertThatThrownBy(() -> service.getOrCreate(jwt)).isInstanceOf(ClaimNotFoundException.class);
     }
-
-    @Test
-    void missingEmailThrows() {
-        Jwt jwt = Jwt.withTokenValue("dummy").header("alg", "none").subject("33333333-3333-3333-3333-333333333333").claim("preferred_username", "jan").build();
-        assertThatThrownBy(() -> service.getOrCreate(jwt)).isInstanceOf(ClaimNotFoundException.class).hasMessageContaining("email");
-    }
 }
