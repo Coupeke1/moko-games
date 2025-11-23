@@ -12,8 +12,8 @@ import be.kdg.team22.socialservice.domain.friendship.FriendshipStatus;
 import be.kdg.team22.socialservice.domain.friendship.exceptions.FriendshipNotFoundException;
 import be.kdg.team22.socialservice.domain.user.UserId;
 import be.kdg.team22.socialservice.domain.user.Username;
-import be.kdg.team22.socialservice.infrastructure.friends.user.ExternalUserRepository;
-import be.kdg.team22.socialservice.infrastructure.friends.user.UserResponse;
+import be.kdg.team22.socialservice.infrastructure.user.ExternalUserRepository;
+import be.kdg.team22.socialservice.infrastructure.user.UserResponse;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;

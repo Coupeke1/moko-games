@@ -1,4 +1,4 @@
-package be.kdg.team22.socialservice.infrastructure.friends.friendship.jpa;
+package be.kdg.team22.socialservice.infrastructure.friendship.jpa;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

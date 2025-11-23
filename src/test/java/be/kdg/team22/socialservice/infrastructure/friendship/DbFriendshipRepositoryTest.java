@@ -1,12 +1,13 @@
-package be.kdg.team22.socialservice.infrastructure.friends.friendship;
+package be.kdg.team22.socialservice.infrastructure.friendship;
 
 import be.kdg.team22.socialservice.config.TestcontainersConfig;
 import be.kdg.team22.socialservice.domain.friendship.Friendship;
 import be.kdg.team22.socialservice.domain.friendship.FriendshipId;
 import be.kdg.team22.socialservice.domain.friendship.FriendshipStatus;
 import be.kdg.team22.socialservice.domain.user.UserId;
-import be.kdg.team22.socialservice.infrastructure.friends.friendship.jpa.FriendshipEntity;
-import be.kdg.team22.socialservice.infrastructure.friends.friendship.jpa.JpaFriendshipRepository;
+import be.kdg.team22.socialservice.infrastructure.friendship.DbFriendshipRepository;
+import be.kdg.team22.socialservice.infrastructure.friendship.jpa.FriendshipEntity;
+import be.kdg.team22.socialservice.infrastructure.friendship.jpa.JpaFriendshipRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

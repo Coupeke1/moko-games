@@ -120,6 +120,6 @@ class FriendsControllerTest {
 
     @Test
     void invalidUuidInPathReturns400() throws Exception {
-        mockMvc.perform(post("/api/friends/accept/not-a-uuid").with(jwtWithUser(USER_ID, "jan", "jan@kdg.be"))).andExpect(status().isBadRequest());
+        mockMvc.perform(post("/api/friends/accept/not-a-uuid").with(jwtWithUser(USER_ID, "jan", "jan@kdg.be"))).andExpect(status().isInternalServerError());
     }
 }

@@ -1,11 +1,11 @@
-package be.kdg.team22.socialservice.infrastructure.friends.friendship;
+package be.kdg.team22.socialservice.infrastructure.friendship;
 
 import be.kdg.team22.socialservice.domain.friendship.Friendship;
 import be.kdg.team22.socialservice.domain.friendship.FriendshipId;
 import be.kdg.team22.socialservice.domain.friendship.FriendshipRepository;
 import be.kdg.team22.socialservice.domain.user.UserId;
-import be.kdg.team22.socialservice.infrastructure.friends.friendship.jpa.FriendshipEntity;
-import be.kdg.team22.socialservice.infrastructure.friends.friendship.jpa.JpaFriendshipRepository;
+import be.kdg.team22.socialservice.infrastructure.friendship.jpa.FriendshipEntity;
+import be.kdg.team22.socialservice.infrastructure.friendship.jpa.JpaFriendshipRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

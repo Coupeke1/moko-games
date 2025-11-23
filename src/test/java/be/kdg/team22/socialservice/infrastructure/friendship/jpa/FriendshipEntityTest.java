@@ -1,4 +1,4 @@
-package be.kdg.team22.socialservice.infrastructure.friends.friendship.jpa;
+package be.kdg.team22.socialservice.infrastructure.friendship.jpa;
 
 import be.kdg.team22.socialservice.domain.friendship.Friendship;
 import be.kdg.team22.socialservice.domain.friendship.FriendshipId;

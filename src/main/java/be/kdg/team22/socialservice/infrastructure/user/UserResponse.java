@@ -1,4 +1,4 @@
-package be.kdg.team22.socialservice.infrastructure.friends.user;
+package be.kdg.team22.socialservice.infrastructure.user;
 
 import java.util.UUID;
 

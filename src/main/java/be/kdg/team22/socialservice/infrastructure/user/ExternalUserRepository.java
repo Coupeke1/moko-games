@@ -1,4 +1,4 @@
-package be.kdg.team22.socialservice.infrastructure.friends.user;
+package be.kdg.team22.socialservice.infrastructure.user;
 
 import be.kdg.team22.socialservice.domain.user.UserId;
 import be.kdg.team22.socialservice.domain.user.Username;
