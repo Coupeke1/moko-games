@@ -3,17 +3,17 @@ package be.kdg.team22.socialservice.applicatiton.friends;
 import be.kdg.team22.socialservice.api.friends.models.FriendModel;
 import be.kdg.team22.socialservice.api.friends.models.FriendsOverviewModel;
 import be.kdg.team22.socialservice.application.friends.FriendService;
-import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.CannotAddException;
-import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.CannotRemoveException;
-import be.kdg.team22.socialservice.domain.friends.friendship.Friendship;
-import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipId;
-import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipRepository;
-import be.kdg.team22.socialservice.domain.friends.friendship.FriendshipStatus;
-import be.kdg.team22.socialservice.domain.friends.friendship.exceptions.NotFoundException;
-import be.kdg.team22.socialservice.domain.friends.user.UserId;
-import be.kdg.team22.socialservice.domain.friends.user.Username;
-import be.kdg.team22.socialservice.infrastructure.friends.user.ExternalUserRepository;
-import be.kdg.team22.socialservice.infrastructure.friends.user.UserResponse;
+import be.kdg.team22.socialservice.domain.friendship.exceptions.CannotAddException;
+import be.kdg.team22.socialservice.domain.friendship.exceptions.CannotRemoveException;
+import be.kdg.team22.socialservice.domain.friendship.Friendship;
+import be.kdg.team22.socialservice.domain.friendship.FriendshipId;
+import be.kdg.team22.socialservice.domain.friendship.FriendshipRepository;
+import be.kdg.team22.socialservice.domain.friendship.FriendshipStatus;
+import be.kdg.team22.socialservice.domain.friendship.exceptions.FriendshipNotFoundException;
+import be.kdg.team22.socialservice.domain.user.UserId;
+import be.kdg.team22.socialservice.domain.user.Username;
+import be.kdg.team22.socialservice.infrastructure.user.ExternalUserRepository;
+import be.kdg.team22.socialservice.infrastructure.user.UserResponse;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -144,7 +144,7 @@ class FriendServiceTest {
 
         when(friendshipRepository.findBetween(currentUser, otherUser)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.acceptRequest(currentUser, otherUser)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.acceptRequest(currentUser, otherUser)).isInstanceOf(FriendshipNotFoundException.class);
     }
 
     @Test
@@ -154,7 +154,7 @@ class FriendServiceTest {
 
         when(friendshipRepository.findBetween(otherUser, currentUser)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.rejectRequest(currentUser, otherUser)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.rejectRequest(currentUser, otherUser)).isInstanceOf(FriendshipNotFoundException.class);
     }
 
     @Test
@@ -177,7 +177,7 @@ class FriendServiceTest {
         UserId otherUser = UserId.from(UUID.randomUUID());
 
         when(friendshipRepository.findBetween(currentUser, otherUser)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> service.cancelRequest(currentUser, otherUser)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.cancelRequest(currentUser, otherUser)).isInstanceOf(FriendshipNotFoundException.class);
     }
 
     @Test
@@ -217,7 +217,7 @@ class FriendServiceTest {
         UserId otherUser = UserId.from(UUID.randomUUID());
 
         when(friendshipRepository.findBetween(currentUser, otherUser)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> service.removeFriend(currentUser, otherUser)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.removeFriend(currentUser, otherUser)).isInstanceOf(FriendshipNotFoundException.class);
     }
 
     @Test
@@ -244,20 +244,20 @@ class FriendServiceTest {
 
         assertThat(overview.friends()).hasSize(1);
         FriendModel friendModel = overview.friends().getFirst();
-        assertThat(friendModel.userId()).isEqualTo(friend.value());
+        assertThat(friendModel.id()).isEqualTo(friend.value());
         assertThat(friendModel.username()).isEqualTo("friendUser");
         assertThat(friendModel.status()).isEqualTo(FriendshipStatus.ACCEPTED.name());
 
         // incoming (PENDING where current == receiver)
         assertThat(overview.incoming()).hasSize(1);
         FriendModel incomingModel = overview.incoming().getFirst();
-        assertThat(incomingModel.userId()).isEqualTo(incoming.value());
+        assertThat(incomingModel.id()).isEqualTo(incoming.value());
         assertThat(incomingModel.username()).isEqualTo("incomingUser");
         assertThat(incomingModel.status()).isEqualTo(FriendshipStatus.PENDING.name());
 
         assertThat(overview.outgoing()).hasSize(1);
         FriendModel outgoingModel = overview.outgoing().getFirst();
-        assertThat(outgoingModel.userId()).isEqualTo(outgoing.value());
+        assertThat(outgoingModel.id()).isEqualTo(outgoing.value());
         assertThat(outgoingModel.username()).isEqualTo("outgoingUser");
         assertThat(outgoingModel.status()).isEqualTo(FriendshipStatus.PENDING.name());
 

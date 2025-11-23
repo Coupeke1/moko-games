@@ -3,8 +3,8 @@ package be.kdg.team22.socialservice.api.friends;
 import be.kdg.team22.socialservice.api.friends.models.AddFriendRequestModel;
 import be.kdg.team22.socialservice.api.friends.models.FriendsOverviewModel;
 import be.kdg.team22.socialservice.application.friends.FriendService;
-import be.kdg.team22.socialservice.domain.friends.user.UserId;
-import be.kdg.team22.socialservice.domain.friends.user.Username;
+import be.kdg.team22.socialservice.domain.user.UserId;
+import be.kdg.team22.socialservice.domain.user.Username;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -22,14 +22,14 @@ public class FriendsController {
 
     @GetMapping
     public FriendsOverviewModel getFriends(@AuthenticationPrincipal final Jwt token) {
-        UserId currentUser = UserId.get(token);
-        return service.getOverview(currentUser);
+        UserId user = UserId.get(token);
+        return service.getOverview(user);
     }
 
     @PostMapping
     public void addFriend(@AuthenticationPrincipal final Jwt token, @RequestBody final AddFriendRequestModel request) {
-        UserId currentUser = UserId.get(token);
-        service.sendRequest(currentUser, new Username(request.username()));
+        UserId user = UserId.get(token);
+        service.sendRequest(user, new Username(request.username()));
     }
 
     @PostMapping("/accept/{id}")
@@ -41,22 +41,22 @@ public class FriendsController {
 
     @PostMapping("/reject/{id}")
     public void reject(@AuthenticationPrincipal final Jwt token, @PathVariable final UUID id) {
-        UserId currentUser = UserId.get(token);
+        UserId user = UserId.get(token);
         UserId otherUser = UserId.from(id);
-        service.rejectRequest(currentUser, otherUser);
+        service.rejectRequest(user, otherUser);
     }
 
     @PostMapping("/cancel/{id}")
     public void cancel(@AuthenticationPrincipal final Jwt token, @PathVariable final UUID id) {
-        UserId currentUser = UserId.get(token);
+        UserId user = UserId.get(token);
         UserId otherUser = UserId.from(id);
-        service.cancelRequest(currentUser, otherUser);
+        service.cancelRequest(user, otherUser);
     }
 
     @DeleteMapping("/remove/{id}")
     public void remove(@AuthenticationPrincipal final Jwt token, @PathVariable final UUID id) {
-        UserId currentUser = UserId.get(token);
+        UserId user = UserId.get(token);
         UserId otherUser = UserId.from(id);
-        service.removeFriend(currentUser, otherUser);
+        service.removeFriend(user, otherUser);
     }
 }
