@@ -3,6 +3,8 @@ package be.kdg.team22.sessionservice.api.lobby;
 import be.kdg.team22.sessionservice.application.lobby.LobbyInviteQueryService;
 import be.kdg.team22.sessionservice.application.lobby.LobbyPlayerService;
 import be.kdg.team22.sessionservice.application.lobby.LobbyService;
+import be.kdg.team22.sessionservice.application.player.PlayerService;
+import be.kdg.team22.sessionservice.config.TestSecurityConfig;
 import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
@@ -19,8 +21,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
@@ -41,6 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(LobbyController.class)
+@Import(TestSecurityConfig.class)
 class LobbyControllerTest {
     private static final UUID GAME_ID = UUID.fromString("00000000-0000-0000-0000-000000000005");
 
@@ -49,10 +54,13 @@ class LobbyControllerTest {
     @MockitoBean
     private LobbyService lobbyService;
     @MockitoBean
-    private LobbyPlayerService playerService;
-
+    private LobbyPlayerService lobbyPlayerService;
+    @MockitoBean
+    private PlayerService playerService;
     @MockitoBean
     private LobbyInviteQueryService inviteQueryService;
+    @MockitoBean
+    private JwtDecoder jwtDecoder;
 
     private static RequestPostProcessor jwtFor(String sub, String username, String email) {
         return jwt().jwt(builder -> {
@@ -146,10 +154,15 @@ class LobbyControllerTest {
     @Test
     @DisplayName("GET /api/lobbies/{id} – returns 404 when not found")
     void getLobbyById_returns404IfNotFound() throws Exception {
-        LobbyId unknownId = LobbyId.create();
+        UUID rawId = UUID.randomUUID();
+        LobbyId lobbyId = LobbyId.from(rawId);
 
-        when(lobbyService.findLobby(unknownId)).thenThrow(new LobbyNotFoundException(unknownId));
-        mockMvc.perform(get("/api/lobbies/{id}", unknownId).with(jwtFor("33333333-3333-3333-3333-333333333333", "user", "user@kdg.be"))).andExpect(status().isNotFound());
+        when(lobbyService.findLobby(lobbyId))
+                .thenThrow(new LobbyNotFoundException(lobbyId));
+
+        mockMvc.perform(get("/api/lobbies/{id}", rawId)
+                        .with(jwtFor("33333333-3333-3333-3333-333333333333", "user", "user@kdg.be")))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -200,28 +213,28 @@ class LobbyControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/lobbies/{lobbyId}/invite/{playerId} – calls playerService.invitePlayer")
+    @DisplayName("POST /api/lobbies/{lobbyId}/invite/{playerId} – calls lobbyPlayerService.invitePlayer")
     void inviteSinglePlayer_callsService() throws Exception {
         UUID lobbyId = UUID.randomUUID();
         UUID ownerId = UUID.fromString("aaaaaaaa-0000-0000-0000-000000000000");
         UUID targetId = UUID.fromString("bbbbbbbb-0000-0000-0000-000000000000");
 
-        doNothing().when(playerService).invitePlayer(any(PlayerId.class), any(LobbyId.class), any(PlayerId.class), any(Jwt.class));
+        doNothing().when(lobbyPlayerService).invitePlayer(any(PlayerId.class), any(LobbyId.class), any(PlayerId.class), any(Jwt.class));
 
         mockMvc.perform(post("/api/lobbies/{lobbyId}/invite/{playerId}", lobbyId, targetId).with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be")).with(csrf())).andExpect(status().isOk());
 
-        verify(playerService).invitePlayer(eq(PlayerId.from(ownerId)), eq(LobbyId.from(lobbyId)), eq(PlayerId.from(targetId)), any(Jwt.class));
+        verify(lobbyPlayerService).invitePlayer(eq(PlayerId.from(ownerId)), eq(LobbyId.from(lobbyId)), eq(PlayerId.from(targetId)), any(Jwt.class));
     }
 
     @Test
-    @DisplayName("POST /api/lobbies/{lobbyId}/invite – calls playerService.invitePlayers")
+    @DisplayName("POST /api/lobbies/{lobbyId}/invite – calls lobbyPlayerService.invitePlayers")
     void inviteMultiplePlayers_callsService() throws Exception {
         UUID lobbyId = UUID.randomUUID();
         UUID ownerId = UUID.fromString("cccccccc-0000-0000-0000-000000000000");
         UUID p1 = UUID.fromString("dddddddd-0000-0000-0000-000000000000");
         UUID p2 = UUID.fromString("eeeeeeee-0000-0000-0000-000000000000");
 
-        doNothing().when(playerService).invitePlayers(any(PlayerId.class), any(LobbyId.class), anyList(), any(Jwt.class));
+        doNothing().when(lobbyPlayerService).invitePlayers(any(PlayerId.class), any(LobbyId.class), anyList(), any(Jwt.class));
 
         String body = """
                 {
@@ -236,7 +249,7 @@ class LobbyControllerTest {
 
         ArgumentCaptor<List<PlayerId>> idsCaptor = ArgumentCaptor.forClass(List.class);
 
-        verify(playerService).invitePlayers(eq(PlayerId.from(ownerId)), eq(LobbyId.from(lobbyId)), idsCaptor.capture(), any(Jwt.class));
+        verify(lobbyPlayerService).invitePlayers(eq(PlayerId.from(ownerId)), eq(LobbyId.from(lobbyId)), idsCaptor.capture(), any(Jwt.class));
 
         List<UUID> capturedIds = idsCaptor.getValue().stream().map(PlayerId::value).collect(Collectors.toList());
 
@@ -249,11 +262,11 @@ class LobbyControllerTest {
         UUID lobbyId = UUID.randomUUID();
         UUID playerId = UUID.fromString("99999999-0000-0000-0000-000000000000");
 
-        doNothing().when(playerService).acceptInvite(eq(PlayerId.from(playerId)), eq(LobbyId.from(lobbyId)), Jwt.withTokenValue(anyString()).build());
+        doNothing().when(lobbyPlayerService).acceptInvite(eq(PlayerId.from(playerId)), eq(LobbyId.from(lobbyId)), Jwt.withTokenValue(anyString()).build());
 
         mockMvc.perform(post("/api/lobbies/{lobbyId}/players/{playerId}", lobbyId, playerId).with(jwtFor(playerId.toString(), "kaj", "kaj@kdg.be")).with(csrf())).andExpect(status().isOk());
 
-        verify(playerService).acceptInvite(eq(PlayerId.from(playerId)), eq(LobbyId.from(lobbyId)), Jwt.withTokenValue(anyString()).build());
+        verify(lobbyPlayerService).acceptInvite(eq(PlayerId.from(playerId)), eq(LobbyId.from(lobbyId)), Jwt.withTokenValue(anyString()).build());
     }
 
     @Test
@@ -267,28 +280,28 @@ class LobbyControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /api/lobbies/{lobbyId}/players/{playerId} – calls playerService.removePlayer")
+    @DisplayName("DELETE /api/lobbies/{lobbyId}/players/{playerId} – calls lobbyPlayerService.removePlayer")
     void removePlayer_callsService() throws Exception {
         UUID lobbyId = UUID.randomUUID();
         UUID ownerId = UUID.fromString("12121212-0000-0000-0000-000000000000");
         UUID targetId = UUID.fromString("13131313-0000-0000-0000-000000000000");
 
-        doNothing().when(playerService).removePlayer(any(PlayerId.class), any(LobbyId.class), any(PlayerId.class));
+        doNothing().when(lobbyPlayerService).removePlayer(any(PlayerId.class), any(LobbyId.class), any(PlayerId.class));
 
         mockMvc.perform(delete("/api/lobbies/{lobbyId}/players/{playerId}", lobbyId, targetId).with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be")).with(csrf())).andExpect(status().isOk());
 
-        verify(playerService).removePlayer(eq(PlayerId.from(ownerId)), eq(LobbyId.from(lobbyId)), eq(PlayerId.from(targetId)));
+        verify(lobbyPlayerService).removePlayer(eq(PlayerId.from(ownerId)), eq(LobbyId.from(lobbyId)), eq(PlayerId.from(targetId)));
     }
 
     @Test
-    @DisplayName("DELETE /api/lobbies/{lobbyId}/players – calls playerService.removePlayers")
+    @DisplayName("DELETE /api/lobbies/{lobbyId}/players – calls lobbyPlayerService.removePlayers")
     void removePlayers_callsService() throws Exception {
         UUID lobbyId = UUID.randomUUID();
         UUID ownerId = UUID.fromString("14141414-0000-0000-0000-000000000000");
         UUID t1 = UUID.fromString("15151515-0000-0000-0000-000000000000");
         UUID t2 = UUID.fromString("16161616-0000-0000-0000-000000000000");
 
-        doNothing().when(playerService).removePlayers(any(PlayerId.class), any(LobbyId.class), anyList());
+        doNothing().when(lobbyPlayerService).removePlayers(any(PlayerId.class), any(LobbyId.class), anyList());
 
         String body = """
                 {
@@ -301,6 +314,6 @@ class LobbyControllerTest {
 
         mockMvc.perform(delete("/api/lobbies/{lobbyId}/players", lobbyId).with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be")).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isOk());
 
-        verify(playerService).removePlayers(eq(PlayerId.from(ownerId)), eq(LobbyId.from(lobbyId)), argThat(list -> list.stream().map(PlayerId::value).collect(Collectors.toSet()).containsAll(Set.of(t1, t2))));
+        verify(lobbyPlayerService).removePlayers(eq(PlayerId.from(ownerId)), eq(LobbyId.from(lobbyId)), argThat(list -> list.stream().map(PlayerId::value).collect(Collectors.toSet()).containsAll(Set.of(t1, t2))));
     }
 }
