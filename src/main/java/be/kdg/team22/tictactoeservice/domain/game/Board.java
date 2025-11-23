@@ -3,6 +3,9 @@ package be.kdg.team22.tictactoeservice.domain.game;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerRole;
 import org.jmolecules.ddd.annotation.ValueObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @ValueObject
 public class Board {
     private final int size;
@@ -38,10 +41,6 @@ public class Board {
 
     public PlayerRole cell(final int row, final int col) {
         return grid[row][col];
-    }
-
-    public PlayerRole[][] grid() {
-        return grid;
     }
 
     public GameStatus checkWinner(final int lastRow, final int lastCol, final PlayerRole role) {
@@ -109,5 +108,21 @@ public class Board {
             }
         }
         return true;
+    }
+
+    public List<List<String>> boardState() {
+        List<List<String>> boardState = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            List<String> row = new ArrayList<>();
+            for (int j = 0; j < size; j++) {
+                if (grid[i][j] == null) {
+                    row.add(" ");
+                } else {
+                    row.add(grid[i][j].toString());
+                }
+            }
+            boardState.add(row);
+        }
+        return boardState;
     }
 }

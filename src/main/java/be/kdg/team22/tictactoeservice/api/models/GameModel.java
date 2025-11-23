@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public record GameModel(
         UUID id,
-        PlayerRole[][] board,
+        List<List<String>> board,
         GameStatus status,
         TreeSet<Player> players,
         Map<UUID, List<MoveModel>> moveHistory,
@@ -23,7 +23,7 @@ public record GameModel(
     public static GameModel from(Game game) {
         return new GameModel(
                 game.id().value(),
-                game.board().grid(),
+                game.board().boardState(),
                 game.status(),
                 game.players(),
                 game.moveHistory().entrySet().stream()
