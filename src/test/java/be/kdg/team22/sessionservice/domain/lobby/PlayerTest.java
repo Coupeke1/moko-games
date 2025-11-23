@@ -16,7 +16,7 @@ class PlayerTest {
         Player p = new Player(playerId, new PlayerName("mathias"));
 
         assertThat(p.id()).isEqualTo(playerId);
-        assertThat(p.username()).isEqualTo("mathias");
+        assertThat(p.username().toString()).isEqualTo("mathias");
     }
 
     @Test

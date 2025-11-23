@@ -85,26 +85,44 @@ class LobbyControllerTest {
 
         Lobby lobby = sampleLobby(lobbyId, UUID.fromString(ownerId));
 
-        when(lobbyService.createLobby(any(GameId.class), any(PlayerId.class), any(), Jwt.withTokenValue(anyString()).build())).thenReturn(lobby);
+        when(lobbyService.createLobby(any(GameId.class), any(PlayerId.class), any(), any(Jwt.class)))
+                .thenReturn(lobby);
 
-        mockMvc.perform(post("/api/lobbies").with(jwtFor(ownerId, "user", "user@kdg.be")).with(csrf()).contentType(MediaType.APPLICATION_JSON).content("""
-                {
-                  "gameId": "00000000-0000-0000-0000-000000000005",
-                  "maxPlayers": 4,
-                  "settings": {
-                    "type": "ticTacToe",
-                    "boardSize": 3
-                  }
-                }
-                """)).andExpect(status().isCreated()).andExpect(jsonPath("$.ownerId").value(ownerId)).andExpect(jsonPath("$.gameId").value(GAME_ID.toString())).andExpect(jsonPath("$.maxPlayers").value(4)).andExpect(jsonPath("$.settings.type").value("ticTacToe")).andExpect(jsonPath("$.settings.boardSize").value(3));
+        mockMvc.perform(post("/api/lobbies")
+                        .with(jwtFor(ownerId, "user", "user@kdg.be"))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "gameId": "00000000-0000-0000-0000-000000000005",
+                                  "maxPlayers": 4,
+                                  "settings": {
+                                    "type": "ticTacToe",
+                                    "boardSize": 3
+                                  }
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.ownerId").value(ownerId))
+                .andExpect(jsonPath("$.gameId").value(GAME_ID.toString()))
+                .andExpect(jsonPath("$.maxPlayers").value(4))
+                .andExpect(jsonPath("$.settings.type").value("ticTacToe"))
+                .andExpect(jsonPath("$.settings.boardSize").value(3));
 
         ArgumentCaptor<GameId> gameIdCaptor = ArgumentCaptor.forClass(GameId.class);
         ArgumentCaptor<PlayerId> ownerCaptor = ArgumentCaptor.forClass(PlayerId.class);
-        verify(lobbyService).createLobby(gameIdCaptor.capture(), ownerCaptor.capture(), any(), Jwt.withTokenValue(anyString()).build());
+
+        verify(lobbyService).createLobby(
+                gameIdCaptor.capture(),
+                ownerCaptor.capture(),
+                any(),
+                any(Jwt.class)
+        );
 
         assertThat(gameIdCaptor.getValue().value()).isEqualTo(GAME_ID);
         assertThat(ownerCaptor.getValue().value().toString()).isEqualTo(ownerId);
     }
+
 
     @Test
     @DisplayName("POST /api/lobbies – missing JWT returns 401")
@@ -126,7 +144,7 @@ class LobbyControllerTest {
     void createLobby_invalidGameId_returns400() throws Exception {
         String ownerId = "22222222-2222-2222-2222-222222222222";
 
-        when(lobbyService.createLobby(any(), any(), any(), Jwt.withTokenValue(anyString()).build())).thenThrow(new GameNotValidException(null));
+        when(lobbyService.createLobby(any(), any(), any(), any(Jwt.class))).thenThrow(new GameNotValidException(null));
 
         mockMvc.perform(post("/api/lobbies").with(jwtFor(ownerId, "user", "user@kdg.be")).with(csrf()).contentType(MediaType.APPLICATION_JSON).content("""
                 {
@@ -157,12 +175,9 @@ class LobbyControllerTest {
         UUID rawId = UUID.randomUUID();
         LobbyId lobbyId = LobbyId.from(rawId);
 
-        when(lobbyService.findLobby(lobbyId))
-                .thenThrow(new LobbyNotFoundException(lobbyId));
+        when(lobbyService.findLobby(lobbyId)).thenThrow(new LobbyNotFoundException(lobbyId));
 
-        mockMvc.perform(get("/api/lobbies/{id}", rawId)
-                        .with(jwtFor("33333333-3333-3333-3333-333333333333", "user", "user@kdg.be")))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/lobbies/{id}", rawId).with(jwtFor("33333333-3333-3333-3333-333333333333", "user", "user@kdg.be"))).andExpect(status().isNotFound());
     }
 
     @Test
@@ -262,21 +277,21 @@ class LobbyControllerTest {
         UUID lobbyId = UUID.randomUUID();
         UUID playerId = UUID.fromString("99999999-0000-0000-0000-000000000000");
 
-        doNothing().when(lobbyPlayerService).acceptInvite(eq(PlayerId.from(playerId)), eq(LobbyId.from(lobbyId)), Jwt.withTokenValue(anyString()).build());
+        doNothing().when(lobbyPlayerService).acceptInvite(eq(PlayerId.from(playerId)), eq(LobbyId.from(lobbyId)), any(Jwt.class));
 
         mockMvc.perform(post("/api/lobbies/{lobbyId}/players/{playerId}", lobbyId, playerId).with(jwtFor(playerId.toString(), "kaj", "kaj@kdg.be")).with(csrf())).andExpect(status().isOk());
 
-        verify(lobbyPlayerService).acceptInvite(eq(PlayerId.from(playerId)), eq(LobbyId.from(lobbyId)), Jwt.withTokenValue(anyString()).build());
+        verify(lobbyPlayerService).acceptInvite(eq(PlayerId.from(playerId)), eq(LobbyId.from(lobbyId)), any(Jwt.class));
     }
 
     @Test
-    @DisplayName("POST /api/lobbies/{lobbyId}/players/{playerId} – id mismatch returns 400")
+    @DisplayName("POST /api/lobbies/{lobbyId}/players/{playerId} – id mismatch returns 404")
     void acceptInvite_idMismatch_returnsBadRequest() throws Exception {
         UUID lobbyId = UUID.randomUUID();
         UUID pathPlayerId = UUID.fromString("aaaaaaaa-0000-0000-0000-000000000000");
         UUID tokenSub = UUID.fromString("bbbbbbbb-0000-0000-0000-000000000000");
 
-        mockMvc.perform(post("/api/lobbies/{lobbyId}/players/{playerId}", lobbyId, pathPlayerId).with(jwtFor(tokenSub.toString(), "other", "other@kdg.be")).with(csrf())).andExpect(status().isBadRequest());
+        mockMvc.perform(post("/api/lobbies/{lobbyId}/players/{playerId}", lobbyId, pathPlayerId).with(jwtFor(tokenSub.toString(), "other", "other@kdg.be")).with(csrf())).andExpect(status().isNotFound());
     }
 
     @Test

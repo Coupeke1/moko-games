@@ -57,13 +57,13 @@ class DbLobbyRepositoryTest {
 
         LobbyEntity db = loaded.get();
 
-        assertThat(db.id()).isEqualTo(id);
-        assertThat(db.gameId()).isEqualTo(gameId);
-        assertThat(db.ownerId()).isEqualTo(ownerId);
+        assertThat(db.id()).isEqualTo(id.value());
+        assertThat(db.gameId()).isEqualTo(gameId.value());
+        assertThat(db.ownerId()).isEqualTo(ownerId.value());
 
         assertThat(db.players()).hasSize(1);
         PlayerEmbed p = db.players().iterator().next();
-        assertThat(p.id()).isEqualTo(ownerId);
+        assertThat(p.id()).isEqualTo(ownerId.value());
         assertThat(p.username()).isEqualTo("ownerUser");
 
         LobbySettings mapped = db.settings();

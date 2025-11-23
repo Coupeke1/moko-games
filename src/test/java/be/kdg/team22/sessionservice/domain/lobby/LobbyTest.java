@@ -44,7 +44,7 @@ class LobbyTest {
 
         assertThat(lobby.ownerId()).isEqualTo(owner);
         assertThat(lobby.players()).hasSize(1);
-        assertThat(lobby.players().iterator().next().id()).isEqualTo(owner.value());
+        assertThat(lobby.players().iterator().next().id()).isEqualTo(owner);
         assertThat(lobby.status()).isEqualTo(LobbyStatus.OPEN);
     }
 

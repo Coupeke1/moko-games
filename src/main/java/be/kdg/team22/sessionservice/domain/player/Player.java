@@ -1,19 +1,12 @@
 package be.kdg.team22.sessionservice.domain.player;
 
-public class Player {
-    private final PlayerId id;
-    private final PlayerName username;
+public record Player(PlayerId id, PlayerName username) {
+    public Player {
+        if (id == null)
+            throw new IllegalArgumentException("Player id cannot be null");
 
-    public Player(PlayerId id, PlayerName username) {
-        this.id = id;
-        this.username = username;
-    }
+        if (username == null)
+            throw new IllegalArgumentException("Player username cannot be null");
 
-    public PlayerId id() {
-        return id;
-    }
-
-    public PlayerName username() {
-        return username;
     }
 }
