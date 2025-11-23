@@ -1,7 +1,7 @@
-package be.kdg.team22.sessionservice.domain.player;
+package be.kdg.team22.sessionservice.domain.friends;
 
+import be.kdg.team22.sessionservice.domain.friends.exceptions.FriendNotFoundException;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.ClaimNotFoundException;
-import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerNotFoundException;
 import org.jmolecules.ddd.annotation.ValueObject;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -9,25 +9,25 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import java.util.UUID;
 
 @ValueObject
-public record PlayerId(UUID value) {
-    public PlayerId {
+public record FriendId(UUID value) {
+    public FriendId {
         if (value == null)
             throw new IllegalArgumentException("ID cannot be null");
     }
 
-    public static PlayerId from(UUID value) {
-        return new PlayerId(value);
+    public static FriendId from(UUID value) {
+        return new FriendId(value);
     }
 
-    public static PlayerId create() {
-        return new PlayerId(UUID.randomUUID());
+    public static FriendId create() {
+        return new FriendId(UUID.randomUUID());
     }
 
-    public static PlayerId create(String value) {
-        return new PlayerId(UUID.fromString(value));
+    public static FriendId create(String value) {
+        return new FriendId(UUID.fromString(value));
     }
 
-    public static PlayerId get(Jwt token) {
+    public static FriendId get(Jwt token) {
         String sub = token.getClaimAsString(StandardClaimNames.SUB);
         if (sub == null)
             throw new ClaimNotFoundException("sub");
@@ -35,7 +35,7 @@ public record PlayerId(UUID value) {
         return create(sub);
     }
 
-    public PlayerNotFoundException notFound() {
-        throw new PlayerNotFoundException(this);
+    public FriendNotFoundException notFound() {
+        throw new FriendNotFoundException(this);
     }
 }

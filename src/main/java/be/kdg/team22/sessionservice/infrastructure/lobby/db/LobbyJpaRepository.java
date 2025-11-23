@@ -7,4 +7,3 @@ import java.util.UUID;
 
 public interface LobbyJpaRepository extends JpaRepository<LobbyEntity, UUID> {
 }
-

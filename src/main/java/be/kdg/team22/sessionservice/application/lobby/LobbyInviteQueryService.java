@@ -13,11 +13,11 @@ import java.util.List;
 public class LobbyInviteQueryService {
     private final LobbyRepository lobbyRepository;
 
-    public LobbyInviteQueryService(LobbyRepository lobbyRepository) {
+    public LobbyInviteQueryService(final LobbyRepository lobbyRepository) {
         this.lobbyRepository = lobbyRepository;
     }
 
-    public List<Lobby> getInvitesForPlayer(final PlayerId playerId, final String token) {
+    public List<Lobby> getInvitesForPlayer(final PlayerId playerId) {
         return lobbyRepository.findAll().stream().filter(lobby -> lobby.isInvited(playerId)).toList();
     }
 }

@@ -32,7 +32,7 @@ public class LobbyController {
     private final LobbyInviteQueryService queryService;
     private final PlayerService playerService;
 
-    public LobbyController(LobbyService lobbyService, LobbyPlayerService lobbyPlayerService, LobbyInviteQueryService queryService, PlayerService playerService) {
+    public LobbyController(final LobbyService lobbyService, final LobbyPlayerService lobbyPlayerService, final LobbyInviteQueryService queryService, final PlayerService playerService) {
         this.lobbyService = lobbyService;
         this.lobbyPlayerService = lobbyPlayerService;
         this.queryService = queryService;
@@ -44,7 +44,7 @@ public class LobbyController {
         PlayerId ownerId = PlayerId.get(token);
         GameId gameId = new GameId(model.gameId());
 
-        Lobby lobby = lobbyService.createLobby(gameId, ownerId, model, token.getTokenValue());
+        Lobby lobby = lobbyService.createLobby(gameId, ownerId, model, token);
         return ResponseEntity.status(HttpStatus.CREATED).body(toResponseModel(lobby));
     }
 
@@ -100,7 +100,7 @@ public class LobbyController {
         if (!player.value().equals(playerId))
             throw new InviteNotFoundException(lobby, player);
 
-        lobbyPlayerService.acceptInvite(player, LobbyId.from(id), token.getTokenValue());
+        lobbyPlayerService.acceptInvite(player, LobbyId.from(id), token);
     }
 
     @DeleteMapping("/{lobbyId}/players/{playerId}")
@@ -109,18 +109,18 @@ public class LobbyController {
         lobbyPlayerService.removePlayer(owner, LobbyId.from(lobbyId), PlayerId.from(playerId));
     }
 
-    @DeleteMapping("/{lobbyId}/players")
-    public void removePlayers(@PathVariable final UUID lobbyId, @RequestBody final RemovePlayersRequestModel request, @AuthenticationPrincipal final Jwt token) {
+    @DeleteMapping("/{id}/players")
+    public void removePlayers(@PathVariable final UUID id, @RequestBody final RemovePlayersRequestModel request, @AuthenticationPrincipal final Jwt token) {
         PlayerId owner = PlayerId.get(token);
         List<PlayerId> players = request.playerIds().stream().map(PlayerId::from).toList();
 
-        lobbyPlayerService.removePlayers(owner, LobbyId.from(lobbyId), players);
+        lobbyPlayerService.removePlayers(owner, LobbyId.from(id), players);
     }
 
     @GetMapping("/invited")
-    public ResponseEntity<List<LobbyInviteModel>> getInvited(@AuthenticationPrincipal Jwt token) {
+    public ResponseEntity<List<LobbyInviteModel>> getInvited(@AuthenticationPrincipal final Jwt token) {
         PlayerId player = PlayerId.get(token);
-        List<Lobby> lobbies = queryService.getInvitesForPlayer(player, token.getTokenValue());
+        List<Lobby> lobbies = queryService.getInvitesForPlayer(player);
         return ResponseEntity.ok(lobbies.stream().map(lobby -> toInviteModel(lobby, token)).toList());
     }
 
@@ -137,18 +137,18 @@ public class LobbyController {
     }
 
     private LobbyInviteModel toInviteModel(final Lobby lobby, final Jwt token) {
-        Player owner = playerService.findPlayer(PlayerId.get(token), token.getTokenValue());
+        Player owner = playerService.findPlayer(PlayerId.get(token), token);
         Set<PlayerSummaryModel> players = lobby.players().stream().map(this::toPlayerModel).collect(Collectors.toSet());
 
         Set<PlayerSummaryModel> invited = lobby.invitedPlayers().stream().map(playerId -> {
-            Player player = playerService.findPlayer(playerId, token.getTokenValue());
-            return new PlayerSummaryModel(player.id().value(), player.username());
+            Player player = playerService.findPlayer(playerId, token);
+            return new PlayerSummaryModel(player.id().value(), player.username().value());
         }).collect(Collectors.toSet());
 
-        return new LobbyInviteModel(lobby.id().value(), lobby.gameId().value(), "TODO_GAME_NAME", owner.id().value(), owner.username(), players, invited, lobby.settings().maxPlayers(), lobby.status().name(), lobby.createdAt());
+        return new LobbyInviteModel(lobby.id().value(), lobby.gameId().value(), "TODO_GAME_NAME", owner.id().value(), owner.username().value(), players, invited, lobby.settings().maxPlayers(), lobby.status().name(), lobby.createdAt());
     }
 
     private PlayerSummaryModel toPlayerModel(final Player player) {
-        return new PlayerSummaryModel(player.id().value(), player.username());
+        return new PlayerSummaryModel(player.id().value(), player.username().value());
     }
 }

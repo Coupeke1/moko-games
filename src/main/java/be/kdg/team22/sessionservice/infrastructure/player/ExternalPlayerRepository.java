@@ -29,7 +29,7 @@ public class ExternalPlayerRepository {
             if (exception.getStatusCode() != HttpStatus.NOT_FOUND)
                 throw exception;
 
-            throw new PlayerNotFoundException(new PlayerId(id));
+            throw new PlayerNotFoundException(PlayerId.from(id));
         } catch (
                 RestClientException exception) {
             throw new NotReachableException();

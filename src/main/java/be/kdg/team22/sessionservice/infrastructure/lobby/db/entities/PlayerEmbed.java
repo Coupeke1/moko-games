@@ -13,16 +13,12 @@ public class PlayerEmbed {
     @Column(name = "username", nullable = false)
     private String username;
 
-    @Column(name = "email", nullable = false)
-    private String email;
-
     protected PlayerEmbed() {
     }
 
-    public PlayerEmbed(final UUID id, final String username, final String email) {
+    public PlayerEmbed(final UUID id, final String username) {
         this.id = id;
         this.username = username;
-        this.email = email;
     }
 
     public UUID id() {
@@ -31,9 +27,5 @@ public class PlayerEmbed {
 
     public String username() {
         return username;
-    }
-
-    public String email() {
-        return email;
     }
 }

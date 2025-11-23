@@ -32,7 +32,7 @@ class LobbyInviteQueryServiceTest {
         PlayerId user = new PlayerId(UUID.randomUUID());
         when(lobbyRepo.findAll()).thenReturn(List.of());
 
-        List<Lobby> result = service.getInvitesForPlayer(user, "token");
+        List<Lobby> result = service.getInvitesForPlayer(user);
         assertThat(result).isEmpty();
     }
 
@@ -60,7 +60,7 @@ class LobbyInviteQueryServiceTest {
 
         when(userRepo.getById(invitedUser.value(), token)).thenReturn(Optional.of(new PlayerResponse(invitedUser.value(), "inv2", "inv2@mail.com")));
 
-        List<Lobby> result = service.getInvitesForPlayer(invitedUser, token);
+        List<Lobby> result = service.getInvitesForPlayer(invitedUser);
 
         assertThat(result).hasSize(1);
 
@@ -112,7 +112,7 @@ class LobbyInviteQueryServiceTest {
 
         when(userRepo.getById(any(), any())).thenReturn(Optional.of(new PlayerResponse(UUID.randomUUID(), "dummy", "d@mail.com")));
 
-        List<Lobby> result = service.getInvitesForPlayer(user, "token");
+        List<Lobby> result = service.getInvitesForPlayer(user);
         assertThat(result).hasSize(1);
         assertThat(result.getFirst()).isNotNull();
     }

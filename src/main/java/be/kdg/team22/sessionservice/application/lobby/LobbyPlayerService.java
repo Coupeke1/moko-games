@@ -21,13 +21,13 @@ public class LobbyPlayerService {
     private final FriendsService friendsService;
     private final PlayerService playerService;
 
-    public LobbyPlayerService(LobbyRepository lobbyRepository, FriendsService friendsService, PlayerService playerService) {
+    public LobbyPlayerService(final LobbyRepository lobbyRepository, final FriendsService friendsService, final PlayerService playerService) {
         this.lobbyRepository = lobbyRepository;
         this.friendsService = friendsService;
         this.playerService = playerService;
     }
 
-    public void invitePlayer(PlayerId ownerId, LobbyId lobbyId, PlayerId playerId, Jwt token) {
+    public void invitePlayer(final PlayerId ownerId, final LobbyId lobbyId, final PlayerId playerId, final Jwt token) {
         Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
         ensureFriend(ownerId, playerId, token);
 
@@ -35,9 +35,9 @@ public class LobbyPlayerService {
         lobbyRepository.save(lobby);
     }
 
-    public void invitePlayers(PlayerId ownerId, LobbyId lobbyId, List<PlayerId> playerIds, Jwt token) {
+    public void invitePlayers(final PlayerId ownerId, final LobbyId lobbyId, final List<PlayerId> playerIds, final Jwt token) {
         Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
-        List<PlayerId> friends = friendsService.findAllFriends(token.getTokenValue());
+        List<PlayerId> friends = friendsService.findAllFriends(token);
 
         for (PlayerId playerId : playerIds) {
             if (friends.contains(playerId))
@@ -50,7 +50,7 @@ public class LobbyPlayerService {
         lobbyRepository.save(lobby);
     }
 
-    public void acceptInvite(PlayerId playerId, LobbyId lobbyId, String token) {
+    public void acceptInvite(final PlayerId playerId, final LobbyId lobbyId, final Jwt token) {
         Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
         Player player = playerService.findPlayer(playerId, token);
 
@@ -58,22 +58,22 @@ public class LobbyPlayerService {
         lobbyRepository.save(lobby);
     }
 
-    public void removePlayer(PlayerId ownerId, LobbyId lobbyId, PlayerId playerId) {
+    public void removePlayer(final PlayerId ownerId, final LobbyId lobbyId, final PlayerId playerId) {
         Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
 
         lobby.removePlayer(ownerId, playerId);
         lobbyRepository.save(lobby);
     }
 
-    public void removePlayers(PlayerId ownerId, LobbyId lobbyId, List<PlayerId> ids) {
+    public void removePlayers(final PlayerId ownerId, final LobbyId lobbyId, final List<PlayerId> ids) {
         Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
 
         lobby.removePlayers(ownerId, ids);
         lobbyRepository.save(lobby);
     }
 
-    private void ensureFriend(PlayerId ownerId, PlayerId playerId, Jwt token) {
-        List<PlayerId> friends = friendsService.findAllFriends(token.getTokenValue());
+    private void ensureFriend(final PlayerId ownerId, final PlayerId playerId, final Jwt token) {
+        List<PlayerId> friends = friendsService.findAllFriends(token);
 
         if (!friends.contains(playerId))
             throw new PlayerNotFriendException(ownerId, playerId);

@@ -2,24 +2,18 @@ package be.kdg.team22.sessionservice.domain.player;
 
 public class Player {
     private final PlayerId id;
-    private final String username;
-    private final String email;
+    private final PlayerName username;
 
-    public Player(PlayerId id, String username, String email) {
+    public Player(PlayerId id, PlayerName username) {
         this.id = id;
         this.username = username;
-        this.email = email;
     }
 
     public PlayerId id() {
         return id;
     }
 
-    public String username() {
+    public PlayerName username() {
         return username;
-    }
-
-    public String email() {
-        return email;
     }
 }

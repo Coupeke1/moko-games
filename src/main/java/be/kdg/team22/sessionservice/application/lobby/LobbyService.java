@@ -12,6 +12,7 @@ import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,12 +24,12 @@ public class LobbyService {
     private final LobbyRepository repository;
     private final PlayerService playerService;
 
-    public LobbyService(final LobbyRepository repository, PlayerService playerService) {
+    public LobbyService(final LobbyRepository repository, final PlayerService playerService) {
         this.repository = repository;
         this.playerService = playerService;
     }
 
-    public Lobby createLobby(GameId gameId, PlayerId ownerId, CreateLobbyModel model, String token) {
+    public Lobby createLobby(final GameId gameId, final PlayerId ownerId, final CreateLobbyModel model, final Jwt token) {
         Player owner = playerService.findPlayer(ownerId, token);
         LobbySettings settings = mapToDomainSettings(model.settings(), model.maxPlayers());
         Lobby lobby = new Lobby(gameId, owner, settings);
@@ -60,7 +61,7 @@ public class LobbyService {
         return lobby;
     }
 
-    private LobbySettings mapToDomainSettings(GameSettingsModel model, Integer maxPlayers) {
+    private LobbySettings mapToDomainSettings(final GameSettingsModel model, final Integer maxPlayers) {
         int resolvedMaxPlayers = maxPlayers != null ? maxPlayers : 4;
 
         GameSettings gameSettings = switch (model) {

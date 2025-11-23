@@ -7,7 +7,7 @@ import java.util.UUID;
 @ValueObject
 public record GameId(UUID value) {
     public GameId {
-        if (value == null) throw new IllegalArgumentException("GameId cannot be null");
+        if (value == null) throw new IllegalArgumentException("ID cannot be null");
     }
 
     public static GameId from(UUID uuid) {

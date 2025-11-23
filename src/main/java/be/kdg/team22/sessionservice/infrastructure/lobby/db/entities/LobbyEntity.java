@@ -7,6 +7,7 @@ import be.kdg.team22.sessionservice.domain.lobby.LobbyStatus;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
+import be.kdg.team22.sessionservice.domain.player.PlayerName;
 import be.kdg.team22.sessionservice.infrastructure.lobby.db.converters.LobbySettingsConverter;
 import jakarta.persistence.*;
 
@@ -68,7 +69,7 @@ public class LobbyEntity {
     }
 
     public static LobbyEntity fromDomain(final Lobby lobby) {
-        Set<PlayerEmbed> players = lobby.players().stream().map(player -> new PlayerEmbed(player.id().value(), player.username(), player.email())).collect(Collectors.toSet());
+        Set<PlayerEmbed> players = lobby.players().stream().map(player -> new PlayerEmbed(player.id().value(), player.username().value())).collect(Collectors.toSet());
         Set<UUID> invitedPlayers = lobby.invitedPlayers().stream().map(PlayerId::value).collect(Collectors.toSet());
 
         return new LobbyEntity(lobby.id().value(), lobby.gameId().value(), lobby.ownerId().value(), players, invitedPlayers, lobby.settings(), lobby.status(), lobby.createdAt(), lobby.updatedAt());
@@ -76,7 +77,7 @@ public class LobbyEntity {
 
 
     public Lobby toDomain() {
-        List<Player> players = this.players.stream().map(p -> new Player(PlayerId.from(p.id()), p.username(), p.email())).collect(Collectors.toList());
+        List<Player> players = this.players.stream().map(player -> new Player(PlayerId.from(player.id()), PlayerName.from(player.username()))).collect(Collectors.toList());
         Set<PlayerId> invitedPlayers = invitedPlayerIds.stream().map(PlayerId::from).collect(Collectors.toSet());
 
         return new Lobby(LobbyId.from(id), GameId.from(gameId), PlayerId.from(ownerId), players, invitedPlayers, settings, status, createdAt, updatedAt);
