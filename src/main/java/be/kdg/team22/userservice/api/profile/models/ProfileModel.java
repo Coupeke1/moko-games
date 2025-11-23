@@ -6,8 +6,9 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record ProfileModel(UUID id,
+                           String username,
                            Instant createdAt) {
     public static ProfileModel from(Profile profile) {
-        return new ProfileModel(profile.id().value(), profile.createdAt());
+        return new ProfileModel(profile.id().value(), profile.username().value(), profile.createdAt());
     }
 }
