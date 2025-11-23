@@ -22,7 +22,7 @@ import java.util.UUID;
 public class ProfileController {
     private final ProfileService service;
 
-    public ProfileController(ProfileService service) {
+    public ProfileController(final ProfileService service) {
         this.service = service;
     }
 

@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProfileService {
     private final ProfileRepository repository;
 
-    public ProfileService(ProfileRepository repository) {
+    public ProfileService(final ProfileRepository repository) {
         this.repository = repository;
     }
 
@@ -37,7 +37,7 @@ public class ProfileService {
         return repository.findByUsername(username).orElseThrow(username::notFound);
     }
 
-    private ProfileName getUsername(Jwt token) {
+    private ProfileName getUsername(final Jwt token) {
         if (token.hasClaim("preferred_username"))
             return new ProfileName(token.getClaimAsString("preferred_username"));
 
