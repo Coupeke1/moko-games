@@ -21,8 +21,11 @@ public class ExternalFriendsRepository {
 
     public List<UUID> getFriendIds(final String token) {
         try {
-            FriendsOverviewResponse response = client.get().uri("/api/friends").header("Authorization", "Bearer " + token).retrieve().body(FriendsOverviewResponse.class);
-
+            FriendsOverviewResponse response = client.get()
+                    .uri("")
+                    .header("Authorization", "Bearer " + token)
+                    .retrieve()
+                    .body(FriendsOverviewResponse.class);
             if (response == null)
                 return List.of();
 
