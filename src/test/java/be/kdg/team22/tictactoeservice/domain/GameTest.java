@@ -193,6 +193,10 @@ public class GameTest {
 
     @Test
     void requestMoveShouldDeclareWinRight() throws NoSuchFieldException, IllegalAccessException {
+        Field currentRoleField = Game.class.getDeclaredField("currentRole");
+        currentRoleField.setAccessible(true);
+        currentRoleField.set(game, PlayerRole.O);
+
         Board board = game.board();
         PlayerRole[][] grid = new PlayerRole[board.size()][board.size()];
         grid[0][0] = game.currentRole();
@@ -207,7 +211,7 @@ public class GameTest {
         game.requestMove(winningMove);
 
         assertEquals(GameStatus.WON, game.status());
-        assertEquals(game.winner(), game.players().first().id());
+        assertEquals(game.winner(), game.players().stream().toList().get(1).id());
     }
 
     @Test
