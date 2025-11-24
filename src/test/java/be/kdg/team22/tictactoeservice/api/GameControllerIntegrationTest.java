@@ -1,11 +1,11 @@
 package be.kdg.team22.tictactoeservice.api;
 
+import be.kdg.team22.tictactoeservice.api.models.CreateGameModel;
+import be.kdg.team22.tictactoeservice.api.models.GameSettingsModel;
 import be.kdg.team22.tictactoeservice.api.models.MoveModel;
-import be.kdg.team22.tictactoeservice.api.models.PlayersModel;
 import be.kdg.team22.tictactoeservice.domain.game.Game;
 import be.kdg.team22.tictactoeservice.domain.game.GameId;
 import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
-import be.kdg.team22.tictactoeservice.domain.player.PlayerRole;
 import be.kdg.team22.tictactoeservice.repository.GameRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,8 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -36,19 +35,30 @@ public class GameControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    PlayersModel model;
+    List<UUID> players;
+    CreateGameModel model;
 
     @BeforeEach
     public void setup() {
-        Map<UUID, PlayerRole> playerMap = Map.of(
-                UUID.randomUUID(), PlayerRole.X,
-                UUID.randomUUID(), PlayerRole.O
+        players = List.of(UUID.randomUUID(), UUID.randomUUID());
+
+        model = new CreateGameModel(
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                players,
+                new GameSettingsModel(3)
         );
-        model = new PlayersModel(playerMap);
     }
 
     @Test
     void shouldCreateGameWithDefaultSize() throws Exception {
+        CreateGameModel defaultModel = new CreateGameModel(
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                players,
+                new GameSettingsModel(0)
+        );
+
         mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(model)))
@@ -60,11 +70,16 @@ public class GameControllerIntegrationTest {
 
     @Test
     void shouldCreateWithCustomSize() throws Exception {
+        CreateGameModel modelSizeFive = new CreateGameModel(
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                players,
+                new GameSettingsModel(5)
+        );
 
-
-        mockMvc.perform(post("/api/games?size=5")
+        mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(model)))
+                        .content(objectMapper.writeValueAsString(modelSizeFive)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.board.length()").value(5))
@@ -73,33 +88,45 @@ public class GameControllerIntegrationTest {
 
     @Test
     void shouldRejectInvalidSize() throws Exception {
-        mockMvc.perform(post("/api/games?size=1")
+        CreateGameModel modelSizeOne = new CreateGameModel(
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                List.of(players.getFirst()),
+                new GameSettingsModel(1)
+        );
+
+        mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(model)))
+                        .content(objectMapper.writeValueAsString(modelSizeOne)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void shouldCreateGameWithCorrectPlayers() throws Exception {
-        UUID playerXUuid = UUID.randomUUID();
-        UUID playerOUuid = UUID.randomUUID();
-        model = new PlayersModel(Map.of(
-                playerXUuid, PlayerRole.X,
-                playerOUuid, PlayerRole.O
-        ));
         mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(model)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.players[?(@.role == 'X')].id.value").value(playerXUuid.toString()))
-                .andExpect(jsonPath("$.players[?(@.role == 'O')].id.value").value(playerOUuid.toString()));
+                .andExpect(jsonPath("$.players[?(@.role == 'X')].id.value").value(players.getFirst().toString()))
+                .andExpect(jsonPath("$.players[?(@.role == 'O')].id.value").value(players.get(1).toString()));
     }
 
     @Test
     void shouldRejectWithMissingPlayers() throws Exception {
-        PlayersModel onePlayerModel = new PlayersModel(Map.of(UUID.randomUUID(), PlayerRole.X));
-        PlayersModel noPlayersModel = new PlayersModel(new HashMap<>());
+        CreateGameModel onePlayerModel = new CreateGameModel(
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                List.of(players.getFirst()),
+                new GameSettingsModel(3)
+        );
+
+        CreateGameModel noPlayersModel = new CreateGameModel(
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                List.of(),
+                new GameSettingsModel(3)
+        );
 
         mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -161,8 +188,8 @@ public class GameControllerIntegrationTest {
     }
 
     @Test
-    void shouldreturnbadrequestforunfinshedGame() throws Exception {
-        String createResponse = mockMvc.perform(post("/api/games?size=3")
+    void shouldReturnBadRequestForUnfinishedGame() throws Exception {
+        String createResponse = mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(model)))
                 .andExpect(status().isOk())

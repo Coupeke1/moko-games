@@ -1,9 +1,6 @@
 package be.kdg.team22.tictactoeservice.domain;
 
-import be.kdg.team22.tictactoeservice.domain.game.Board;
-import be.kdg.team22.tictactoeservice.domain.game.Game;
-import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
-import be.kdg.team22.tictactoeservice.domain.game.Move;
+import be.kdg.team22.tictactoeservice.domain.game.*;
 import be.kdg.team22.tictactoeservice.domain.game.exceptions.*;
 import be.kdg.team22.tictactoeservice.domain.player.Player;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
@@ -12,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,7 +25,9 @@ public class GameTest {
     public void setup() {
         Player playerX = new Player(PlayerId.create(), PlayerRole.X);
         Player playerO = new Player(PlayerId.create(), PlayerRole.O);
-        game = Game.create(minSize, maxSize, boardSize, List.of(playerX, playerO));
+        game = Game.create(GameId.create(),
+                minSize, maxSize, 3,
+                List.of(playerX.id(), playerO.id()));
     }
 
     @Test
@@ -59,23 +59,34 @@ public class GameTest {
 
     @Test
     void createShouldThrowWhenTooFewPlayers() {
-        Player playerX = new Player(PlayerId.create(), PlayerRole.X);
-        assertThrows(GameSizeException.class, () -> Game.create(minSize, maxSize, 3, List.of(playerX)));
+        PlayerId playerId = PlayerId.create();
+        assertThrows(GameSizeException.class, () ->
+                Game.create(GameId.create(),
+                        minSize, maxSize, 3,
+                        List.of(playerId)));
+    }
+
+    @Test
+    void createShouldThrowWhenTooManyPlayers() {
+        List<PlayerId> playerIds = new ArrayList<>();
+        for (int i = 0; i <= PlayerRole.values().length; i++) {
+            playerIds.add(PlayerId.create());
+        }
+        assertThrows(GameSizeException.class, () ->
+                Game.create(GameId.create(),
+                        minSize, maxSize, 3,
+                        playerIds));
     }
 
     @Test
     void createShouldThrowWhenNonUniquePlayerIds() {
         UUID uuid = UUID.randomUUID();
-        Player playerX = new Player(new PlayerId(uuid), PlayerRole.X);
-        Player playerO = new Player(new PlayerId(uuid), PlayerRole.O);
-        assertThrows(UniquePlayersException.class, () -> Game.create(minSize, maxSize, 3, List.of(playerX, playerO)));
-    }
-
-    @Test
-    void createShouldThrowWhenNonUniquePlayerRoles() {
-        Player playerX = new Player(PlayerId.create(), PlayerRole.X);
-        Player playerX2 = new Player(PlayerId.create(), PlayerRole.X);
-        assertThrows(PlayerRolesException.class, () -> Game.create(minSize, maxSize, 4, List.of(playerX, playerX2)));
+        PlayerId playerX = new PlayerId(uuid);
+        PlayerId playerO = new PlayerId(uuid);
+        assertThrows(UniquePlayersException.class, () ->
+                Game.create(GameId.create(),
+                        minSize, maxSize, 3,
+                        List.of(playerX, playerO)));
     }
 
     @Test
