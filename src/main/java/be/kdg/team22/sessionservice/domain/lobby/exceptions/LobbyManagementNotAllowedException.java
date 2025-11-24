@@ -6,4 +6,8 @@ public class LobbyManagementNotAllowedException extends RuntimeException {
     public LobbyManagementNotAllowedException(LobbyStatus status) {
         super("Lobby cannot be managed in state " + status);
     }
+
+    public LobbyManagementNotAllowedException(String message) {
+        super(message);
+    }
 }
