@@ -16,11 +16,10 @@ public class Lobby {
     private final LobbyId id;
     private final GameId game;
     private final PlayerId owner;
-
     private final List<Player> players;
     private final Set<PlayerId> invitedPlayerIds;
-
     private final Instant createdAt;
+    private GameId startedGameId;
     private Instant updatedAt;
 
     private LobbyStatus status;
@@ -145,7 +144,7 @@ public class Lobby {
         updatedAt = Instant.now();
     }
 
-    private void ensureOwner(final PlayerId ownerId) {
+    public void ensureOwner(final PlayerId ownerId) {
         if (!owner.equals(ownerId))
             throw new NotLobbyOwnerException(ownerId);
     }
@@ -157,6 +156,32 @@ public class Lobby {
 
     public boolean isInvited(final PlayerId id) {
         return invitedPlayerIds.contains(id);
+    }
+
+    public void setReady(PlayerId playerId, boolean ready) {
+        ensureModifiable();
+
+        Player existing = players.stream()
+                .filter(p -> p.id().equals(playerId))
+                .findFirst()
+                .orElseThrow(() -> new PlayerNotInLobbyException(playerId, id));
+
+        players.remove(existing);
+        players.add(existing.withReady(ready));
+        updatedAt = Instant.now();
+    }
+
+    public void ensureAllPlayersReady() {
+        boolean allReady = players.stream().allMatch(Player::ready);
+        if (!allReady)
+            throw new PlayersNotReadyException(id.value());
+    }
+
+    public void markStarted(GameId gameInstanceId) {
+        ensureModifiable();
+        this.status = LobbyStatus.STARTED;
+        this.startedGameId = gameInstanceId;
+        this.updatedAt = Instant.now();
     }
 
     public LobbyId id() {
@@ -193,5 +218,9 @@ public class Lobby {
 
     public Set<PlayerId> invitedPlayers() {
         return Set.copyOf(invitedPlayerIds);
+    }
+
+    public Optional<GameId> startedGameId() {
+        return Optional.ofNullable(startedGameId);
     }
 }

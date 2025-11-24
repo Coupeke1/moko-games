@@ -9,6 +9,7 @@ import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.InviteNotFoundException;
+import be.kdg.team22.sessionservice.domain.lobby.exceptions.LobbyManagementNotAllowedException;
 import be.kdg.team22.sessionservice.domain.lobby.settings.CheckersSettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
@@ -124,16 +125,52 @@ public class LobbyController {
         return ResponseEntity.ok(lobbies.stream().map(lobby -> toInviteModel(lobby, token)).toList());
     }
 
+    @PostMapping("/{lobbyId}/start")
+    public ResponseEntity<LobbyResponseModel> start(
+            @PathVariable UUID lobbyId,
+            @AuthenticationPrincipal Jwt token
+    ) {
+        PlayerId owner = PlayerId.get(token);
+        Lobby lobby = lobbyService.startLobby(LobbyId.from(lobbyId), owner, token);
+        return ResponseEntity.ok(toResponseModel(lobby));
+    }
+
+    @PatchMapping("/{lobbyId}/players/{playerId}/ready")
+    public void setReady(
+            @PathVariable UUID lobbyId,
+            @PathVariable UUID playerId,
+            @RequestBody ReadyRequestModel request,
+            @AuthenticationPrincipal Jwt token
+    ) {
+        PlayerId acting = PlayerId.get(token);
+        if (!acting.value().equals(playerId))
+            throw new LobbyManagementNotAllowedException("Cannot change ready state of others");
+
+        lobbyPlayerService.setReady(
+                acting,
+                LobbyId.from(lobbyId),
+                request.ready()
+        );
+    }
+
     private LobbyResponseModel toResponseModel(final Lobby lobby) {
         GameSettingsModel model = switch (lobby.settings().gameSettings()) {
-            case TicTacToeSettings t ->
-                    new TicTacToeSettingsModel(t.boardSize());
-            case CheckersSettings c ->
-                    new CheckersSettingsModel(c.boardSize(), c.flyingKings());
+            case TicTacToeSettings t -> new TicTacToeSettingsModel(t.boardSize());
+            case CheckersSettings c -> new CheckersSettingsModel(c.boardSize(), c.flyingKings());
         };
 
         Set<UUID> players = lobby.players().stream().map(player -> player.id().value()).collect(Collectors.toSet());
-        return new LobbyResponseModel(lobby.id().value(), lobby.gameId().value(), lobby.ownerId().value(), players, lobby.settings().maxPlayers(), lobby.status(), lobby.createdAt(), model);
+        return new LobbyResponseModel(
+                lobby.id().value(),
+                lobby.gameId().value(),
+                lobby.ownerId().value(),
+                players,
+                lobby.settings().maxPlayers(),
+                lobby.status(),
+                lobby.createdAt(),
+                model,
+                lobby.startedGameId().map(GameId::value).orElse(null)
+        );
     }
 
     private LobbyInviteModel toInviteModel(final Lobby lobby, final Jwt token) {

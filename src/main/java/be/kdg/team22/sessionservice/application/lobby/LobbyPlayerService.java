@@ -78,4 +78,12 @@ public class LobbyPlayerService {
         if (!friends.contains(playerId))
             throw new PlayerNotFriendException(ownerId, playerId);
     }
+
+    public void setReady(final PlayerId playerId, final LobbyId lobbyId, final boolean ready) {
+        Lobby lobby = lobbyRepository.findById(lobbyId)
+                .orElseThrow(lobbyId::notFound);
+
+        lobby.setReady(playerId, ready);
+        lobbyRepository.save(lobby);
+    }
 }
