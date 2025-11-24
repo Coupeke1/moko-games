@@ -126,8 +126,8 @@ public class LobbyController {
 
     @PostMapping("/{lobbyId}/start")
     public ResponseEntity<LobbyResponseModel> start(
-            @PathVariable UUID lobbyId,
-            @AuthenticationPrincipal Jwt token
+            @PathVariable final UUID lobbyId,
+            @AuthenticationPrincipal final Jwt token
     ) {
         PlayerId owner = PlayerId.get(token);
         Lobby lobby = lobbyService.startLobby(LobbyId.from(lobbyId), owner, token);
@@ -136,9 +136,9 @@ public class LobbyController {
 
     @PatchMapping("/{lobbyId}/players/ready")
     public void setReady(
-            @PathVariable UUID lobbyId,
-            @RequestBody ReadyRequestModel request,
-            @AuthenticationPrincipal Jwt token
+            @PathVariable final UUID lobbyId,
+            @RequestBody final ReadyRequestModel request,
+            @AuthenticationPrincipal final Jwt token
     ) {
         PlayerId acting = PlayerId.get(token);
         lobbyPlayerService.setReady(
@@ -150,8 +150,10 @@ public class LobbyController {
 
     private LobbyResponseModel toResponseModel(final Lobby lobby) {
         GameSettingsModel model = switch (lobby.settings().gameSettings()) {
-            case TicTacToeSettings t -> new TicTacToeSettingsModel(t.boardSize());
-            case CheckersSettings c -> new CheckersSettingsModel(c.boardSize(), c.flyingKings());
+            case TicTacToeSettings t ->
+                    new TicTacToeSettingsModel(t.boardSize());
+            case CheckersSettings c ->
+                    new CheckersSettingsModel(c.boardSize(), c.flyingKings());
         };
 
         Set<UUID> players = lobby.players().stream().map(player -> player.id().value()).collect(Collectors.toSet());

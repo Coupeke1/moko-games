@@ -7,10 +7,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
 
 @Configuration
-class FriendServiceConfig {
+class ExternalFriendsRepositoryConfig {
     @Bean
     @Qualifier("socialService")
-    RestClient socialServiceClient(@Value("${social-service.url}") String baseUrl) {
+    RestClient socialServiceClient(@Value("${social-service.url}") final String baseUrl) {
         return RestClient.builder().baseUrl(baseUrl).build();
     }
 }

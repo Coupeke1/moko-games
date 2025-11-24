@@ -1,7 +1,7 @@
 package be.kdg.team22.sessionservice.application.friends;
 
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
-import be.kdg.team22.sessionservice.infrastructure.friends.HttpFriendsClient;
+import be.kdg.team22.sessionservice.infrastructure.friends.ExternalFriendsRepository;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
@@ -10,9 +10,9 @@ import java.util.UUID;
 
 @Service
 public class FriendsService {
-    private final HttpFriendsClient repository;
+    private final ExternalFriendsRepository repository;
 
-    public FriendsService(final HttpFriendsClient repository) {
+    public FriendsService(final ExternalFriendsRepository repository) {
         this.repository = repository;
     }
 

@@ -11,31 +11,25 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
 @Component
-public class HttpGameClient implements GameClient {
-
+public class ExternalGamesRepository implements GameClient {
     private final RestClient client;
 
-    public HttpGameClient(@Qualifier("gameService") RestClient client) {
+    public ExternalGamesRepository(@Qualifier("gameService") final RestClient client) {
         this.client = client;
     }
 
     @Override
     public StartGameResponse startGame(StartGameRequest request, Jwt token) {
         try {
-            return client.post()
-                    .uri("/api/games")
-                    .header("Authorization", "Bearer " + token.getTokenValue())
-                    .body(request)
-                    .retrieve()
-                    .body(StartGameResponse.class);
-
-        } catch (HttpClientErrorException exception) {
+            return client.post().uri("/api/games").header("Authorization", "Bearer " + token.getTokenValue()).body(request).retrieve().body(StartGameResponse.class);
+        } catch (
+                HttpClientErrorException exception) {
 
             if (exception.getStatusCode() == HttpStatus.NOT_FOUND) {
                 throw new GameNotFoundException(request.gameId());
             }
-            throw exception;
 
+            throw exception;
         } catch (RestClientException exception) {
             throw new NotReachableException();
         }

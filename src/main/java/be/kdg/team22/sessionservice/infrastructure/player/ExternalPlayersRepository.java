@@ -14,10 +14,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
-public class HttpPlayersClient {
+public class ExternalPlayersRepository {
     private final RestClient client;
 
-    public HttpPlayersClient(@Qualifier("userService") RestClient client) {
+    public ExternalPlayersRepository(@Qualifier("userService") final RestClient client) {
         this.client = client;
     }
 
@@ -30,8 +30,7 @@ public class HttpPlayersClient {
                 throw exception;
 
             throw new PlayerNotFoundException(PlayerId.from(id));
-        } catch (
-                RestClientException exception) {
+        } catch (RestClientException exception) {
             throw new NotReachableException();
         }
     }

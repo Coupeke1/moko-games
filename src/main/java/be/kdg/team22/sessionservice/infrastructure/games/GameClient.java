@@ -9,15 +9,12 @@ import java.util.UUID;
 public interface GameClient {
     StartGameResponse startGame(StartGameRequest request, Jwt token);
 
-    record StartGameRequest(
-            UUID lobbyId,
-            UUID gameId,
-            List<UUID> players,
-            GameSettings settings
-    ) {
-    }
+    record StartGameRequest(UUID lobbyId,
+                            UUID gameId,
+                            List<UUID> players,
+                            GameSettings settings) {}
 
 
-    record StartGameResponse(UUID gameInstanceId) {
-    }
+    record StartGameResponse(
+            UUID gameInstanceId) {}
 }

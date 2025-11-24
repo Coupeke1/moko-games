@@ -3,7 +3,7 @@ package be.kdg.team22.sessionservice.application.player;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerNotFoundException;
-import be.kdg.team22.sessionservice.infrastructure.player.HttpPlayersClient;
+import be.kdg.team22.sessionservice.infrastructure.player.ExternalPlayersRepository;
 import be.kdg.team22.sessionservice.infrastructure.player.PlayerResponse;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.*;
 
 class PlayerServiceTest {
 
-    HttpPlayersClient repo = mock(HttpPlayersClient.class);
+    ExternalPlayersRepository repo = mock(ExternalPlayersRepository.class);
 
     PlayerService service = new PlayerService(repo);
 

@@ -1,7 +1,7 @@
 package be.kdg.team22.sessionservice.application.friends;
 
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
-import be.kdg.team22.sessionservice.infrastructure.friends.HttpFriendsClient;
+import be.kdg.team22.sessionservice.infrastructure.friends.ExternalFriendsRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.oauth2.jwt.Jwt;
 
@@ -15,7 +15,7 @@ import static org.mockito.Mockito.*;
 
 class FriendsServiceTest {
 
-    HttpFriendsClient client = mock(HttpFriendsClient.class);
+    ExternalFriendsRepository client = mock(ExternalFriendsRepository.class);
     FriendsService service = new FriendsService(client);
 
     private Jwt jwtWithToken(String token) {

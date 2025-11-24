@@ -39,37 +39,4 @@ class PlayerTest {
         assertThatThrownBy(() -> new Player(PlayerId.create(), new PlayerName(" ")))
                 .isInstanceOf(IllegalArgumentException.class);
     }
-
-    @Test
-    void withReady_setsReadyTrue() {
-        Player p = new Player(PlayerId.create(), new PlayerName("mathias"));
-
-        Player readyPlayer = p.withReady(true);
-
-        assertThat(readyPlayer.ready()).isTrue();
-        assertThat(p.ready()).isFalse();
-    }
-
-    @Test
-    void withReady_setsReadyFalse() {
-        Player p = new Player(PlayerId.create(), new PlayerName("mathias"));
-
-        Player readyPlayer = p.withReady(true);
-        Player unreadyPlayer = readyPlayer.withReady(false);
-
-        assertThat(unreadyPlayer.ready()).isFalse();
-        assertThat(readyPlayer.ready()).isTrue();
-    }
-
-    @Test
-    void withReady_preservesIdentityAndUsername() {
-        PlayerId id = PlayerId.create();
-        PlayerName username = new PlayerName("alice");
-        Player p = new Player(id, username);
-
-        Player updated = p.withReady(true);
-
-        assertThat(updated.id()).isEqualTo(id);
-        assertThat(updated.username()).isEqualTo(username);
-    }
 }
