@@ -14,10 +14,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
-public class ExternalPlayerRepository {
+public class HttpPlayersClient {
     private final RestClient client;
 
-    public ExternalPlayerRepository(@Qualifier("userService") RestClient client) {
+    public HttpPlayersClient(@Qualifier("userService") RestClient client) {
         this.client = client;
     }
 

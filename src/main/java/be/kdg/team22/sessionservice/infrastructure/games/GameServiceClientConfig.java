@@ -1,4 +1,4 @@
-package be.kdg.team22.sessionservice.infrastructure.friends;
+package be.kdg.team22.sessionservice.infrastructure.games;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -7,10 +7,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
 
 @Configuration
-class ExternalFriendsRepositoryConfig {
+class GameServiceClientConfig {
     @Bean
-    @Qualifier("socialService")
-    RestClient socialServiceClient(@Value("${social-service.url}") String baseUrl) {
-        return RestClient.builder().baseUrl(baseUrl).build();
+    @Qualifier("gameService")
+    RestClient gameServiceClient(@Value("${game-service.url}") String baseUrl) {
+        return RestClient.builder()
+                .baseUrl(baseUrl)
+                .build();
     }
 }

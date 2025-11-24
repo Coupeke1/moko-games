@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
-public class ExternalFriendsRepository {
+public class HttpFriendsClient {
     private final RestClient client;
 
-    public ExternalFriendsRepository(@Qualifier("socialService") RestClient client) {
+    public HttpFriendsClient(@Qualifier("socialService") RestClient client) {
         this.client = client;
     }
 
