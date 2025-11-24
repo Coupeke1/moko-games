@@ -169,4 +169,8 @@ public class LobbyEntity {
     public LobbyStatus status() {
         return status;
     }
+
+    public UUID startedGameId() {
+        return startedGameId;
+    }
 }

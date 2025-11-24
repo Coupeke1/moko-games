@@ -184,6 +184,9 @@ class LobbyPlayerServiceTest {
 
         Lobby lobby = spy(newLobby(lobbyId, owner));
 
+        lobby.invitePlayer(owner, target);
+        lobby.acceptInvite(new Player(target, new PlayerName("target")));
+
         when(repo.findById(lobbyId)).thenReturn(Optional.of(lobby));
 
         service.removePlayer(owner, lobbyId, target);
