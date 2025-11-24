@@ -19,8 +19,8 @@ public class Game {
     private PlayerRole currentRole;
     private PlayerId winner;
 
-    private Game(final int requestedSize, final List<Player> players) {
-        id = GameId.create();
+    private Game(final GameId id, final int requestedSize, final List<Player> players) {
+        this.id = id;
         board = Board.create(requestedSize);
         status = GameStatus.IN_PROGRESS;
         this.players = new TreeSet<>(Comparator.comparing((Player player) ->
@@ -31,25 +31,27 @@ public class Game {
         winner = null;
     }
 
-    public static Game create(final int minSize, final int maxSize, final int size, final List<Player> players) {
+    public static Game create(final GameId id, final int minSize, final int maxSize, final int size, final List<PlayerId> playerIds) {
         if (size < minSize || size > maxSize)
             throw new BoardSizeException(minSize, maxSize);
 
-        if (players.size() < 2)
-            throw new GameSizeException();
-
-        List<PlayerId> playerIds = players.stream().map(Player::id).toList();
         Set<PlayerId> uniquePlayerIds = new HashSet<>(playerIds);
-        if (uniquePlayerIds.size() != players.size())
+        if (uniquePlayerIds.size() != playerIds.size())
             throw new UniquePlayersException();
 
+        PlayerRole[] roles = PlayerRole.values();
+        if (playerIds.size() < 2 || playerIds.size() > roles.length) {
+            throw new GameSizeException(roles.length);
+        }
 
-        List<PlayerRole> playerRoles = players.stream().map(Player::role).toList();
-        Set<PlayerRole> uniquePlayerRoles = new HashSet<>(playerRoles);
-        if (uniquePlayerRoles.size() != players.size())
-            throw new PlayerRolesException();
+        List<Player> players = new ArrayList<>();
+        for (int i = 0; i < playerIds.size(); i++) {
+            PlayerId playerId = playerIds.get(i);
+            PlayerRole role = roles[i % roles.length];
+            players.add(new Player(playerId, role));
+        }
 
-        return new Game(size, players);
+        return new Game(id, size, players);
     }
 
     public void reset() {
