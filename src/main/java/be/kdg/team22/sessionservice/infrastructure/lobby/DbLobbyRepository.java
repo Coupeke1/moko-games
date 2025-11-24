@@ -1,19 +1,20 @@
-package be.kdg.team22.sessionservice.infrastructure.lobby.db;
+package be.kdg.team22.sessionservice.infrastructure.lobby;
 
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyRepository;
-import be.kdg.team22.sessionservice.infrastructure.lobby.db.entities.LobbyEntity;
+import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.LobbyJpaRepository;
+import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.LobbyEntity;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class LobbyRepositoryImpl implements LobbyRepository {
+public class DbLobbyRepository implements LobbyRepository {
     private final LobbyJpaRepository repository;
 
-    public LobbyRepositoryImpl(final LobbyJpaRepository repository) {
+    public DbLobbyRepository(final LobbyJpaRepository repository) {
         this.repository = repository;
     }
 

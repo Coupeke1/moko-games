@@ -1,7 +1,10 @@
 package be.kdg.team22.sessionservice.api.lobby;
 
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.*;
-import be.kdg.team22.sessionservice.infrastructure.lobby.db.exceptions.SettingsConversionException;
+import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerAlreadyInLobbyException;
+import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerNotFoundException;
+import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerNotInLobbyException;
+import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.exceptions.SettingsConversionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -9,8 +12,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class ExceptionController {
-    @ExceptionHandler(LobbyNotFoundException.class)
-    public ResponseEntity<String> handleLobbyNotFound(final LobbyNotFoundException exception) {
+    @ExceptionHandler({ClaimNotFoundException.class, LobbyNotFoundException.class, PlayerNotFoundException.class, OwnerNotFoundException.class, InviteNotFoundException.class})
+    public ResponseEntity<String> handleNotFound(final RuntimeException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
@@ -34,38 +37,23 @@ public class ExceptionController {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({
-            CannotJoinClosedLobbyException.class,
-            PlayerAlreadyInLobbyException.class,
-            OwnerCannotLeaveLobbyException.class,
-            PlayerNotInLobbyException.class,
-            LobbyAlreadyStartedException.class,
-            NotLobbyOwnerException.class,
-            LobbyManagementNotAllowedException.class,
-            MaxPlayersTooSmallException.class
-    })
+    @ExceptionHandler({CannotJoinClosedLobbyException.class, PlayerAlreadyInLobbyException.class, OwnerCannotLeaveLobbyException.class, PlayerNotInLobbyException.class, LobbyAlreadyStartedException.class, NotLobbyOwnerException.class, LobbyManagementNotAllowedException.class, MaxPlayersTooSmallException.class})
     public ResponseEntity<String> handleDomainErrors(final RuntimeException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(SettingsConversionException.class)
     public ResponseEntity<String> handleSettingsConversion(final SettingsConversionException exception) {
-        return new ResponseEntity<>(
-                "Settings conversion error: " + exception.getMessage(),
-                HttpStatus.INTERNAL_SERVER_ERROR
-        );
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleUnknown(final Exception exception) {
-        return new ResponseEntity<>(
-                "Internal server error: " + exception.getMessage(),
-                HttpStatus.INTERNAL_SERVER_ERROR
-        );
+        return new ResponseEntity<>("Settings conversion error: " + exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(LobbySettingsInvalidException.class)
     public ResponseEntity<String> handleLobbySettingsInvalid(final LobbySettingsInvalidException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleUnknown(final Exception exception) {
+        return new ResponseEntity<>("Internal server error: " + exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

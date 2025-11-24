@@ -1,6 +1,7 @@
-package be.kdg.team22.sessionservice.domain.lobby;
+package be.kdg.team22.sessionservice.domain.player;
 
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.ClaimNotFoundException;
+import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerNotFoundException;
 import org.jmolecules.ddd.annotation.ValueObject;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -14,8 +15,12 @@ public record PlayerId(UUID value) {
             throw new IllegalArgumentException("PlayerId cannot be null");
     }
 
-    public static PlayerId from(UUID uuid) {
-        return new PlayerId(uuid);
+    public static PlayerId from(UUID value) {
+        return new PlayerId(value);
+    }
+
+    public static PlayerId create() {
+        return new PlayerId(UUID.randomUUID());
     }
 
     public static PlayerId create(String value) {
@@ -28,5 +33,9 @@ public record PlayerId(UUID value) {
             throw new ClaimNotFoundException("sub");
 
         return create(sub);
+    }
+
+    public PlayerNotFoundException notFound() {
+        throw new PlayerNotFoundException(this);
     }
 }

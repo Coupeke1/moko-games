@@ -1,5 +1,6 @@
 package be.kdg.team22.sessionservice.domain.lobby;
 
+import be.kdg.team22.sessionservice.domain.lobby.exceptions.LobbyNotFoundException;
 import org.jmolecules.ddd.annotation.ValueObject;
 
 import java.util.UUID;
@@ -11,8 +12,8 @@ public record LobbyId(UUID value) {
             throw new IllegalArgumentException("LobbyId cannot be null");
     }
 
-    public static LobbyId from(UUID uuid) {
-        return new LobbyId(uuid);
+    public static LobbyId from(UUID value) {
+        return new LobbyId(value);
     }
 
     public static LobbyId create() {
@@ -21,5 +22,9 @@ public record LobbyId(UUID value) {
 
     public static LobbyId create(String value) {
         return new LobbyId(UUID.fromString(value));
+    }
+
+    public LobbyNotFoundException notFound() {
+        throw new LobbyNotFoundException(this);
     }
 }
