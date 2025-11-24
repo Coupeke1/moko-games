@@ -19,9 +19,10 @@ public class ProfileService {
         ProfileId id = ProfileId.get(token);
         ProfileName username = getUsername(token);
         ProfileEmail email = getEmail(token);
+        String description = "Hey there! I am using Moko.";
 
         return repository.findById(id).orElseGet(() -> {
-            Profile profile = new Profile(id, username, email);
+            Profile profile = new Profile(id, username, email, description);
             repository.save(profile);
             return profile;
         });

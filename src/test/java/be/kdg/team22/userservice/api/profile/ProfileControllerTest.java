@@ -52,10 +52,11 @@ class ProfileControllerTest {
         String id = "22222222-2222-2222-2222-222222222222";
         String username = "user";
         String email = "user@email.com";
+        String description = "Test";
         StatisticsEmbed statistics = new StatisticsEmbed(5, 50);
         ModulesEmbed modules = new ModulesEmbed(true, false);
 
-        repository.save(new ProfileEntity(UUID.fromString(id), username, email, statistics, modules, Instant.now()));
+        repository.save(new ProfileEntity(UUID.fromString(id), username, email, description, statistics, modules, Instant.now()));
         mock.perform(get("/api/profiles/me").with(tokenWithUser(id, "piet", "piet@kdg.be"))).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(id));
     }
 

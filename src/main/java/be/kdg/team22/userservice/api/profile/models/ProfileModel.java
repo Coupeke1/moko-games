@@ -8,10 +8,11 @@ import java.util.UUID;
 public record ProfileModel(UUID id,
                            String username,
                            String email,
+                           String description,
                            StatisticsModel statistics,
                            ModulesModel modules,
                            Instant createdAt) {
     public static ProfileModel from(Profile profile) {
-        return new ProfileModel(profile.id().value(), profile.username().value(), profile.email().value(), StatisticsModel.from(profile.statistics()), ModulesModel.from(profile.modules()), profile.createdAt());
+        return new ProfileModel(profile.id().value(), profile.username().value(), profile.email().value(), profile.description(), StatisticsModel.from(profile.statistics()), ModulesModel.from(profile.modules()), profile.createdAt());
     }
 }

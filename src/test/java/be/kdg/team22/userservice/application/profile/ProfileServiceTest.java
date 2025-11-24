@@ -43,7 +43,8 @@ class ProfileServiceTest {
         ProfileId id = new ProfileId(UUID.fromString(sub));
         ProfileName username = new ProfileName("existing-user");
         ProfileEmail email = new ProfileEmail("user@existing.com");
-        Profile existing = new Profile(id, username, email);
+        String description = "Test";
+        Profile existing = new Profile(id, username, email, description);
 
         when(repository.findById(id)).thenReturn(Optional.of(existing));
         Profile result = service.getOrCreate(token(sub, "anderenaam", "andere@mail"));
