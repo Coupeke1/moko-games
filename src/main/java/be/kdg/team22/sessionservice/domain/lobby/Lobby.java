@@ -26,7 +26,7 @@ public class Lobby {
     private LobbyStatus status;
     private LobbySettings settings;
 
-    public Lobby(LobbyId id, GameId game, PlayerId owner, List<Player> players, Set<PlayerId> invitedPlayers, LobbySettings settings, LobbyStatus status, Instant createdAt, Instant updatedAt) {
+    public Lobby(final LobbyId id, final GameId game, final PlayerId owner, final List<Player> players, final Set<PlayerId> invitedPlayers, final LobbySettings settings, final LobbyStatus status, final Instant createdAt, final Instant updatedAt) {
         this.id = id;
         this.game = game;
         this.owner = owner;
@@ -45,7 +45,7 @@ public class Lobby {
             throw new MaxPlayersTooSmallException(players.size(), settings.maxPlayers());
     }
 
-    public Lobby(GameId game, Player owner, LobbySettings settings) {
+    public Lobby(final GameId game, final Player owner, final LobbySettings settings) {
         this.id = LobbyId.create();
         this.game = game;
         this.owner = owner.id();
@@ -60,7 +60,7 @@ public class Lobby {
         this.invitedPlayerIds = new HashSet<>();
     }
 
-    public void acceptInvite(Player player) {
+    public void acceptInvite(final Player player) {
         ensureModifiable();
 
         if (!invitedPlayerIds.contains(player.id()))
@@ -77,7 +77,7 @@ public class Lobby {
         updatedAt = Instant.now();
     }
 
-    public void invitePlayer(PlayerId ownerId, PlayerId targetId) {
+    public void invitePlayer(final PlayerId ownerId, final PlayerId targetId) {
         ensureOwner(ownerId);
         ensureModifiable();
 
@@ -88,7 +88,7 @@ public class Lobby {
         updatedAt = Instant.now();
     }
 
-    public void invitePlayers(PlayerId ownerId, Collection<PlayerId> targetIds) {
+    public void invitePlayers(final PlayerId ownerId, final Collection<PlayerId> targetIds) {
         ensureOwner(ownerId);
         ensureModifiable();
 
@@ -101,7 +101,7 @@ public class Lobby {
         updatedAt = Instant.now();
     }
 
-    public void removePlayer(PlayerId ownerId, PlayerId targetId) {
+    public void removePlayer(final PlayerId ownerId, final PlayerId targetId) {
         ensureOwner(ownerId);
         ensureModifiable();
 
@@ -115,7 +115,7 @@ public class Lobby {
         updatedAt = Instant.now();
     }
 
-    public void removePlayers(PlayerId ownerId, Collection<PlayerId> targetId) {
+    public void removePlayers(final PlayerId ownerId, final Collection<PlayerId> targetId) {
         ensureOwner(ownerId);
         ensureModifiable();
 
@@ -126,7 +126,7 @@ public class Lobby {
         updatedAt = Instant.now();
     }
 
-    public void close(PlayerId ownerId) {
+    public void close(final PlayerId ownerId) {
         ensureOwner(ownerId);
         ensureModifiable();
 
@@ -134,7 +134,7 @@ public class Lobby {
         updatedAt = Instant.now();
     }
 
-    public void changeSettings(PlayerId ownerId, LobbySettings settings) {
+    public void changeSettings(final PlayerId ownerId, final LobbySettings settings) {
         ensureOwner(ownerId);
         ensureModifiable();
 
@@ -145,7 +145,7 @@ public class Lobby {
         updatedAt = Instant.now();
     }
 
-    private void ensureOwner(PlayerId ownerId) {
+    private void ensureOwner(final PlayerId ownerId) {
         if (!owner.equals(ownerId))
             throw new NotLobbyOwnerException(ownerId);
     }
@@ -155,7 +155,7 @@ public class Lobby {
             throw new LobbyStateInvalidException(id, status.name());
     }
 
-    public boolean isInvited(PlayerId id) {
+    public boolean isInvited(final PlayerId id) {
         return invitedPlayerIds.contains(id);
     }
 
