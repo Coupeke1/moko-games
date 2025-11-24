@@ -61,4 +61,14 @@ public class ExceptionController {
     public ResponseEntity<String> handlePlayersNotReady(PlayersNotReadyException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(GameNotFoundException.class)
+    public ResponseEntity<String> handleGameNotFound(final GameNotFoundException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(NotReachableException.class)
+    public ResponseEntity<String> handleGameServiceUnreachable(final NotReachableException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
+    }
 }

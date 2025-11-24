@@ -7,18 +7,23 @@ import java.util.UUID;
 
 @Embeddable
 public class PlayerEmbed {
+
     @Column(name = "player_id", nullable = false)
     private UUID id;
 
     @Column(name = "username", nullable = false)
     private String username;
 
+    @Column(name = "ready", nullable = false)
+    private boolean ready;
+
     protected PlayerEmbed() {
     }
 
-    public PlayerEmbed(final UUID id, final String username) {
+    public PlayerEmbed(UUID id, String username, boolean ready) {
         this.id = id;
         this.username = username;
+        this.ready = ready;
     }
 
     public UUID id() {
@@ -27,5 +32,9 @@ public class PlayerEmbed {
 
     public String username() {
         return username;
+    }
+
+    public boolean ready() {
+        return ready;
     }
 }

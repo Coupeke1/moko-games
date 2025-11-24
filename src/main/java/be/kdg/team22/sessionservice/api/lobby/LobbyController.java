@@ -9,7 +9,6 @@ import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.InviteNotFoundException;
-import be.kdg.team22.sessionservice.domain.lobby.exceptions.LobbyManagementNotAllowedException;
 import be.kdg.team22.sessionservice.domain.lobby.settings.CheckersSettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
@@ -135,17 +134,13 @@ public class LobbyController {
         return ResponseEntity.ok(toResponseModel(lobby));
     }
 
-    @PatchMapping("/{lobbyId}/players/{playerId}/ready")
+    @PatchMapping("/{lobbyId}/players/ready")
     public void setReady(
             @PathVariable UUID lobbyId,
-            @PathVariable UUID playerId,
             @RequestBody ReadyRequestModel request,
             @AuthenticationPrincipal Jwt token
     ) {
         PlayerId acting = PlayerId.get(token);
-        if (!acting.value().equals(playerId))
-            throw new LobbyManagementNotAllowedException("Cannot change ready state of others");
-
         lobbyPlayerService.setReady(
                 acting,
                 LobbyId.from(lobbyId),

@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "lobbies")
 public class LobbyEntity {
+
     @Id
     private UUID id;
 
@@ -30,12 +31,18 @@ public class LobbyEntity {
     private UUID ownerId;
 
     @ElementCollection
-    @CollectionTable(name = "lobby_players", schema = "session_service", joinColumns = @JoinColumn(name = "lobby_id"))
-    @AttributeOverrides({@AttributeOverride(name = "id", column = @Column(name = "player_id", nullable = false)), @AttributeOverride(name = "username", column = @Column(name = "username", nullable = false))})
+    @CollectionTable(name = "lobby_players", schema = "session_service",
+            joinColumns = @JoinColumn(name = "lobby_id"))
+    @AttributeOverrides({
+            @AttributeOverride(name = "id", column = @Column(name = "player_id", nullable = false)),
+            @AttributeOverride(name = "username", column = @Column(name = "username", nullable = false)),
+            @AttributeOverride(name = "ready", column = @Column(name = "ready", nullable = false))
+    })
     private Set<PlayerEmbed> players;
 
     @ElementCollection
-    @CollectionTable(name = "lobby_invited_players", schema = "session_service", joinColumns = @JoinColumn(name = "lobby_id"))
+    @CollectionTable(name = "lobby_invited_players", schema = "session_service",
+            joinColumns = @JoinColumn(name = "lobby_id"))
     @Column(name = "invited_player_id", nullable = false)
     private Set<UUID> invitedPlayerIds;
 
@@ -53,10 +60,24 @@ public class LobbyEntity {
     @Column(nullable = false)
     private Instant updatedAt;
 
+    @Column(name = "started_game_id")
+    private UUID startedGameId;
+
     protected LobbyEntity() {
     }
 
-    public LobbyEntity(UUID id, UUID gameId, UUID ownerId, Set<PlayerEmbed> players, Set<UUID> invitedPlayerIds, LobbySettings settings, LobbyStatus status, Instant createdAt, Instant updatedAt) {
+    public LobbyEntity(
+            UUID id,
+            UUID gameId,
+            UUID ownerId,
+            Set<PlayerEmbed> players,
+            Set<UUID> invitedPlayerIds,
+            LobbySettings settings,
+            LobbyStatus status,
+            Instant createdAt,
+            Instant updatedAt,
+            UUID startedGameId
+    ) {
         this.id = id;
         this.gameId = gameId;
         this.ownerId = ownerId;
@@ -66,21 +87,63 @@ public class LobbyEntity {
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.startedGameId = startedGameId;
     }
 
     public static LobbyEntity fromDomain(final Lobby lobby) {
-        Set<PlayerEmbed> players = lobby.players().stream().map(player -> new PlayerEmbed(player.id().value(), player.username().value())).collect(Collectors.toSet());
-        Set<UUID> invitedPlayers = lobby.invitedPlayers().stream().map(PlayerId::value).collect(Collectors.toSet());
+        Set<PlayerEmbed> players = lobby.players()
+                .stream()
+                .map(player -> new PlayerEmbed(
+                        player.id().value(),
+                        player.username().value(),
+                        player.ready()
+                ))
+                .collect(Collectors.toSet());
 
-        return new LobbyEntity(lobby.id().value(), lobby.gameId().value(), lobby.ownerId().value(), players, invitedPlayers, lobby.settings(), lobby.status(), lobby.createdAt(), lobby.updatedAt());
+        Set<UUID> invited = lobby.invitedPlayers()
+                .stream()
+                .map(PlayerId::value)
+                .collect(Collectors.toSet());
+
+        return new LobbyEntity(
+                lobby.id().value(),
+                lobby.gameId().value(),
+                lobby.ownerId().value(),
+                players,
+                invited,
+                lobby.settings(),
+                lobby.status(),
+                lobby.createdAt(),
+                lobby.updatedAt(),
+                lobby.startedGameId().map(GameId::value).orElse(null)
+        );
     }
 
-
     public Lobby toDomain() {
-        List<Player> players = this.players.stream().map(player -> new Player(PlayerId.from(player.id()), PlayerName.from(player.username()))).collect(Collectors.toList());
-        Set<PlayerId> invitedPlayers = invitedPlayerIds.stream().map(PlayerId::from).collect(Collectors.toSet());
+        List<Player> players = this.players.stream()
+                .map(p -> new Player(
+                        PlayerId.from(p.id()),
+                        PlayerName.from(p.username()),
+                        p.ready()
+                ))
+                .collect(Collectors.toList());
 
-        return new Lobby(LobbyId.from(id), GameId.from(gameId), PlayerId.from(ownerId), players, invitedPlayers, settings, status, createdAt, updatedAt);
+        Set<PlayerId> invitedPlayers = this.invitedPlayerIds.stream()
+                .map(PlayerId::from)
+                .collect(Collectors.toSet());
+
+        return new Lobby(
+                LobbyId.from(id),
+                GameId.from(gameId),
+                PlayerId.from(ownerId),
+                players,
+                invitedPlayers,
+                settings,
+                status,
+                createdAt,
+                updatedAt,
+                startedGameId == null ? null : GameId.from(startedGameId)
+        );
     }
 
     public UUID id() {
