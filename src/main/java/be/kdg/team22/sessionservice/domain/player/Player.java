@@ -19,6 +19,10 @@ public class Player {
         ready = true;
     }
 
+    public void setUnready() {
+        ready = false;
+    }
+
     public PlayerId id() {
         return id;
     }

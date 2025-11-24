@@ -125,27 +125,22 @@ public class LobbyController {
     }
 
     @PostMapping("/{lobbyId}/start")
-    public ResponseEntity<LobbyResponseModel> start(
-            @PathVariable final UUID lobbyId,
-            @AuthenticationPrincipal final Jwt token
-    ) {
+    public ResponseEntity<LobbyResponseModel> start(@PathVariable final UUID lobbyId, @AuthenticationPrincipal final Jwt token) {
         PlayerId owner = PlayerId.get(token);
         Lobby lobby = lobbyService.startLobby(LobbyId.from(lobbyId), owner, token);
         return ResponseEntity.ok(toResponseModel(lobby));
     }
 
     @PatchMapping("/{lobbyId}/players/ready")
-    public void setReady(
-            @PathVariable final UUID lobbyId,
-            @RequestBody final ReadyRequestModel request,
-            @AuthenticationPrincipal final Jwt token
-    ) {
-        PlayerId acting = PlayerId.get(token);
-        lobbyPlayerService.setReady(
-                acting,
-                LobbyId.from(lobbyId),
-                request.ready()
-        );
+    public void setReady(@PathVariable final UUID lobbyId, @AuthenticationPrincipal final Jwt token) {
+        PlayerId player = PlayerId.get(token);
+        lobbyPlayerService.setReady(player, LobbyId.from(lobbyId));
+    }
+
+    @PatchMapping("/{lobbyId}/players/unready")
+    public void setUnready(@PathVariable final UUID lobbyId, @AuthenticationPrincipal final Jwt token) {
+        PlayerId player = PlayerId.get(token);
+        lobbyPlayerService.setUnready(player, LobbyId.from(lobbyId));
     }
 
     private LobbyResponseModel toResponseModel(final Lobby lobby) {
@@ -157,17 +152,7 @@ public class LobbyController {
         };
 
         Set<UUID> players = lobby.players().stream().map(player -> player.id().value()).collect(Collectors.toSet());
-        return new LobbyResponseModel(
-                lobby.id().value(),
-                lobby.gameId().value(),
-                lobby.ownerId().value(),
-                players,
-                lobby.settings().maxPlayers(),
-                lobby.status(),
-                lobby.createdAt(),
-                model,
-                lobby.startedGameId().map(GameId::value).orElse(null)
-        );
+        return new LobbyResponseModel(lobby.id().value(), lobby.gameId().value(), lobby.ownerId().value(), players, lobby.settings().maxPlayers(), lobby.status(), lobby.createdAt(), model, lobby.startedGameId().map(GameId::value).orElse(null));
     }
 
     private LobbyInviteModel toInviteModel(final Lobby lobby, final Jwt token) {

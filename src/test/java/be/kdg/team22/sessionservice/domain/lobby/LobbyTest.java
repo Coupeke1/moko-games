@@ -211,15 +211,9 @@ class LobbyTest {
         lobby.invitePlayer(owner, p2);
         lobby.acceptInvite(p2Player);
 
-        lobby.setReady(p2, true);
+        lobby.setReady(p2);
 
-        assertThat(
-                lobby.players().stream()
-                        .filter(p -> p.id().equals(p2))
-                        .findFirst()
-                        .orElseThrow()
-                        .ready()
-        ).isTrue();
+        assertThat(lobby.players().stream().filter(p -> p.id().equals(p2)).findFirst().orElseThrow().ready()).isTrue();
     }
 
     @Test
@@ -227,8 +221,7 @@ class LobbyTest {
         Lobby lobby = new Lobby(game(), lp(pid(), new PlayerName("owner")), settings(4));
         PlayerId notInLobby = pid();
 
-        assertThatThrownBy(() -> lobby.setReady(notInLobby, true))
-                .isInstanceOf(PlayerNotInLobbyException.class);
+        assertThatThrownBy(() -> lobby.setReady(notInLobby)).isInstanceOf(PlayerNotInLobbyException.class);
     }
 
     @Test
@@ -241,11 +234,10 @@ class LobbyTest {
         lobby.invitePlayer(owner, p2);
         lobby.acceptInvite(lp(p2, new PlayerName("p2")));
 
-        lobby.setReady(owner, true);
-        lobby.setReady(p2, false);
+        lobby.setReady(owner);
+        lobby.setUnready(p2);
 
-        assertThatThrownBy(lobby::ensureAllPlayersReady)
-                .isInstanceOf(PlayersNotReadyException.class);
+        assertThatThrownBy(lobby::ensureAllPlayersReady).isInstanceOf(PlayersNotReadyException.class);
     }
 
     @Test
@@ -254,8 +246,8 @@ class LobbyTest {
         Player ownerPlayer = lp(owner, new PlayerName("owner"));
         Lobby lobby = new Lobby(game(), ownerPlayer, settings(4));
 
-        lobby.setReady(owner, true);
-        lobby.ensureAllPlayersReady(); // should NOT throw
+        lobby.setReady(owner);
+        lobby.ensureAllPlayersReady();
     }
 
     @Test
@@ -277,8 +269,7 @@ class LobbyTest {
         Lobby lobby = new Lobby(game(), lp(owner, new PlayerName("owner")), settings(4));
         lobby.close(owner);
 
-        assertThatThrownBy(() -> lobby.markStarted(GameId.from(UUID.randomUUID())))
-                .isInstanceOf(LobbyStateInvalidException.class);
+        assertThatThrownBy(() -> lobby.markStarted(GameId.from(UUID.randomUUID()))).isInstanceOf(LobbyStateInvalidException.class);
     }
 
     @Test
@@ -288,8 +279,7 @@ class LobbyTest {
 
         lobby.markStarted(GameId.from(UUID.randomUUID()));
 
-        assertThatThrownBy(() -> lobby.markStarted(GameId.from(UUID.randomUUID())))
-                .isInstanceOf(LobbyStateInvalidException.class);
+        assertThatThrownBy(() -> lobby.markStarted(GameId.from(UUID.randomUUID()))).isInstanceOf(LobbyStateInvalidException.class);
     }
 
     @Test
@@ -312,16 +302,14 @@ class LobbyTest {
 
         Lobby lobby = new Lobby(game(), lp(owner, new PlayerName("owner")), settings(4));
 
-        assertThatThrownBy(() -> lobby.invitePlayers(notOwner, List.of(pid())))
-                .isInstanceOf(NotLobbyOwnerException.class);
+        assertThatThrownBy(() -> lobby.invitePlayers(notOwner, List.of(pid()))).isInstanceOf(NotLobbyOwnerException.class);
     }
 
     @Test
     void invitedPlayers_returnsImmutable() {
         Lobby lobby = new Lobby(game(), lp(pid(), new PlayerName("owner")), settings(4));
 
-        assertThatThrownBy(() -> lobby.invitedPlayers().add(pid()))
-                .isInstanceOf(UnsupportedOperationException.class);
+        assertThatThrownBy(() -> lobby.invitedPlayers().add(pid())).isInstanceOf(UnsupportedOperationException.class);
     }
 
     @Test
@@ -337,14 +325,12 @@ class LobbyTest {
 
         lobby.close(owner);
         Lobby finalLobby = lobby;
-        assertThatThrownBy(() -> finalLobby.invitePlayer(owner, pid()))
-                .isInstanceOf(LobbyStateInvalidException.class);
+        assertThatThrownBy(() -> finalLobby.invitePlayer(owner, pid())).isInstanceOf(LobbyStateInvalidException.class);
 
         lobby = new Lobby(game(), lp(owner, new PlayerName("owner")), settings(4));
         lobby.markStarted(GameId.from(UUID.randomUUID()));
 
         Lobby finalLobby1 = lobby;
-        assertThatThrownBy(() -> finalLobby1.invitePlayer(owner, pid()))
-                .isInstanceOf(LobbyStateInvalidException.class);
+        assertThatThrownBy(() -> finalLobby1.invitePlayer(owner, pid())).isInstanceOf(LobbyStateInvalidException.class);
     }
 }

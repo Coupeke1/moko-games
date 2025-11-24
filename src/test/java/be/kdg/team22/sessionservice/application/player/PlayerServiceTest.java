@@ -18,10 +18,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 class PlayerServiceTest {
-
-    ExternalPlayersRepository repo = mock(ExternalPlayersRepository.class);
-
-    PlayerService service = new PlayerService(repo);
+    private ExternalPlayersRepository repo = mock(ExternalPlayersRepository.class);
+    private PlayerService service = new PlayerService(repo);
 
     private Jwt jwtFor() {
         return Jwt.withTokenValue("TOKEN-123")

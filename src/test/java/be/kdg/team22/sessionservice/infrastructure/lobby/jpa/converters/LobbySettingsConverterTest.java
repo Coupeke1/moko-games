@@ -9,7 +9,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class LobbySettingsConverterTest {
-
     private final LobbySettingsConverter converter = new LobbySettingsConverter();
 
     @Test

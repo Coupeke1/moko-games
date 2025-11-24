@@ -28,10 +28,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class LobbyPlayerServiceTest {
-
-    LobbyRepository repo = mock(LobbyRepository.class);
-    FriendsService friendsService = mock(FriendsService.class);
-    PlayerService playerService = mock(PlayerService.class);
+    private LobbyRepository repo = mock(LobbyRepository.class);
+    private FriendsService friendsService = mock(FriendsService.class);
+    private PlayerService playerService = mock(PlayerService.class);
 
     LobbyPlayerService service = new LobbyPlayerService(repo, friendsService, playerService);
 
@@ -249,9 +248,9 @@ class LobbyPlayerServiceTest {
 
         when(repo.findById(lobbyId)).thenReturn(Optional.of(lobby));
 
-        service.setReady(p, lobbyId, true);
+        service.setReady(p, lobbyId);
 
-        verify(lobby).setReady(p, true);
+        verify(lobby).setReady(p);
         verify(repo).save(lobby);
     }
 
@@ -263,7 +262,7 @@ class LobbyPlayerServiceTest {
         when(repo.findById(lobbyId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() ->
-                service.setReady(p, lobbyId, true)
+                service.setReady(p, lobbyId)
         ).isInstanceOf(LobbyNotFoundException.class);
     }
 }

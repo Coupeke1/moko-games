@@ -151,10 +151,10 @@ public class Lobby {
         updatedAt = Instant.now();
     }
 
-    public void setReady(final PlayerId playerId, final boolean ready) {
+    public void setReady(final PlayerId id) {
         ensureModifiable();
 
-        Player existing = players.stream().filter(player -> player.id().equals(playerId)).findFirst().orElseThrow(() -> new PlayerNotInLobbyException(playerId, id));
+        Player existing = players.stream().filter(player -> player.id().equals(id)).findFirst().orElseThrow(() -> new PlayerNotInLobbyException(id, this.id));
 
         players.remove(existing);
         existing.setReady();
@@ -162,9 +162,19 @@ public class Lobby {
         updatedAt = Instant.now();
     }
 
+    public void setUnready(final PlayerId id) {
+        ensureModifiable();
+
+        Player existing = players.stream().filter(player -> player.id().equals(id)).findFirst().orElseThrow(() -> new PlayerNotInLobbyException(id, id()));
+
+        players.remove(existing);
+        existing.setUnready();
+        players.add(existing);
+        updatedAt = Instant.now();
+    }
+
     public void ensureAllPlayersReady() {
-        boolean allReady = players.stream().allMatch(Player::ready);
-        if (!allReady)
+        if (!players.stream().allMatch(Player::ready))
             throw new PlayersNotReadyException(id.value());
     }
 

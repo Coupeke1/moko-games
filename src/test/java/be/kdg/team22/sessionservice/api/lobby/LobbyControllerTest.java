@@ -84,39 +84,23 @@ class LobbyControllerTest {
 
         Lobby lobby = sampleLobby(lobbyId, UUID.fromString(ownerId));
 
-        when(lobbyService.createLobby(any(GameId.class), any(PlayerId.class), any(), any(Jwt.class)))
-                .thenReturn(lobby);
+        when(lobbyService.createLobby(any(GameId.class), any(PlayerId.class), any(), any(Jwt.class))).thenReturn(lobby);
 
-        mockMvc.perform(post("/api/lobbies")
-                        .with(jwtFor(ownerId, "user", "user@kdg.be"))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "gameId": "00000000-0000-0000-0000-000000000005",
-                                  "maxPlayers": 4,
-                                  "settings": {
-                                    "type": "ticTacToe",
-                                    "boardSize": 3
-                                  }
-                                }
-                                """))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.ownerId").value(ownerId))
-                .andExpect(jsonPath("$.gameId").value(GAME_ID.toString()))
-                .andExpect(jsonPath("$.maxPlayers").value(4))
-                .andExpect(jsonPath("$.settings.type").value("ticTacToe"))
-                .andExpect(jsonPath("$.settings.boardSize").value(3));
+        mockMvc.perform(post("/api/lobbies").with(jwtFor(ownerId, "user", "user@kdg.be")).with(csrf()).contentType(MediaType.APPLICATION_JSON).content("""
+                {
+                  "gameId": "00000000-0000-0000-0000-000000000005",
+                  "maxPlayers": 4,
+                  "settings": {
+                    "type": "ticTacToe",
+                    "boardSize": 3
+                  }
+                }
+                """)).andExpect(status().isCreated()).andExpect(jsonPath("$.ownerId").value(ownerId)).andExpect(jsonPath("$.gameId").value(GAME_ID.toString())).andExpect(jsonPath("$.maxPlayers").value(4)).andExpect(jsonPath("$.settings.type").value("ticTacToe")).andExpect(jsonPath("$.settings.boardSize").value(3));
 
         ArgumentCaptor<GameId> gameIdCaptor = ArgumentCaptor.forClass(GameId.class);
         ArgumentCaptor<PlayerId> ownerCaptor = ArgumentCaptor.forClass(PlayerId.class);
 
-        verify(lobbyService).createLobby(
-                gameIdCaptor.capture(),
-                ownerCaptor.capture(),
-                any(),
-                any(Jwt.class)
-        );
+        verify(lobbyService).createLobby(gameIdCaptor.capture(), ownerCaptor.capture(), any(), any(Jwt.class));
 
         assertThat(gameIdCaptor.getValue().value()).isEqualTo(GAME_ID);
         assertThat(ownerCaptor.getValue().value().toString()).isEqualTo(ownerId);
@@ -337,18 +321,11 @@ class LobbyControllerTest {
         UUID lobbyId = UUID.randomUUID();
         UUID actingUserId = UUID.fromString("77777777-0000-0000-0000-000000000000");
 
-        doNothing().when(lobbyPlayerService)
-                .setReady(eq(PlayerId.from(actingUserId)), eq(LobbyId.from(lobbyId)), eq(true));
+        doNothing().when(lobbyPlayerService).setReady(eq(PlayerId.from(actingUserId)), eq(LobbyId.from(lobbyId)));
 
-        mockMvc.perform(patch("/api/lobbies/{lobbyId}/players/ready", lobbyId)
-                        .with(jwtFor(actingUserId.toString(), "user", "user@kdg.be"))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"ready\": true}"))
-                .andExpect(status().isOk());
+        mockMvc.perform(patch("/api/lobbies/{lobbyId}/players/ready", lobbyId).with(jwtFor(actingUserId.toString(), "user", "user@kdg.be")).with(csrf()).contentType(MediaType.APPLICATION_JSON).content("{\"ready\": true}")).andExpect(status().isOk());
 
-        verify(lobbyPlayerService)
-                .setReady(eq(PlayerId.from(actingUserId)), eq(LobbyId.from(lobbyId)), eq(true));
+        verify(lobbyPlayerService).setReady(eq(PlayerId.from(actingUserId)), eq(LobbyId.from(lobbyId)));
     }
 
     @Test
@@ -358,12 +335,7 @@ class LobbyControllerTest {
         UUID tokenUser = UUID.fromString("99999999-0000-0000-0000-000000000000");
 
         // The controller does NOT allow specifying another player's ID, so mismatch = 400
-        mockMvc.perform(patch("/api/lobbies/{lobbyId}/players/ready", lobbyId)
-                        .with(jwtFor(tokenUser.toString(), "user", "user@kdg.be"))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"ready\": true}"))
-                .andExpect(status().isOk()); // still OK because ready endpoint always applies to acting user only
+        mockMvc.perform(patch("/api/lobbies/{lobbyId}/players/ready", lobbyId).with(jwtFor(tokenUser.toString(), "user", "user@kdg.be")).with(csrf()).contentType(MediaType.APPLICATION_JSON).content("{\"ready\": true}")).andExpect(status().isOk()); // still OK because ready endpoint always applies to acting user only
     }
 
     @Test
@@ -374,16 +346,11 @@ class LobbyControllerTest {
 
         Lobby lobby = sampleLobby(lobbyId, ownerId);
 
-        when(lobbyService.startLobby(eq(LobbyId.from(lobbyId)), eq(PlayerId.from(ownerId)), any(Jwt.class)))
-                .thenReturn(lobby);
+        when(lobbyService.startLobby(eq(LobbyId.from(lobbyId)), eq(PlayerId.from(ownerId)), any(Jwt.class))).thenReturn(lobby);
 
-        mockMvc.perform(post("/api/lobbies/{lobbyId}/start", lobbyId)
-                        .with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be"))
-                        .with(csrf()))
-                .andExpect(status().isOk());
+        mockMvc.perform(post("/api/lobbies/{lobbyId}/start", lobbyId).with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be")).with(csrf())).andExpect(status().isOk());
 
-        verify(lobbyService)
-                .startLobby(eq(LobbyId.from(lobbyId)), eq(PlayerId.from(ownerId)), any(Jwt.class));
+        verify(lobbyService).startLobby(eq(LobbyId.from(lobbyId)), eq(PlayerId.from(ownerId)), any(Jwt.class));
     }
 
     @Test
@@ -392,13 +359,9 @@ class LobbyControllerTest {
         UUID lobbyId = UUID.randomUUID();
         UUID ownerId = UUID.fromString("20202020-0000-0000-0000-000000000000");
 
-        when(lobbyService.startLobby(eq(LobbyId.from(lobbyId)), eq(PlayerId.from(ownerId)), any(Jwt.class)))
-                .thenThrow(new PlayersNotReadyException(lobbyId));
+        when(lobbyService.startLobby(eq(LobbyId.from(lobbyId)), eq(PlayerId.from(ownerId)), any(Jwt.class))).thenThrow(new PlayersNotReadyException(lobbyId));
 
-        mockMvc.perform(post("/api/lobbies/{lobbyId}/start", lobbyId)
-                        .with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be"))
-                        .with(csrf()))
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/api/lobbies/{lobbyId}/start", lobbyId).with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be")).with(csrf())).andExpect(status().isBadRequest());
     }
 
     @Test
@@ -407,13 +370,9 @@ class LobbyControllerTest {
         UUID lobbyId = UUID.randomUUID();
         UUID otherUserId = UUID.fromString("30303030-0000-0000-0000-000000000000");
 
-        when(lobbyService.startLobby(eq(LobbyId.from(lobbyId)), eq(PlayerId.from(otherUserId)), any(Jwt.class)))
-                .thenThrow(new NotLobbyOwnerException(new PlayerId(otherUserId)));
+        when(lobbyService.startLobby(eq(LobbyId.from(lobbyId)), eq(PlayerId.from(otherUserId)), any(Jwt.class))).thenThrow(new NotLobbyOwnerException(new PlayerId(otherUserId)));
 
-        mockMvc.perform(post("/api/lobbies/{lobbyId}/start", lobbyId)
-                        .with(jwtFor(otherUserId.toString(), "other", "other@kdg.be"))
-                        .with(csrf()))
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/api/lobbies/{lobbyId}/start", lobbyId).with(jwtFor(otherUserId.toString(), "other", "other@kdg.be")).with(csrf())).andExpect(status().isBadRequest());
     }
 
     @Test
@@ -422,12 +381,8 @@ class LobbyControllerTest {
         UUID lobbyId = UUID.randomUUID();
         UUID ownerId = UUID.fromString("40404040-0000-0000-0000-000000000000");
 
-        when(lobbyService.startLobby(eq(LobbyId.from(lobbyId)), eq(PlayerId.from(ownerId)), any(Jwt.class)))
-                .thenThrow(new NotReachableException());
+        when(lobbyService.startLobby(eq(LobbyId.from(lobbyId)), eq(PlayerId.from(ownerId)), any(Jwt.class))).thenThrow(new NotReachableException());
 
-        mockMvc.perform(post("/api/lobbies/{lobbyId}/start", lobbyId)
-                        .with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be"))
-                        .with(csrf()))
-                .andExpect(status().isServiceUnavailable());
+        mockMvc.perform(post("/api/lobbies/{lobbyId}/start", lobbyId).with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be")).with(csrf())).andExpect(status().isServiceUnavailable());
     }
 }

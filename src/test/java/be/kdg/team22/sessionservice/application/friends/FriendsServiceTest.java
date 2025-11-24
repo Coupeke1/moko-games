@@ -14,9 +14,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 class FriendsServiceTest {
-
-    ExternalFriendsRepository client = mock(ExternalFriendsRepository.class);
-    FriendsService service = new FriendsService(client);
+    private ExternalFriendsRepository client = mock(ExternalFriendsRepository.class);
+    private FriendsService service = new FriendsService(client);
 
     private Jwt jwtWithToken(String token) {
         return Jwt.withTokenValue(token)
