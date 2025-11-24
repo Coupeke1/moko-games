@@ -1,5 +1,6 @@
 package be.kdg.team22.userservice.domain.profile;
 
+import be.kdg.team22.userservice.domain.profile.exceptions.CannotUpdateProfileException;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
 import java.time.Instant;
@@ -9,9 +10,9 @@ public class Profile {
     private final ProfileId id;
     private final ProfileName username;
     private final ProfileEmail email;
-    private final String description;
+    private String description;
     private final Statistics statistics;
-    private final Modules modules;
+    private Modules modules;
     private final Instant createdAt;
 
     public Profile(final ProfileId id, final ProfileName username, final ProfileEmail email, final String description, final Statistics statistics, final Modules modules, final Instant createdAt) {
@@ -26,6 +27,22 @@ public class Profile {
 
     public Profile(final ProfileId id, final ProfileName username, final ProfileEmail email, final String description) {
         this(id, username, email, description, new Statistics(0, 0), new Modules(false, false), Instant.now());
+    }
+
+    public String updateDescription(final String description) {
+        if (this.description.equals(description))
+            throw CannotUpdateProfileException.description(id);
+
+        this.description = description;
+        return this.description;
+    }
+
+    public Modules updateModules(final Modules modules) {
+        if (this.modules.equals(modules))
+            throw CannotUpdateProfileException.modules(id);
+
+        this.modules = modules;
+        return this.modules;
     }
 
     public ProfileId id() {

@@ -1,6 +1,7 @@
 package be.kdg.team22.userservice.application.profile;
 
 import be.kdg.team22.userservice.domain.profile.*;
+import be.kdg.team22.userservice.domain.profile.exceptions.CannotUpdateProfileException;
 import be.kdg.team22.userservice.domain.profile.exceptions.ClaimNotFoundException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,26 @@ public class ProfileService {
 
     public Profile getByUsername(final ProfileName username) {
         return repository.findByUsername(username).orElseThrow(username::notFound);
+    }
+
+    public String changeDescription(final Profile profile, final String description) {
+        if (description.equals(profile.description()))
+            throw CannotUpdateProfileException.description(profile.id());
+
+        profile.updateDescription(description);
+        repository.save(profile);
+
+        return profile.description();
+    }
+
+    public Modules changeModules(final Profile profile, final Modules modules) {
+        if (modules.equals(profile.modules()))
+            throw CannotUpdateProfileException.modules(profile.id());
+
+        profile.updateModules(modules);
+        repository.save(profile);
+
+        return profile.modules();
     }
 
     private ProfileName getUsername(final Jwt token) {
