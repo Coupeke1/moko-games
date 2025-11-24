@@ -431,14 +431,9 @@ DELETE http://localhost:8081/api/lobbies/{{lobby_id}}/players/{{owner_user_id}}
 Authorization: Bearer {{owner_token}}
 
 
-
-########################################################
-# NIEUWE FUNCTIES: READY + GAME START
-########################################################
-
 ### 21) OWNER sets himself READY = true
 # Vereist: owner is member van de lobby
-PATCH http://localhost:8081/api/lobbies/{{lobby_id}}/players/{{owner_user_id}}/ready
+PATCH http://localhost:8081/api/lobbies/{{lobby_id}}/players/ready
 Authorization: Bearer {{owner_token}}
 Content-Type: application/json
 
@@ -449,18 +444,7 @@ Content-Type: application/json
 
 ### 22) OTHER (kaj) sets himself READY = true
 # Gebruik het userId van kaj. Hier hardcoded of via {{other_user_id}}
-PATCH http://localhost:8081/api/lobbies/{{lobby_id}}/players/bd169114-8834-4a40-983f-59b4d8bc1334/ready
-Authorization: Bearer {{other_token}}
-Content-Type: application/json
-
-{
-  "ready": true
-}
-
-
-### 23) INVALID – user cannot change READY state of another player
-# other probeert ready van owner te wijzigen → LobbyManagementNotAllowedException
-PATCH http://localhost:8081/api/lobbies/{{lobby_id}}/players/{{owner_user_id}}/ready
+PATCH http://localhost:8081/api/lobbies/{{lobby_id}}/players/ready
 Authorization: Bearer {{other_token}}
 Content-Type: application/json
 
