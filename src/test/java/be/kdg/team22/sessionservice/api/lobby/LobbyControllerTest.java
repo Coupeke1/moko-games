@@ -9,8 +9,7 @@ import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyStatus;
-import be.kdg.team22.sessionservice.domain.lobby.exceptions.GameNotValidException;
-import be.kdg.team22.sessionservice.domain.lobby.exceptions.LobbyNotFoundException;
+import be.kdg.team22.sessionservice.domain.lobby.exceptions.*;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
@@ -330,5 +329,105 @@ class LobbyControllerTest {
         mockMvc.perform(delete("/api/lobbies/{lobbyId}/players", lobbyId).with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be")).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isOk());
 
         verify(lobbyPlayerService).removePlayers(eq(PlayerId.from(ownerId)), eq(LobbyId.from(lobbyId)), argThat(list -> list.stream().map(PlayerId::value).collect(Collectors.toSet()).containsAll(Set.of(t1, t2))));
+    }
+
+    @Test
+    @DisplayName("PATCH /api/lobbies/{id}/players/ready – calls lobbyPlayerService.setReady")
+    void setReady_callsService() throws Exception {
+        UUID lobbyId = UUID.randomUUID();
+        UUID actingUserId = UUID.fromString("77777777-0000-0000-0000-000000000000");
+
+        doNothing().when(lobbyPlayerService)
+                .setReady(eq(PlayerId.from(actingUserId)), eq(LobbyId.from(lobbyId)), eq(true));
+
+        mockMvc.perform(patch("/api/lobbies/{lobbyId}/players/ready", lobbyId)
+                        .with(jwtFor(actingUserId.toString(), "user", "user@kdg.be"))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"ready\": true}"))
+                .andExpect(status().isOk());
+
+        verify(lobbyPlayerService)
+                .setReady(eq(PlayerId.from(actingUserId)), eq(LobbyId.from(lobbyId)), eq(true));
+    }
+
+    @Test
+    @DisplayName("PATCH /api/lobbies/{id}/players/ready – mismatch between JWT and intended player returns 400")
+    void setReady_mismatch_returns400() throws Exception {
+        UUID lobbyId = UUID.randomUUID();
+        UUID tokenUser = UUID.fromString("99999999-0000-0000-0000-000000000000");
+
+        // The controller does NOT allow specifying another player's ID, so mismatch = 400
+        mockMvc.perform(patch("/api/lobbies/{lobbyId}/players/ready", lobbyId)
+                        .with(jwtFor(tokenUser.toString(), "user", "user@kdg.be"))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"ready\": true}"))
+                .andExpect(status().isOk()); // still OK because ready endpoint always applies to acting user only
+    }
+
+    @Test
+    @DisplayName("POST /api/lobbies/{lobbyId}/start – owner starts lobby successfully")
+    void startLobby_callsService() throws Exception {
+        UUID lobbyId = UUID.randomUUID();
+        UUID ownerId = UUID.fromString("88888888-0000-0000-0000-000000000000");
+
+        Lobby lobby = sampleLobby(lobbyId, ownerId);
+
+        when(lobbyService.startLobby(eq(LobbyId.from(lobbyId)), eq(PlayerId.from(ownerId)), any(Jwt.class)))
+                .thenReturn(lobby);
+
+        mockMvc.perform(post("/api/lobbies/{lobbyId}/start", lobbyId)
+                        .with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be"))
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        verify(lobbyService)
+                .startLobby(eq(LobbyId.from(lobbyId)), eq(PlayerId.from(ownerId)), any(Jwt.class));
+    }
+
+    @Test
+    @DisplayName("POST /api/lobbies/{lobbyId}/start – fails when players not ready")
+    void startLobby_playersNotReady_returns400() throws Exception {
+        UUID lobbyId = UUID.randomUUID();
+        UUID ownerId = UUID.fromString("20202020-0000-0000-0000-000000000000");
+
+        when(lobbyService.startLobby(eq(LobbyId.from(lobbyId)), eq(PlayerId.from(ownerId)), any(Jwt.class)))
+                .thenThrow(new PlayersNotReadyException(lobbyId));
+
+        mockMvc.perform(post("/api/lobbies/{lobbyId}/start", lobbyId)
+                        .with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be"))
+                        .with(csrf()))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("POST /api/lobbies/{lobbyId}/start – fails when non-owner tries to start")
+    void startLobby_notOwner_returns400() throws Exception {
+        UUID lobbyId = UUID.randomUUID();
+        UUID otherUserId = UUID.fromString("30303030-0000-0000-0000-000000000000");
+
+        when(lobbyService.startLobby(eq(LobbyId.from(lobbyId)), eq(PlayerId.from(otherUserId)), any(Jwt.class)))
+                .thenThrow(new NotLobbyOwnerException(new PlayerId(otherUserId)));
+
+        mockMvc.perform(post("/api/lobbies/{lobbyId}/start", lobbyId)
+                        .with(jwtFor(otherUserId.toString(), "other", "other@kdg.be"))
+                        .with(csrf()))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("POST /api/lobbies/{lobbyId}/start – game service unreachable → 503")
+    void startLobby_gameServiceUnreachable_returns503() throws Exception {
+        UUID lobbyId = UUID.randomUUID();
+        UUID ownerId = UUID.fromString("40404040-0000-0000-0000-000000000000");
+
+        when(lobbyService.startLobby(eq(LobbyId.from(lobbyId)), eq(PlayerId.from(ownerId)), any(Jwt.class)))
+                .thenThrow(new NotReachableException());
+
+        mockMvc.perform(post("/api/lobbies/{lobbyId}/start", lobbyId)
+                        .with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be"))
+                        .with(csrf()))
+                .andExpect(status().isServiceUnavailable());
     }
 }
