@@ -38,11 +38,17 @@ class DbLobbyRepositoryTest {
 
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
+        PlayerEmbed embed = new PlayerEmbed(
+                ownerId.value(),
+                "ownerUser",
+                true // NEW FIELD
+        );
+
         LobbyEntity entity = new LobbyEntity(
                 id.value(),
                 gameId.value(),
                 ownerId.value(),
-                Set.of(new PlayerEmbed(ownerId.value(), "ownerUser")),
+                Set.of(embed),
                 Set.of(),
                 settings,
                 LobbyStatus.OPEN,
@@ -65,6 +71,7 @@ class DbLobbyRepositoryTest {
         PlayerEmbed p = db.players().iterator().next();
         assertThat(p.id()).isEqualTo(ownerId.value());
         assertThat(p.username()).isEqualTo("ownerUser");
+        assertThat(p.ready()).isTrue(); // NEW ASSERT
 
         LobbySettings mapped = db.settings();
         assertThat(mapped.maxPlayers()).isEqualTo(4);

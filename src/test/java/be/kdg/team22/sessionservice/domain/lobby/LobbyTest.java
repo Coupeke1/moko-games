@@ -198,4 +198,153 @@ class LobbyTest {
 
         assertThatThrownBy(() -> lobby.players().add(lp(pid(), new PlayerName("x")))).isInstanceOf(UnsupportedOperationException.class);
     }
+
+    @Test
+    void setReady_setsReadyFlag() {
+        PlayerId owner = pid();
+        PlayerId p2 = pid();
+        Player ownerPlayer = lp(owner, new PlayerName("owner"));
+        Player p2Player = lp(p2, new PlayerName("john"));
+
+        Lobby lobby = new Lobby(game(), ownerPlayer, settings(4));
+
+        lobby.invitePlayer(owner, p2);
+        lobby.acceptInvite(p2Player);
+
+        lobby.setReady(p2, true);
+
+        assertThat(
+                lobby.players().stream()
+                        .filter(p -> p.id().equals(p2))
+                        .findFirst()
+                        .orElseThrow()
+                        .ready()
+        ).isTrue();
+    }
+
+    @Test
+    void setReady_throwsIfPlayerNotInLobby() {
+        Lobby lobby = new Lobby(game(), lp(pid(), new PlayerName("owner")), settings(4));
+        PlayerId notInLobby = pid();
+
+        assertThatThrownBy(() -> lobby.setReady(notInLobby, true))
+                .isInstanceOf(PlayerNotInLobbyException.class);
+    }
+
+    @Test
+    void ensureAllPlayersReady_throwsIfAnyNotReady() {
+        PlayerId owner = pid();
+        Player ownerPlayer = lp(owner, new PlayerName("owner"));
+        Lobby lobby = new Lobby(game(), ownerPlayer, settings(4));
+
+        PlayerId p2 = pid();
+        lobby.invitePlayer(owner, p2);
+        lobby.acceptInvite(lp(p2, new PlayerName("p2")));
+
+        lobby.setReady(owner, true);
+        lobby.setReady(p2, false);
+
+        assertThatThrownBy(lobby::ensureAllPlayersReady)
+                .isInstanceOf(PlayersNotReadyException.class);
+    }
+
+    @Test
+    void ensureAllPlayersReady_okWhenAllReady() {
+        PlayerId owner = pid();
+        Player ownerPlayer = lp(owner, new PlayerName("owner"));
+        Lobby lobby = new Lobby(game(), ownerPlayer, settings(4));
+
+        lobby.setReady(owner, true);
+        lobby.ensureAllPlayersReady(); // should NOT throw
+    }
+
+    @Test
+    void markStarted_setsStatusAndStoresGameId() {
+        PlayerId owner = pid();
+        Lobby lobby = new Lobby(game(), lp(owner, new PlayerName("owner")), settings(4));
+
+        GameId gameInstanceId = GameId.from(UUID.randomUUID());
+
+        lobby.markStarted(gameInstanceId);
+
+        assertThat(lobby.status()).isEqualTo(LobbyStatus.STARTED);
+        assertThat(lobby.startedGameId()).contains(gameInstanceId);
+    }
+
+    @Test
+    void markStarted_throwsWhenClosed() {
+        PlayerId owner = pid();
+        Lobby lobby = new Lobby(game(), lp(owner, new PlayerName("owner")), settings(4));
+        lobby.close(owner);
+
+        assertThatThrownBy(() -> lobby.markStarted(GameId.from(UUID.randomUUID())))
+                .isInstanceOf(LobbyStateInvalidException.class);
+    }
+
+    @Test
+    void markStarted_throwsWhenAlreadyStarted() {
+        PlayerId owner = pid();
+        Lobby lobby = new Lobby(game(), lp(owner, new PlayerName("owner")), settings(4));
+
+        lobby.markStarted(GameId.from(UUID.randomUUID()));
+
+        assertThatThrownBy(() -> lobby.markStarted(GameId.from(UUID.randomUUID())))
+                .isInstanceOf(LobbyStateInvalidException.class);
+    }
+
+    @Test
+    void invitePlayers_addsOnlyNonExistingPlayers() {
+        PlayerId owner = pid();
+        PlayerId p1 = pid();
+        PlayerId p2 = pid();
+
+        Lobby lobby = new Lobby(game(), lp(owner, new PlayerName("owner")), settings(4));
+
+        lobby.invitePlayers(owner, List.of(p1, p2));
+
+        assertThat(lobby.invitedPlayers()).containsExactlyInAnyOrder(p1, p2);
+    }
+
+    @Test
+    void invitePlayers_throwsForNonOwner() {
+        PlayerId owner = pid();
+        PlayerId notOwner = pid();
+
+        Lobby lobby = new Lobby(game(), lp(owner, new PlayerName("owner")), settings(4));
+
+        assertThatThrownBy(() -> lobby.invitePlayers(notOwner, List.of(pid())))
+                .isInstanceOf(NotLobbyOwnerException.class);
+    }
+
+    @Test
+    void invitedPlayers_returnsImmutable() {
+        Lobby lobby = new Lobby(game(), lp(pid(), new PlayerName("owner")), settings(4));
+
+        assertThatThrownBy(() -> lobby.invitedPlayers().add(pid()))
+                .isInstanceOf(UnsupportedOperationException.class);
+    }
+
+    @Test
+    void startedGameId_isEmptyBeforeStart() {
+        Lobby lobby = new Lobby(game(), lp(pid(), new PlayerName("owner")), settings(4));
+        assertThat(lobby.startedGameId()).isEmpty();
+    }
+
+    @Test
+    void ensureModifiable_throwsWhenClosedOrStarted() {
+        PlayerId owner = pid();
+        Lobby lobby = new Lobby(game(), lp(owner, new PlayerName("owner")), settings(4));
+
+        lobby.close(owner);
+        Lobby finalLobby = lobby;
+        assertThatThrownBy(() -> finalLobby.invitePlayer(owner, pid()))
+                .isInstanceOf(LobbyStateInvalidException.class);
+
+        lobby = new Lobby(game(), lp(owner, new PlayerName("owner")), settings(4));
+        lobby.markStarted(GameId.from(UUID.randomUUID()));
+
+        Lobby finalLobby1 = lobby;
+        assertThatThrownBy(() -> finalLobby1.invitePlayer(owner, pid()))
+                .isInstanceOf(LobbyStateInvalidException.class);
+    }
 }
