@@ -1,12 +1,7 @@
 package be.kdg.team22.userservice.infrastructure.profile.jpa;
 
-import be.kdg.team22.userservice.domain.profile.Profile;
-import be.kdg.team22.userservice.domain.profile.ProfileId;
-import be.kdg.team22.userservice.domain.profile.ProfileName;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import be.kdg.team22.userservice.domain.profile.*;
+import jakarta.persistence.*;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -21,23 +16,46 @@ public class ProfileEntity {
     @Column(name = "username", nullable = false)
     private String username;
 
+    @Column(name = "email", nullable = false)
+    private String email;
+
+    @Column(name = "description", nullable = false)
+    private String description;
+
+    @Embedded
+    private StatisticsEmbed statistics;
+
+    @Embedded
+    private ModulesEmbed modules;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
-    protected ProfileEntity() {
-    }
+    protected ProfileEntity() {}
 
-    public ProfileEntity(final UUID id, final String username, final Instant createdAt) {
+    public ProfileEntity(final UUID id, final String username, final String email, final String description, final StatisticsEmbed statistics, final ModulesEmbed modules, final Instant createdAt) {
         this.id = id;
         this.username = username;
+        this.email = email;
+        this.description = description;
+        this.statistics = statistics;
+        this.modules = modules;
         this.createdAt = createdAt;
     }
 
     public static ProfileEntity from(final Profile profile) {
-        return new ProfileEntity(profile.id().value(), profile.username().value(), profile.createdAt());
+        StatisticsEmbed statistics = new StatisticsEmbed(profile.statistics().level(), profile.statistics().playTime());
+
+        ModulesEmbed modules = new ModulesEmbed(profile.modules().achievements(), profile.modules().favourites());
+
+        return new ProfileEntity(profile.id().value(), profile.username().value(), profile.email().value(), profile.description(), statistics, modules, profile.createdAt());
     }
 
     public Profile to() {
-        return new Profile(new ProfileId(id), new ProfileName(username), createdAt);
+        Statistics statistics = new Statistics(this.statistics.level(), this.statistics.playTime());
+
+        Modules modules = new Modules(this.modules.achievements(), this.modules.favourites());
+
+        return new Profile(new ProfileId(id), new ProfileName(username), new ProfileEmail(email), description, statistics, modules, createdAt);
     }
 }

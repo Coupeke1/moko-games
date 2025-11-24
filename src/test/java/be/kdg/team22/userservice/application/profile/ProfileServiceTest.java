@@ -1,9 +1,6 @@
 package be.kdg.team22.userservice.application.profile;
 
-import be.kdg.team22.userservice.domain.profile.Profile;
-import be.kdg.team22.userservice.domain.profile.ProfileId;
-import be.kdg.team22.userservice.domain.profile.ProfileName;
-import be.kdg.team22.userservice.domain.profile.ProfileRepository;
+import be.kdg.team22.userservice.domain.profile.*;
 import be.kdg.team22.userservice.domain.profile.exceptions.ClaimNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -44,8 +41,10 @@ class ProfileServiceTest {
     void returnsExistingProfile() {
         String sub = "22222222-2222-2222-2222-222222222222";
         ProfileId id = new ProfileId(UUID.fromString(sub));
-        ProfileName username = new ProfileName("exisiting-user");
-        Profile existing = new Profile(id, username);
+        ProfileName username = new ProfileName("existing-user");
+        ProfileEmail email = new ProfileEmail("user@existing.com");
+        String description = "Test";
+        Profile existing = new Profile(id, username, email, description);
 
         when(repository.findById(id)).thenReturn(Optional.of(existing));
         Profile result = service.getOrCreate(token(sub, "anderenaam", "andere@mail"));

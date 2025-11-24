@@ -1,9 +1,6 @@
 package be.kdg.team22.userservice.application.profile;
 
-import be.kdg.team22.userservice.domain.profile.Profile;
-import be.kdg.team22.userservice.domain.profile.ProfileId;
-import be.kdg.team22.userservice.domain.profile.ProfileName;
-import be.kdg.team22.userservice.domain.profile.ProfileRepository;
+import be.kdg.team22.userservice.domain.profile.*;
 import be.kdg.team22.userservice.domain.profile.exceptions.ClaimNotFoundException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -21,9 +18,11 @@ public class ProfileService {
     public Profile getOrCreate(final Jwt token) {
         ProfileId id = ProfileId.get(token);
         ProfileName username = getUsername(token);
+        ProfileEmail email = getEmail(token);
+        String description = "Hey there! I am using Moko.";
 
         return repository.findById(id).orElseGet(() -> {
-            Profile profile = new Profile(id, username);
+            Profile profile = new Profile(id, username, email, description);
             repository.save(profile);
             return profile;
         });
@@ -45,5 +44,12 @@ public class ProfileService {
             return new ProfileName(token.getClaimAsString("username"));
 
         throw ClaimNotFoundException.username();
+    }
+
+    private ProfileEmail getEmail(final Jwt token) {
+        if (token.hasClaim("email"))
+            return new ProfileEmail(token.getClaimAsString("email"));
+
+        throw ClaimNotFoundException.email();
     }
 }
