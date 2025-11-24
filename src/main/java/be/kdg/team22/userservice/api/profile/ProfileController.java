@@ -1,6 +1,6 @@
 package be.kdg.team22.userservice.api.profile;
 
-import be.kdg.team22.userservice.api.profile.models.ModulesModel;
+import be.kdg.team22.userservice.api.profile.models.EditModulesModel;
 import be.kdg.team22.userservice.api.profile.models.ProfileModel;
 import be.kdg.team22.userservice.application.profile.ProfileService;
 import be.kdg.team22.userservice.domain.profile.Modules;
@@ -39,10 +39,10 @@ public class ProfileController {
     }
 
     @PatchMapping("/me/modules")
-    public ResponseEntity<ModulesModel> updateMyModules(@AuthenticationPrincipal final Jwt token, @RequestBody final ModulesModel model) {
+    public ResponseEntity<EditModulesModel> updateMyModules(@AuthenticationPrincipal final Jwt token, @RequestBody final EditModulesModel model) {
         Profile profile = service.getOrCreate(token);
         Modules modules = service.changeModules(profile, model.to());
-        return ResponseEntity.ok(ModulesModel.from(modules));
+        return ResponseEntity.ok(EditModulesModel.from(modules));
     }
 
     @GetMapping("/{id}")
