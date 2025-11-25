@@ -1,5 +1,7 @@
 package be.kdg.team22.tictactoeservice.application;
 
+import be.kdg.team22.tictactoeservice.api.models.CreateGameModel;
+import be.kdg.team22.tictactoeservice.api.models.GameSettingsModel;
 import be.kdg.team22.tictactoeservice.config.BoardSizeProperties;
 import be.kdg.team22.tictactoeservice.domain.game.Game;
 import be.kdg.team22.tictactoeservice.domain.game.GameId;
@@ -54,11 +56,14 @@ public class GameServiceTest {
     @Test
     void shouldStartGameWithSize3x3() {
         // Arrange
-        Game expectedGame = Game.create(config.minSize(), config.maxSize(), 3, players);
+        Game expectedGame = Game.create(config.minSize(), config.maxSize(), 3,
+                players.stream().map(Player::id).toList());
         doNothing().when(repository).save(expectedGame);
 
         // Act
-        Game game = service.startGame(3, List.of(playerX, playerO));
+        CreateGameModel model = new CreateGameModel(
+                players.stream().map(p -> p.id().value()).toList(), new GameSettingsModel(3));
+        Game game = service.startGame(model);
 
         // Asset
         assertNotNull(game);
@@ -69,10 +74,13 @@ public class GameServiceTest {
     @Test
     void shouldStartGameWithSize4x4() {
         // Arrange
-        Game expectedGame = Game.create(config.minSize(), config.maxSize(), 4, players);
+        Game expectedGame = Game.create(config.minSize(), config.maxSize(), 4,
+                players.stream().map(Player::id).toList());
         doNothing().when(repository).save(expectedGame);
         // Act
-        Game game = service.startGame(4, players);
+        CreateGameModel model = new CreateGameModel(
+                players.stream().map(p -> p.id().value()).toList(), new GameSettingsModel(4));
+        Game game = service.startGame(model);
 
         // Asset
         assertNotNull(game);
@@ -83,11 +91,13 @@ public class GameServiceTest {
     @Test
     void shouldStartGameWithSize5x5() {
         // Arrange
-        Game expectedGame = Game.create(config.minSize(), config.maxSize(), 5, players);
+        Game expectedGame = Game.create(config.minSize(), config.maxSize(), 5,
+                players.stream().map(Player::id).toList());
         doNothing().when(repository).save(expectedGame);
 
         // Act
-        Game game = service.startGame(5, players);
+        CreateGameModel model = new CreateGameModel(players.stream().map(p -> p.id().value()).toList(), new GameSettingsModel(5));
+        Game game = service.startGame(model);
 
         // Asset
         assertNotNull(game);
@@ -97,17 +107,21 @@ public class GameServiceTest {
 
     @Test
     void shouldThrowWhenTooSmall() {
-        assertThrows(BoardSizeException.class, () -> service.startGame(2, players));
+        CreateGameModel model = new CreateGameModel(
+                players.stream().map(p -> p.id().value()).toList(), new GameSettingsModel(config.minSize() - 1));
+        assertThrows(BoardSizeException.class, () -> service.startGame(model));
     }
 
     @Test
     void shouldThrowWhenTooBig() {
-        assertThrows(BoardSizeException.class, () -> service.startGame(11, players));
+        CreateGameModel model = new CreateGameModel(players.stream().map(p -> p.id().value()).toList(), new GameSettingsModel(config.maxSize() + 1));
+        assertThrows(BoardSizeException.class, () -> service.startGame(model));
     }
 
     @Test
     void shouldGetExistingGame() {
-        Game storedGame = Game.create(config.minSize(), config.maxSize(), 5, players);
+        Game storedGame = Game.create(config.minSize(), config.maxSize(), 5,
+                players.stream().map(Player::id).toList());
 
         when(repository.findById(storedGame.id())).thenReturn(Optional.of(storedGame));
 
@@ -128,13 +142,14 @@ public class GameServiceTest {
     @Test
     void shouldResetExistingFinishedGame() throws NoSuchFieldException, IllegalAccessException {
         // Arrange
-        Game storedGame = spy(Game.create(config.minSize(), config.maxSize(), 3, players));
+        GameId gameId = GameId.create();
+        Game storedGame = spy(Game.create(config.minSize(), config.maxSize(), 5,
+                players.stream().map(Player::id).toList()));
 
         Field statusField = Game.class.getDeclaredField("status");
         statusField.setAccessible(true);
         statusField.set(storedGame, GameStatus.WON);
 
-        GameId gameId = storedGame.id();
         when(repository.findById(gameId)).thenReturn(Optional.of(storedGame));
 
         // Act
@@ -149,8 +164,9 @@ public class GameServiceTest {
     @Test
     void shouldThrowWhenResettingInProgressGame() {
         // Arrange
-        Game storedGame = spy(Game.create(config.minSize(), config.maxSize(), 3, players));
-        GameId gameId = storedGame.id();
+        GameId gameId = GameId.create();
+        Game storedGame = spy(Game.create(config.minSize(), config.maxSize(), 5,
+                players.stream().map(Player::id).toList()));
         when(repository.findById(gameId)).thenReturn(Optional.of(storedGame));
 
         // Assert

@@ -18,7 +18,6 @@ public class ApiExceptionHandler {
             GameSizeException.class,
             InvalidCellException.class,
             NotPlayersTurnException.class,
-            PlayerRolesException.class,
             RoleUnfulfilledException.class,
             UniquePlayersException.class,
             InvalidPlayerException.class})
