@@ -23,6 +23,12 @@ services:
   frontend-platform:
     image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/platform-frontend:main-latest
     restart: always
+    environment:
+      VITE_AUTH_URL: http://proxy/auth
+      VITE_AUTH_REALM: moko
+      VITE_AUTH_CLIENT: platform-frontend
+
+      VITE_USER_SERVICE: http://proxy/user-service/api/profiles
     expose:
       - "80"
     networks:
@@ -90,8 +96,8 @@ services:
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://idp-keycloak:8080/realms/moko
       SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ENDPOINT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
 
-      USER_SERVICE_URL: http://user-service:8080/api/profiles
-      SOCIAL_SERVICE_URL: http://social-service:8083/api/friends
+      USER_SERVICE_URL: http://user-service:8080
+      SOCIAL_SERVICE_URL: http://social-service:8083
     expose:
       - "8081"
     networks:
@@ -156,38 +162,11 @@ services:
       - app-rabbitmq
       - idp-keycloak
 
-#  service-games:
-#    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/games-service:main-latest
-#    restart: always
-#    environment:
-#      SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=games_service
-#      SPRING_DATASOURCE_USER: user
-#      SPRING_DATASOURCE_PASSWORD: password
-#
-#      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-#
-#      SPRING_RABBITMQ_HOST: app-rabbitmq
-#      SPRING_RABBITMQ_PORT: 5672
-#      SPRING_RABBITMQ_USERNAME: user
-#      SPRING_RABBITMQ_PASSWORD: password
-#
-#      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://idp-keycloak:8080/realms/moko
-#      SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ENDPOINT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
-#    expose:
-#      - "8084"
-#    networks:
-#      - moko_backend
-#      - moko_kc
-#    depends_on:
-#      - app-postgres
-#      - app-rabbitmq
-#      - idp-keycloak
-
-  service-store:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/store-service:main-latest
+  service-games:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/games-service:main-latest
     restart: always
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=store_service
+      SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=games_service
       SPRING_DATASOURCE_USER: user
       SPRING_DATASOURCE_PASSWORD: password
 
@@ -201,7 +180,7 @@ services:
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://idp-keycloak:8080/realms/moko
       SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ENDPOINT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
     expose:
-      - "8085"
+      - "8084"
     networks:
       - moko_backend
       - moko_kc
@@ -209,6 +188,33 @@ services:
       - app-postgres
       - app-rabbitmq
       - idp-keycloak
+
+#  service-store:
+#    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/store-service:main-latest
+#    restart: always
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=store_service
+#      SPRING_DATASOURCE_USER: user
+#      SPRING_DATASOURCE_PASSWORD: password
+#
+#      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+#
+#      SPRING_RABBITMQ_HOST: app-rabbitmq
+#      SPRING_RABBITMQ_PORT: 5672
+#      SPRING_RABBITMQ_USERNAME: user
+#      SPRING_RABBITMQ_PASSWORD: password
+#
+#      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://idp-keycloak:8080/realms/moko
+#      SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ENDPOINT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
+#    expose:
+#      - "8085"
+#    networks:
+#      - moko_backend
+#      - moko_kc
+#    depends_on:
+#      - app-postgres
+#      - app-rabbitmq
+#      - idp-keycloak
 
   service-tic-tac-toe:
     image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/tic-tac-toe-service:main-latest
