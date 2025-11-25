@@ -4,11 +4,10 @@ import path from 'path'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-    plugins: [react(), tailwindcss()],
+    plugins: [react(), tailwindcss(),],
     resolve: {
         alias: {
             '@': path.resolve(__dirname, './src'),
         },
     },
-
 })
