@@ -86,8 +86,8 @@ class GameServiceTest {
     @Test
     @DisplayName("startGame – null settings throws InvalidGameConfigurationException")
     void startGame_nullSettings() {
+
         UUID gameIdRaw = UUID.fromString("22222222-2222-2222-2222-222222222222");
-        GameId gameId = GameId.from(gameIdRaw);
 
         StartGameRequest request = new StartGameRequest(
                 UUID.randomUUID(),
@@ -96,15 +96,11 @@ class GameServiceTest {
                 null
         );
 
-        when(gameRepository.findById(gameId))
-                .thenReturn(Optional.of(exampleGame(gameId)));
-
         assertThatThrownBy(() -> service.startGame(request))
                 .isInstanceOf(InvalidGameConfigurationException.class)
                 .hasMessageContaining("Game settings cannot be null");
 
-        verify(gameRepository).findById(gameId);
-        verifyNoInteractions(engine);
+        verifyNoInteractions(gameRepository, engine);
     }
 
     @Test
