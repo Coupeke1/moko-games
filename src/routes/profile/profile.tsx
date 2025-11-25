@@ -12,9 +12,9 @@ import FriendCard from "@/routes/profile/components/friend-card";
 import ProfileInformation from "@/routes/profile/components/information";
 
 export default function ProfilePage() {
-    const { data: profile, isLoading, isError } = useMyProfile();
+    const { profile, isLoading, isError } = useMyProfile();
 
-    if (isLoading) return <Page><LoadingState /></Page>
+    if (isLoading || profile === undefined) return <Page><LoadingState /></Page>
     if (isError) return <Page><ErrorState /></Page>
 
     return (

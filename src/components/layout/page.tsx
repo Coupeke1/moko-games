@@ -9,7 +9,7 @@ interface Props {
 
 export default function Page({ children }: Props) {
     return (
-        <section className="flex flex-col gap-8 justify-between min-h-screen mx-auto max-w-4xl px-4 pt-4 pb-2.5">
+        <section className="flex flex-col gap-8 justify-between min-h-screen mx-auto max-w-4xl px-4 pt-4 pb-1.5">
             <section className="flex flex-col gap-4 md:gap-12">
                 <section className="w-full">
                     <NavigationBar />

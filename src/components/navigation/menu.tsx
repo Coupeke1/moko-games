@@ -5,8 +5,8 @@ import LibraryIcon from "@/components/icons/bar/library-icon";
 import NotificationsIcon from "@/components/icons/bar/notifications-icon";
 import ProfileIcon from "@/components/icons/bar/profile-icon";
 import StoreIcon from "@/components/icons/bar/store-icon";
-import NavigationButton from "@/components/navigation/button";
 import NavigationLink from "@/components/navigation/link";
+import SmallButton from "../dialog/small-button";
 
 interface Props {
     open: boolean;
@@ -29,9 +29,9 @@ export default function NavigationMenu({ open, onClose }: Props) {
                 <section className="p-4 border-b border-bg-2 flex items-center justify-between">
                     <h2 className="text-lg font-semibold">Moko</h2>
 
-                    <NavigationButton onClick={onClose}>
+                    <SmallButton onClick={onClose}>
                         <CloseIcon />
-                    </NavigationButton>
+                    </SmallButton>
                 </section>
 
                 <section className="flex flex-col gap-4 p-4 border-b border-bg-2">
