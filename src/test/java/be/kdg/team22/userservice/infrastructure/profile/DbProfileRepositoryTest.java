@@ -33,7 +33,7 @@ class DbProfileRepositoryTest {
         StatisticsEmbed statistics = new StatisticsEmbed(5, 50);
         ModulesEmbed modules = new ModulesEmbed(true, false);
 
-        ProfileEntity entity = new ProfileEntity(id, username, email, description, statistics, modules, Instant.now());
+        ProfileEntity entity = new ProfileEntity(id, username, email, description, "", statistics, modules, Instant.now());
         repository.save(entity);
 
         Optional<ProfileEntity> loaded = repository.findById(id);
