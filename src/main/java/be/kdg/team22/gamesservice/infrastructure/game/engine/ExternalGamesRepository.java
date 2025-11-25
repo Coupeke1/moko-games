@@ -32,20 +32,18 @@ public class ExternalGamesRepository {
                 .build();
 
         try {
-            EngineStartResponse response = client.post()
+            EngineGameResponse response = client.post()
                     .uri("")
                     .body(engineReq)
                     .retrieve()
-                    .body(EngineStartResponse.class);
+                    .body(EngineGameResponse.class);
 
-            return response.gameInstanceId();
+            return response.id();
 
         } catch (HttpClientErrorException ex) {
-
             if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
                 throw new EngineGameNotFoundException(request.gameId());
             }
-
             throw ex;
 
         } catch (RestClientException ex) {
