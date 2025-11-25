@@ -57,12 +57,10 @@ class LobbyEntityTest {
         assertThat(entity.settings().maxPlayers()).isEqualTo(4);
         assertThat(entity.settings().gameSettings()).isInstanceOf(TicTacToeSettings.class);
 
-        // players
         assertThat(entity.players()).hasSize(2);
         assertThat(entity.players().stream().anyMatch(e -> e.username().equals("owner") && e.ready())).isTrue();
         assertThat(entity.players().stream().anyMatch(e -> e.username().equals("jan") && !e.ready())).isTrue();
 
-        // started game id
         assertThat(entity.startedGameId()).isEqualTo(UUID.fromString("00000000-0000-0000-0000-000000000999"));
     }
 
@@ -100,7 +98,6 @@ class LobbyEntityTest {
         assertThat(domain.status()).isEqualTo(LobbyStatus.CLOSED);
         assertThat(domain.settings().maxPlayers()).isEqualTo(5);
 
-        // players mapped
         assertThat(domain.players()).hasSize(2);
         assertThat(domain.players().stream().anyMatch(p -> p.username().value().equals("owner") && p.ready())).isTrue();
         assertThat(domain.players().stream().anyMatch(p -> p.username().value().equals("other") && !p.ready())).isTrue();

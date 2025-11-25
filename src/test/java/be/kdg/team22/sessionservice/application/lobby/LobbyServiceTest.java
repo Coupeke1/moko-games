@@ -52,10 +52,6 @@ class LobbyServiceTest {
         return new Lobby(gameId, p, settings);
     }
 
-    // ------------------------------------------------------------------
-    // createLobby
-    // ------------------------------------------------------------------
-
     @Test
     void createLobby_savesLobby_andReturnsIt() {
         GameId gameId = new GameId(UUID.randomUUID());
@@ -76,10 +72,6 @@ class LobbyServiceTest {
         verify(repo).save(any(Lobby.class));
     }
 
-    // ------------------------------------------------------------------
-    // findLobby
-    // ------------------------------------------------------------------
-
     @Test
     void findLobby_returnsLobby() {
         LobbyId id = LobbyId.create();
@@ -98,10 +90,6 @@ class LobbyServiceTest {
         assertThatThrownBy(() -> service.findLobby(id)).isInstanceOf(LobbyNotFoundException.class);
     }
 
-    // ------------------------------------------------------------------
-    // findAllLobbies
-    // ------------------------------------------------------------------
-
     @Test
     void findAll_returnsList() {
         List<Lobby> list = List.of(mock(Lobby.class));
@@ -109,10 +97,6 @@ class LobbyServiceTest {
 
         assertThat(service.findAllLobbies()).containsExactlyElementsOf(list);
     }
-
-    // ------------------------------------------------------------------
-    // updateSettings
-    // ------------------------------------------------------------------
 
     @Test
     void updateSettings_tictactoe_updatesSuccessfully() {
@@ -167,10 +151,6 @@ class LobbyServiceTest {
         assertThatThrownBy(() -> service.updateSettings(id, owner, model)).isInstanceOf(NullPointerException.class);
     }
 
-    // ------------------------------------------------------------------
-    // closeLobby
-    // ------------------------------------------------------------------
-
     @Test
     void closeLobby_succeeds() {
         LobbyId id = LobbyId.create();
@@ -187,10 +167,6 @@ class LobbyServiceTest {
         assertThat(closed).isEqualTo(lobby);
     }
 
-    // ------------------------------------------------------------------
-    // startLobby
-    // ------------------------------------------------------------------
-
     @Test
     void startLobby_succeeds() {
         LobbyId id = LobbyId.create();
@@ -198,7 +174,6 @@ class LobbyServiceTest {
 
         Lobby lobby = spy(newLobby(new GameId(UUID.randomUUID()), owner));
 
-        // Mock ready state
         doNothing().when(lobby).ensureOwner(owner);
         doNothing().when(lobby).ensureAllPlayersReady();
 

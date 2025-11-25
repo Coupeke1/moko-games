@@ -334,8 +334,7 @@ class LobbyControllerTest {
         UUID lobbyId = UUID.randomUUID();
         UUID tokenUser = UUID.fromString("99999999-0000-0000-0000-000000000000");
 
-        // The controller does NOT allow specifying another player's ID, so mismatch = 400
-        mockMvc.perform(patch("/api/lobbies/{lobbyId}/players/ready", lobbyId).with(jwtFor(tokenUser.toString(), "user", "user@kdg.be")).with(csrf()).contentType(MediaType.APPLICATION_JSON).content("{\"ready\": true}")).andExpect(status().isOk()); // still OK because ready endpoint always applies to acting user only
+        mockMvc.perform(patch("/api/lobbies/{lobbyId}/players/ready", lobbyId).with(jwtFor(tokenUser.toString(), "user", "user@kdg.be")).with(csrf()).contentType(MediaType.APPLICATION_JSON).content("{\"ready\": true}")).andExpect(status().isOk());
     }
 
     @Test

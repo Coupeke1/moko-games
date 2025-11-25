@@ -16,6 +16,6 @@ class PlayerTest {
 
         assertThat(p.id()).isEqualTo(playerId);
         assertThat(p.username().toString()).isEqualTo("mathias");
-        assertThat(p.ready()).isFalse(); // default = false
+        assertThat(p.ready()).isFalse();
     }
 }

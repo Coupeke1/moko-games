@@ -18,8 +18,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 class PlayerServiceTest {
-    private ExternalPlayersRepository repo = mock(ExternalPlayersRepository.class);
-    private PlayerService service = new PlayerService(repo);
+    private final ExternalPlayersRepository repo = mock(ExternalPlayersRepository.class);
+    private final PlayerService service = new PlayerService(repo);
 
     private Jwt jwtFor() {
         return Jwt.withTokenValue("TOKEN-123")
@@ -32,7 +32,6 @@ class PlayerServiceTest {
 
     @Test
     void findPlayer_success() {
-        // Arrange
         UUID id = UUID.randomUUID();
         PlayerId pid = PlayerId.from(id);
 
@@ -40,10 +39,8 @@ class PlayerServiceTest {
 
         when(repo.getById(id, "TOKEN-123")).thenReturn(Optional.of(response));
 
-        // Act
         Player out = service.findPlayer(pid, jwtFor());
 
-        // Assert
         assertThat(out.id().value()).isEqualTo(id);
         assertThat(out.username().value()).isEqualTo("mathias");
 
