@@ -1,5 +1,4 @@
 package be.kdg.team22.gamesservice.api.game;
-
 import be.kdg.team22.gamesservice.domain.game.exceptions.GameNotFoundException;
 import be.kdg.team22.gamesservice.domain.game.exceptions.PlayersListEmptyException;
 import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GameExceptionHandler {
-
     private static final Logger log = LoggerFactory.getLogger(GameExceptionHandler.class);
 
     @ExceptionHandler(GameNotFoundException.class)

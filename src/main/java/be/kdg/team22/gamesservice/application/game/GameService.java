@@ -1,5 +1,4 @@
 package be.kdg.team22.gamesservice.application.game;
-
 import be.kdg.team22.gamesservice.api.game.models.StartGameRequest;
 import be.kdg.team22.gamesservice.api.game.models.StartGameResponseModel;
 import be.kdg.team22.gamesservice.domain.game.Game;
@@ -17,7 +16,6 @@ import java.util.UUID;
 
 @Service
 public class GameService {
-
     private final GameRepository gameRepository;
     private final ExternalGamesRepository engine;
 
