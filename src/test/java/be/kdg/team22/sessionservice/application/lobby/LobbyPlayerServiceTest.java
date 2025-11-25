@@ -15,7 +15,6 @@ import be.kdg.team22.sessionservice.domain.player.PlayerName;
 import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerNotFriendException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.oauth2.jwt.Jwt;
 
@@ -29,15 +28,14 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class LobbyPlayerServiceTest {
-
-    LobbyRepository repo = mock(LobbyRepository.class);
-    FriendsService friendsService = mock(FriendsService.class);
-    PlayerService playerService = mock(PlayerService.class);
+    private LobbyRepository repo = mock(LobbyRepository.class);
+    private FriendsService friendsService = mock(FriendsService.class);
+    private PlayerService playerService = mock(PlayerService.class);
 
     LobbyPlayerService service = new LobbyPlayerService(repo, friendsService, playerService);
 
     private Jwt jwtFor(PlayerId pid) {
-        return Jwt.withTokenValue("TOKEN")
+        return Jwt.withTokenValue("TOKEN-" + pid.value())
                 .header("alg", "none")
                 .claim("sub", pid.value().toString())
                 .claim("preferred_username", "testuser")
@@ -46,19 +44,19 @@ class LobbyPlayerServiceTest {
                 .build();
     }
 
-    private Lobby mockLobby(LobbyId id, PlayerId owner) {
+    private Lobby newLobby(LobbyId id, PlayerId owner) {
         Player ownerPlayer = new Player(owner, new PlayerName("owner"));
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
         return new Lobby(new GameId(UUID.randomUUID()), ownerPlayer, settings);
     }
 
     @Test
-    void invitePlayer_success_whenFriend() {
-        PlayerId owner = new PlayerId(UUID.randomUUID());
-        PlayerId target = new PlayerId(UUID.randomUUID());
+    void invitePlayer_success() {
+        PlayerId owner = PlayerId.from(UUID.randomUUID());
+        PlayerId target = PlayerId.from(UUID.randomUUID());
         LobbyId lobbyId = LobbyId.create();
 
-        Lobby lobby = mockLobby(lobbyId, owner);
+        Lobby lobby = newLobby(lobbyId, owner);
 
         when(repo.findById(lobbyId)).thenReturn(Optional.of(lobby));
         when(friendsService.findAllFriends(any())).thenReturn(List.of(target));
@@ -70,11 +68,11 @@ class LobbyPlayerServiceTest {
 
     @Test
     void invitePlayer_notFriend_throws() {
-        PlayerId owner = new PlayerId(UUID.randomUUID());
-        PlayerId target = new PlayerId(UUID.randomUUID());
+        PlayerId owner = PlayerId.from(UUID.randomUUID());
+        PlayerId target = PlayerId.from(UUID.randomUUID());
         LobbyId lobbyId = LobbyId.create();
 
-        Lobby lobby = mockLobby(lobbyId, owner);
+        Lobby lobby = newLobby(lobbyId, owner);
 
         when(repo.findById(lobbyId)).thenReturn(Optional.of(lobby));
         when(friendsService.findAllFriends(any())).thenReturn(List.of());
@@ -86,8 +84,8 @@ class LobbyPlayerServiceTest {
 
     @Test
     void invitePlayer_lobbyNotFound_throws() {
-        PlayerId owner = new PlayerId(UUID.randomUUID());
-        PlayerId target = new PlayerId(UUID.randomUUID());
+        PlayerId owner = PlayerId.from(UUID.randomUUID());
+        PlayerId target = PlayerId.from(UUID.randomUUID());
         LobbyId lobbyId = LobbyId.create();
 
         when(repo.findById(lobbyId)).thenReturn(Optional.empty());
@@ -98,15 +96,15 @@ class LobbyPlayerServiceTest {
     }
 
     @Test
-    void invitePlayers_success_whenAllAreFriends() {
-        PlayerId owner = new PlayerId(UUID.randomUUID());
+    void invitePlayers_success_allFriends() {
+        PlayerId owner = PlayerId.from(UUID.randomUUID());
         LobbyId lobbyId = LobbyId.create();
-        List<PlayerId> targets = List.of(
-                new PlayerId(UUID.randomUUID()),
-                new PlayerId(UUID.randomUUID())
-        );
 
-        Lobby lobby = mockLobby(lobbyId, owner);
+        PlayerId p1 = PlayerId.from(UUID.randomUUID());
+        PlayerId p2 = PlayerId.from(UUID.randomUUID());
+        List<PlayerId> targets = List.of(p1, p2);
+
+        Lobby lobby = newLobby(lobbyId, owner);
 
         when(repo.findById(lobbyId)).thenReturn(Optional.of(lobby));
         when(friendsService.findAllFriends(any())).thenReturn(targets);
@@ -118,15 +116,14 @@ class LobbyPlayerServiceTest {
 
     @Test
     void invitePlayers_notAllFriends_throws() {
-        PlayerId owner = new PlayerId(UUID.randomUUID());
+        PlayerId owner = PlayerId.from(UUID.randomUUID());
         LobbyId lobbyId = LobbyId.create();
 
-        PlayerId friend = new PlayerId(UUID.randomUUID());
-        PlayerId notFriend = new PlayerId(UUID.randomUUID());
+        PlayerId friend = PlayerId.from(UUID.randomUUID());
+        PlayerId stranger = PlayerId.from(UUID.randomUUID());
+        List<PlayerId> targets = List.of(friend, stranger);
 
-        List<PlayerId> targets = List.of(friend, notFriend);
-
-        Lobby lobby = mockLobby(lobbyId, owner);
+        Lobby lobby = newLobby(lobbyId, owner);
 
         when(repo.findById(lobbyId)).thenReturn(Optional.of(lobby));
         when(friendsService.findAllFriends(any())).thenReturn(List.of(friend));
@@ -137,43 +134,54 @@ class LobbyPlayerServiceTest {
     }
 
     @Test
-    void acceptInvite_success() {
-        PlayerId playerId = new PlayerId(UUID.randomUUID());
+    void invitePlayers_lobbyNotFound_throws() {
+        PlayerId owner = PlayerId.from(UUID.randomUUID());
         LobbyId lobbyId = LobbyId.create();
 
-        Lobby lobby = mockLobby(lobbyId, new PlayerId(UUID.randomUUID()));
+        when(repo.findById(lobbyId)).thenReturn(Optional.empty());
 
-        lobby.invitePlayer(lobby.ownerId(), playerId);
+        assertThatThrownBy(() ->
+                service.invitePlayers(owner, lobbyId, List.of(), jwtFor(owner))
+        ).isInstanceOf(LobbyNotFoundException.class);
+    }
+
+    @Test
+    void acceptInvite_success() {
+        PlayerId player = PlayerId.from(UUID.randomUUID());
+        LobbyId lobbyId = LobbyId.create();
+        Player p = new Player(player, new PlayerName("test"));
+
+        Lobby lobby = newLobby(lobbyId, PlayerId.from(UUID.randomUUID()));
+
+        lobby.invitePlayer(lobby.ownerId(), player);
 
         when(repo.findById(lobbyId)).thenReturn(Optional.of(lobby));
-        when(playerService.findPlayer(eq(playerId), any())).thenReturn(
-                new Player(playerId, new PlayerName("player"))
-        );
+        when(playerService.findPlayer(eq(player), any())).thenReturn(p);
 
-        service.acceptInvite(playerId, lobbyId, jwtFor(playerId));
+        service.acceptInvite(player, lobbyId, jwtFor(player));
 
         verify(repo).save(lobby);
     }
 
     @Test
     void acceptInvite_lobbyNotFound_throws() {
-        PlayerId playerId = new PlayerId(UUID.randomUUID());
+        PlayerId player = PlayerId.from(UUID.randomUUID());
         LobbyId lobbyId = LobbyId.create();
 
         when(repo.findById(lobbyId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() ->
-                service.acceptInvite(playerId, lobbyId, jwtFor(playerId))
+                service.acceptInvite(player, lobbyId, jwtFor(player))
         ).isInstanceOf(LobbyNotFoundException.class);
     }
 
     @Test
     void removePlayer_success() {
-        PlayerId owner = new PlayerId(UUID.randomUUID());
-        PlayerId target = new PlayerId(UUID.randomUUID());
+        PlayerId owner = PlayerId.from(UUID.randomUUID());
+        PlayerId target = PlayerId.from(UUID.randomUUID());
         LobbyId lobbyId = LobbyId.create();
 
-        Lobby lobby = Mockito.spy(mockLobby(lobbyId, owner));
+        Lobby lobby = spy(newLobby(lobbyId, owner));
 
         lobby.invitePlayer(owner, target);
         lobby.acceptInvite(new Player(target, new PlayerName("target")));
@@ -187,15 +195,28 @@ class LobbyPlayerServiceTest {
     }
 
     @Test
+    void removePlayer_lobbyNotFound_throws() {
+        PlayerId owner = PlayerId.from(UUID.randomUUID());
+        PlayerId target = PlayerId.from(UUID.randomUUID());
+        LobbyId lobbyId = LobbyId.create();
+
+        when(repo.findById(lobbyId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() ->
+                service.removePlayer(owner, lobbyId, target)
+        ).isInstanceOf(LobbyNotFoundException.class);
+    }
+
+    @Test
     void removePlayers_success() {
-        PlayerId owner = new PlayerId(UUID.randomUUID());
+        PlayerId owner = PlayerId.from(UUID.randomUUID());
         LobbyId lobbyId = LobbyId.create();
         List<PlayerId> ids = List.of(
-                new PlayerId(UUID.randomUUID()),
-                new PlayerId(UUID.randomUUID())
+                PlayerId.from(UUID.randomUUID()),
+                PlayerId.from(UUID.randomUUID())
         );
 
-        Lobby lobby = Mockito.spy(mockLobby(lobbyId, owner));
+        Lobby lobby = spy(newLobby(lobbyId, owner));
 
         when(repo.findById(lobbyId)).thenReturn(Optional.of(lobby));
 
@@ -203,5 +224,45 @@ class LobbyPlayerServiceTest {
 
         verify(lobby).removePlayers(owner, ids);
         verify(repo).save(lobby);
+    }
+
+    @Test
+    void removePlayers_lobbyNotFound_throws() {
+        PlayerId owner = PlayerId.from(UUID.randomUUID());
+        LobbyId lobbyId = LobbyId.create();
+        List<PlayerId> ids = List.of(PlayerId.from(UUID.randomUUID()));
+
+        when(repo.findById(lobbyId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() ->
+                service.removePlayers(owner, lobbyId, ids)
+        ).isInstanceOf(LobbyNotFoundException.class);
+    }
+
+    @Test
+    void setReady_success() {
+        PlayerId p = PlayerId.from(UUID.randomUUID());
+        LobbyId lobbyId = LobbyId.create();
+
+        Lobby lobby = spy(newLobby(lobbyId, p));
+
+        when(repo.findById(lobbyId)).thenReturn(Optional.of(lobby));
+
+        service.setReady(p, lobbyId);
+
+        verify(lobby).setReady(p);
+        verify(repo).save(lobby);
+    }
+
+    @Test
+    void setReady_lobbyNotFound_throws() {
+        PlayerId p = PlayerId.from(UUID.randomUUID());
+        LobbyId lobbyId = LobbyId.create();
+
+        when(repo.findById(lobbyId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() ->
+                service.setReady(p, lobbyId)
+        ).isInstanceOf(LobbyNotFoundException.class);
     }
 }

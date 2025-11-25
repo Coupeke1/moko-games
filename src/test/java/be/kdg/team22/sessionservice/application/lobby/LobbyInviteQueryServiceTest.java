@@ -6,7 +6,7 @@ import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.domain.player.PlayerName;
-import be.kdg.team22.sessionservice.infrastructure.player.ExternalPlayerRepository;
+import be.kdg.team22.sessionservice.infrastructure.player.ExternalPlayersRepository;
 import be.kdg.team22.sessionservice.infrastructure.player.PlayerResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 class LobbyInviteQueryServiceTest {
 
     LobbyRepository lobbyRepo = mock(LobbyRepository.class);
-    ExternalPlayerRepository userRepo = mock(ExternalPlayerRepository.class);
+    ExternalPlayersRepository userRepo = mock(ExternalPlayersRepository.class);
 
     LobbyInviteQueryService service = new LobbyInviteQueryService(lobbyRepo);
 

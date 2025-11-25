@@ -12,21 +12,31 @@ import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
+import be.kdg.team22.sessionservice.infrastructure.games.ExternalGamesRepository;
+import be.kdg.team22.sessionservice.infrastructure.games.StartGameRequest;
+import be.kdg.team22.sessionservice.infrastructure.games.StartGameResponse;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional
 public class LobbyService {
     private final LobbyRepository repository;
     private final PlayerService playerService;
+    private final ExternalGamesRepository gamesRepository;
 
-    public LobbyService(final LobbyRepository repository, final PlayerService playerService) {
+    public LobbyService(
+            final LobbyRepository repository,
+            final PlayerService playerService,
+            final ExternalGamesRepository gamesRepository
+    ) {
         this.repository = repository;
         this.playerService = playerService;
+        this.gamesRepository = gamesRepository;
     }
 
     public Lobby createLobby(final GameId gameId, final PlayerId ownerId, final CreateLobbyModel model, final Jwt token) {
@@ -61,14 +71,37 @@ public class LobbyService {
         return lobby;
     }
 
+    public Lobby startLobby(final LobbyId lobbyId, final PlayerId ownerId, final Jwt token) {
+        Lobby lobby = findLobby(lobbyId);
+
+        lobby.ensureOwner(ownerId);
+        lobby.ensureAllPlayersReady();
+
+        List<UUID> playerIds = lobby.players()
+                .stream().map(p -> p.id().value()).toList();
+
+        StartGameResponse response = gamesRepository.startGame(
+                new StartGameRequest(
+                        lobbyId.value(),
+                        lobby.gameId().value(),
+                        playerIds,
+                        lobby.settings().gameSettings()
+                ),
+                token
+        );
+
+        lobby.markStarted(GameId.from(response.gameInstanceId()));
+
+        repository.save(lobby);
+        return lobby;
+    }
+
     private LobbySettings mapToDomainSettings(final GameSettingsModel model, final Integer maxPlayers) {
         int resolvedMaxPlayers = maxPlayers != null ? maxPlayers : 4;
 
         GameSettings gameSettings = switch (model) {
-            case TicTacToeSettingsModel t ->
-                    new TicTacToeSettings(t.boardSize());
-            case CheckersSettingsModel c ->
-                    new CheckersSettings(c.boardSize(), c.flyingKings());
+            case TicTacToeSettingsModel t -> new TicTacToeSettings(t.boardSize());
+            case CheckersSettingsModel c -> new CheckersSettings(c.boardSize(), c.flyingKings());
         };
 
         return new LobbySettings(gameSettings, resolvedMaxPlayers);

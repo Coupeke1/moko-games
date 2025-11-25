@@ -15,17 +15,14 @@ import java.util.UUID;
 public class ExternalFriendsRepository {
     private final RestClient client;
 
-    public ExternalFriendsRepository(@Qualifier("socialService") RestClient client) {
+    public ExternalFriendsRepository(@Qualifier("socialService") final RestClient client) {
         this.client = client;
     }
 
     public List<UUID> getFriendIds(final String token) {
         try {
-            FriendsOverviewResponse response = client.get()
-                    .uri("")
-                    .header("Authorization", "Bearer " + token)
-                    .retrieve()
-                    .body(FriendsOverviewResponse.class);
+            FriendsOverviewResponse response = client.get().uri("").header("Authorization", "Bearer " + token).retrieve().body(FriendsOverviewResponse.class);
+
             if (response == null)
                 return List.of();
 
@@ -35,8 +32,7 @@ public class ExternalFriendsRepository {
             if (exception.getStatusCode() == HttpStatus.NOT_FOUND)
                 return List.of();
             throw exception;
-        } catch (
-                RestClientException exception) {
+        } catch (RestClientException exception) {
             throw new NotReachableException();
         }
     }

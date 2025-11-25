@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Import;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,7 +27,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(TestcontainersConfig.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class DbLobbyRepositoryTest {
-
     @Autowired
     private LobbyJpaRepository repo;
 
@@ -38,17 +38,11 @@ class DbLobbyRepositoryTest {
 
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
-        LobbyEntity entity = new LobbyEntity(
-                id.value(),
-                gameId.value(),
-                ownerId.value(),
-                Set.of(new PlayerEmbed(ownerId.value(), "ownerUser")),
-                Set.of(),
-                settings,
-                LobbyStatus.OPEN,
-                Instant.now(),
-                Instant.now()
-        );
+        PlayerEmbed embed = new PlayerEmbed(ownerId.value(), "ownerUser", true);
+
+        UUID fakeStartedGameId = UUID.randomUUID();
+
+        LobbyEntity entity = new LobbyEntity(id.value(), gameId.value(), ownerId.value(), Set.of(embed), Set.of(), settings, LobbyStatus.OPEN, Instant.now(), Instant.now(), fakeStartedGameId);
 
         repo.save(entity);
 
@@ -65,9 +59,12 @@ class DbLobbyRepositoryTest {
         PlayerEmbed p = db.players().iterator().next();
         assertThat(p.id()).isEqualTo(ownerId.value());
         assertThat(p.username()).isEqualTo("ownerUser");
+        assertThat(p.ready()).isTrue();
 
         LobbySettings mapped = db.settings();
         assertThat(mapped.maxPlayers()).isEqualTo(4);
         assertThat(mapped.gameSettings()).isInstanceOf(TicTacToeSettings.class);
+
+        assertThat(db.startedGameId()).isEqualTo(fakeStartedGameId);
     }
 }

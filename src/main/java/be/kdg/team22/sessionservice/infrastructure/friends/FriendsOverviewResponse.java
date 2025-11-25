@@ -5,6 +5,4 @@ import java.util.List;
 public record FriendsOverviewResponse(
         List<FriendsResponse> friends,
         List<FriendsResponse> incoming,
-        List<FriendsResponse> outgoing
-) {
-}
+        List<FriendsResponse> outgoing) {}
