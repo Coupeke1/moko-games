@@ -1,13 +1,13 @@
 package be.kdg.team22.sessionservice.config;
 
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.utility.DockerImageName;
 
-@Configuration
+@TestConfiguration
 public class TestcontainersConfig {
 
     @Bean

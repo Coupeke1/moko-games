@@ -1,5 +1,8 @@
 package be.kdg.team22.sessionservice.domain.player;
 
+import org.jmolecules.ddd.annotation.Entity;
+
+@Entity
 public class Player {
     private final PlayerId id;
     private final PlayerName username;
