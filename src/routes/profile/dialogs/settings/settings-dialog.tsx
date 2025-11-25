@@ -8,7 +8,8 @@ import { Gap } from "@/components/layout/gap";
 import TabContent from "@/components/tabs/content";
 import TabRow from "@/components/tabs/row";
 import showToast from "@/components/toast";
-import type { Profile } from "@/models/profile";
+import type { Modules } from "@/models/profile/modules";
+import type { Profile } from "@/models/profile/profile";
 import { updateProfile } from "@/services/profile-service";
 import { useAuthStore } from "@/stores/auth-store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -26,18 +27,28 @@ export default function SettingsDialog({ profile, close, open, onChange }: Props
     const client = useQueryClient();
     const { token } = useAuthStore();
 
-    const [current, setCurrent] = useState<string>("Details");
+    const [current, setCurrent] = useState<string>("About");
     const [image, setImage] = useState("");
     const [description, setDescription] = useState("");
+    const [achievements, setAchievements] = useState("hidden");
+    const [favourites, setFavourites] = useState("hidden");
 
     useEffect(() => {
         setDescription(profile.description);
         setImage(profile.image);
-    }, [profile]);
+    }, [profile, open]);
 
     const save = useMutation({
-        mutationFn: async ({ profile, image, description }: { profile: Profile, image: string, description: string }) => {
-            await updateProfile(profile.id, description, image);
+        mutationFn: async (
+            { profile, description, image, achievements, favourites }: {
+                profile: Profile,
+                description: string,
+                image: string,
+                achievements: boolean,
+                favourites: boolean
+            }
+        ) => {
+            await updateProfile(profile.id, description, image, { achievements, favourites } as Modules);
         },
         onSuccess: async () => {
             await client.refetchQueries({ queryKey: ["profile", "me", token] });
@@ -53,7 +64,13 @@ export default function SettingsDialog({ profile, close, open, onChange }: Props
     });
 
     function handleSave() {
-        save.mutate({ profile, description, image });
+        save.mutate({
+            profile,
+            description,
+            image,
+            achievements: (achievements === "displayed"),
+            favourites: (favourites === "displayed")
+        });
     };
 
     return (
@@ -87,12 +104,12 @@ export default function SettingsDialog({ profile, close, open, onChange }: Props
                     {
                         title: "Modules", element: (
                             <Column>
-                                <Select label="Achievements" value="" onChange={() => { }} options={[
+                                <Select label="Achievements" value={achievements} onChange={(e) => setAchievements(e.target.value)} options={[
                                     { label: "Hidden", value: "hidden" },
                                     { label: "Displayed", value: "displayed" }
                                 ]} />
 
-                                <Select label="Favourites" value="" onChange={() => { }} options={[
+                                <Select label="Favourites" value={favourites} onChange={(e) => setFavourites(e.target.value)} options={[
                                     { label: "Hidden", value: "hidden" },
                                     { label: "Displayed", value: "displayed" }
                                 ]} />

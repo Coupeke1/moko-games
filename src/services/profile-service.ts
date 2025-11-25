@@ -1,10 +1,10 @@
 
 import { validIdCheck } from "@/lib/id";
-import type { Profile } from "@/models/profile";
+import type { Modules } from "@/models/profile/modules";
+import type { Profile } from "@/models/profile/profile";
 import axios from 'axios';
 import type { KeycloakTokenParsed } from "keycloak-js";
 import Keycloak from 'keycloak-js';
-import { redirect, useNavigate } from "react-router";
 
 const BASE_URL = import.meta.env.VITE_USER_SERVICE;
 
@@ -31,11 +31,12 @@ export async function findProfile(id: string): Promise<Profile> {
     }
 }
 
-export async function updateProfile(id: string, description: string, image: string) {
+export async function updateProfile(id: string, description: string, image: string, modules: Modules) {
     try {
         const profile: Profile = await findProfile(id);
         await updateDescription(profile.description, description);
         await updateImage(profile.image, image);
+        await updateModules(profile.modules, modules);
     } catch {
         throw new Error(`Profile with id '${id}' could not be updated`);
     }
@@ -55,8 +56,9 @@ async function updateImage(old: string, model: string) {
     });
 }
 
-async function updateModules() {
-    
+async function updateModules(old: Modules, model: Modules) {
+    if (old === model) return;
+    await axios.patch(`${BASE_URL}/me/modules`, model);
 }
 
 export async function parseProfile(keycloak: Keycloak, token: string | null): Promise<Profile | null> {
