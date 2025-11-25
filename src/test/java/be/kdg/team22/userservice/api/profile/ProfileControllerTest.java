@@ -56,7 +56,7 @@ class ProfileControllerTest {
         StatisticsEmbed statistics = new StatisticsEmbed(5, 50);
         ModulesEmbed modules = new ModulesEmbed(true, false);
 
-        repository.save(new ProfileEntity(UUID.fromString(id), username, email, description, statistics, modules, Instant.now()));
+        repository.save(new ProfileEntity(UUID.fromString(id), username, email, description, "", statistics, modules, Instant.now()));
         mock.perform(get("/api/profiles/me").with(tokenWithUser(id, "piet", "piet@kdg.be"))).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(id));
     }
 

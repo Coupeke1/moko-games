@@ -2,6 +2,8 @@ package be.kdg.team22.userservice.application.profile;
 
 import be.kdg.team22.userservice.domain.profile.*;
 import be.kdg.team22.userservice.domain.profile.exceptions.ClaimNotFoundException;
+import be.kdg.team22.userservice.infrastructure.image.ExternalImageRepository;
+import be.kdg.team22.userservice.infrastructure.image.ImageResponse;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -14,8 +16,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 class ProfileServiceTest {
-    private final ProfileRepository repository = mock(ProfileRepository.class);
-    private final ProfileService service = new ProfileService(repository);
+    private final ProfileRepository profileRepository = mock(ProfileRepository.class);
+    private final ExternalImageRepository imageRepository = mock(ExternalImageRepository.class);
+    private final ProfileService service = new ProfileService(profileRepository, imageRepository);
 
     private Jwt token(String sub, String username, String email) {
         return Jwt.withTokenValue("dummy").header("alg", "none").subject(sub).claim("preferred_username", username).claim("email", email).build();
@@ -27,14 +30,15 @@ class ProfileServiceTest {
         Jwt token = token(sub, "jan", "jan@kdg.be");
         ProfileId id = new ProfileId(UUID.fromString(sub));
 
-        when(repository.findById(id)).thenReturn(Optional.empty());
+        when(imageRepository.get()).thenReturn(new ImageResponse("test", "image", 200, 200));
+        when(profileRepository.findById(id)).thenReturn(Optional.empty());
 
         Profile profile = service.getOrCreate(token);
 
         assertThat(profile.id().value()).isEqualTo(UUID.fromString(sub));
 
         ArgumentCaptor<Profile> saved = ArgumentCaptor.forClass(Profile.class);
-        verify(repository).save(saved.capture());
+        verify(profileRepository).save(saved.capture());
     }
 
     @Test
@@ -44,13 +48,17 @@ class ProfileServiceTest {
         ProfileName username = new ProfileName("existing-user");
         ProfileEmail email = new ProfileEmail("user@existing.com");
         String description = "Test";
-        Profile existing = new Profile(id, username, email, description);
+        Profile existing = new Profile(id, username, email, description, "");
 
-        when(repository.findById(id)).thenReturn(Optional.of(existing));
+        when(imageRepository.get()).thenReturn(new ImageResponse("test", "image", 200, 200));
+        when(profileRepository.findById(id)).thenReturn(Optional.of(existing));
+
         Profile result = service.getOrCreate(token(sub, "anderenaam", "andere@mail"));
 
-        assertThat(result).isSameAs(existing);
-        verify(repository, never()).save(any());
+        assertThat(result.email()).isSameAs(existing.email());
+        assertThat(result.username()).isSameAs(existing.username());
+        assertThat(result.description()).isSameAs(existing.description());
+        verify(profileRepository, never()).save(any());
     }
 
     @Test
