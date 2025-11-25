@@ -13,8 +13,6 @@ export default function NavigationBar() {
     const toggle = () => setOpen(!open);
     const close = () => setOpen(false);
 
-    const { authenticated } = useAuthStore();
-
     return (
         <>
             <Row gap={Gap.Large} justify={Justify.Between}>

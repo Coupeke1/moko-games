@@ -11,13 +11,13 @@ interface Props {
     email: string;
     description: string;
     level: number;
-    playtime: string;
+    playTime: string;
 }
 
 function Image({ src }: { src: string }) {
     return (
         <section
-            className="bg-cover min-w-32 min-h-28 rounded-lg bg-center"
+            className="bg-cover min-w-30 min-h-30 rounded-lg bg-center"
             style={{ backgroundImage: `url(${src})` }}
         />
     )
@@ -36,12 +36,12 @@ function Statistic({ title, value }: { title: string; value: string; }) {
     return (
         <Column gap={Gap.None}>
             <h4 className="text-sm md:text-xs text-fg-2">{title}</h4>
-            <p className="text-lg md:text-md">{value}</p>
+            <p className="text-lg text-right md:text-md">{value}</p>
         </Column>
     )
 }
 
-export default function ProfileInformation({ image, username, email, description, level, playtime }: Props) {
+export default function ProfileInformation({ image, username, email, description, level, playTime: playtime }: Props) {
     return (
         <Row justify={Justify.Between} items={Items.Stretch}>
             <Row gap={Gap.Large} items={Items.Stretch}>
@@ -64,12 +64,12 @@ export default function ProfileInformation({ image, username, email, description
                 <Row gap={Gap.Large} responsive={false}>
                     <Statistic
                         title="Level"
-                        value="124"
+                        value={level.toString()}
                     />
 
                     <Statistic
                         title="Time Played"
-                        value="365h 23m"
+                        value={playtime.toString()}
                     />
                 </Row>
             </section>

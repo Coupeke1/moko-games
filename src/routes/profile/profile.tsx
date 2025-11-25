@@ -3,29 +3,35 @@ import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
 import Page from "@/components/layout/page";
 import Section from "@/components/section";
+import ErrorState from "@/components/state/error";
+import LoadingState from "@/components/state/loading";
+import { useMyProfile } from "@/hooks/use-my-profile";
 import AchievementCard from "@/routes/profile/components/achievement-card";
 import FriendCard from "@/routes/profile/components/friend-card";
 import ProfileInformation from "@/routes/profile/components/information";
 
-const profileImage = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fhips.hearstapps.com%2Fhmg-prod%2Fimages%2Fhow-to-keep-ducks-call-ducks-1615457181.jpg%3Fresize%3D2048%3A*&f=1&nofb=1&ipt=05b3fac00194ed3070012ebda1a671c31e59553b92b5373e1e361522b4f74491";
-
 export default function ProfilePage() {
+    const { data: profile, isLoading, isError } = useMyProfile();
+
+    if (isLoading) return <Page><LoadingState /></Page>
+    if (isError) return <Page><ErrorState /></Page>
+
     return (
         <Page>
             <Column gap={Gap.ExtraLarge}>
                 <ProfileInformation
-                    image={profileImage}
-                    username="niceduckbro"
-                    email="kaj.botty@student.kdg.be"
-                    description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere odit culpa cumque illum commodia exercitationem mollitia eligendi. Unde sequi facere nostrum rerum. Voluptatibus amet praesentium esse quos veniam maiores quaerat aliquid voluptates ad, at consectetur similique sint reprehenderit soluta libero voluptatum aperiam eaque accusamus dolore vitae aut! Ea, autem."
-                    level={124}
-                    playtime="365h 23m"
+                    image={profile.image}
+                    username={profile.username}
+                    email={profile.email}
+                    description={profile.description}
+                    level={profile.statistics.level}
+                    playTime={profile.statistics.playTime}
                 />
 
                 <Section title="Friends">
                     <Grid>
                         <FriendCard
-                            image={profileImage}
+                            image={profile.image}
                             username="niceduckbro"
                             level={33}
                             playtime="322h 44m"
@@ -39,17 +45,37 @@ export default function ProfilePage() {
                     </Grid>
                 </Section>
 
-                <Section title="Achievements">
-                    <Column>
-                        <AchievementCard
-                            image={"https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimg.opencritic.com%2Fgame%2F6846%2Fo%2FOynP2Fqx.jpg&f=1&nofb=1&ipt=371f8470bf154c2bf29073bc3c6ee6b8d0a1fbbfb728b1e7b20538e5266af57a"}
-                            title="The Ends and the Means"
-                            description="Discover what happened to NERO"
-                            date="7/10/23"
-                            game="Days Gone"
-                        />
-                    </Column>
-                </Section>
+                {
+                    profile.modules.achievements && (
+                        <Section title="Achievements">
+                            <Column>
+                                <AchievementCard
+                                    image={"https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimg.opencritic.com%2Fgame%2F6846%2Fo%2FOynP2Fqx.jpg&f=1&nofb=1&ipt=371f8470bf154c2bf29073bc3c6ee6b8d0a1fbbfb728b1e7b20538e5266af57a"}
+                                    title="The Ends and the Means"
+                                    description="Discover what happened to NERO"
+                                    date="7/10/23"
+                                    game="Days Gone"
+                                />
+                            </Column>
+                        </Section>
+                    )
+                }
+
+                {
+                    profile.modules.favourites && (
+                        <Section title="Favourites">
+                            <Column>
+                                <AchievementCard
+                                    image={"https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimg.opencritic.com%2Fgame%2F6846%2Fo%2FOynP2Fqx.jpg&f=1&nofb=1&ipt=371f8470bf154c2bf29073bc3c6ee6b8d0a1fbbfb728b1e7b20538e5266af57a"}
+                                    title="The Ends and the Means"
+                                    description="Discover what happened to NERO"
+                                    date="7/10/23"
+                                    game="Days Gone"
+                                />
+                            </Column>
+                        </Section>
+                    )
+                }
             </Column>
         </Page>
     )

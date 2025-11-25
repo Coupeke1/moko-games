@@ -1,5 +1,7 @@
 import { useAuthStore } from "@/stores/auth-store";
 import { useEffect } from "react";
+import LoadingState from "@/components/state/loading";
+import Page from "./layout/page";
 
 const config: Keycloak.KeycloakConfig = {
     url: import.meta.env.VITE_AUTH_URL,
@@ -15,13 +17,10 @@ export default function Auth() {
         initAuth(config);
     }, []);
 
-    if (!initialized) {
-        return (
-            <main className="bg-bg min-h-screen flex items-center justify-center">
-                <p className="text-fg-2 animate-pulse">Loading...</p>
-            </main>
-        );
-    }
-
+    if (!initialized) return (
+        <Page>
+            <LoadingState />
+        </Page>
+    )
     return <></>;
 }
