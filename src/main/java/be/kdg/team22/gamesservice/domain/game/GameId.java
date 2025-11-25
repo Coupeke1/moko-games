@@ -1,5 +1,6 @@
 package be.kdg.team22.gamesservice.domain.game;
 
+import be.kdg.team22.gamesservice.domain.game.exceptions.GameIdNullException;
 import be.kdg.team22.gamesservice.domain.game.exceptions.GameNotFoundException;
 import org.jmolecules.ddd.annotation.ValueObject;
 
@@ -9,7 +10,7 @@ import java.util.UUID;
 public record GameId(UUID value) {
 
     public GameId {
-        if (value == null) throw new IllegalArgumentException("GameId cannot be null");
+        if (value == null) throw new GameIdNullException();
     }
 
     public static GameId from(UUID value) {
