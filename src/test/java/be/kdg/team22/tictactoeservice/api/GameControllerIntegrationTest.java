@@ -100,8 +100,8 @@ public class GameControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(model)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.players[?(@.role == 'X')].id.value").value(players.getFirst().toString()))
-                .andExpect(jsonPath("$.players[?(@.role == 'O')].id.value").value(players.get(1).toString()));
+                .andExpect(jsonPath("$.players[?(@.role == 'X')].id").value(players.getFirst().toString()))
+                .andExpect(jsonPath("$.players[?(@.role == 'O')].id").value(players.get(1).toString()));
     }
 
     @Test
