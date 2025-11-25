@@ -1,14 +1,19 @@
 package be.kdg.team22.gamesservice.api.game;
+
+import be.kdg.team22.gamesservice.api.game.models.GameDetailsModel;
+import be.kdg.team22.gamesservice.api.game.models.GameListModel;
 import be.kdg.team22.gamesservice.api.game.models.StartGameRequest;
 import be.kdg.team22.gamesservice.api.game.models.StartGameResponseModel;
 import be.kdg.team22.gamesservice.application.game.GameService;
+import be.kdg.team22.gamesservice.domain.game.Game;
+import be.kdg.team22.gamesservice.domain.game.GameId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/games")
@@ -27,5 +32,22 @@ public class GameController {
         StartGameResponseModel response = service.startGame(request);
 
         return ResponseEntity.accepted().body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<GameListModel> getAllGames() {
+        List<Game> games = service.findAll();
+
+        List<GameDetailsModel> models = games.stream()
+                .map(GameDetailsModel::from)
+                .toList();
+
+        return ResponseEntity.ok(new GameListModel(models));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<GameDetailsModel> getGameById(@PathVariable UUID id) {
+        Game game = service.findById(GameId.from(id));
+        return ResponseEntity.ok(GameDetailsModel.from(game));
     }
 }
