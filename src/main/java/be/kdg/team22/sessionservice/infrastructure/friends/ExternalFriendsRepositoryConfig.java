@@ -11,6 +11,8 @@ class ExternalFriendsRepositoryConfig {
     @Bean
     @Qualifier("socialService")
     RestClient socialServiceClient(@Value("${social-service.url}") final String baseUrl) {
-        return RestClient.builder().baseUrl(baseUrl).build();
+        return RestClient.builder()
+                .baseUrl(baseUrl + "/api/friends")
+                .build();
     }
 }

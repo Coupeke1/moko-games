@@ -11,6 +11,8 @@ class ExternalPlayersRepositoryConfig {
     @Bean
     @Qualifier("userService")
     RestClient userServiceClient(@Value("${user-service.url}") final String baseUrl) {
-        return RestClient.builder().baseUrl(baseUrl).build();
+        return RestClient.builder()
+                .baseUrl(baseUrl + "/api/profiles")
+                .build();
     }
 }
