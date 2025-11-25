@@ -18,7 +18,7 @@ WORKDIR /app
 
 COPY --from=build /app/build/libs/*.jar app.jar
 
-EXPOSE 8080
+EXPOSE 8084
 
 ARG CI_COMMIT_SHA
 ARG CI_PIPELINE_CREATED_AT
