@@ -1,5 +1,4 @@
 package be.kdg.team22.gamesservice.infrastructure.game.engine;
-
 import be.kdg.team22.gamesservice.api.game.models.CheckersSettingsModel;
 import be.kdg.team22.gamesservice.api.game.models.GameSettingsModel;
 import be.kdg.team22.gamesservice.api.game.models.StartGameRequest;
@@ -12,12 +11,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
-
 import java.util.UUID;
 
 @Component
 public class ExternalGamesRepository {
-
     public UUID startExternalGame(Game game, StartGameRequest request) {
 
         String engineUrl = game.baseUrl() + game.startEndpoint();
@@ -27,9 +24,7 @@ public class ExternalGamesRepository {
                 mapSettings(request.settings())
         );
 
-        RestClient client = RestClient.builder()
-                .baseUrl(engineUrl)
-                .build();
+        RestClient client = createRestClient(engineUrl);
 
         try {
             EngineGameResponse response = client.post()
@@ -41,14 +36,22 @@ public class ExternalGamesRepository {
             return response.id();
 
         } catch (HttpClientErrorException ex) {
+
             if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
                 throw new EngineGameNotFoundException(request.gameId());
             }
+
             throw ex;
 
         } catch (RestClientException ex) {
             throw new EngineNotReachableException(engineUrl);
         }
+    }
+
+    RestClient createRestClient(String baseUrl) {
+        return RestClient.builder()
+                .baseUrl(baseUrl)
+                .build();
     }
 
     private Object mapSettings(GameSettingsModel model) {
