@@ -1,10 +1,12 @@
+import type { ChangeEvent } from "react";
+
 interface Props {
     label: string;
     disabled?: boolean;
     required?: boolean;
     value: string;
-    onChange: (e: any) => void;
-    options: { value: any; label: string; default?: boolean }[];
+    onChange: (e: ChangeEvent<HTMLSelectElement>) => void;
+    options: { value: string; label: string; default?: boolean }[];
 }
 
 export default function Select({ label, disabled, required, value, onChange, options }: Props) {

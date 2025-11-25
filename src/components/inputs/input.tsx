@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ChangeEvent, ReactNode } from "react";
 
 interface Props {
     label: string;
@@ -6,7 +6,7 @@ interface Props {
     disabled?: boolean;
     required?: boolean;
     value: string;
-    onChange: (e: any) => void;
+    onChange: (e: ChangeEvent<HTMLInputElement>) => void;
     children?: ReactNode;
 }
 
