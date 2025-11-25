@@ -19,7 +19,8 @@ import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.domain.player.PlayerName;
-import be.kdg.team22.sessionservice.infrastructure.games.GameClient;
+import be.kdg.team22.sessionservice.infrastructure.games.ExternalGamesRepository;
+import be.kdg.team22.sessionservice.infrastructure.games.StartGameResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -36,10 +37,10 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class LobbyServiceTest {
-    private LobbyRepository repo = mock(LobbyRepository.class);
-    private PlayerService playerService = mock(PlayerService.class);
-    private GameClient gameClient = mock(GameClient.class);
-    private LobbyService service = new LobbyService(repo, playerService, gameClient);
+    private final LobbyRepository repo = mock(LobbyRepository.class);
+    private final PlayerService playerService = mock(PlayerService.class);
+    private final ExternalGamesRepository gameClient = mock(ExternalGamesRepository.class);
+    private final LobbyService service = new LobbyService(repo, playerService, gameClient);
 
     private Jwt jwtFor(PlayerId owner) {
         return Jwt.withTokenValue("TOKEN-" + owner.value()).header("alg", "none").header("typ", "JWT").claim("sub", owner.value().toString()).claim("preferred_username", "owner").issuedAt(Instant.now()).expiresAt(Instant.now().plusSeconds(3600)).build();
@@ -204,7 +205,7 @@ class LobbyServiceTest {
         when(repo.findById(id)).thenReturn(Optional.of(lobby));
 
         UUID newGameInstance = UUID.randomUUID();
-        GameClient.StartGameResponse response = new GameClient.StartGameResponse(newGameInstance);
+        StartGameResponse response = new StartGameResponse(newGameInstance);
 
         when(gameClient.startGame(any(), any())).thenReturn(response);
 

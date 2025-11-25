@@ -11,14 +11,13 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
 @Component
-public class ExternalGamesRepository implements GameClient {
+public class ExternalGamesRepository {
     private final RestClient client;
 
     public ExternalGamesRepository(@Qualifier("gameService") final RestClient client) {
         this.client = client;
     }
 
-    @Override
     public StartGameResponse startGame(StartGameRequest request, Jwt token) {
         try {
             return client.post().uri("/api/games").header("Authorization", "Bearer " + token.getTokenValue()).body(request).retrieve().body(StartGameResponse.class);

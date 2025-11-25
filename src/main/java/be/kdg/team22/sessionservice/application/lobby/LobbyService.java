@@ -12,7 +12,9 @@ import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
-import be.kdg.team22.sessionservice.infrastructure.games.GameClient;
+import be.kdg.team22.sessionservice.infrastructure.games.ExternalGamesRepository;
+import be.kdg.team22.sessionservice.infrastructure.games.StartGameRequest;
+import be.kdg.team22.sessionservice.infrastructure.games.StartGameResponse;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,16 +27,16 @@ import java.util.UUID;
 public class LobbyService {
     private final LobbyRepository repository;
     private final PlayerService playerService;
-    private final GameClient gameClient;
+    private final ExternalGamesRepository gamesRepository;
 
     public LobbyService(
             final LobbyRepository repository,
             final PlayerService playerService,
-            final GameClient gameClient
+            final ExternalGamesRepository gamesRepository
     ) {
         this.repository = repository;
         this.playerService = playerService;
-        this.gameClient = gameClient;
+        this.gamesRepository = gamesRepository;
     }
 
     public Lobby createLobby(final GameId gameId, final PlayerId ownerId, final CreateLobbyModel model, final Jwt token) {
@@ -78,8 +80,8 @@ public class LobbyService {
         List<UUID> playerIds = lobby.players()
                 .stream().map(p -> p.id().value()).toList();
 
-        GameClient.StartGameResponse response = gameClient.startGame(
-                new GameClient.StartGameRequest(
+        StartGameResponse response = gamesRepository.startGame(
+                new StartGameRequest(
                         lobbyId.value(),
                         lobby.gameId().value(),
                         playerIds,
