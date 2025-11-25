@@ -25,7 +25,7 @@ export async function getProfile(id: string): Promise<Profile> {
 
         if (data.id !== id) throw new Error("Profile not found!");
         return data;
-    } catch (error) {
+    } catch {
         throw new Error(`Profile with id '${id}' could not be fetched`);
     }
 }
@@ -47,7 +47,7 @@ export async function parseProfile(keycloak: Keycloak, token: string | null): Pr
         const profile = await getProfile(id);
 
         return profile;
-    } catch (error) {
+    } catch {
         throw new Error("Profile could not be found");
     }
 }

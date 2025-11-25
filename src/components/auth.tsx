@@ -15,7 +15,7 @@ export default function Auth() {
 
     useEffect(() => {
         initAuth(config);
-    }, []);
+    });
 
     if (!initialized) return (
         <Page>

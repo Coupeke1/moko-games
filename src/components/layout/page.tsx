@@ -1,4 +1,3 @@
-import Auth from "@/components/auth"
 import { Gap } from "@/components/layout/gap"
 import NavigationBar from "@/components/navigation/bar"
 import Footer from "@/components/navigation/footer"
