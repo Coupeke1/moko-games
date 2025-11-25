@@ -1,5 +1,5 @@
-import type {GameState} from "@/routes/game/model/GameState.ts";
-import {CurrentPlayerDisplay} from "@/routes/game/components/CurrentPlayerDisplay.tsx";
+import type {GameState} from "@/routes/game/model/game-state.ts";
+import {CurrentPlayerDisplay} from "@/routes/game/components/current-player-display.tsx";
 
 interface TurnIndicatorProps {
     gameState: GameState;

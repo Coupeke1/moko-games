@@ -1,6 +1,6 @@
 import {useParams} from "react-router";
-import {useGameState} from "@/routes/game/hooks/useGameState.ts";
-import {TurnIndicator} from "@/routes/game/components/TurnIndicator.tsx";
+import {useGameState} from "@/routes/game/hooks/use-game-state.ts";
+import {TurnIndicator} from "@/routes/game/components/turn-indicator.tsx";
 
 export default function GamePage() {
     const {id} = useParams<{ id: string }>()
