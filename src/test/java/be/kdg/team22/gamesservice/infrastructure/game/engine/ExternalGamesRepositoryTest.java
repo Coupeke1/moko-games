@@ -1,4 +1,5 @@
 package be.kdg.team22.gamesservice.infrastructure.game.engine;
+
 import be.kdg.team22.gamesservice.api.game.models.CheckersSettingsModel;
 import be.kdg.team22.gamesservice.api.game.models.GameSettingsModel;
 import be.kdg.team22.gamesservice.api.game.models.StartGameRequest;
@@ -13,8 +14,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
@@ -29,7 +33,12 @@ class ExternalGamesRepositoryTest {
                 GameId.from(UUID.fromString("00000000-0000-0000-0000-000000000111")),
                 "tic-tac-toe",
                 "http://engine-service",
-                "/start"
+                "/start",
+                "Tic Tac Toe",
+                "A simple tic-tac-toe game",
+                new BigDecimal("5.00"),
+                "http://image",
+                null
         );
     }
 
@@ -74,7 +83,6 @@ class ExternalGamesRepositoryTest {
     @Test
     @DisplayName("startExternalGame – success returns engine gameId")
     void startExternalGame_success() {
-
         UUID instanceId = UUID.fromString("99999999-aaaa-aaaa-aaaa-999999999999");
         EngineGameResponse response = new EngineGameResponse(instanceId);
 
@@ -102,7 +110,7 @@ class ExternalGamesRepositoryTest {
     }
 
     @Test
-    @DisplayName("startExternalGame – other 4xx rethrows HttpClientErrorException")
+    @DisplayName("startExternalGame – other 4xx → rethrow HttpClientErrorException")
     void startExternalGame_other4xx() {
         RestClient mock = mockClientThrowing(new HttpClientErrorException(HttpStatus.FORBIDDEN));
 
@@ -114,7 +122,7 @@ class ExternalGamesRepositoryTest {
     }
 
     @Test
-    @DisplayName("startExternalGame – RestClientException triggers EngineNotReachableException")
+    @DisplayName("startExternalGame – RestClientException → EngineNotReachableException")
     void startExternalGame_notReachable() {
         RestClient mock = mockClientThrowing(new RestClientException("connection refused"));
 

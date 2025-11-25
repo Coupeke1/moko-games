@@ -112,4 +112,43 @@ public class GameEntity {
     public UUID id() {
         return id;
     }
+
+    public String name() {
+        return name;
+    }
+
+    public String baseUrl() {
+        return baseUrl;
+    }
+
+    public String startEndpoint() {
+        return startEndpoint;
+    }
+
+    public String title() {
+        return title;
+    }
+
+    public String description() {
+        return description;
+    }
+
+    public BigDecimal price() {
+        return price;
+    }
+
+    public String imageUrl() {
+        return imageUrl;
+    }
+
+    public String storeUrl() {
+        return storeUrl;
+    }
+
+    public Instant createdAt() {
+        return createdAt;
+    }
+    public Instant updatedAt() {
+        return updatedAt;
+    }
 }

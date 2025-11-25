@@ -14,6 +14,7 @@ import be.kdg.team22.gamesservice.infrastructure.game.engine.ExternalGamesReposi
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,17 +27,26 @@ class GameServiceTest {
 
     private final GameRepository gameRepository = mock(GameRepository.class);
     private final ExternalGamesRepository engine = mock(ExternalGamesRepository.class);
-
     private final GameService service = new GameService(gameRepository, engine);
 
     private Game exampleGame(GameId id) {
-        return new Game(id, "checkers", "http://localhost:8087", "/start");
+        return new Game(
+                id,
+                "checkers",
+                "http://localhost:8087",
+                "/start",
+                "Checkers",
+                "A fun board game",
+                BigDecimal.TEN,
+                "http://img",
+                "http://store"
+        );
     }
 
     private StartGameRequest createRequest(GameSettingsModel settings) {
         return new StartGameRequest(
-                UUID.fromString("11111111-1111-1111-1111-111111111111"), // lobbyId
-                UUID.fromString("22222222-2222-2222-2222-222222222222"), // gameId
+                UUID.fromString("11111111-1111-1111-1111-111111111111"),
+                UUID.fromString("22222222-2222-2222-2222-222222222222"), 
                 List.of(
                         UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
                         UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
@@ -72,7 +82,7 @@ class GameServiceTest {
         StartGameRequest request = new StartGameRequest(
                 UUID.randomUUID(),
                 UUID.randomUUID(),
-                List.of(),
+                List.of(),   // leeg!
                 new CheckersSettingsModel(8, true)
         );
 
@@ -84,14 +94,11 @@ class GameServiceTest {
     }
 
     @Test
-    @DisplayName("startGame – null settings throws InvalidGameConfigurationException")
+    @DisplayName("startGame → null settings → InvalidGameConfigurationException")
     void startGame_nullSettings() {
-
-        UUID gameIdRaw = UUID.fromString("22222222-2222-2222-2222-222222222222");
-
         StartGameRequest request = new StartGameRequest(
                 UUID.randomUUID(),
-                gameIdRaw,
+                UUID.randomUUID(),
                 List.of(UUID.randomUUID()),
                 null
         );
@@ -116,5 +123,51 @@ class GameServiceTest {
 
         verify(gameRepository).findById(id);
         verifyNoInteractions(engine);
+    }
+
+    @Test
+    @DisplayName("findById → returns game when found")
+    void findById_found() {
+        GameId id = GameId.from(UUID.randomUUID());
+        Game game = exampleGame(id);
+
+        when(gameRepository.findById(id)).thenReturn(Optional.of(game));
+
+        Game result = service.findById(id);
+
+        assertThat(result).isEqualTo(game);
+        verify(gameRepository).findById(id);
+    }
+
+    @Test
+    @DisplayName("findById → throws GameNotFoundException when missing")
+    void findById_notFound() {
+        GameId id = GameId.from(UUID.randomUUID());
+
+        when(gameRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.findById(id))
+                .isInstanceOf(GameNotFoundException.class);
+
+        verify(gameRepository).findById(id);
+    }
+
+    @Test
+    @DisplayName("findAll → returns all games")
+    void findAll_returnsList() {
+        GameId id1 = GameId.from(UUID.randomUUID());
+        GameId id2 = GameId.from(UUID.randomUUID());
+
+        List<Game> games = List.of(
+                exampleGame(id1),
+                exampleGame(id2)
+        );
+
+        when(gameRepository.findAll()).thenReturn(games);
+
+        List<Game> result = service.findAll();
+
+        assertThat(result).containsExactlyElementsOf(games);
+        verify(gameRepository).findAll();
     }
 }
