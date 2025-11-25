@@ -7,6 +7,7 @@ import ProfilePage from "@/routes/profile/profile"
 import StorePage from "@/routes/store/store"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { BrowserRouter, Navigate, Route, Routes } from "react-router"
+import { Toaster } from "sonner"
 
 const client = new QueryClient();
 
@@ -28,6 +29,8 @@ function App() {
                     <Route path="/cart" element={<CartPage />} />
                 </Routes>
             </BrowserRouter>
+
+            <Toaster position="top-right" />
         </QueryClientProvider>
     )
 }

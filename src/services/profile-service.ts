@@ -1,6 +1,7 @@
 
 import { validIdCheck } from "@/lib/id";
-import type { Profile } from "@/models/profile";
+import type { Modules } from "@/models/profile/modules";
+import type { Profile } from "@/models/profile/profile";
 import axios from 'axios';
 import type { KeycloakTokenParsed } from "keycloak-js";
 import Keycloak from 'keycloak-js';
@@ -18,7 +19,7 @@ export function removeToken() {
     delete axios.defaults.headers.common['Authorization']
 }
 
-export async function getProfile(id: string): Promise<Profile> {
+export async function findProfile(id: string): Promise<Profile> {
     try {
         validIdCheck(id);
         const { data } = await axios.get<Profile>(`${BASE_URL}/me`);
@@ -28,6 +29,36 @@ export async function getProfile(id: string): Promise<Profile> {
     } catch {
         throw new Error(`Profile with id '${id}' could not be fetched`);
     }
+}
+
+export async function updateProfile(id: string, description: string, image: string, modules: Modules) {
+    try {
+        const profile: Profile = await findProfile(id);
+        await updateDescription(profile.description, description);
+        await updateImage(profile.image, image);
+        await updateModules(profile.modules, modules);
+    } catch {
+        throw new Error(`Profile with id '${id}' could not be updated`);
+    }
+}
+
+async function updateDescription(old: string, model: string) {
+    if (old === model) return;
+    await axios.patch(`${BASE_URL}/me/description`, model, {
+        headers: { 'Content-Type': 'text/plain' }
+    });
+}
+
+async function updateImage(old: string, model: string) {
+    if (old === model) return;
+    await axios.patch(`${BASE_URL}/me/image`, model, {
+        headers: { 'Content-Type': 'text/plain' }
+    });
+}
+
+async function updateModules(old: Modules, model: Modules) {
+    if (old === model) return;
+    await axios.patch(`${BASE_URL}/me/modules`, model);
 }
 
 export async function parseProfile(keycloak: Keycloak, token: string | null): Promise<Profile | null> {
@@ -44,7 +75,7 @@ export async function parseProfile(keycloak: Keycloak, token: string | null): Pr
         if (parsedToken.sub === undefined) throw new Error("Id could not be found");
 
         const id: string = parsedToken.sub;
-        const profile = await getProfile(id);
+        const profile = await findProfile(id);
 
         return profile;
     } catch {

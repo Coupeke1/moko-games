@@ -7,7 +7,7 @@ export default function StorePage() {
     return (
         <Page>
             <Column>
-                <Input label="Search Store..." value="" onChange={() => { }} />
+                <Input placeholder="Search Store..." value="" onChange={() => { }} />
                 <Select label="Sorting" value="" onChange={() => { }} options={[]} />
                 <Select label="Category" value="" onChange={() => { }} options={[]} />
             </Column>

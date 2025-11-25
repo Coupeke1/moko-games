@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
 import Column from "@/components/layout/column";
-import { Gap } from "./layout/gap";
+import type { ReactNode } from "react";
+import { Gap } from "@/components/layout/gap";
 
 interface Props {
     title: string;

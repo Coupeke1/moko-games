@@ -1,7 +1,8 @@
 import type { ChangeEvent, ReactNode } from "react";
 
 interface Props {
-    label: string;
+    label?: string;
+    placeholder?: string;
     type?: string;
     disabled?: boolean;
     required?: boolean;
@@ -10,21 +11,12 @@ interface Props {
     children?: ReactNode;
 }
 
-export default function Input({ label, type = "text", disabled, required, value, onChange, children }: Props) {
+export default function Input({ label, placeholder, type = "text", disabled, required, value, onChange }: Props) {
     return (
-        <input
-            type={type}
-            required={required}
-            disabled={disabled}
-            placeholder={label}
-            className="rounded-lg bg-bg-2 w-full h-10 px-3 placeholder:text-fg-2"
-            value={value} onChange={onChange}
-        >
-            {children && (
-                <section className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    {children}
-                </section>
-            )}
-        </input>
+        <label className="flex flex-col w-full">
+            {label && <span className="font-semibold pl-1">{label} {required ? <span>(required)</span> : <></>}</span>}
+            <input placeholder={placeholder} type={type} disabled={disabled} value={value} onChange={onChange} className="rounded-lg bg-bg-2 w-full h-10 px-3 placeholder:text-fg-2 disabled:text-fg-2 font-semibold"
+            />
+        </label>
     )
 }

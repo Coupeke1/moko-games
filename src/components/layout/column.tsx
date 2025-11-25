@@ -9,13 +9,14 @@ interface Props {
     justify?: Justify,
     items?: Items,
     padding?: Padding;
+    grow?: boolean;
     maxHeight?: boolean,
     children: ReactNode
 }
 
-export default function Column({ gap = Gap.Medium, justify = Justify.None, items = Items.Stretch, padding = Padding.None, maxHeight, children }: Props) {
+export default function Column({ gap = Gap.Medium, justify = Justify.None, items = Items.Stretch, padding = Padding.None, grow, maxHeight, children }: Props) {
     return (
-        <section className={`flex flex-col ${gap} ${padding} ${justify} ${items} ${maxHeight ? "min-h-screen" : ""}`}>
+        <section className={`flex flex-col ${gap} ${padding} ${justify} ${items} ${maxHeight ? "min-h-screen" : ""} ${grow ? "grow" : ""}`}>
             {children}
         </section>
     )

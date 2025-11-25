@@ -1,3 +1,4 @@
+import PlusIcon from "@/components/icons/plus-icon";
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
@@ -9,15 +10,20 @@ import { useMyProfile } from "@/hooks/use-my-profile";
 import AchievementCard from "@/routes/profile/components/achievement-card";
 import FriendCard from "@/routes/profile/components/friend-card";
 import ProfileInformation from "@/routes/profile/components/information";
+import { useState } from "react";
+import SettingsDialog from "./dialogs/settings/settings-dialog";
 
 export default function ProfilePage() {
-    const { data: profile, isLoading, isError } = useMyProfile();
+    const { profile, isLoading, isError } = useMyProfile();
+    const [settings, setSettings] = useState(false);
 
-    if (isLoading) return <Page><LoadingState /></Page>
+    if (isLoading || profile === undefined) return <Page><LoadingState /></Page>
     if (isError) return <Page><ErrorState /></Page>
 
     return (
         <Page>
+            <SettingsDialog profile={profile} close={() => setSettings(false)} open={settings} onChange={setSettings} />
+
             <Column gap={Gap.ExtraLarge}>
                 <ProfileInformation
                     image={profile.image}
@@ -26,6 +32,7 @@ export default function ProfilePage() {
                     description={profile.description}
                     level={profile.statistics.level}
                     playTime={profile.statistics.playTime}
+                    onEdit={() => setSettings(true)}
                 />
 
                 <Section title="Friends">
@@ -38,9 +45,7 @@ export default function ProfilePage() {
                         />
 
                         <button className="bg-bg-2 hover:bg-bg-3 transition-colors duration-75 flex flex-col justify-center items-center cursor-pointer select-none x-4 py-2 rounded-lg h-48">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-8 text-fg-2">
-                                <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z" clipRule="evenodd" />
-                            </svg>
+                            <PlusIcon />
                         </button>
                     </Grid>
                 </Section>
