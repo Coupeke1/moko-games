@@ -23,7 +23,7 @@ public class GameService {
 
     public Game startGame(final CreateGameModel model) {
         List<PlayerId> players = model.players().stream().map(PlayerId::new).toList();
-        Game game = Game.create(new GameId(model.gameId()), config.minSize(), config.maxSize(), model.settings().boardSize(), players);
+        Game game = Game.create(config.minSize(), config.maxSize(), model.settings().boardSize(), players);
         repository.save(game);
         return game;
     }

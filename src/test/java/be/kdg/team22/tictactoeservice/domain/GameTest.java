@@ -1,6 +1,9 @@
 package be.kdg.team22.tictactoeservice.domain;
 
-import be.kdg.team22.tictactoeservice.domain.game.*;
+import be.kdg.team22.tictactoeservice.domain.game.Board;
+import be.kdg.team22.tictactoeservice.domain.game.Game;
+import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
+import be.kdg.team22.tictactoeservice.domain.game.Move;
 import be.kdg.team22.tictactoeservice.domain.game.exceptions.*;
 import be.kdg.team22.tictactoeservice.domain.player.Player;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
@@ -25,8 +28,7 @@ public class GameTest {
     public void setup() {
         Player playerX = new Player(PlayerId.create(), PlayerRole.X);
         Player playerO = new Player(PlayerId.create(), PlayerRole.O);
-        game = Game.create(GameId.create(),
-                minSize, maxSize, 3,
+        game = Game.create(minSize, maxSize, 3,
                 List.of(playerX.id(), playerO.id()));
     }
 
@@ -61,8 +63,7 @@ public class GameTest {
     void createShouldThrowWhenTooFewPlayers() {
         PlayerId playerId = PlayerId.create();
         assertThrows(GameSizeException.class, () ->
-                Game.create(GameId.create(),
-                        minSize, maxSize, 3,
+                Game.create(minSize, maxSize, 3,
                         List.of(playerId)));
     }
 
@@ -73,8 +74,7 @@ public class GameTest {
             playerIds.add(PlayerId.create());
         }
         assertThrows(GameSizeException.class, () ->
-                Game.create(GameId.create(),
-                        minSize, maxSize, 3,
+                Game.create(minSize, maxSize, 3,
                         playerIds));
     }
 
@@ -84,8 +84,7 @@ public class GameTest {
         PlayerId playerX = new PlayerId(uuid);
         PlayerId playerO = new PlayerId(uuid);
         assertThrows(UniquePlayersException.class, () ->
-                Game.create(GameId.create(),
-                        minSize, maxSize, 3,
+                Game.create(minSize, maxSize, 3,
                         List.of(playerX, playerO)));
     }
 

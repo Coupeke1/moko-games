@@ -43,8 +43,6 @@ public class GameControllerIntegrationTest {
         players = List.of(UUID.randomUUID(), UUID.randomUUID());
 
         model = new CreateGameModel(
-                UUID.randomUUID(),
-                UUID.randomUUID(),
                 players,
                 new GameSettingsModel(3)
         );
@@ -53,15 +51,13 @@ public class GameControllerIntegrationTest {
     @Test
     void shouldCreateGameWithDefaultSize() throws Exception {
         CreateGameModel defaultModel = new CreateGameModel(
-                UUID.randomUUID(),
-                UUID.randomUUID(),
                 players,
                 new GameSettingsModel(0)
         );
 
         mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(model)))
+                        .content(objectMapper.writeValueAsString(defaultModel)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.board.length()").value(3))
@@ -71,8 +67,6 @@ public class GameControllerIntegrationTest {
     @Test
     void shouldCreateWithCustomSize() throws Exception {
         CreateGameModel modelSizeFive = new CreateGameModel(
-                UUID.randomUUID(),
-                UUID.randomUUID(),
                 players,
                 new GameSettingsModel(5)
         );
@@ -89,8 +83,6 @@ public class GameControllerIntegrationTest {
     @Test
     void shouldRejectInvalidSize() throws Exception {
         CreateGameModel modelSizeOne = new CreateGameModel(
-                UUID.randomUUID(),
-                UUID.randomUUID(),
                 List.of(players.getFirst()),
                 new GameSettingsModel(1)
         );
@@ -115,15 +107,11 @@ public class GameControllerIntegrationTest {
     @Test
     void shouldRejectWithMissingPlayers() throws Exception {
         CreateGameModel onePlayerModel = new CreateGameModel(
-                UUID.randomUUID(),
-                UUID.randomUUID(),
                 List.of(players.getFirst()),
                 new GameSettingsModel(3)
         );
 
         CreateGameModel noPlayersModel = new CreateGameModel(
-                UUID.randomUUID(),
-                UUID.randomUUID(),
                 List.of(),
                 new GameSettingsModel(3)
         );

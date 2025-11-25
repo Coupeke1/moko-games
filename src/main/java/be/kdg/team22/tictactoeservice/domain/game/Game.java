@@ -19,8 +19,8 @@ public class Game {
     private PlayerRole currentRole;
     private PlayerId winner;
 
-    private Game(final GameId id, final int requestedSize, final List<Player> players) {
-        this.id = id;
+    private Game(final int requestedSize, final List<Player> players) {
+        this.id = GameId.create();
         board = Board.create(requestedSize);
         status = GameStatus.IN_PROGRESS;
         this.players = new TreeSet<>(Comparator.comparing((Player player) ->
@@ -31,7 +31,7 @@ public class Game {
         winner = null;
     }
 
-    public static Game create(final GameId id, final int minSize, final int maxSize, final int size, final List<PlayerId> playerIds) {
+    public static Game create(final int minSize, final int maxSize, final int size, final List<PlayerId> playerIds) {
         if (size < minSize || size > maxSize)
             throw new BoardSizeException(minSize, maxSize);
 
@@ -51,7 +51,7 @@ public class Game {
             players.add(new Player(playerId, role));
         }
 
-        return new Game(id, size, players);
+        return new Game(size, players);
     }
 
     public void reset() {
