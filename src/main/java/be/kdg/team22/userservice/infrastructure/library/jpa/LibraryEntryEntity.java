@@ -50,4 +50,20 @@ public class LibraryEntryEntity {
                 purchasedAt
         );
     }
+
+    public UUID id() {
+        return id;
+    }
+
+    public UUID userId() {
+        return userId;
+    }
+
+    public UUID gameId() {
+        return gameId;
+    }
+
+    public Instant purchasedAt() {
+        return purchasedAt;
+    }
 }

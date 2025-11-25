@@ -4,6 +4,7 @@ import be.kdg.team22.userservice.api.library.models.LibraryGameModel;
 import be.kdg.team22.userservice.api.library.models.LibraryGamesModel;
 import be.kdg.team22.userservice.domain.library.LibraryEntry;
 import be.kdg.team22.userservice.domain.library.LibraryRepository;
+import be.kdg.team22.userservice.domain.profile.ProfileId;
 import be.kdg.team22.userservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.userservice.infrastructure.games.GameDetailsResponse;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -27,9 +27,9 @@ public class LibraryService {
         this.gamesRepository = gamesRepository;
     }
 
-    public LibraryGamesModel getLibraryForUser(UUID userId, Jwt token) {
+    public LibraryGamesModel getLibraryForUser(ProfileId userId, Jwt token) {
 
-        List<LibraryEntry> entries = libraryRepository.findByUserId(userId);
+        List<LibraryEntry> entries = libraryRepository.findByUserId(userId.value());
 
         List<LibraryGameModel> models = entries.stream()
                 .map(entry -> {
