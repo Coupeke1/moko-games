@@ -1,49 +1,53 @@
 package be.kdg.team22.gamesservice.application.game;
 
-import be.kdg.team22.gamesservice.api.game.models.GameSettingsModel;
 import be.kdg.team22.gamesservice.api.game.models.StartGameRequest;
+import be.kdg.team22.gamesservice.api.game.models.StartGameResponseModel;
 import be.kdg.team22.gamesservice.domain.game.Game;
 import be.kdg.team22.gamesservice.domain.game.GameId;
 import be.kdg.team22.gamesservice.domain.game.GameRepository;
 import be.kdg.team22.gamesservice.domain.game.exceptions.GameNotFoundException;
+import be.kdg.team22.gamesservice.domain.game.exceptions.InvalidGameConfigurationException;
 import be.kdg.team22.gamesservice.domain.game.exceptions.PlayersListEmptyException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import be.kdg.team22.gamesservice.infrastructure.game.engine.EngineStartRequest;
+import be.kdg.team22.gamesservice.infrastructure.game.engine.ExternalGamesRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class GameService {
 
-    private static final Logger log = LoggerFactory.getLogger(GameService.class);
-
     private final GameRepository gameRepository;
+    private final ExternalGamesRepository engine;
 
-    public GameService(final GameRepository gameRepository) {
+    public GameService(GameRepository gameRepository,
+                       ExternalGamesRepository engine) {
         this.gameRepository = gameRepository;
+        this.engine = engine;
     }
 
-    public void startGame(final StartGameRequest command) {
-        if (command.players() == null || command.players().isEmpty()) {
+    public StartGameResponseModel startGame(StartGameRequest request) {
+
+        if (request.players() == null || request.players().isEmpty())
             throw new PlayersListEmptyException();
-        }
 
-        GameSettingsModel settings = command.settings();
-        if (settings == null) {
-            throw new IllegalArgumentException("Game settings cannot be null");
-        }
+        if (request.settings() == null)
+            throw new InvalidGameConfigurationException("Game settings cannot be null");
 
-        GameId gameId = new GameId(command.gameId());
-        Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new GameNotFoundException(gameId));
+        GameId id = GameId.from(request.gameId());
+        Game game = gameRepository.findById(id)
+                .orElseThrow(() -> new GameNotFoundException(id));
 
-        log.info(
-                "Starting game '{}' for lobby {} with {} players and settings type {}",
-                game.name(),
-                command.lobbyId(),
-                command.players().size(),
-                settings.getClass().getSimpleName()
+        EngineStartRequest engineRequest = new EngineStartRequest(
+                game.id().value(),
+                request.lobbyId(),
+                request.players(),
+                request.settings()
         );
 
-        // TODO: in toekomstige sprint HTTP-call doen naar externe game engine
+        UUID instanceId = engine.startExternalGame(game, engineRequest);
+
+        return new StartGameResponseModel(instanceId);
     }
 }

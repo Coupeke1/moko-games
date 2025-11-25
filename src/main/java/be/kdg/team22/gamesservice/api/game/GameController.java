@@ -1,8 +1,8 @@
 package be.kdg.team22.gamesservice.api.game;
 
 import be.kdg.team22.gamesservice.api.game.models.StartGameRequest;
+import be.kdg.team22.gamesservice.api.game.models.StartGameResponseModel;
 import be.kdg.team22.gamesservice.application.game.GameService;
-import be.kdg.team22.gamesservice.domain.game.GameId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class GameController {
 
     private static final Logger log = LoggerFactory.getLogger(GameController.class);
-
     private final GameService service;
 
     public GameController(final GameService service) {
@@ -24,18 +23,11 @@ public class GameController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> startGame(@RequestBody final StartGameRequest request) {
-        log.info("Received game start request for lobby {} and game {}", request.lobbyId(), request.gameId());
+    public ResponseEntity<StartGameResponseModel> startGame(@RequestBody final StartGameRequest request) {
+        log.info("Received start-game request for lobby {} and game {}", request.lobbyId(), request.gameId());
 
-        StartGameCommand command = new StartGameCommand(
-                request.lobbyId(),
-                GameId.from(request.gameId()),
-                request.players(),
-                request.settings()
-        );
+        var response = service.startGame(request);
 
-        service.startGame(command);
-
-        return ResponseEntity.accepted().build();
+        return ResponseEntity.accepted().body(response);
     }
 }
