@@ -1,11 +1,11 @@
-import GamePage from "@/routes/game/game"
-import { BrowserRouter, Route, Routes } from "react-router"
+import GamePage from "@/routes/game/gamePage.tsx"
+import {BrowserRouter, Route, Routes} from "react-router"
 
 function App() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<GamePage />} />
+                <Route path="/game/:id" element={<GamePage/>}/>
             </Routes>
         </BrowserRouter>
     )
