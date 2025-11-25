@@ -56,4 +56,16 @@ public class GameEntity {
     public UUID id() {
         return id;
     }
+
+    public String name() {
+        return name;
+    }
+
+    public String baseUrl() {
+        return baseUrl;
+    }
+
+    public String startEndpoint() {
+        return startEndpoint;
+    }
 }
