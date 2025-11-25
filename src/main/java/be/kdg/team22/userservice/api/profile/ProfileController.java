@@ -38,6 +38,13 @@ public class ProfileController {
         return ResponseEntity.ok(description);
     }
 
+    @PatchMapping("/me/image")
+    public ResponseEntity<String> updateMyImage(@AuthenticationPrincipal final Jwt token, @RequestBody final String model) {
+        Profile profile = service.getOrCreate(token);
+        String image = service.changeImage(profile, model);
+        return ResponseEntity.ok(image);
+    }
+
     @PatchMapping("/me/modules")
     public ResponseEntity<EditModulesModel> updateMyModules(@AuthenticationPrincipal final Jwt token, @RequestBody final EditModulesModel model) {
         Profile profile = service.getOrCreate(token);

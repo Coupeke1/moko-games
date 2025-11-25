@@ -3,6 +3,7 @@ package be.kdg.team22.userservice.application.profile;
 import be.kdg.team22.userservice.domain.profile.*;
 import be.kdg.team22.userservice.domain.profile.exceptions.CannotUpdateProfileException;
 import be.kdg.team22.userservice.domain.profile.exceptions.ClaimNotFoundException;
+import be.kdg.team22.userservice.infrastructure.image.ExternalImageRepository;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,10 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class ProfileService {
-    private final ProfileRepository repository;
+    private final ProfileRepository profileRepository;
+    private final ExternalImageRepository imageRepository;
 
-    public ProfileService(final ProfileRepository repository) {
-        this.repository = repository;
+    public ProfileService(final ProfileRepository profileRepository, ExternalImageRepository imageRepository) {
+        this.profileRepository = profileRepository;
+        this.imageRepository = imageRepository;
     }
 
     public Profile getOrCreate(final Jwt token) {
@@ -21,20 +24,21 @@ public class ProfileService {
         ProfileName username = getUsername(token);
         ProfileEmail email = getEmail(token);
         String description = "Hey there! I am using Moko.";
+        String image = imageRepository.get().url();
 
-        return repository.findById(id).orElseGet(() -> {
-            Profile profile = new Profile(id, username, email, description);
-            repository.save(profile);
+        return profileRepository.findById(id).orElseGet(() -> {
+            Profile profile = new Profile(id, username, email, description, image);
+            profileRepository.save(profile);
             return profile;
         });
     }
 
     public Profile getById(final ProfileId id) {
-        return repository.findById(id).orElseThrow(id::notFound);
+        return profileRepository.findById(id).orElseThrow(id::notFound);
     }
 
     public Profile getByUsername(final ProfileName username) {
-        return repository.findByUsername(username).orElseThrow(username::notFound);
+        return profileRepository.findByUsername(username).orElseThrow(username::notFound);
     }
 
     public String changeDescription(final Profile profile, final String description) {
@@ -42,9 +46,19 @@ public class ProfileService {
             throw CannotUpdateProfileException.description(profile.id());
 
         profile.updateDescription(description);
-        repository.save(profile);
+        profileRepository.save(profile);
 
         return profile.description();
+    }
+
+    public String changeImage(final Profile profile, final String image) {
+        if (image.equals(profile.image()))
+            throw CannotUpdateProfileException.image(profile.id());
+
+        profile.updateImage(image);
+        profileRepository.save(profile);
+
+        return profile.image();
     }
 
     public Modules changeModules(final Profile profile, final Modules modules) {
@@ -52,7 +66,7 @@ public class ProfileService {
             throw CannotUpdateProfileException.modules(profile.id());
 
         profile.updateModules(modules);
-        repository.save(profile);
+        profileRepository.save(profile);
 
         return profile.modules();
     }

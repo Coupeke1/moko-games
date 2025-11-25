@@ -11,38 +11,45 @@ public class Profile {
     private final ProfileName username;
     private final ProfileEmail email;
     private String description;
+    private String image;
     private final Statistics statistics;
     private Modules modules;
     private final Instant createdAt;
 
-    public Profile(final ProfileId id, final ProfileName username, final ProfileEmail email, final String description, final Statistics statistics, final Modules modules, final Instant createdAt) {
+    public Profile(final ProfileId id, final ProfileName username, final ProfileEmail email, final String description, final String image, final Statistics statistics, final Modules modules, final Instant createdAt) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.description = description;
+        this.image = image;
         this.statistics = statistics;
         this.modules = modules;
         this.createdAt = createdAt;
     }
 
-    public Profile(final ProfileId id, final ProfileName username, final ProfileEmail email, final String description) {
-        this(id, username, email, description, new Statistics(0, 0), new Modules(false, false), Instant.now());
+    public Profile(final ProfileId id, final ProfileName username, final ProfileEmail email, final String description, final String image) {
+        this(id, username, email, description, image, new Statistics(0, 0), new Modules(false, false), Instant.now());
     }
 
-    public String updateDescription(final String description) {
+    public void updateDescription(final String description) {
         if (this.description.equals(description))
             throw CannotUpdateProfileException.description(id);
 
         this.description = description;
-        return this.description;
     }
 
-    public Modules updateModules(final Modules modules) {
+    public void updateImage(final String image) {
+        if (this.image.equals(image))
+            throw CannotUpdateProfileException.image(id);
+
+        this.image = image;
+    }
+
+    public void updateModules(final Modules modules) {
         if (this.modules.equals(modules))
             throw CannotUpdateProfileException.modules(id);
 
         this.modules = modules;
-        return this.modules;
     }
 
     public ProfileId id() {
@@ -59,6 +66,10 @@ public class Profile {
 
     public String description() {
         return description;
+    }
+
+    public String image() {
+        return image;
     }
 
     public Statistics statistics() {
