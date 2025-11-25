@@ -12,7 +12,7 @@ class ExternalGamesRepositoryConfig {
     @Qualifier("gameService")
     RestClient gameServiceClient(@Value("${game-service.url}") final String baseUrl) {
         return RestClient.builder()
-                .baseUrl(baseUrl)
+                .baseUrl(baseUrl + "/api/games")
                 .build();
     }
 }
