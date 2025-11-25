@@ -1,10 +1,13 @@
 import {useParams} from "react-router";
 import {useGameState} from "@/routes/game/hooks/use-game-state.ts";
 import {TurnIndicator} from "@/routes/game/components/turn-indicator.tsx";
+import {MyRoleDisplay} from "@/routes/game/components/my-role-display.tsx";
+import {useMyPlayerRole} from "@/routes/game/hooks/use-my-player-role.ts";
 
 export default function GamePage() {
     const {id} = useParams<{ id: string }>()
     const { data: gameState, isLoading, isError, error } = useGameState(id!);
+    const myRole = useMyPlayerRole(id!)
 
     if (isLoading) return (
         <div className="flex items-center justify-center min-h-screen">
@@ -28,8 +31,14 @@ export default function GamePage() {
 
     return (
         <div className="flex flex-col items-center gap-8 p-8 min-h-screen bg-bg text-fg">
-            <header className="text-center">
-                <h1 className="text-3xl font-bold">Tic Tac Toe - Game #{id}</h1>
+            <header className="text-center w-full">
+                <div className="flex justify-between items-center mb-4">
+                    <MyRoleDisplay role={myRole} />
+
+                    <h1 className="text-3xl font-bold flex-1 text-center">Tic Tac Toe - Game #{id}</h1>
+
+                    <div className="w-40"></div>
+                </div>
             </header>
 
             <TurnIndicator gameState={gameState} />
