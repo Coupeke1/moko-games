@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = CheckersSettingsModel.class,   name = "checkers"),
-        @JsonSubTypes.Type(value = TicTacToeSettingsModel.class, name = "tic-tac-toe")
+        @JsonSubTypes.Type(value = TicTacToeSettingsModel.class, name = "tic_tac_toe")
 })
 public sealed interface GameSettingsModel
         permits CheckersSettingsModel, TicTacToeSettingsModel {
