@@ -1,5 +1,6 @@
 package be.kdg.team22.userservice.infrastructure.library;
 
+import be.kdg.team22.userservice.domain.library.LibraryEntry;
 import be.kdg.team22.userservice.domain.library.LibraryRepository;
 import be.kdg.team22.userservice.infrastructure.library.jpa.JpaLibraryEntryRepository;
 import be.kdg.team22.userservice.infrastructure.library.jpa.LibraryEntryEntity;
@@ -10,14 +11,18 @@ import java.util.UUID;
 
 @Repository
 public class DbLibraryRepository implements LibraryRepository {
-    private final JpaLibraryEntryRepository repository;
 
-    public DbLibraryRepository(final JpaLibraryEntryRepository repository) {
-        this.repository = repository;
+    private final JpaLibraryEntryRepository jpa;
+
+    public DbLibraryRepository(JpaLibraryEntryRepository jpa) {
+        this.jpa = jpa;
     }
 
     @Override
-    public List<LibraryEntryEntity> findByUserId(UUID userId) {
-        return repository.findByUserId(userId);
+    public List<LibraryEntry> findByUserId(UUID userId) {
+        return jpa.findByUserId(userId)
+                .stream()
+                .map(LibraryEntryEntity::toDomain)
+                .toList();
     }
 }

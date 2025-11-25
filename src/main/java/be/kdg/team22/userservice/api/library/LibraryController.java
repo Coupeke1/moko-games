@@ -24,11 +24,11 @@ public class LibraryController {
 
     @GetMapping("/me")
     public ResponseEntity<LibraryGamesModel> getMyLibrary(
-            @AuthenticationPrincipal Jwt jwt
+            @AuthenticationPrincipal Jwt token
     ) {
-        UUID userId = UUID.fromString(jwt.getSubject());
+        UUID userId = UUID.fromString(token.getSubject());
 
-        LibraryGamesModel model = libraryService.getLibraryForUser(userId);
+        LibraryGamesModel model = libraryService.getLibraryForUser(userId, token);
 
         return ResponseEntity.ok(model);
     }

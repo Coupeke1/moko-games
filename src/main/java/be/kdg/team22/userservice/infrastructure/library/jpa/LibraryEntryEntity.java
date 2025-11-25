@@ -1,5 +1,6 @@
 package be.kdg.team22.userservice.infrastructure.library.jpa;
 
+import be.kdg.team22.userservice.domain.library.LibraryEntry;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -25,25 +26,28 @@ public class LibraryEntryEntity {
     protected LibraryEntryEntity() {
     }
 
-    public LibraryEntryEntity(UUID userId, UUID gameId, Instant purchasedAt) {
+    public LibraryEntryEntity(UUID id, UUID userId, UUID gameId, Instant purchasedAt) {
+        this.id = id;
         this.userId = userId;
         this.gameId = gameId;
         this.purchasedAt = purchasedAt;
     }
 
-    public UUID id() {
-        return id;
+    public static LibraryEntryEntity fromDomain(LibraryEntry entry) {
+        return new LibraryEntryEntity(
+                entry.id(),
+                entry.userId(),
+                entry.gameId(),
+                entry.purchasedAt()
+        );
     }
 
-    public UUID userId() {
-        return userId;
-    }
-
-    public UUID gameId() {
-        return gameId;
-    }
-
-    public Instant purchasedAt() {
-        return purchasedAt;
+    public LibraryEntry toDomain() {
+        return new LibraryEntry(
+                id,
+                userId,
+                gameId,
+                purchasedAt
+        );
     }
 }

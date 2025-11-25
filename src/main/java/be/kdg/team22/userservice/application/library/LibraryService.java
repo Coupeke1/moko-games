@@ -2,10 +2,11 @@ package be.kdg.team22.userservice.application.library;
 
 import be.kdg.team22.userservice.api.library.models.LibraryGameModel;
 import be.kdg.team22.userservice.api.library.models.LibraryGamesModel;
+import be.kdg.team22.userservice.domain.library.LibraryEntry;
 import be.kdg.team22.userservice.domain.library.LibraryRepository;
 import be.kdg.team22.userservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.userservice.infrastructure.games.GameDetailsResponse;
-import be.kdg.team22.userservice.infrastructure.library.jpa.LibraryEntryEntity;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,29 +14,26 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class LibraryService {
-
     private final LibraryRepository libraryRepository;
     private final ExternalGamesRepository gamesRepository;
 
     public LibraryService(
-            LibraryRepository libraryRepo,
-            ExternalGamesRepository gameClient
+            LibraryRepository libraryRepository,
+            ExternalGamesRepository gamesRepository
     ) {
-        this.libraryRepository = libraryRepo;
-        this.gamesRepository = gameClient;
+        this.libraryRepository = libraryRepository;
+        this.gamesRepository = gamesRepository;
     }
 
-    public LibraryGamesModel getLibraryForUser(UUID userId) {
+    public LibraryGamesModel getLibraryForUser(UUID userId, Jwt token) {
 
-        List<LibraryEntryEntity> entries = libraryRepository.findByUserId(userId);
+        List<LibraryEntry> entries = libraryRepository.findByUserId(userId);
 
         List<LibraryGameModel> models = entries.stream()
                 .map(entry -> {
-                    GameDetailsResponse game = gamesRepository.getGame(entry.gameId());
-
-                    String url = game.storeUrl() != null ? game.storeUrl() : null;
+                    GameDetailsResponse game = gamesRepository.getGame(entry.gameId(), token);
 
                     return new LibraryGameModel(
                             game.id(),
@@ -43,7 +41,7 @@ public class LibraryService {
                             game.description(),
                             game.price(),
                             game.imageUrl(),
-                            url,
+                            game.storeUrl(),
                             entry.purchasedAt()
                     );
                 })
