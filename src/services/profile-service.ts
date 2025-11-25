@@ -55,6 +55,10 @@ async function updateImage(old: string, model: string) {
     });
 }
 
+async function updateModules() {
+    
+}
+
 export async function parseProfile(keycloak: Keycloak, token: string | null): Promise<Profile | null> {
     if (!token) {
         throw new Error("Token not found");

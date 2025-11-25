@@ -10,15 +10,20 @@ import { useMyProfile } from "@/hooks/use-my-profile";
 import AchievementCard from "@/routes/profile/components/achievement-card";
 import FriendCard from "@/routes/profile/components/friend-card";
 import ProfileInformation from "@/routes/profile/components/information";
+import { useState } from "react";
+import SettingsDialog from "./dialogs/settings/settings-dialog";
 
 export default function ProfilePage() {
     const { profile, isLoading, isError } = useMyProfile();
+    const [settings, setSettings] = useState(false);
 
     if (isLoading || profile === undefined) return <Page><LoadingState /></Page>
     if (isError) return <Page><ErrorState /></Page>
 
     return (
         <Page>
+            <SettingsDialog profile={profile} close={() => setSettings(false)} open={settings} onChange={setSettings} />
+
             <Column gap={Gap.ExtraLarge}>
                 <ProfileInformation
                     image={profile.image}
@@ -27,6 +32,7 @@ export default function ProfilePage() {
                     description={profile.description}
                     level={profile.statistics.level}
                     playTime={profile.statistics.playTime}
+                    onEdit={() => setSettings(true)}
                 />
 
                 <Section title="Friends">

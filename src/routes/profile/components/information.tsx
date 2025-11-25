@@ -5,7 +5,6 @@ import { Items } from "@/components/layout/items";
 import { Justify } from "@/components/layout/justify";
 import { Padding } from "@/components/layout/padding";
 import Row from "@/components/layout/row";
-import { Link as RouterLink } from "react-router";
 import Image from "@/routes/profile/components/image";
 
 interface Props {
@@ -15,6 +14,7 @@ interface Props {
     description: string;
     level: number;
     playTime: string;
+    onEdit: () => void;
 }
 
 function Statistic({ title, value }: { title: string; value: string; }) {
@@ -26,7 +26,7 @@ function Statistic({ title, value }: { title: string; value: string; }) {
     )
 }
 
-export default function ProfileInformation({ image, username, email, description, level, playTime }: Props) {
+export default function ProfileInformation({ image, username, email, description, level, playTime, onEdit }: Props) {
     return (
         <Row justify={Justify.Between} items={Items.Stretch}>
             <Row gap={Gap.Large} items={Items.Stretch}>
@@ -37,9 +37,9 @@ export default function ProfileInformation({ image, username, email, description
                         <Row items={Items.Center} responsive={false}>
                             <h2 className="text-3xl font-bold">{username}</h2>
 
-                            <RouterLink to="/profile/settings">
+                            <button onClick={onEdit}>
                                 <EditIcon small={true} />
-                            </RouterLink>
+                            </button>
                         </Row>
 
                         <h3 className="text-fg-2">{email}</h3>
@@ -50,9 +50,9 @@ export default function ProfileInformation({ image, username, email, description
             </Row>
 
             <section className="flex flex-col md:justify-between md:items-end p-1">
-                <RouterLink to="/profile/settings">
+                <button onClick={onEdit}>
                     <EditIcon small={false} />
-                </RouterLink>
+                </button>
 
                 <Row gap={Gap.Large} responsive={false}>
                     <Statistic

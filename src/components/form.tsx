@@ -7,7 +7,7 @@ interface Props {
 
 export default function Form({ onSubmit, children }: Props) {
     return (
-        <form onSubmit={onSubmit}>
+        <form onSubmit={onSubmit} className="flex flex-col gap-2 justify-between grow">
             {children}
         </form>
     )
