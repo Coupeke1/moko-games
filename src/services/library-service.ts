@@ -1,7 +1,8 @@
+import { config } from "@/config";
 import { client } from "@/lib/api-client";
 import type { Game } from "@/models/library/game";
 
-const BASE_URL = import.meta.env.VITE_LIBRARY_SERVICE;
+const BASE_URL = config.libraryService;
 
 export async function findGames(): Promise<Game[]> {
     try {
