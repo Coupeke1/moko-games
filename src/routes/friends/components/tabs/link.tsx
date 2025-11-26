@@ -1,6 +1,5 @@
 import { Link as RouterLink, useLocation } from "react-router";
 
-
 interface Props {
     title: string;
     path: string;
