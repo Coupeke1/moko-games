@@ -7,10 +7,10 @@ import {useMyProfile} from "@/routes/game/hooks/use-my-profile.ts";
 import LoadingState from "@/components/state/loading.tsx";
 import ErrorState from "@/components/state/error.tsx";
 import Page from "@/components/layout/page.tsx";
-import {Row} from "@/components/layout/row.tsx";
 import {GameGrid} from "@/routes/game/components/game-grid.tsx";
 import {useMakeMove} from "@/routes/game/hooks/use-make-move.ts";
 import {Toast} from "@/components/layout/Toast.tsx";
+import {GameStateDisplay} from "@/routes/game/components/game-state-display.tsx";
 
 export default function GamePage() {
     const {id} = useParams<{ id: string }>()
@@ -18,7 +18,7 @@ export default function GamePage() {
     const {profile, isLoading: profileLoading, isError: profileError} = useMyProfile();
     const myRole = useMyPlayerRole(gameState?.players, profile?.id)
 
-    const { makeMove, errorMsg, closeToast } = useMakeMove(id!, profile);
+    const {makeMove, errorMsg, closeToast} = useMakeMove(id!, profile);
 
     if (isLoading || !gameState || profileLoading || !profile)
         return (
@@ -48,29 +48,23 @@ export default function GamePage() {
             <div className="flex items-start justify-center gap-30 w-full max-w-6xl">
                 <div className="w-80 flex-shrink-0 mt-2">
                     <MyRoleDisplay
-                        userId={profile.id || 'Unknown'}
+                        profile={profile}
                         role={myRole}/>
                 </div>
 
                 <div className="flex flex-col items-center gap-6 flex-1 max-w-md">
                     <div className="game-board">
-                        <GameGrid board={gameState.board} onCellClick={makeMove} />
+                        <GameGrid board={gameState.board} onCellClick={makeMove}/>
 
                         {errorMsg && (
-                            <Toast message={errorMsg} onClose={closeToast} />
+                            <Toast message={errorMsg} onClose={closeToast}/>
                         )}
                     </div>
                 </div>
 
                 <div className="w-80 flex-shrink-0 flex flex-col gap-4 mt-2">
                     <TurnIndicator gameState={gameState}/>
-
-                    <section className="game-info bg-bg-2 p-4 rounded-lg
-                        flex flex-col gap-2">
-                        <Row label="Game Status" value={gameState.status}/>
-                        <Row label="Players" value={gameState.players.length}/>
-                        {gameState.winner && <Row label="Winner" value={gameState.winner}/>}
-                    </section>
+                    <GameStateDisplay gameState={gameState}/>
                 </div>
             </div>
         </div>
