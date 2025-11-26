@@ -9,13 +9,15 @@ import ErrorState from "@/components/state/error.tsx";
 import Page from "@/components/layout/page.tsx";
 import {Row} from "@/components/layout/row.tsx";
 import {GameGrid} from "@/routes/game/components/game-grid.tsx";
-import {requestMove} from "@/routes/game/services/game-service.ts";
+import {useMakeMove} from "@/routes/game/hooks/use-make-move.ts";
 
 export default function GamePage() {
     const {id} = useParams<{ id: string }>()
     const {data: gameState, isLoading, isError} = useGameState(id!);
     const {profile, isLoading: profileLoading, isError: profileError} = useMyProfile();
     const myRole = useMyPlayerRole(gameState?.players, profile?.id)
+
+    const makeMove = useMakeMove(id!, profile);
 
     if (isLoading || !gameState || profileLoading || !profile)
         return (
@@ -36,14 +38,6 @@ export default function GamePage() {
         </Page>
     );
 
-    const handleCellClick = async (rowIndex: number, colIndex: number) => {
-        try {
-            await requestMove(id!, profile.id, rowIndex, colIndex);
-        } catch (error) {
-            console.error('Error making move:', error);
-        }
-    };
-
     return (
         <div className="flex flex-col items-center gap-8 p-8 min-h-screen bg-bg text-fg">
             <header className="text-center w-full">
@@ -58,7 +52,7 @@ export default function GamePage() {
 
             <div className="game-board">
                 <h3 className="text-xl font-semibold mb-4 text-center">Board</h3>
-                <GameGrid board={gameState.board} onCellClick={handleCellClick} />
+                <GameGrid board={gameState.board} onCellClick={makeMove} />
             </div>
 
             <div className="grid grid-cols-2 gap-4 items-stretch">

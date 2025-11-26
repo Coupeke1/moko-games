@@ -28,7 +28,7 @@ export async function requestMove(gameId: string, playerId: string, rowIndex: nu
             col: colIndex,
         };
 
-        const response = await axios.post<MoveRequest>(`${BASE_URL}/${gameId}/move`, moveRequest);
+        const response = await axios.post<GameState>(`${BASE_URL}/${gameId}/move`, moveRequest);
         return response.data;
     } catch (error) {
         if (error instanceof Error) {
