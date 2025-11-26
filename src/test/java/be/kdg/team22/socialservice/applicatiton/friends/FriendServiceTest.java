@@ -74,7 +74,7 @@ class FriendServiceTest {
 
         Friendship existing = mock(Friendship.class);
         when(existing.status()).thenReturn(FriendshipStatus.ACCEPTED);
-        doThrow(new IllegalStateException("You are already friends")).when(existing).resetToPending(currentUser, targetUser);
+        doThrow(new IllegalStateException("You are already friends")).when(existing).restartRequest(currentUser, targetUser);
 
         when(userRepository.getByUsername(new Username("piet"))).thenReturn(Optional.of(userResponse(targetId, "piet")));
         when(friendshipRepository.findBetween(currentUser, targetUser)).thenReturn(Optional.of(existing));
@@ -98,7 +98,7 @@ class FriendServiceTest {
 
         service.sendRequest(currentUser, new Username("piet"));
 
-        verify(existing).resetToPending(currentUser, targetUser);
+        verify(existing).restartRequest(currentUser, targetUser);
         verify(friendshipRepository).save(existing);
     }
 
@@ -116,7 +116,7 @@ class FriendServiceTest {
 
         service.sendRequest(currentUser, new Username("piet"));
 
-        verify(existing).resetToPending(currentUser, targetUser);
+        verify(existing).restartRequest(currentUser, targetUser);
         verify(friendshipRepository).save(existing);
     }
 
@@ -274,8 +274,8 @@ class FriendServiceTest {
 
         Friendship existing = mock(Friendship.class);
         when(existing.status()).thenReturn(FriendshipStatus.PENDING);
-        // resetToPending() is what actually throws → so we mock that behavior
-        doThrow(new IllegalStateException("Friend request already pending")).when(existing).resetToPending(currentUser, targetUser);
+
+        doThrow(new IllegalStateException("Friend request already pending")).when(existing).restartRequest(currentUser, targetUser);
 
         when(userRepository.getByUsername(new Username("piet"))).thenReturn(Optional.of(userResponse(targetId, "piet")));
         when(friendshipRepository.findBetween(currentUser, targetUser)).thenReturn(Optional.of(existing));

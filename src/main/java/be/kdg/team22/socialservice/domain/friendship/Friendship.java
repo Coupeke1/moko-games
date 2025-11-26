@@ -11,9 +11,9 @@ import java.time.Instant;
 @AggregateRoot
 public class Friendship {
     private final FriendshipId id;
-    private final UserId requester;
-    private final UserId receiver;
     private final Instant createdAt;
+    private UserId requester;
+    private UserId receiver;
     private Instant updatedAt;
     private FriendshipStatus status;
 
@@ -48,6 +48,16 @@ public class Friendship {
         checkBeforeChanging(user);
 
         this.status = FriendshipStatus.CANCELLED;
+        this.updatedAt = Instant.now();
+    }
+
+    public void restartRequest(UserId newRequester, UserId newReceiver) {
+        if (!involves(newRequester) || !involves(newReceiver)) {
+            throw new NoMatchingUsersException();
+        }
+        this.requester = newRequester;
+        this.receiver = newReceiver;
+        this.status = FriendshipStatus.PENDING;
         this.updatedAt = Instant.now();
     }
 

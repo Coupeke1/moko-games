@@ -124,11 +124,11 @@ Authorization: Bearer {{kaj_token}}
 
 ### Mathias sends again
 POST http://localhost:8083/api/friends
-Authorization: Bearer {{mathias_token}}
+Authorization: Bearer {{kaj_token}}
 Content-Type: application/json
 
 {
-  "username": "kaj"
+  "username": "mathias"
 }
 
 ### Mathias cancels his own request

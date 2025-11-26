@@ -28,16 +28,19 @@ public class FriendService {
     }
 
     public void sendRequest(final UserId userId, final Username username) {
-        UserResponse response = userRepository.getByUsername(username).orElseThrow(username::notFound);
+        UserResponse response = userRepository.getByUsername(username)
+                .orElseThrow(username::notFound);
         UserId targetId = UserId.from(response.id());
 
         if (userId.equals(targetId))
             throw new CannotAddException(username);
 
-        Friendship friendship = friendshipRepository.findBetween(userId, targetId).map(existingFriendship -> {
-            existingFriendship.resetToPending(userId, targetId);
-            return existingFriendship;
-        }).orElseGet(() -> new Friendship(userId, targetId));
+        Friendship friendship = friendshipRepository.findBetween(userId, targetId)
+                .map(existingFriendship -> {
+                    existingFriendship.restartRequest(userId, targetId);
+                    return existingFriendship;
+                })
+                .orElseGet(() -> new Friendship(userId, targetId));
 
         friendshipRepository.save(friendship);
     }
