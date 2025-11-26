@@ -1,28 +1,16 @@
-
+import { client } from "@/lib/api-client";
 import { validIdCheck } from "@/lib/id";
 import type { Modules } from "@/models/profile/modules";
 import type { Profile } from "@/models/profile/profile";
-import axios from 'axios';
 import type { KeycloakTokenParsed } from "keycloak-js";
 import Keycloak from 'keycloak-js';
 
 const BASE_URL = import.meta.env.VITE_USER_SERVICE;
 
-export function addToken(token: string | undefined) {
-    if (token) axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-    else {
-        removeToken()
-    }
-}
-
-export function removeToken() {
-    delete axios.defaults.headers.common['Authorization']
-}
-
 export async function findProfile(id: string): Promise<Profile> {
     try {
         validIdCheck(id);
-        const { data } = await axios.get<Profile>(`${BASE_URL}/me`);
+        const { data } = await client.get<Profile>(`${BASE_URL}/me`);
 
         if (data.id !== id) throw new Error("Profile not found!");
         return data;
@@ -44,21 +32,21 @@ export async function updateProfile(id: string, description: string, image: stri
 
 async function updateDescription(old: string, model: string) {
     if (old === model) return;
-    await axios.patch(`${BASE_URL}/me/description`, model, {
+    await client.patch(`${BASE_URL}/me/description`, model, {
         headers: { 'Content-Type': 'text/plain' }
     });
 }
 
 async function updateImage(old: string, model: string) {
     if (old === model) return;
-    await axios.patch(`${BASE_URL}/me/image`, model, {
+    await client.patch(`${BASE_URL}/me/image`, model, {
         headers: { 'Content-Type': 'text/plain' }
     });
 }
 
 async function updateModules(old: Modules, model: Modules) {
     if (old === model) return;
-    await axios.patch(`${BASE_URL}/me/modules`, model);
+    await client.patch(`${BASE_URL}/me/modules`, model);
 }
 
 export async function parseProfile(keycloak: Keycloak, token: string | null): Promise<Profile | null> {
@@ -67,8 +55,6 @@ export async function parseProfile(keycloak: Keycloak, token: string | null): Pr
     }
 
     try {
-        addToken(token);
-
         const parsedToken: KeycloakTokenParsed | undefined = keycloak.tokenParsed;
         if (parsedToken === undefined) throw new Error("Token could not be parsed");
 

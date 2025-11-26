@@ -1,4 +1,5 @@
 import Button from "@/components/buttons/button";
+import CancelIcon from "@/components/icons/cancel-icon";
 import Input from "@/components/inputs/input";
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
@@ -9,18 +10,16 @@ import LoadingState from "@/components/state/loading";
 import Message from "@/components/state/message";
 import showToast from "@/components/toast";
 import { useFriends } from "@/hooks/use-friends";
+import type { Friend } from "@/models/friends/friend";
 import type { Profile } from "@/models/profile/profile";
-import TabRow from "@/routes/friends/components/tabs/row";
 import FriendCard from "@/routes/friends/components/friend-card";
-import { sendRequest } from "@/services/friends-service";
+import TabRow from "@/routes/friends/components/tabs/row";
+import { removeFriend, sendRequest } from "@/services/friends-service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { useMyProfile } from "@/hooks/use-my-profile";
 
-export default function FriendsPage() {
+function Add() {
     const client = useQueryClient();
-    const { friends, isLoading, isError } = useFriends();
-
     const [username, setUsername] = useState("");
 
     const add = useMutation({
@@ -41,6 +40,49 @@ export default function FriendsPage() {
         add.mutate({ username });
     };
 
+    return (
+        <section className={`grid sm:grid-cols-4 ${Gap.Medium}`}>
+            <section className="sm:col-span-3">
+                <Input placeholder="Search Username..." value={username} onChange={(e) => setUsername(e.target.value)} />
+            </section>
+            <Button onClick={handleAdd}>Add</Button>
+        </section>
+    );
+}
+
+function Friend({ friend }: { friend: Profile }) {
+    const client = useQueryClient();
+
+    const remove = useMutation({
+        mutationFn: async ({ request }: { request: Profile }) => await removeFriend(request.id),
+        onSuccess: async () => {
+            await client.invalidateQueries({ queryKey: ["friends"] });
+            showToast("Request", "Removed");
+        },
+        onError: (error: Error) => {
+            showToast("Request", error.message);
+        }
+    });
+
+    function handleRemove(request: Profile) {
+        remove.mutate({ request });
+    };
+
+    return (
+        <FriendCard friend={friend} footer={
+            <Button
+                onClick={() => handleRemove(friend)}
+                fullWidth={true}
+            >
+                <CancelIcon />
+            </Button>
+        } />
+    );
+}
+
+export default function FriendsPage() {
+    const { friends, isLoading, isError } = useFriends();
+
     if (isLoading || friends === undefined) return <Page><LoadingState /></Page>
     if (isError) return <Page><ErrorState /></Page>
 
@@ -48,13 +90,7 @@ export default function FriendsPage() {
         <Page>
             <Column gap={Gap.Large}>
                 <TabRow />
-
-                <section className={`grid sm:grid-cols-4 ${Gap.Medium}`}>
-                    <section className="sm:col-span-3">
-                        <Input placeholder="Search Username..." value={username} onChange={(e) => setUsername(e.target.value)} />
-                    </section>
-                    <Button onClick={handleAdd}>Add</Button>
-                </section>
+                <Add />
 
                 {
                     friends.length == 0 ? (
@@ -62,7 +98,7 @@ export default function FriendsPage() {
                     ) : (
                         <Grid>
                             {
-                                friends.map((friend: Profile) => <FriendCard profile={friend} />)
+                                friends.map((friend: Profile) => <Friend friend={friend} />)
                             }
                         </Grid>
                     )

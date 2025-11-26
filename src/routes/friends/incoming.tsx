@@ -12,7 +12,7 @@ import Message from "@/components/state/message";
 import showToast from "@/components/toast";
 import { useIncomingRequests } from "@/hooks/use-requests";
 import type { Profile } from "@/models/profile/profile";
-import RequestCard from "@/routes/friends/components/request-card";
+import FriendCard from "@/routes/friends/components/friend-card";
 import TabRow from "@/routes/friends/components/tabs/row";
 import { acceptRequest, rejectRequest } from "@/services/friends-service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -41,7 +41,6 @@ export default function IncomingRequestsPage() {
         mutationFn: async ({ request }: { request: Profile }) => await rejectRequest(request.id),
         onSuccess: async () => {
             await client.invalidateQueries({ queryKey: ["friends", "incoming"] });
-            await client.invalidateQueries({ queryKey: ["friends"] });
             showToast("Request", "Rejected");
         },
         onError: (error: Error) => {
@@ -83,7 +82,7 @@ export default function IncomingRequestsPage() {
                         <Grid>
                             {
                                 requests.map((request: Profile) => (
-                                    <RequestCard request={request} footer={
+                                    <FriendCard friend={request} footer={
                                         <Row>
                                             <Button
                                                 onClick={() => handleAccept(request)}
