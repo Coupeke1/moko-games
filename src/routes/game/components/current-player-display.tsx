@@ -13,9 +13,8 @@ export function CurrentPlayerDisplay({role, player}: PlayerDisplayProps) {
 
     return (
         <div className="current-player flex flex-col items-center gap-2">
-            <div className={`player-role text-4xl font-bold ${
-                displayRole === 'X' ? 'text-red-500' : 'text-blue-500'
-            }`}>
+            <div className={`player-role text-4xl font-bold
+                ${displayRole === 'X' ? 'text-x' : 'text-o'}`}>
                 {String(displayRole)}
             </div>
             <div className="player-info text-fg-2">
