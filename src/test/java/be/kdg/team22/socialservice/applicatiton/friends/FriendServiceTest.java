@@ -109,7 +109,7 @@ class FriendServiceTest {
         UserId targetUser = UserId.from(targetId);
 
         Friendship existing = mock(Friendship.class);
-        when(existing.status()).thenReturn(FriendshipStatus.CANCELED);
+        when(existing.status()).thenReturn(FriendshipStatus.CANCELLED);
 
         when(userRepository.getByUsername(new Username("piet"))).thenReturn(Optional.of(userResponse(targetId, "piet")));
         when(friendshipRepository.findBetween(currentUser, targetUser)).thenReturn(Optional.of(existing));

@@ -87,7 +87,7 @@ class FriendshipTest {
         );
 
         f.cancel(requester);
-        assertThat(f.status()).isEqualTo(FriendshipStatus.CANCELED);
+        assertThat(f.status()).isEqualTo(FriendshipStatus.CANCELLED);
     }
 
     @Test
