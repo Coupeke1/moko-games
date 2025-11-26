@@ -1,9 +1,6 @@
 package be.kdg.team22.socialservice.api.friends;
 
-import be.kdg.team22.socialservice.api.friends.models.FriendModel;
-import be.kdg.team22.socialservice.api.friends.models.FriendsOverviewModel;
 import be.kdg.team22.socialservice.application.friends.FriendService;
-import be.kdg.team22.socialservice.domain.user.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,16 +9,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
 import java.util.UUID;
 
 import static be.kdg.team22.socialservice.testutils.JwtTestUtils.jwtWithUser;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(FriendsController.class)
@@ -36,19 +29,6 @@ class FriendsControllerTest {
 
     @BeforeEach
     void setup() {
-    }
-
-    @Test
-    void getFriends_returnsOverview() throws Exception {
-        UUID friendId = UUID.randomUUID();
-        UUID incomingId = UUID.randomUUID();
-        UUID outgoingId = UUID.randomUUID();
-
-        FriendsOverviewModel overview = new FriendsOverviewModel(List.of(new FriendModel(friendId, "friend", "ACCEPTED")), List.of(new FriendModel(incomingId, "incoming", "PENDING")), List.of(new FriendModel(outgoingId, "outgoing", "PENDING")));
-
-        when(friendService.getOverview(any(UserId.class))).thenReturn(overview);
-
-        mockMvc.perform(get("/api/friends").with(jwtWithUser(USER_ID, "jan", "jan@kdg.be"))).andExpect(status().isOk()).andExpect(jsonPath("$.friends[0].username").value("friend")).andExpect(jsonPath("$.incoming[0].username").value("incoming")).andExpect(jsonPath("$.outgoing[0].username").value("outgoing"));
     }
 
     @Test

@@ -73,7 +73,7 @@ Content-Type: application/json
 ### 4) SOCIAL-SERVICE — OVERVIEW REQUESTS
 
 ### Mathias sees outgoing
-GET http://localhost:8083/api/friends
+GET http://localhost:8083/api/friends/requests/outgoing
 Authorization: Bearer {{mathias_token}}
 
 ### Kaj sees incoming
@@ -134,14 +134,3 @@ Content-Type: application/json
 ### Mathias cancels his own request
 POST http://localhost:8083/api/friends/cancel/{{kaj_id}}
 Authorization: Bearer {{mathias_token}}
-
-
-# 9) FINAL — CLEANUP CHECK
-
-### Mathias overview
-GET http://localhost:8083/api/friends
-Authorization: Bearer {{mathias_token}}
-
-### Kaj overview
-GET http://localhost:8083/api/friends
-Authorization: Bearer {{kaj_token}}
