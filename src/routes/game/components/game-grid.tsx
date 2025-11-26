@@ -22,7 +22,10 @@ export function GameGrid({board, onCellClick}: GameGridProps) {
                         key={`${rowIndex}-${colIndex}`}
                         className="aspect-square flex items-center justify-center
                        text-3xl font-bold bg-bg-2 hover:bg-bg-3 transition-colors"
-                        onClick={() => onCellClick?.(rowIndex, colIndex)}
+                        onClick={() => {
+                            if (cell != ' ') return;
+                            onCellClick?.(rowIndex, colIndex)}
+                        }
                     >
                         {cell || ''}
                     </button>
