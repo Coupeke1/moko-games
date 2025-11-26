@@ -11,7 +11,7 @@ interface PlayerDisplayProps {
 export function CurrentPlayerDisplay({role, player, profile}: PlayerDisplayProps) {
     return (
         <div className="items-center">
-            <div className={`player-role text-4xl font-bold
+            <div className={`player-role text-5xl font-bold
                 ${player?.role === 'X' ? 'text-x' : 'text-o'}`}>
                 {String(player?.role)}
             </div>

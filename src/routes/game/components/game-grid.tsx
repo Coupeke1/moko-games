@@ -20,8 +20,9 @@ export function GameGrid({board, onCellClick}: GameGridProps) {
                 row.map((cell, colIndex) => (
                     <button
                         key={`${rowIndex}-${colIndex}`}
-                        className="aspect-square flex items-center justify-center
-                       text-3xl font-bold bg-bg-2 hover:bg-bg-3 transition-colors"
+                        className={`aspect-square flex items-center justify-center
+                       text-5xl font-bold bg-bg-2 hover:bg-bg-3 transition-colors
+                       ${cell === 'X' ? 'text-x' : 'text-o'}`}
                         onClick={() => {
                             if (cell != ' ') return;
                             onCellClick?.(rowIndex, colIndex)}

@@ -8,7 +8,7 @@ export function PlayerRoleBadge({ role }: PlayerRoleBadgeProps) {
     }
 
     return (
-        <div className={`player-role text-4xl font-bold
+        <div className={`player-role text-5xl font-bold
                 ${role === 'X' ? 'text-x' : 'text-o'}`}>
             {role}
         </div>
