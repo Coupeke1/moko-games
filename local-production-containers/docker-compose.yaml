@@ -26,11 +26,11 @@ services:
     image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/platform-frontend:branch-env-var-injection
     restart: always
     environment:
-      VITE_AUTH_URL: http://localhost:80/auth
+      VITE_AUTH_URL: http://localhost/auth
       VITE_AUTH_REALM: moko
       VITE_AUTH_CLIENT: platform-frontend
 
-      VITE_USER_SERVICE: /user-service/api/profiles
+      VITE_USER_SERVICE: http://localhost/user-service/api/profiles
     expose:
       - "80"
     networks:
@@ -68,8 +68,8 @@ services:
       SPRING_RABBITMQ_USERNAME: user
       SPRING_RABBITMQ_PASSWORD: password
 
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://idp-keycloak:8080/realms/moko
-      SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ENDPOINT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://idp-keycloak:8080/auth/realms/moko
+      SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ENDPOINT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
     expose:
       - "8080"
     networks:
@@ -95,8 +95,8 @@ services:
       SPRING_RABBITMQ_USERNAME: user
       SPRING_RABBITMQ_PASSWORD: password
 
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://idp-keycloak:8080/realms/moko
-      SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ENDPOINT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://idp-keycloak:8080/auth/realms/moko
+      SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ENDPOINT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
 
       USER_SERVICE_URL: http://user-service:8080
       SOCIAL_SERVICE_URL: http://social-service:8083
@@ -125,8 +125,8 @@ services:
 #      SPRING_RABBITMQ_USERNAME: user
 #      SPRING_RABBITMQ_PASSWORD: password
 #
-#      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://idp-keycloak:8080/realms/moko
-#      SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ENDPOINT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
+#      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://idp-keycloak:8080/auth/realms/moko
+#      SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ENDPOINT_JWK_SET_URI: http://idp-keycloak:8080/auht/realms/moko/protocol/openid-connect/certs
 #    expose:
 #      - "8082"
 #    networks:
@@ -152,8 +152,8 @@ services:
       SPRING_RABBITMQ_USERNAME: user
       SPRING_RABBITMQ_PASSWORD: password
 
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://idp-keycloak:8080/realms/moko
-      SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ENDPOINT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://idp-keycloak:8080/auth/realms/moko
+      SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ENDPOINT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
     expose:
       - "8083"
     networks:
@@ -179,8 +179,8 @@ services:
 #      SPRING_RABBITMQ_USERNAME: user
 #      SPRING_RABBITMQ_PASSWORD: password
 #
-#      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://idp-keycloak:8080/realms/moko
-#      SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ENDPOINT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
+#      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://idp-keycloak:8080/auth/realms/moko
+#      SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ENDPOINT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
 #    expose:
 #      - "8084"
 #    networks:
@@ -206,8 +206,8 @@ services:
 #      SPRING_RABBITMQ_USERNAME: user
 #      SPRING_RABBITMQ_PASSWORD: password
 #
-#      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://idp-keycloak:8080/realms/moko
-#      SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ENDPOINT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
+#      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://idp-keycloak:8080/auth/realms/moko
+#      SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ENDPOINT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
 #    expose:
 #      - "8085"
 #    networks:
@@ -308,8 +308,6 @@ services:
       - ./configs/keycloak-import:/opt/keycloak/data/import
     expose:
       - "8080"
-    ports:
-      - "8180:8080"
     depends_on:
       - idp-mysql
     networks:
