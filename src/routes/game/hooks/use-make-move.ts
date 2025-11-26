@@ -1,9 +1,11 @@
 import type {Profile} from "@/models/profile.ts";
 import {useQueryClient} from "@tanstack/react-query";
 import {requestMove} from "@/routes/game/services/game-service.ts";
+import {useState} from "react";
 
 export function useMakeMove(gameId: string, profile: Profile | undefined) {
     const queryClient = useQueryClient();
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     const makeMove = async (row: number, col: number) => {
         if (!profile) return;
@@ -11,10 +13,15 @@ export function useMakeMove(gameId: string, profile: Profile | undefined) {
         try {
             const updatedGameState = await requestMove(gameId, profile.id, row, col);
             queryClient.setQueryData(['gameState', gameId], updatedGameState);
-        } catch (err) {
-            console.error('Move failed:', err);
+        } catch (error) {
+            if (error instanceof Error) {
+                setErrorMsg(error.message);
+            }
+            setErrorMsg('Illegal move');
         }
     };
 
-    return makeMove;
+    const closeToast = () => setErrorMsg(null);
+
+    return { makeMove, errorMsg, closeToast };
 }
