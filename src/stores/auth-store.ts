@@ -27,6 +27,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                 checkLoginIframe: false
             });
 
+            await keycloak.updateToken(70);
+
             keycloak.onTokenExpired = () => {
                 console.log('Token expired, refreshing...');
                 get().updateToken(70).catch(() => {
@@ -89,12 +91,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     },
 
     getValidToken: async () => {
-        const { keycloak, updateToken } = get();
+        const { keycloak, token } = get();
         if (!keycloak) return null;
 
+        if (token && keycloak.isTokenExpired && !keycloak.isTokenExpired(70)) {
+            return token;
+        }
+
         try {
-            await updateToken(70);
-            return keycloak.token || null;
+            await keycloak.updateToken(70);
+            const newToken = keycloak.token || null;
+            set({ token: newToken });
+            return newToken;
         } catch (error) {
             console.error('Failed to get valid token:', error);
             return null;
