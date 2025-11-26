@@ -20,7 +20,7 @@ export function removeToken() {
 export async function findProfile(id: string): Promise<Profile> {
     try {
         validIdCheck(id);
-        const { data } = await axios.get<Profile>(`${BASE_URL}/me`);
+        const { data } = await axios.get<Profile>(`${BASE_URL}/${id}`);
 
         if (data.id !== id) throw new Error("Profile not found!");
         return data;
