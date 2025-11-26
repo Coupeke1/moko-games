@@ -81,8 +81,8 @@ class LibraryControllerTest {
 
         mockMvc.perform(get("/api/library/me").with(authentication(auth)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.games.length()").value(1))
-                .andExpect(jsonPath("$.games[0].title").value("Tic Tac Toe"));
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].title").value("Tic Tac Toe"));
 
         verify(libraryService).getLibraryForUser(
                 eq(profileId),
@@ -137,7 +137,7 @@ class LibraryControllerTest {
 
         mockMvc.perform(get("/api/library/me").with(authentication(auth)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.games.length()").value(0));
+                .andExpect(jsonPath("$.length()").value(0));
     }
 
     @Test
