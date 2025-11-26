@@ -1,5 +1,6 @@
 import type {GameState} from "@/routes/game/model/game-state.ts";
 import {CurrentPlayerDisplay} from "@/routes/game/components/current-player-display.tsx";
+import {usePlayerProfile} from "@/routes/game/hooks/use-player-profile.ts";
 
 interface TurnIndicatorProps {
     gameState: GameState;
@@ -8,6 +9,7 @@ interface TurnIndicatorProps {
 export function TurnIndicator({gameState}: TurnIndicatorProps) {
     const {currentRole, players} = gameState;
     const currentPlayer = players.find(player => player.role === currentRole);
+    const { data: profile } = usePlayerProfile(currentPlayer?.id);
 
     return (
         <div className="turn-indicator bg-bg-2 p-4 rounded-lg text-center flex flex-col justify-center">
@@ -15,6 +17,7 @@ export function TurnIndicator({gameState}: TurnIndicatorProps) {
             <CurrentPlayerDisplay
                 role={currentRole}
                 player={currentPlayer}
+                profile={profile}
             />
         </div>
     );
