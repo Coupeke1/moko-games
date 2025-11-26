@@ -1,6 +1,5 @@
 import ClockIcon from "@/components/icons/clock-icon";
 import PriceIcon from "@/components/icons/price-icon";
-import UsersIcon from "@/components/icons/users-icon";
 import { Gap } from "@/components/layout/gap";
 import { Items } from "@/components/layout/items";
 import Row from "@/components/layout/row";
