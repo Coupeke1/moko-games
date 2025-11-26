@@ -18,7 +18,7 @@ export default function GamePage() {
     const {profile, isLoading: profileLoading, isError: profileError} = useMyProfile();
     const myRole = useMyPlayerRole(gameState?.players, profile?.id)
 
-    const {makeMove, errorMsg, closeToast} = useMakeMove(id!, profile);
+    const {makeMove, errorMsg, closeToast} = useMakeMove(id!, profile, gameState?.status);
 
     if (isLoading || !gameState || profileLoading || !profile)
         return (
