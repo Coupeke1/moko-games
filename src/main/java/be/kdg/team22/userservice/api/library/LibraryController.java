@@ -9,6 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -22,11 +23,16 @@ public class LibraryController {
 
     @GetMapping("/me")
     public ResponseEntity<LibraryGamesModel> getMyLibrary(
-            @AuthenticationPrincipal final Jwt token
+            @AuthenticationPrincipal final Jwt token,
+            @RequestParam(required = false) final String filter,
+            @RequestParam(required = false, defaultValue = "title_asc") final String order,
+            @RequestParam(required = false, defaultValue = "100") final Integer limit
     ) {
         ProfileId userId = ProfileId.get(token);
-
-        LibraryGamesModel model = service.getLibraryForUser(userId, token);
+        //TODO favourite filter
+        LibraryGamesModel model = service.getLibraryForUser(
+                userId, token, filter, order, limit
+        );
 
         return ResponseEntity.ok(model);
     }
