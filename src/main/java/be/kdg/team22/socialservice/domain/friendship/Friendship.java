@@ -47,7 +47,7 @@ public class Friendship {
     public void cancel(final UserId user) {
         checkBeforeChanging(user);
 
-        this.status = FriendshipStatus.CANCELED;
+        this.status = FriendshipStatus.CANCELLED;
         this.updatedAt = Instant.now();
     }
 
