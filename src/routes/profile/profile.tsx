@@ -33,7 +33,7 @@ export default function ProfilePage() {
                     onEdit={() => setSettings(true)}
                 />
 
-                <FriendsSection profile={profile} />
+                <FriendsSection />
 
                 {
                     profile.modules.achievements && (

@@ -4,15 +4,10 @@ import Section from "@/components/section";
 import ErrorState from "@/components/state/error";
 import LoadingState from "@/components/state/loading";
 import { useFriends } from "@/hooks/use-friends";
-import type { Friend } from "@/models/friends/friend";
 import type { Profile } from "@/models/profile/profile";
 import FriendCard from "@/routes/profile/components/friend-card";
 
-interface Props {
-    profile: Profile;
-}
-
-export default function FriendsSection({ profile }: Props) {
+export default function FriendsSection() {
     const { friends, isLoading, isError } = useFriends();
 
     if (isLoading || friends === undefined) return (
