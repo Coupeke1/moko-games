@@ -1,11 +1,12 @@
 
+import { config } from "@/config";
 import { validIdCheck } from "@/lib/id";
 import type { Profile } from "@/models/profile";
 import axios from 'axios';
 import type { KeycloakTokenParsed } from "keycloak-js";
 import Keycloak from 'keycloak-js';
 
-const BASE_URL = import.meta.env.VITE_USER_SERVICE;
+const BASE_URL = config.userService;
 
 export function addToken(token: string | undefined) {
     if (token) axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
