@@ -1,15 +1,19 @@
 import Grid from "@/components/layout/grid/grid";
 import Page from "@/components/layout/page";
-import SearchBar from "@/routes/library/components/search-bar";
-import LibraryCard from "@/routes/library/components/card";
-import { useLibrary } from "@/hooks/use-library";
-import LoadingState from "@/components/state/loading";
 import ErrorState from "@/components/state/error";
+import LoadingState from "@/components/state/loading";
 import Message from "@/components/state/message";
+import { useLibrary } from "@/hooks/use-library";
 import type { Game } from "@/models/library/game";
+import LibraryCard from "@/routes/library/components/card";
+import SearchBar from "@/routes/library/components/search-bar";
+import GameDialog from "@/routes/library/dialogs/game-dialog";
+import { useState } from "react";
 
 export default function LibraryPage() {
     const { games, isLoading, isError } = useLibrary();
+    const [details, setDetails] = useState(false);
+    const [game, setGame] = useState<Game | null>(null);
 
     if (isLoading || games === undefined) return (
         <Page>
@@ -27,27 +31,40 @@ export default function LibraryPage() {
     return (
         <Page>
             <SearchBar />
+            {
+                game && (
+                    <GameDialog
+                        game={game}
+                        close={() => {
+                            setDetails(false);
+                            setGame(null);
+                        }}
+                        open={details}
+                        onChange={setDetails}
+                    />
+                )
+            }
 
-            <Grid>
-                {
-                    games.length == 0 ? (
-                        <Message>No games :(</Message>
-                    ) : (
-                        <Grid>
-                            {
-                                games.map((game: Game) => (
-                                    <LibraryCard
-                                        title={game.title}
-                                        image={game.image}
-                                        playtime="6h 30m"
-                                        friendCount={3}
-                                    />
-                                ))
-                            }
-                        </Grid>
-                    )
-                }
-            </Grid>
+            {
+                games.length == 0 ? (
+                    <Message>No games :(</Message>
+                ) : (
+                    <Grid>
+                        {
+                            games.map((game: Game) => (
+                                <LibraryCard
+                                    key={game.id}
+                                    game={game}
+                                    onClick={(game: Game) => {
+                                        setGame(game);
+                                        setDetails(true);
+                                    }}
+                                />
+                            ))
+                        }
+                    </Grid>
+                )
+            }
         </Page>
     )
 }
