@@ -10,8 +10,8 @@ export function TurnIndicator({gameState}: TurnIndicatorProps) {
     const currentPlayer = players.find(player => player.role === currentRole);
 
     return (
-        <div className="turn-indicator bg-bg-2 p-4 rounded text-center">
-            <div className="status-message text-fg-2 text-lg mb-2">Current turn:</div>
+        <div className="turn-indicator bg-bg-2 p-4 rounded-lg text-center flex flex-col justify-center">
+            <div className="status-message text-fg-2 text-lg">Current turn:</div>
             <CurrentPlayerDisplay
                 role={currentRole}
                 player={currentPlayer}
