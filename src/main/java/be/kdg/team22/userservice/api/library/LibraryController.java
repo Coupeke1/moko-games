@@ -1,6 +1,7 @@
 package be.kdg.team22.userservice.api.library;
 
 
+import be.kdg.team22.userservice.api.library.models.LibraryGameModel;
 import be.kdg.team22.userservice.api.library.models.LibraryGamesModel;
 import be.kdg.team22.userservice.application.library.LibraryService;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/library")
 public class LibraryController {
@@ -22,18 +25,10 @@ public class LibraryController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<LibraryGamesModel> getMyLibrary(
-            @AuthenticationPrincipal final Jwt token,
-            @RequestParam(required = false) final String filter,
-            @RequestParam(required = false) final Boolean favourite,
-            @RequestParam(required = false, defaultValue = "title_asc") final String order,
-            @RequestParam(required = false, defaultValue = "100") final Integer limit
-    ) {
+    public ResponseEntity<List<LibraryGameModel>> getMyLibrary(@AuthenticationPrincipal final Jwt token, @RequestParam(required = false) final String filter, @RequestParam(required = false) final Boolean favourite, @RequestParam(required = false, defaultValue = "title_asc") final String order, @RequestParam(required = false, defaultValue = "100") final Integer limit) {
         ProfileId userId = ProfileId.get(token);
-        LibraryGamesModel model = service.getLibraryForUser(
-                userId, token, filter, favourite, order, limit
-        );
+        LibraryGamesModel model = service.getLibraryForUser(userId, token, filter, favourite, order, limit);
 
-        return ResponseEntity.ok(model);
+        return ResponseEntity.ok(model.games());
     }
 }
