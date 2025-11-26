@@ -7,9 +7,9 @@ export default function StorePage() {
     return (
         <Page>
             <Column>
-                <Input label="Search Store..." value="" onChange={() => { }} />
-                <Select label="Sorting" value="" onChange={() => { }} options={[]} />
-                <Select label="Category" value="" onChange={() => { }} options={[]} />
+                <Input placeholder="Search Store..." value="" onChange={() => { }} />
+                <Select value="" onChange={() => { }} options={[]} />
+                <Select value="" onChange={() => { }} options={[]} />
             </Column>
         </Page>
     )
