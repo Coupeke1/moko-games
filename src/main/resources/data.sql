@@ -1,28 +1,24 @@
-INSERT INTO games (id, name, base_url, start_endpoint, title, description, price, image_url, store_url, created_at, updated_at)
-VALUES
-    (
-        '00000000-0000-0000-0000-000000000001',
+INSERT INTO games (id, name, base_url, start_endpoint, title, description, price, image_url, store_url, created_at,
+                   updated_at)
+VALUES ('00000000-0000-0000-0000-000000000001',
         'tic-tac-toe',
         'http://localhost:8086',
         '/api/games',
         'Tic Tac Toe',
-        'Tic Tac Toe game',
-        20,
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Tic-tac-toe-game-board-with-lines.svg/1200px-Tic-tac-toe-game-board-with-lines.svg.png',
+        'Tic-tac-toe is played on a three-by-three grid by two players, who alternately place the marks X and O in one of the nine spaces in the grid.',
+        14.99,
+        'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ffacts.net%2Fwp-content%2Fuploads%2F2023%2F09%2F8-enigmatic-facts-about-tic-tac-toe-played-with-xs-and-os-1695597315.jpg&f=1&nofb=1&ipt=240d93760ce6dbd872ada5607fccd0cff1e361735a643064c06224a6d6a7e29f',
         'https://www.tictactoe.com/',
         NOW(),
-        NOW()
-    ),
-    (
-        '00000000-0000-0000-0000-000000000002',
+        NOW()),
+       ('00000000-0000-0000-0000-000000000002',
         'checkers',
         'http://localhost:8087',
         '/api/games',
         'Checkers',
-        'Checkers game',
-        60,
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Checkers_board_with_pieces.svg/1200px-Checkers_board_with_pieces.svg.png',
+        'Checkers is played by two opponents on opposite sides of the game board. One player has dark pieces (usually black); the other has light pieces (usually white or red). The darker color moves first, then players alternate turns. A player cannot move the opponent''s pieces. A move consists of moving a piece to an adjacent unoccupied square. All pieces move forward only at the beginning of the game. At the beginning of a player''s turn, if the adjacent square of a player''s piece (in the player''s forward direction) contains an opponent''s piece, and the square immediately beyond it is vacant, the piece may be captured (must be captured in most international rules) by jumping over it. The captured piece is then removed from the board. ',
+        44.99,
+        'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.etsystatic.com%2F9295891%2Fr%2Fil%2Ffe59d4%2F1941663431%2Fil_fullxfull.1941663431_27n8.jpg&f=1&nofb=1&ipt=19a33fabc9ec064ede9375f4c348d4e071701043299d452fd9650d057ea22329',
         'https://www.checkers.com/',
         NOW(),
-        NOW()
-    );
+        NOW());
