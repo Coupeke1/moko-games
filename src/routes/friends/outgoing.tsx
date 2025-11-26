@@ -11,8 +11,23 @@ import TabRow from "@/routes/friends/components/tabs/row";
 export default function OutgoingRequestsPage() {
     const { requests, isLoading, isError } = useOutgoingRequests();
 
-    if (isLoading || requests === undefined) return <Page><LoadingState /></Page>
-    if (isError) return <Page><ErrorState /></Page>
+    if (isLoading || requests === undefined) return (
+        <Page>
+            <Column gap={Gap.Large}>
+                <TabRow />
+                <LoadingState />
+            </Column>
+        </Page>
+    );
+
+    if (isError) return (
+        <Page>
+            <Column gap={Gap.Large}>
+                <TabRow />
+                <ErrorState />
+            </Column>
+        </Page>
+    );
 
     return (
         <Page>
@@ -30,5 +45,5 @@ export default function OutgoingRequestsPage() {
                 }
             </Column>
         </Page>
-    )
+    );
 }

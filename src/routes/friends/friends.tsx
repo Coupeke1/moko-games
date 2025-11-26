@@ -11,10 +11,11 @@ import showToast from "@/components/toast";
 import { useFriends } from "@/hooks/use-friends";
 import type { Profile } from "@/models/profile/profile";
 import TabRow from "@/routes/friends/components/tabs/row";
-import FriendCard from "@/routes/profile/components/friend-card";
+import FriendCard from "@/routes/friends/components/friend-card";
 import { sendRequest } from "@/services/friends-service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { useMyProfile } from "@/hooks/use-my-profile";
 
 export default function FriendsPage() {
     const client = useQueryClient();
@@ -61,15 +62,7 @@ export default function FriendsPage() {
                     ) : (
                         <Grid>
                             {
-
-                                friends.map((friend: Profile) => (
-                                    <FriendCard
-                                        image={friend.image}
-                                        username={friend.username}
-                                        level={friend.statistics.level}
-                                        playtime={friend.statistics.playTime.toString()}
-                                    />
-                                ))
+                                friends.map((friend: Profile) => <FriendCard profile={friend} />)
                             }
                         </Grid>
                     )

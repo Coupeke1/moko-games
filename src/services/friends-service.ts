@@ -1,5 +1,5 @@
+import { validIdCheck } from "@/lib/id";
 import type { Friend } from "@/models/friends/friend";
-import type { Overview } from "@/models/friends/overview";
 import type { Profile } from "@/models/profile/profile";
 import axios from "axios";
 
@@ -8,11 +8,10 @@ const SOCIAL_URL = import.meta.env.VITE_SOCIAL_SERVICE;
 
 export async function findFriends() {
     try {
-        const { data: response } = await axios.get<Overview>(SOCIAL_URL);
-        if (!response?.friends) return [];
+        const { data: response } = await axios.get<Friend[]>(SOCIAL_URL);
 
         const details = await Promise.all(
-            response.friends.map(async (friend: Friend) => {
+            response.map(async (friend: Friend) => {
                 try {
                     const { data } = await axios.get<Profile>(`${PROFILE_URL}/${friend.id}`);
                     return data;
@@ -31,8 +30,21 @@ export async function findFriends() {
 
 export async function findIncomingRequests() {
     try {
-        const { data } = await axios.get<Friend[]>(`${SOCIAL_URL}/requests/incoming`);
-        return data;
+        const { data: response } = await axios.get<Friend[]>(`${SOCIAL_URL}/requests/incoming`);
+
+        const details = await Promise.all(
+            response.map(async (friend: Friend) => {
+                try {
+                    const { data } = await axios.get<Profile>(`${PROFILE_URL}/${friend.id}`);
+                    return data;
+                }
+                catch {
+                    throw new Error(`Friend with id '${friend.id}' could not be fetched`);
+                }
+            })
+        );
+
+        return details;
     } catch {
         throw new Error("Incoming requests could not be fetched");
     }
@@ -40,8 +52,21 @@ export async function findIncomingRequests() {
 
 export async function findOutgoingRequests() {
     try {
-        const { data } = await axios.get<Friend[]>(`${SOCIAL_URL}/requests/outgoing`);
-        return data;
+        const { data: response } = await axios.get<Friend[]>(`${SOCIAL_URL}/requests/outgoing`);
+
+        const details = await Promise.all(
+            response.map(async (friend: Friend) => {
+                try {
+                    const { data } = await axios.get<Profile>(`${PROFILE_URL}/${friend.id}`);
+                    return data;
+                }
+                catch {
+                    throw new Error(`Friend with id '${friend.id}' could not be fetched`);
+                }
+            })
+        );
+
+        return details;
     } catch {
         throw new Error("Outgoing requests could not be fetched");
     }
@@ -56,5 +81,32 @@ export async function sendRequest(username: string) {
         await axios.post(SOCIAL_URL, { username });
     } catch {
         throw new Error(`Request to '${username}' could not be sent`);
+    }
+}
+
+export async function acceptRequest(id: string) {
+    try {
+        validIdCheck(id);
+        await axios.post(`${SOCIAL_URL}/accept/${id}`);
+    } catch {
+        throw new Error(`Request from user with id '${id}' could not be accepted`);
+    }
+}
+
+export async function rejectRequest(id: string) {
+    try {
+        validIdCheck(id);
+        await axios.post(`${SOCIAL_URL}/reject/${id}`);
+    } catch {
+        throw new Error(`Request from user with id '${id}' could not be rejected`);
+    }
+}
+
+export async function cancelRequest(id: string) {
+    try {
+        validIdCheck(id);
+        await axios.post(`${SOCIAL_URL}/cancel/${id}`);
+    } catch {
+        throw new Error(`Request from user with id '${id}' could not be cancelled`);
     }
 }
