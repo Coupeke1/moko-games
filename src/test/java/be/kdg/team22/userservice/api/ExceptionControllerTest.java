@@ -1,5 +1,6 @@
 package be.kdg.team22.userservice.api;
 
+import be.kdg.team22.userservice.domain.library.exceptions.LibraryException;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
 import be.kdg.team22.userservice.domain.profile.exceptions.ClaimNotFoundException;
 import be.kdg.team22.userservice.domain.profile.exceptions.NotAuthenticatedException;
@@ -50,14 +51,30 @@ class ExceptionControllerTest {
     }
 
     @Test
-    @DisplayName("IllegalArgumentException → 400 BAD_REQUEST")
-    void handleBadRequest() {
-        IllegalArgumentException ex = new IllegalArgumentException("invalid input");
-
-        ResponseEntity<String> response = controller.handleBadRequest(ex);
+    @DisplayName("LibraryException.missingGameId → 400 BAD_REQUEST")
+    void handleMissingGameId() {
+        ResponseEntity<String> response = controller.handleLibraryErrors(LibraryException.missingGameId());
 
         assertThat(response.getStatusCode().value()).isEqualTo(400);
-        assertThat(response.getBody()).isEqualTo("invalid input");
+        assertThat(response.getBody()).isEqualTo("gameId cannot be null");
+    }
+
+    @Test
+    @DisplayName("LibraryException.missingUserId → 400 BAD_REQUEST")
+    void handleMissingUserId() {
+        ResponseEntity<String> response = controller.handleLibraryErrors(LibraryException.missingUserId());
+
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+        assertThat(response.getBody()).isEqualTo("userId cannot be null");
+    }
+
+    @Test
+    @DisplayName("LibraryException.missingPurchasedAt → 400 BAD_REQUEST")
+    void handleMissingPurchasedAt() {
+        ResponseEntity<String> response = controller.handleLibraryErrors(LibraryException.missingPurchasedAt());
+
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+        assertThat(response.getBody()).isEqualTo("purchasedAt cannot be null");
     }
 
     @Test
