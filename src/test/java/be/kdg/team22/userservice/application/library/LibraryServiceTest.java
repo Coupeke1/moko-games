@@ -19,7 +19,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 class LibraryServiceTest {
-
     private final LibraryRepository repo = mock(LibraryRepository.class);
     private final ExternalGamesRepository games = mock(ExternalGamesRepository.class);
 
@@ -32,11 +31,11 @@ class LibraryServiceTest {
                 .build();
     }
 
-    private GameDetailsResponse game(UUID id) {
+    private GameDetailsResponse game(UUID id, String title) {
         return new GameDetailsResponse(
                 id,
                 "EngineName",
-                "Tic Tac Toe",
+                title,
                 "Fun game",
                 BigDecimal.TEN,
                 "img.png",
@@ -44,58 +43,143 @@ class LibraryServiceTest {
         );
     }
 
+    private LibraryEntry entry(UUID id, UUID userId, UUID gameId, boolean favourite) {
+        return new LibraryEntry(
+                id,
+                userId,
+                gameId,
+                Instant.parse("2024-01-01T10:00:00Z"),
+                favourite
+        );
+    }
+
     @Test
-    @DisplayName("getLibraryForUser → maps all entries to LibraryGameModel")
-    void getLibraryForUser_success() {
+    @DisplayName("Maps all entries to LibraryGameModel")
+    void getLibraryForUser_mapsEntries() {
+        ProfileId userId = new ProfileId(UUID.randomUUID());
+        UUID game1 = UUID.randomUUID();
+        UUID game2 = UUID.randomUUID();
 
-        ProfileId userId = new ProfileId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
-        Instant purchasedAt = Instant.parse("2024-01-01T10:00:00Z");
+        LibraryEntry e1 = entry(UUID.randomUUID(), userId.value(), game1, true);
+        LibraryEntry e2 = entry(UUID.randomUUID(), userId.value(), game2, false);
 
-        LibraryEntry entry1 = new LibraryEntry(
-                UUID.randomUUID(),
-                userId.value(),
-                UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
-                purchasedAt
-        );
+        when(repo.findByUserId(userId.value())).thenReturn(List.of(e1, e2));
+        when(games.getGame(eq(game1), any())).thenReturn(game(game1, "A"));
+        when(games.getGame(eq(game2), any())).thenReturn(game(game2, "B"));
 
-        LibraryEntry entry2 = new LibraryEntry(
-                UUID.randomUUID(),
-                userId.value(),
-                UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
-                purchasedAt
-        );
-
-        when(repo.findByUserId(userId.value())).thenReturn(List.of(entry1, entry2));
-
-        when(games.getGame(eq(entry1.gameId()), any(Jwt.class)))
-                .thenReturn(game(entry1.gameId()));
-
-        when(games.getGame(eq(entry2.gameId()), any(Jwt.class)))
-                .thenReturn(game(entry2.gameId()));
-
-        LibraryGamesModel result = service.getLibraryForUser(userId, token());
+        LibraryGamesModel result = service.getLibraryForUser(
+                userId, token(), null, null, "title_asc", 100);
 
         assertThat(result.games()).hasSize(2);
-        assertThat(result.games().get(0).id()).isEqualTo(entry1.gameId());
-        assertThat(result.games().get(1).id()).isEqualTo(entry2.gameId());
+        assertThat(result.games().get(0).id()).isEqualTo(game1);
+        assertThat(result.games().get(0).favourite()).isTrue();
+        assertThat(result.games().get(1).id()).isEqualTo(game2);
+        assertThat(result.games().get(1).favourite()).isFalse();
 
         verify(repo).findByUserId(userId.value());
         verify(games, times(2)).getGame(any(), any());
     }
 
     @Test
-    @DisplayName("getLibraryForUser → empty library returns empty model")
-    void getLibraryForUser_emptyLibrary() {
+    @DisplayName("Filter by title or description")
+    void getLibraryForUser_filter() {
+        ProfileId userId = new ProfileId(UUID.randomUUID());
+        UUID game1 = UUID.randomUUID();
+        UUID game2 = UUID.randomUUID();
 
+        LibraryEntry e1 = entry(UUID.randomUUID(), userId.value(), game1, false);
+        LibraryEntry e2 = entry(UUID.randomUUID(), userId.value(), game2, false);
+
+        when(repo.findByUserId(userId.value())).thenReturn(List.of(e1, e2));
+
+        when(games.getGame(eq(game1), any())).thenReturn(game(game1, "Chess"));
+        when(games.getGame(eq(game2), any())).thenReturn(game(game2, "Monopoly"));
+
+        LibraryGamesModel result = service.getLibraryForUser(
+                userId, token(), "ch", null, "title_asc", 100);
+
+        assertThat(result.games()).hasSize(1);
+        assertThat(result.games().getFirst().title()).isEqualTo("Chess");
+    }
+
+    @Test
+    @DisplayName("Filter favourite only")
+    void getLibraryForUser_filterFavourite() {
+        ProfileId userId = new ProfileId(UUID.randomUUID());
+        UUID g1 = UUID.randomUUID();
+        UUID g2 = UUID.randomUUID();
+
+        LibraryEntry e1 = entry(UUID.randomUUID(), userId.value(), g1, true);
+        LibraryEntry e2 = entry(UUID.randomUUID(), userId.value(), g2, false);
+
+        when(repo.findByUserId(userId.value())).thenReturn(List.of(e1, e2));
+
+        when(games.getGame(eq(g1), any())).thenReturn(game(g1, "A"));
+        when(games.getGame(eq(g2), any())).thenReturn(game(g2, "B"));
+
+        LibraryGamesModel result = service.getLibraryForUser(
+                userId, token(), null, true, "title_asc", 100);
+
+        assertThat(result.games()).hasSize(1);
+        assertThat(result.games().getFirst().id()).isEqualTo(g1);
+        assertThat(result.games().getFirst().favourite()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Ordering by title_desc")
+    void getLibraryForUser_ordering() {
+        ProfileId userId = new ProfileId(UUID.randomUUID());
+        UUID g1 = UUID.randomUUID();
+        UUID g2 = UUID.randomUUID();
+
+        LibraryEntry e1 = entry(UUID.randomUUID(), userId.value(), g1, false);
+        LibraryEntry e2 = entry(UUID.randomUUID(), userId.value(), g2, false);
+
+        when(repo.findByUserId(userId.value())).thenReturn(List.of(e1, e2));
+
+        when(games.getGame(eq(g1), any())).thenReturn(game(g1, "Alpha"));
+        when(games.getGame(eq(g2), any())).thenReturn(game(g2, "Zulu"));
+
+        LibraryGamesModel result = service.getLibraryForUser(
+                userId, token(), null, null, "title_desc", 100);
+
+        assertThat(result.games()).hasSize(2);
+        assertThat(result.games().getFirst().title()).isEqualTo("Zulu");
+        assertThat(result.games().get(1).title()).isEqualTo("Alpha");
+    }
+
+    @Test
+    @DisplayName("Limit reduces result size")
+    void getLibraryForUser_limit() {
+        ProfileId userId = new ProfileId(UUID.randomUUID());
+        UUID g1 = UUID.randomUUID();
+        UUID g2 = UUID.randomUUID();
+
+        LibraryEntry e1 = entry(UUID.randomUUID(), userId.value(), g1, false);
+        LibraryEntry e2 = entry(UUID.randomUUID(), userId.value(), g2, false);
+
+        when(repo.findByUserId(userId.value())).thenReturn(List.of(e1, e2));
+
+        when(games.getGame(eq(g1), any())).thenReturn(game(g1, "Alpha"));
+        when(games.getGame(eq(g2), any())).thenReturn(game(g2, "Zulu"));
+
+        LibraryGamesModel result = service.getLibraryForUser(
+                userId, token(), null, null, "title_asc", 1);
+
+        assertThat(result.games()).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("Empty library returns empty model")
+    void getLibraryForUser_empty() {
         ProfileId userId = new ProfileId(UUID.randomUUID());
 
         when(repo.findByUserId(userId.value())).thenReturn(List.of());
 
-        LibraryGamesModel result = service.getLibraryForUser(userId, token());
+        LibraryGamesModel result = service.getLibraryForUser(
+                userId, token(), null, null, "title_asc", 100);
 
         assertThat(result.games()).isEmpty();
-
-        verify(repo).findByUserId(userId.value());
         verifyNoInteractions(games);
     }
 }
