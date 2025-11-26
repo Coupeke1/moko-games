@@ -1,5 +1,6 @@
 package be.kdg.team22.userservice.api;
 
+import be.kdg.team22.userservice.domain.achievement.exceptions.AchievementException;
 import be.kdg.team22.userservice.domain.library.exceptions.ExternalGameNotFoundException;
 import be.kdg.team22.userservice.domain.library.exceptions.GameServiceNotReachableException;
 import be.kdg.team22.userservice.domain.library.exceptions.LibraryException;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class ExceptionController {
+
     @ExceptionHandler({
             ClaimNotFoundException.class,
             ProfileNotFoundException.class,
@@ -29,6 +31,7 @@ public class ExceptionController {
 
     @ExceptionHandler({
             LibraryException.class,
+            AchievementException.class,
             IllegalArgumentException.class
     })
     public ResponseEntity<String> handleBadRequest(RuntimeException ex) {
