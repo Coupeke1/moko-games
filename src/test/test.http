@@ -50,3 +50,8 @@ Content-Type: application/json
   "username": "invalid-test",
   "email": "not-an-email"
 }
+
+### 7) opvragen library
+GET http://localhost:8080/api/library/me
+Authorization: Bearer {{access_token}}
+
