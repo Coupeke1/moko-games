@@ -1,8 +1,9 @@
 interface GameGridProps {
     board: string[][];
+    onCellClick?: (rowIndex: number, colIndex: number) => void;
 }
 
-export function GameGrid({board}: GameGridProps) {
+export function GameGrid({board, onCellClick}: GameGridProps) {
     const size = board.length;
 
     return (
@@ -20,8 +21,8 @@ export function GameGrid({board}: GameGridProps) {
                     <button
                         key={`${rowIndex}-${colIndex}`}
                         className="aspect-square flex items-center justify-center
-                       text-3xl font-bold
-                       bg-bg-2 hover:bg-bg-3 transition-colors"
+                       text-3xl font-bold bg-bg-2 hover:bg-bg-3 transition-colors"
+                        onClick={() => onCellClick?.(rowIndex, colIndex)}
                     >
                         {cell || ''}
                     </button>
