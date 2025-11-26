@@ -8,6 +8,7 @@ import LoadingState from "@/components/state/loading.tsx";
 import ErrorState from "@/components/state/error.tsx";
 import Page from "@/components/layout/page.tsx";
 import {Row} from "@/components/layout/row.tsx";
+import {GameGrid} from "@/routes/game/components/game-grid.tsx";
 
 export default function GamePage() {
     const {id} = useParams<{ id: string }>()
@@ -38,9 +39,7 @@ export default function GamePage() {
         <div className="flex flex-col items-center gap-8 p-8 min-h-screen bg-bg text-fg">
             <header className="text-center w-full">
                 <div className="flex justify-between items-center mb-4">
-                    <h1 className="text-3xl font-bold flex-1 text-center">Tic Tac Toe - Game #{id}</h1>
-
-                    <div className="w-40"></div>
+                    <h1 className="text-3xl font-bold flex-1 text-center">Tic Tac Toe</h1>
                 </div>
             </header>
 
@@ -50,29 +49,16 @@ export default function GamePage() {
 
             <div className="game-board">
                 <h3 className="text-xl font-semibold mb-4 text-center">Board</h3>
-                <div className="border-2 border-fg rounded">
-                    {gameState.board.map((row, rowIndex) => (
-                        <div key={rowIndex} className="flex">
-                            {row.map((cell, cellIndex) => (
-                                <div
-                                    key={cellIndex}
-                                    className="w-16 h-16 border border-fg-2 flex items-center justify-center text-2xl font-bold bg-bg-2"
-                                >
-                                    {cell || ' '}
-                                </div>
-                            ))}
-                        </div>
-                    ))}
-                </div>
+                <GameGrid board={gameState.board}/>
             </div>
 
             <div className="grid grid-cols-2 gap-4 items-stretch">
                 <TurnIndicator gameState={gameState}/>
                 <section className="game-info bg-bg-2 p-4 text-center rounded-lg
                     flex flex-col justify-center gap-2">
-                    <Row label="Game Status" value={gameState.status} />
-                    <Row label="Players" value={gameState.players.length} />
-                    {gameState.winner && <Row label="Winner" value={gameState.winner} />}
+                    <Row label="Game Status" value={gameState.status}/>
+                    <Row label="Players" value={gameState.players.length}/>
+                    {gameState.winner && <Row label="Winner" value={gameState.winner}/>}
                 </section>
             </div>
         </div>
