@@ -22,6 +22,9 @@ public class ProfileEntity {
     @Column(name = "description", nullable = false)
     private String description;
 
+    @Column(name = "image", nullable = false)
+    private String image;
+
     @Embedded
     private StatisticsEmbed statistics;
 
@@ -33,11 +36,12 @@ public class ProfileEntity {
 
     protected ProfileEntity() {}
 
-    public ProfileEntity(final UUID id, final String username, final String email, final String description, final StatisticsEmbed statistics, final ModulesEmbed modules, final Instant createdAt) {
+    public ProfileEntity(final UUID id, final String username, final String email, final String description, final String image, final StatisticsEmbed statistics, final ModulesEmbed modules, final Instant createdAt) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.description = description;
+        this.image = image;
         this.statistics = statistics;
         this.modules = modules;
         this.createdAt = createdAt;
@@ -48,7 +52,7 @@ public class ProfileEntity {
 
         ModulesEmbed modules = new ModulesEmbed(profile.modules().achievements(), profile.modules().favourites());
 
-        return new ProfileEntity(profile.id().value(), profile.username().value(), profile.email().value(), profile.description(), statistics, modules, profile.createdAt());
+        return new ProfileEntity(profile.id().value(), profile.username().value(), profile.email().value(), profile.description(), profile.image(), statistics, modules, profile.createdAt());
     }
 
     public Profile to() {
@@ -56,6 +60,6 @@ public class ProfileEntity {
 
         Modules modules = new Modules(this.modules.achievements(), this.modules.favourites());
 
-        return new Profile(new ProfileId(id), new ProfileName(username), new ProfileEmail(email), description, statistics, modules, createdAt);
+        return new Profile(new ProfileId(id), new ProfileName(username), new ProfileEmail(email), description, image, statistics, modules, createdAt);
     }
 }
