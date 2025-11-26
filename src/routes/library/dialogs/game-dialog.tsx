@@ -45,7 +45,7 @@ export default function GameDialog({ game, close, open, onChange }: Props) {
     };
 
     return (
-        <Dialog title={game.title} open={open} onChange={onChange} footer={
+        <Dialog title="Game Details" open={open} onChange={onChange} footer={
             <Button>Start Lobby</Button>
         }>
             <Column>
