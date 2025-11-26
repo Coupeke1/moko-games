@@ -70,13 +70,28 @@ public class FriendService {
         friendshipRepository.save(friendship);
     }
 
-    public FriendsOverviewModel getOverview(final UserId userId) {
-        List<Friendship> all = friendshipRepository.findAllFor(userId);
-        List<FriendModel> friends = all.stream().filter(f -> f.status() == FriendshipStatus.ACCEPTED).map(friendship -> toFriendModel(userId, friendship)).toList();
-        List<FriendModel> incoming = all.stream().filter(f -> f.status() == FriendshipStatus.PENDING && f.receiver().value().equals(userId.value())).map(friendship -> toFriendModel(userId, friendship)).toList();
-        List<FriendModel> outgoing = all.stream().filter(f -> f.status() == FriendshipStatus.PENDING && f.requester().value().equals(userId.value())).map(friendship -> toFriendModel(userId, friendship)).toList();
+    public FriendsOverviewModel getOverview(final UserId id) {
+        List<Friendship> all = friendshipRepository.findAllFor(id);
+        List<FriendModel> friends = all.stream().filter(f -> f.status() == FriendshipStatus.ACCEPTED).map(friendship -> toFriendModel(id, friendship)).toList();
+        List<FriendModel> incoming = all.stream().filter(f -> f.status() == FriendshipStatus.PENDING && f.receiver().value().equals(id.value())).map(friendship -> toFriendModel(id, friendship)).toList();
+        List<FriendModel> outgoing = all.stream().filter(f -> f.status() == FriendshipStatus.PENDING && f.requester().value().equals(id.value())).map(friendship -> toFriendModel(id, friendship)).toList();
 
         return new FriendsOverviewModel(friends, incoming, outgoing);
+    }
+
+    public List<FriendModel> getFriends(final UserId id) {
+        List<Friendship> all = friendshipRepository.findAllFor(id);
+        return all.stream().filter(f -> f.status() == FriendshipStatus.ACCEPTED).map(friendship -> toFriendModel(id, friendship)).toList();
+    }
+
+    public List<FriendModel> getIncomingRequests(final UserId id) {
+        List<Friendship> all = friendshipRepository.findAllFor(id);
+        return all.stream().filter(f -> f.status() == FriendshipStatus.PENDING && f.receiver().value().equals(id.value())).map(friendship -> toFriendModel(id, friendship)).toList();
+    }
+
+    public List<FriendModel> getOutgoingRequests(final UserId id) {
+        List<Friendship> all = friendshipRepository.findAllFor(id);
+        return all.stream().filter(f -> f.status() == FriendshipStatus.PENDING && f.requester().value().equals(id.value())).map(friendship -> toFriendModel(id, friendship)).toList();
     }
 
     private FriendModel toFriendModel(final UserId userId, final Friendship friendship) {

@@ -1,7 +1,7 @@
 package be.kdg.team22.socialservice.api.friends;
 
 import be.kdg.team22.socialservice.api.friends.models.AddFriendRequestModel;
-import be.kdg.team22.socialservice.api.friends.models.FriendsOverviewModel;
+import be.kdg.team22.socialservice.api.friends.models.FriendModel;
 import be.kdg.team22.socialservice.application.friends.FriendService;
 import be.kdg.team22.socialservice.domain.user.UserId;
 import be.kdg.team22.socialservice.domain.user.Username;
@@ -9,6 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -21,9 +22,21 @@ public class FriendsController {
     }
 
     @GetMapping
-    public FriendsOverviewModel getFriends(@AuthenticationPrincipal final Jwt token) {
+    public List<FriendModel> getFriends(@AuthenticationPrincipal final Jwt token) {
         UserId user = UserId.get(token);
-        return service.getOverview(user);
+        return service.getFriends(user);
+    }
+
+    @GetMapping("/requests/incoming")
+    public List<FriendModel> getIncomingRequests(@AuthenticationPrincipal final Jwt token) {
+        UserId user = UserId.get(token);
+        return service.getIncomingRequests(user);
+    }
+
+    @GetMapping("/requests/outgoing")
+    public List<FriendModel> getOutgoingRequests(@AuthenticationPrincipal final Jwt token) {
+        UserId user = UserId.get(token);
+        return service.getOutgoingRequests(user);
     }
 
     @PostMapping
