@@ -1,8 +1,8 @@
 import { useAuthStore } from "@/stores/auth-store";
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig, type AxiosResponse, type AxiosError } from 'axios';
 
-const requestInterceptor = async (config: InternalAxiosRequestConfig) => {
-    const token = await useAuthStore.getState().getValidToken();
+const requestInterceptor = (config: InternalAxiosRequestConfig) => {
+    const token = useAuthStore.getState().token;
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }

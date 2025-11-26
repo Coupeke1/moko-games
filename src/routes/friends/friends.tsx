@@ -45,6 +45,7 @@ function Add() {
             <section className="sm:col-span-3">
                 <Input placeholder="Search Username..." value={username} onChange={(e) => setUsername(e.target.value)} />
             </section>
+            
             <Button onClick={handleAdd}>Add</Button>
         </section>
     );
