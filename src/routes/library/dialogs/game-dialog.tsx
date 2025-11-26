@@ -46,7 +46,7 @@ export default function GameDialog({ game, close, open, onChange }: Props) {
 
     return (
         <Dialog title={game.title} open={open} onChange={onChange} footer={
-            <Button>Play</Button>
+            <Button>Start Lobby</Button>
         }>
             <Column>
                 <article className="flex flex-col items-center justify-center relative overflow-hidden select-none bg-cover bg-center px-4 py-2 rounded-lg h-30" style={{ backgroundImage: `url("${game.image}")` }}>
