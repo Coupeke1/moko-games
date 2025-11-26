@@ -9,7 +9,7 @@ const requestInterceptor = async (config: InternalAxiosRequestConfig) => {
     return config;
 };
 
-const requestErrorInterceptor = (error: any) => {
+const requestErrorInterceptor = (error: unknown) => {
     return Promise.reject(error);
 };
 
