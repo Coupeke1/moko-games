@@ -1,7 +1,7 @@
 import type { ChangeEvent } from "react";
 
 interface Props {
-    label: string;
+    label?: string;
     disabled?: boolean;
     required?: boolean;
     value: string;

@@ -8,7 +8,7 @@ import type { Profile } from "@/models/profile/profile";
 import FriendCard from "@/routes/profile/components/friend-card";
 
 export default function FriendsSection() {
-    const { friends, isLoading, isError } = useFriends();
+    const { friends: friends, isLoading, isError } = useFriends();
 
     if (isLoading || friends === undefined) return (
         <Section title="Friends">

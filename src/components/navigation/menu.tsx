@@ -1,3 +1,4 @@
+import SmallButton from "@/components/dialog/small-button";
 import CartIcon from "@/components/icons/bar/cart-icon";
 import ChatIcon from "@/components/icons/bar/chat-icon";
 import CloseIcon from "@/components/icons/bar/close-icon";
@@ -5,8 +6,8 @@ import LibraryIcon from "@/components/icons/bar/library-icon";
 import NotificationsIcon from "@/components/icons/bar/notifications-icon";
 import ProfileIcon from "@/components/icons/bar/profile-icon";
 import StoreIcon from "@/components/icons/bar/store-icon";
+import UsersIcon from "@/components/icons/users-icon";
 import NavigationLink from "@/components/navigation/link";
-import SmallButton from "../dialog/small-button";
 
 interface Props {
     open: boolean;
@@ -54,6 +55,13 @@ export default function NavigationMenu({ open, onClose }: Props) {
                         path="/profile"
                     >
                         <ProfileIcon />
+                    </NavigationLink>
+
+                    <NavigationLink
+                        title="Friends"
+                        path="/friends"
+                    >
+                        <UsersIcon />
                     </NavigationLink>
                 </section>
 
