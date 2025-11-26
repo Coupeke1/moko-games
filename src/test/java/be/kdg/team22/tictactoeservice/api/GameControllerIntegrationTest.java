@@ -6,7 +6,7 @@ import be.kdg.team22.tictactoeservice.api.models.MoveModel;
 import be.kdg.team22.tictactoeservice.domain.game.Game;
 import be.kdg.team22.tictactoeservice.domain.game.GameId;
 import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
-import be.kdg.team22.tictactoeservice.repository.GameRepository;
+import be.kdg.team22.tictactoeservice.infrastructure.game.GameRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

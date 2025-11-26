@@ -1,24 +1,31 @@
 package be.kdg.team22.tictactoeservice.application;
 
 import be.kdg.team22.tictactoeservice.api.models.CreateGameModel;
+import be.kdg.team22.tictactoeservice.application.events.GameEventPublisher;
 import be.kdg.team22.tictactoeservice.config.BoardSizeProperties;
+import be.kdg.team22.tictactoeservice.domain.events.GameDrawEvent;
+import be.kdg.team22.tictactoeservice.domain.events.GameWonEvent;
 import be.kdg.team22.tictactoeservice.domain.game.Game;
 import be.kdg.team22.tictactoeservice.domain.game.GameId;
+import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
 import be.kdg.team22.tictactoeservice.domain.game.Move;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
-import be.kdg.team22.tictactoeservice.repository.GameRepository;
+import be.kdg.team22.tictactoeservice.infrastructure.game.GameRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
 public class GameService {
     private final GameRepository repository;
     private final BoardSizeProperties config;
+    private final GameEventPublisher publisher;
 
-    public GameService(final GameRepository repository, final BoardSizeProperties config) {
+    public GameService(GameRepository repository, BoardSizeProperties config, GameEventPublisher publisher) {
         this.repository = repository;
         this.config = config;
+        this.publisher = publisher;
     }
 
     public Game startGame(final CreateGameModel model) {
@@ -43,6 +50,29 @@ public class GameService {
         Game game = getGame(id);
         game.requestMove(move);
         repository.save(game);
+
+        if (game.status() == GameStatus.WON) {
+            publisher.publishGameWon(
+                    new GameWonEvent(
+                            game.id().value(),
+                            game.winner().value(),
+                            Instant.now()
+                    )
+            );
+        }
+
+        if (game.status() == GameStatus.TIE) {
+            publisher.publishGameDraw(
+                    new GameDrawEvent(
+                            game.id().value(),
+                            game.players().stream()
+                                    .map(p -> p.id().value())
+                                    .toList(),
+                            Instant.now()
+                    )
+            );
+        }
+
         return game;
     }
 }
