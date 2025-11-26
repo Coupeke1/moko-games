@@ -73,7 +73,7 @@ class ProfileControllerTest {
 
     @Test
     void invalidUuidReturns400() throws Exception {
-        mock.perform(get("/api/profiles/not-a-uuid")).andExpect(status().isInternalServerError());
+        mock.perform(get("/api/profiles/not-a-uuid")).andExpect(status().isBadRequest());
     }
 
     @Test

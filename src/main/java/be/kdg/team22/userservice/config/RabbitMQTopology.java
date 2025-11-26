@@ -1,0 +1,24 @@
+package be.kdg.team22.userservice.config;
+
+import org.springframework.amqp.core.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class RabbitMQTopology {
+
+    public static final String EXCHANGE_GAMEPLAY = "exchange.gameplay";
+    public static final String QUEUE_USER_GAMEPLAY = "queue.user.gameplay";
+
+    @Bean
+    Queue userGameplayQueue() {
+        return QueueBuilder.durable(QUEUE_USER_GAMEPLAY).build();
+    }
+
+    @Bean
+    Binding gameplayBinding() {
+        return BindingBuilder.bind(userGameplayQueue())
+                .to(new TopicExchange(EXCHANGE_GAMEPLAY))
+                .with("tictactoe.#");
+    }
+}

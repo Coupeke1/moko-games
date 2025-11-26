@@ -75,3 +75,11 @@ Authorization: Bearer {{access_token}}
 ### Combinatie (filter + favourite + sort)
 GET http://localhost:8080/api/library/me?filter=ta&favourite=true&order=title_desc&limit=10
 Authorization: Bearer {{access_token}}
+
+### getting my achievements
+GET http://localhost:8080/api/achievements/me
+Authorization: Bearer {{access_token}}
+
+### getting a users achievements
+GET http://localhost:8080/api/achievements/cf36d3e1-a1e0-4c18-89eb-95fa76fc81ee
+Authorization: Bearer {{access_token}}
