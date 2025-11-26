@@ -15,7 +15,7 @@ export function MyRoleDisplay({userId, role}: MyRoleDisplayProps) {
     }
 
     return (
-        <div className="flex items-center gap-4 bg-bg-2 p-4 rounded-lg border border-fg-2">
+        <div className="flex items-center gap-4 bg-bg-2 p-4 rounded-lg">
             <div className="flex items-center gap-3">
                 <PlayerRoleBadge role={role}/>
                 <div className="flex flex-col">
