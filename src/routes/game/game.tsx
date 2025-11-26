@@ -42,32 +42,36 @@ export default function GamePage() {
     return (
         <div className="flex flex-col items-center gap-8 p-8 min-h-screen bg-bg text-fg">
             <header className="text-center w-full">
-                <div className="flex justify-between items-center mb-4">
-                    <h1 className="text-3xl font-bold flex-1 text-center">Tic Tac Toe</h1>
-                </div>
+                <h1 className="text-3xl font-bold mb-4">Tic Tac Toe</h1>
             </header>
 
-            <MyRoleDisplay
-                userId={profile.id || 'Unknown'}
-                role={myRole}/>
+            <div className="flex items-start justify-center gap-30 w-full max-w-6xl">
+                <div className="w-80 flex-shrink-0 mt-2">
+                    <MyRoleDisplay
+                        userId={profile.id || 'Unknown'}
+                        role={myRole}/>
+                </div>
 
-            <div className="game-board">
-                <h3 className="text-xl font-semibold mb-4 text-center">Board</h3>
-                <GameGrid board={gameState.board} onCellClick={makeMove} />
+                <div className="flex flex-col items-center gap-6 flex-1 max-w-md">
+                    <div className="game-board">
+                        <GameGrid board={gameState.board} onCellClick={makeMove} />
 
-                {errorMsg && (
-                    <Toast message={errorMsg} onClose={closeToast} />
-                )}
-            </div>
+                        {errorMsg && (
+                            <Toast message={errorMsg} onClose={closeToast} />
+                        )}
+                    </div>
+                </div>
 
-            <div className="grid grid-cols-2 gap-4 items-stretch">
-                <TurnIndicator gameState={gameState}/>
-                <section className="game-info bg-bg-2 p-4 text-center rounded-lg
-                    flex flex-col justify-center gap-2">
-                    <Row label="Game Status" value={gameState.status}/>
-                    <Row label="Players" value={gameState.players.length}/>
-                    {gameState.winner && <Row label="Winner" value={gameState.winner}/>}
-                </section>
+                <div className="w-80 flex-shrink-0 flex flex-col gap-4 mt-2">
+                    <TurnIndicator gameState={gameState}/>
+
+                    <section className="game-info bg-bg-2 p-4 rounded-lg
+                        flex flex-col gap-2">
+                        <Row label="Game Status" value={gameState.status}/>
+                        <Row label="Players" value={gameState.players.length}/>
+                        {gameState.winner && <Row label="Winner" value={gameState.winner}/>}
+                    </section>
+                </div>
             </div>
         </div>
     )
