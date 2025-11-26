@@ -157,7 +157,7 @@ class LibraryControllerTest {
                 .build();
 
         UsernamePasswordAuthenticationToken auth =
-                new UsernamePasswordAuthenticationToken(jwt, jwt.getTokenValue());
+                new UsernamePasswordAuthenticationToken(jwt, jwt.getTokenValue(), List.of());
 
         mockMvc.perform(get("/api/library/me").with(authentication(auth)))
                 .andExpect(status().isBadRequest());
