@@ -1,4 +1,4 @@
-import GamePage from "@/routes/game/game-page.tsx"
+import GamePage from "@/routes/game/game.tsx"
 import {BrowserRouter, Route, Routes} from "react-router"
 import Auth from "@/components/auth.tsx";
 

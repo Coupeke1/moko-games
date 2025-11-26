@@ -5,6 +5,10 @@
     --font-sans: "Nunito", "sans-serif";
     --color-bg: oklch(0.1749 0.0082 285.52);
     --color-bg-2: oklch(0.234 0.0096 294.82);
+    --color-bg-3: oklch(0.2177 0.0096 294.82);
     --color-fg: oklch(0.9612 0 0);
     --color-fg-2: oklch(0.5694 0.0128 269.45);
+
+    --color-x: oklch(0.75 0.2 25);
+    --color-o: oklch(0.75 0.2 230);
 }

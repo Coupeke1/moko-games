@@ -1,6 +1,6 @@
 import type {Player} from "@/routes/game/model/Player.ts";
 
-export function useMyPlayerRole(players: Player[], playerId: string | undefined) {
+export function useMyPlayerRole(players: Player[] | undefined, playerId: string | undefined) {
     if (!players || players.length <= 0 || !playerId) {
         return null;
     }

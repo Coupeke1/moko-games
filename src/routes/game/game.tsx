@@ -4,40 +4,34 @@ import {TurnIndicator} from "@/routes/game/components/turn-indicator.tsx";
 import {MyRoleDisplay} from "@/routes/game/components/my-role-display.tsx";
 import {useMyPlayerRole} from "@/routes/game/hooks/use-my-player-role.ts";
 import {useMyProfile} from "@/routes/game/hooks/use-my-profile.ts";
+import LoadingState from "@/components/state/loading.tsx";
+import ErrorState from "@/components/state/error.tsx";
+import Page from "@/components/layout/page.tsx";
 
 export default function GamePage() {
     const {id} = useParams<{ id: string }>()
-    const { data: gameState, isLoading, isError, error } = useGameState(id!);
-    const { profile, isLoading: profileLoading, isError: profileError } = useMyProfile();
+    const {data: gameState, isLoading, isError} = useGameState(id!);
+    const {profile, isLoading: profileLoading, isError: profileError} = useMyProfile();
     const myRole = useMyPlayerRole(gameState?.players, profile?.id)
 
-    if (isLoading || !gameState) return (
-        <div className="flex items-center justify-center min-h-screen">
-            <div className="text-fg-2 text-xl">Loading game {id}...</div>
-        </div>
-    )
-
-    if (isError) return (
-        <div className="flex items-center justify-center min-h-screen">
-            <div className="text-red-500 text-xl">
-                Error loading game: {error instanceof Error ? error.message : 'Unknown error'}
-            </div>
-        </div>
-    )
-
-    if (profileLoading || !profile) return (
-        <div className="flex items-center justify-center min-h-screen">
-            <div className="text-fg-2 text-xl">Loading profile...</div>
-        </div>
-    )
+    if (isLoading || !gameState || profileLoading || !profile)
+        return (
+            <Page>
+                <LoadingState/>
+            </Page>
+        );
+    if (isError)
+        return (
+            <Page>
+                <ErrorState msg="Could not load the game"/>
+            </Page>
+        );
 
     if (profileError) return (
-        <div className="flex items-center justify-center min-h-screen">
-            <div className="text-red-500 text-xl">
-                Error loading profile
-            </div>
-        </div>
-    )
+        <Page>
+            <ErrorState msg="Could not load your profile"/>
+        </Page>
+    );
 
     return (
         <div className="flex flex-col items-center gap-8 p-8 min-h-screen bg-bg text-fg">
@@ -45,7 +39,7 @@ export default function GamePage() {
                 <div className="flex justify-between items-center mb-4">
                     <MyRoleDisplay
                         userId={profile?.id || 'Unknown'}
-                        role={myRole} />
+                        role={myRole}/>
 
                     <h1 className="text-3xl font-bold flex-1 text-center">Tic Tac Toe - Game #{id}</h1>
 
@@ -53,7 +47,7 @@ export default function GamePage() {
                 </div>
             </header>
 
-            <TurnIndicator gameState={gameState} />
+            <TurnIndicator gameState={gameState}/>
 
             <div className="game-board">
                 <h3 className="text-xl font-semibold mb-4 text-center">Board</h3>
