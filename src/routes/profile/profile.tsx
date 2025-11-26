@@ -1,17 +1,15 @@
-import PlusIcon from "@/components/icons/plus-icon";
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
-import Grid from "@/components/layout/grid/grid";
 import Page from "@/components/layout/page";
 import Section from "@/components/section";
 import ErrorState from "@/components/state/error";
 import LoadingState from "@/components/state/loading";
 import { useMyProfile } from "@/hooks/use-my-profile";
 import AchievementCard from "@/routes/profile/components/achievement-card";
-import FriendCard from "@/routes/profile/components/friend-card";
 import ProfileInformation from "@/routes/profile/components/information";
+import SettingsDialog from "@/routes/profile/dialogs/settings-dialog";
 import { useState } from "react";
-import SettingsDialog from "./dialogs/settings/settings-dialog";
+import FriendsSection from "./friends";
 
 export default function ProfilePage() {
     const { profile, isLoading, isError } = useMyProfile();
@@ -35,20 +33,7 @@ export default function ProfilePage() {
                     onEdit={() => setSettings(true)}
                 />
 
-                <Section title="Friends">
-                    <Grid>
-                        <FriendCard
-                            image={profile.image}
-                            username="niceduckbro"
-                            level={33}
-                            playtime="322h 44m"
-                        />
-
-                        <button className="bg-bg-2 hover:bg-bg-3 transition-colors duration-75 flex flex-col justify-center items-center cursor-pointer select-none x-4 py-2 rounded-lg h-48">
-                            <PlusIcon />
-                        </button>
-                    </Grid>
-                </Section>
+                <FriendsSection />
 
                 {
                     profile.modules.achievements && (

@@ -14,7 +14,7 @@ import { updateProfile } from "@/services/profile-service";
 import { useAuthStore } from "@/stores/auth-store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import Image from "../../components/image";
+import Image from "@/routes/profile/components/image";
 
 interface Props {
     profile: Profile;
