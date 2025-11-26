@@ -25,13 +25,13 @@ public class LibraryController {
     public ResponseEntity<LibraryGamesModel> getMyLibrary(
             @AuthenticationPrincipal final Jwt token,
             @RequestParam(required = false) final String filter,
+            @RequestParam(required = false) final Boolean favourite,
             @RequestParam(required = false, defaultValue = "title_asc") final String order,
             @RequestParam(required = false, defaultValue = "100") final Integer limit
     ) {
         ProfileId userId = ProfileId.get(token);
-        //TODO favourite filter
         LibraryGamesModel model = service.getLibraryForUser(
-                userId, token, filter, order, limit
+                userId, token, filter, favourite, order, limit
         );
 
         return ResponseEntity.ok(model);

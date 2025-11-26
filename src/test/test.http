@@ -55,3 +55,23 @@ Content-Type: application/json
 GET http://localhost:8080/api/library/me
 Authorization: Bearer {{access_token}}
 
+
+### Library filteren op zoekterm "ch"
+GET http://localhost:8080/api/library/me?filter=ch
+Authorization: Bearer {{access_token}}
+
+### Alleen favourited games
+GET http://localhost:8080/api/library/me?favourite=true
+Authorization: Bearer {{access_token}}
+
+### Sorteren op aankoopdatum (nieuw → oud)
+GET http://localhost:8080/api/library/me?order=purchased_desc
+Authorization: Bearer {{access_token}}
+
+### Max 5 games teruggeven
+GET http://localhost:8080/api/library/me?limit=1
+Authorization: Bearer {{access_token}}
+
+### Combinatie (filter + favourite + sort)
+GET http://localhost:8080/api/library/me?filter=ta&favourite=true&order=title_desc&limit=10
+Authorization: Bearer {{access_token}}
