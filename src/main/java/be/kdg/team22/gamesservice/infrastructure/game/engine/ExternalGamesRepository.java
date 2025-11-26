@@ -1,4 +1,5 @@
 package be.kdg.team22.gamesservice.infrastructure.game.engine;
+
 import be.kdg.team22.gamesservice.api.game.models.CheckersSettingsModel;
 import be.kdg.team22.gamesservice.api.game.models.GameSettingsModel;
 import be.kdg.team22.gamesservice.api.game.models.StartGameRequest;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+
 import java.util.UUID;
 
 @Component

@@ -46,7 +46,7 @@ public class GameController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GameDetailsModel> getGameById(@PathVariable UUID id) {
+    public ResponseEntity<GameDetailsModel> getGameById(final @PathVariable UUID id) {
         Game game = service.findById(GameId.from(id));
         return ResponseEntity.ok(GameDetailsModel.from(game));
     }

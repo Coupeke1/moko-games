@@ -13,12 +13,12 @@ public class Game {
     private final Instant createdAt;
     private Instant updatedAt;
 
-    // Engine / integration
+    // Engine data
     private String name;
     private String baseUrl;
     private String startEndpoint;
 
-    // Store / frontend metadata
+    // frontend metadata
     private String title;
     private String description;
     private BigDecimal price;
