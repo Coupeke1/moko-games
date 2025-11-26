@@ -32,6 +32,7 @@ public class LibraryService {
             final ProfileId userId,
             final Jwt token,
             final String filter,
+            final Boolean favourite,
             final String order,
             final Integer limit
     ) {
@@ -48,7 +49,8 @@ public class LibraryService {
                             game.price(),
                             game.imageUrl(),
                             game.storeUrl(),
-                            entry.purchasedAt()
+                            entry.purchasedAt(),
+                            entry.favourite()
                     );
                 })
                 .toList();
@@ -63,8 +65,11 @@ public class LibraryService {
                     .toList();
         }
 
-        //TODO future add possible favourite filter
-        // if (Boolean.TRUE.equals(favourite)) { ... }
+        if (Boolean.TRUE.equals(favourite)) {
+            games = games.stream()
+                    .filter(LibraryGameModel::favourite)
+                    .toList();
+        }
 
         Comparator<LibraryGameModel> comparator = switch (order) {
             case "title_desc" -> Comparator.comparing(LibraryGameModel::title,
@@ -75,15 +80,10 @@ public class LibraryService {
                     Comparator.nullsLast(String::compareToIgnoreCase));
         };
 
-        games = games.stream()
-                .sorted(comparator)
-                .toList();
-
+        games = games.stream().sorted(comparator).toList();
 
         if (limit != null && limit > 0) {
-            games = games.stream()
-                    .limit(limit)
-                    .toList();
+            games = games.stream().limit(limit).toList();
         }
 
         return new LibraryGamesModel(games);
