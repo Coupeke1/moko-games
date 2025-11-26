@@ -8,8 +8,8 @@ export default function StorePage() {
         <Page>
             <Column>
                 <Input placeholder="Search Store..." value="" onChange={() => { }} />
-                <Select label="Sorting" value="" onChange={() => { }} options={[]} />
-                <Select label="Category" value="" onChange={() => { }} options={[]} />
+                <Select value="" onChange={() => { }} options={[]} />
+                <Select value="" onChange={() => { }} options={[]} />
             </Column>
         </Page>
     )

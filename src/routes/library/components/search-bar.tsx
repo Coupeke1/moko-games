@@ -7,8 +7,8 @@ export default function SearchBar() {
         <section className={`flex flex-col sm:flex-row justify-between ${Gap.Medium}`}>
             <Input placeholder="Search Library..." value="" onChange={() => { }} />
             <section className={`flex flex-col xss:flex-row ${Gap.Medium}`}>
-                <Select label="Sorting" value="" onChange={() => { }} options={[]} />
-                <Select label="Category" value="" onChange={() => { }} options={[]} />
+                <Select value="" onChange={() => { }} options={[]} />
+                <Select value="" onChange={() => { }} options={[]} />
             </section>
         </section>
     )

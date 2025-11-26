@@ -5,6 +5,7 @@ import MenuIcon from "@/components/icons/bar/menu-icon";
 import NotificationsIcon from "@/components/icons/bar/notifications-icon";
 import ProfileIcon from "@/components/icons/bar/profile-icon";
 import StoreIcon from "@/components/icons/bar/store-icon";
+import UsersIcon from "@/components/icons/users-icon";
 import { Gap } from "@/components/layout/gap";
 import { Justify } from "@/components/layout/justify";
 import Row from "@/components/layout/row";
@@ -44,6 +45,10 @@ export default function NavigationBar() {
 
                         <NavigationLink title="Profile" path="/profile">
                             <ProfileIcon />
+                        </NavigationLink>
+
+                        <NavigationLink title="Friends" path="/friends">
+                            <UsersIcon />
                         </NavigationLink>
                     </Row>
                 </section>

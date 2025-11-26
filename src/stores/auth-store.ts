@@ -10,6 +10,7 @@ interface AuthState {
     login: () => void;
     logout: () => void;
     updateToken: (minValidity?: number) => Promise<boolean>;
+    getValidToken: () => Promise<string | null>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -27,8 +28,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             });
 
             keycloak.onTokenExpired = () => {
-                get().updateToken(70);
+                console.log('Token expired, refreshing...');
+                get().updateToken(70).catch(() => {
+                    console.error('Token refresh failed, redirecting to login');
+                    get().login();
+                });
             };
+
+            setInterval(() => {
+                get().updateToken(70);
+            }, 30000);
 
             const token = keycloak.token || null;
 
@@ -69,11 +78,26 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             const refreshed = await keycloak.updateToken(minValidity);
             if (refreshed) {
                 set({ token: keycloak.token || null });
+                console.log('Token refreshed successfully');
             }
             return refreshed;
         } catch (error) {
             console.error('Failed to refresh token:', error);
+            set({ authenticated: false });
             return false;
+        }
+    },
+
+    getValidToken: async () => {
+        const { keycloak, updateToken } = get();
+        if (!keycloak) return null;
+
+        try {
+            await updateToken(70);
+            return keycloak.token || null;
+        } catch (error) {
+            console.error('Failed to get valid token:', error);
+            return null;
         }
     }
 }));

@@ -9,7 +9,6 @@ import AchievementCard from "@/routes/profile/components/achievement-card";
 import ProfileInformation from "@/routes/profile/components/information";
 import SettingsDialog from "@/routes/profile/dialogs/settings-dialog";
 import { useState } from "react";
-import FriendsSection from "./friends";
 
 export default function ProfilePage() {
     const { profile, isLoading, isError } = useMyProfile();
@@ -32,8 +31,6 @@ export default function ProfilePage() {
                     playTime={profile.statistics.playTime}
                     onEdit={() => setSettings(true)}
                 />
-
-                <FriendsSection />
 
                 {
                     profile.modules.achievements && (

@@ -1,7 +1,7 @@
+import Page from "@/components/layout/page";
+import LoadingState from "@/components/state/loading";
 import { useAuthStore } from "@/stores/auth-store";
 import { useEffect } from "react";
-import LoadingState from "@/components/state/loading";
-import Page from "./layout/page";
 
 const config: Keycloak.KeycloakConfig = {
     url: import.meta.env.VITE_AUTH_URL,
