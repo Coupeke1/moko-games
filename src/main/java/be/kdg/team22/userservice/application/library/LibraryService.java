@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -27,11 +28,17 @@ public class LibraryService {
         this.gamesRepository = gamesRepository;
     }
 
-    public LibraryGamesModel getLibraryForUser(final ProfileId userId, final Jwt token) {
-
+    public LibraryGamesModel getLibraryForUser(
+            final ProfileId userId,
+            final Jwt token,
+            final String filter,
+            final Boolean favourite,
+            final String order,
+            final Integer limit
+    ) {
         List<LibraryEntry> entries = libraryRepository.findByUserId(userId.value());
 
-        List<LibraryGameModel> models = entries.stream()
+        List<LibraryGameModel> games = entries.stream()
                 .map(entry -> {
                     GameDetailsResponse game = gamesRepository.getGame(entry.gameId(), token);
 
@@ -42,11 +49,43 @@ public class LibraryService {
                             game.price(),
                             game.imageUrl(),
                             game.storeUrl(),
-                            entry.purchasedAt()
+                            entry.purchasedAt(),
+                            entry.favourite()
                     );
                 })
                 .toList();
 
-        return new LibraryGamesModel(models);
+        if (filter != null && !filter.isBlank()) {
+            final String lower = filter.toLowerCase();
+            games = games.stream()
+                    .filter(g ->
+                            (g.title() != null && g.title().toLowerCase().contains(lower)) ||
+                                    (g.description() != null && g.description().toLowerCase().contains(lower))
+                    )
+                    .toList();
+        }
+
+        if (Boolean.TRUE.equals(favourite)) {
+            games = games.stream()
+                    .filter(LibraryGameModel::favourite)
+                    .toList();
+        }
+
+        Comparator<LibraryGameModel> comparator = switch (order) {
+            case "title_desc" -> Comparator.comparing(LibraryGameModel::title,
+                    Comparator.nullsLast(String::compareToIgnoreCase)).reversed();
+            case "purchased_asc" -> Comparator.comparing(LibraryGameModel::purchasedAt);
+            case "purchased_desc" -> Comparator.comparing(LibraryGameModel::purchasedAt).reversed();
+            default -> Comparator.comparing(LibraryGameModel::title,
+                    Comparator.nullsLast(String::compareToIgnoreCase));
+        };
+
+        games = games.stream().sorted(comparator).toList();
+
+        if (limit != null && limit > 0) {
+            games = games.stream().limit(limit).toList();
+        }
+
+        return new LibraryGamesModel(games);
     }
 }

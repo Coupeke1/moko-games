@@ -18,7 +18,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
@@ -35,14 +35,18 @@ class LibraryControllerTest {
     @MockitoBean
     LibraryService libraryService;
 
-    private UsernamePasswordAuthenticationToken jwtAuth(String uuid) {
-        Jwt jwt = Jwt.withTokenValue("token")
+    private UsernamePasswordAuthenticationToken authWithUser(UUID id) {
+        Jwt jwt = Jwt.withTokenValue("token-" + id)
                 .header("alg", "none")
-                .subject(uuid)
+                .subject(id.toString())
                 .claim("preferred_username", "mathias")
                 .build();
 
         return new UsernamePasswordAuthenticationToken(jwt, jwt.getTokenValue(), List.of());
+    }
+
+    private Jwt extractJwt(UsernamePasswordAuthenticationToken token) {
+        return (Jwt) token.getPrincipal();
     }
 
     @Test
@@ -50,58 +54,110 @@ class LibraryControllerTest {
     void getMyLibrary_success() throws Exception {
         UUID userId = UUID.randomUUID();
         ProfileId profileId = ProfileId.from(userId);
+        UsernamePasswordAuthenticationToken auth = authWithUser(userId);
+        Jwt jwt = extractJwt(auth);
+
         LibraryGameModel gameModel = new LibraryGameModel(
                 UUID.randomUUID(),
                 "Tic Tac Toe",
                 "desc",
-                BigDecimal.valueOf(20),
+                BigDecimal.TEN,
                 "img.png",
                 "url",
-                Instant.parse("2024-01-01T10:00:00Z")
+                Instant.parse("2024-01-01T10:00:00Z"),
+                true
         );
 
         LibraryGamesModel response = new LibraryGamesModel(List.of(gameModel));
 
-        when(libraryService.getLibraryForUser(eq(profileId), eq((Jwt) jwtAuth(userId.toString()).getPrincipal())))
-                .thenReturn(response);
+        when(libraryService.getLibraryForUser(
+                eq(profileId),
+                eq(jwt),
+                isNull(),
+                isNull(),
+                eq("title_asc"),
+                eq(100)
+        )).thenReturn(response);
 
-        mockMvc.perform(get("/api/library/me")
-                        .with(authentication(jwtAuth(userId.toString()))))
+        mockMvc.perform(get("/api/library/me").with(authentication(auth)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.games.length()").value(1))
                 .andExpect(jsonPath("$.games[0].title").value("Tic Tac Toe"));
 
-        verify(libraryService).getLibraryForUser(eq(profileId), eq((Jwt) jwtAuth(userId.toString()).getPrincipal()));
+        verify(libraryService).getLibraryForUser(
+                eq(profileId),
+                eq(jwt),
+                isNull(),
+                isNull(),
+                eq("title_asc"),
+                eq(100)
+        );
     }
 
     @Test
-    @DisplayName("GET /api/library/me → returns empty list when user has no games")
+    @DisplayName("GET /api/library/me with filters → service receives correct parameters")
+    void getMyLibrary_withFilters() throws Exception {
+        UUID userId = UUID.randomUUID();
+        ProfileId profileId = ProfileId.from(userId);
+        UsernamePasswordAuthenticationToken auth = authWithUser(userId);
+        Jwt jwt = extractJwt(auth);
+
+        LibraryGamesModel response = new LibraryGamesModel(List.of());
+        when(libraryService.getLibraryForUser(any(), any(), any(), any(), any(), any()))
+                .thenReturn(response);
+
+        mockMvc.perform(get("/api/library/me")
+                        .param("filter", "ch")
+                        .param("favourite", "true")
+                        .param("order", "purchased_desc")
+                        .param("limit", "5")
+                        .with(authentication(auth)))
+                .andExpect(status().isOk());
+
+        verify(libraryService).getLibraryForUser(
+                eq(profileId),
+                eq(jwt),
+                eq("ch"),
+                eq(true),
+                eq("purchased_desc"),
+                eq(5)
+        );
+    }
+
+    @Test
+    @DisplayName("GET /api/library/me → empty list")
     void getMyLibrary_empty() throws Exception {
         UUID userId = UUID.randomUUID();
         ProfileId profileId = ProfileId.from(userId);
+        UsernamePasswordAuthenticationToken auth = authWithUser(userId);
+        Jwt jwt = extractJwt(auth);
 
-        LibraryGamesModel empty = new LibraryGamesModel(List.of());
+        when(libraryService.getLibraryForUser(eq(profileId), eq(jwt), any(), any(), any(), any()))
+                .thenReturn(new LibraryGamesModel(List.of()));
 
-        when(libraryService.getLibraryForUser(eq(profileId), eq((Jwt) jwtAuth(userId.toString()).getPrincipal())))
-                .thenReturn(empty);
-
-        mockMvc.perform(get("/api/library/me")
-                        .with(authentication(jwtAuth(userId.toString()))))
+        mockMvc.perform(get("/api/library/me").with(authentication(auth)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.games.length()").value(0));
     }
 
     @Test
-    @DisplayName("GET /api/library/me → 401 without JWT")
+    @DisplayName("GET /api/library/me → 401 when no JWT")
     void getMyLibrary_noJwtUnauthorized() throws Exception {
         mockMvc.perform(get("/api/library/me"))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
-    @DisplayName("GET /api/library/me → subject is not a UUID → 400 BAD REQUEST")
+    @DisplayName("GET /api/library/me → 400 when subject is not a valid UUID")
     void getMyLibrary_invalidUuid() throws Exception {
-        UsernamePasswordAuthenticationToken auth = jwtAuth("not-a-uuid");
+        Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "none")
+                .subject("not-a-uuid")
+                .claim("preferred_username", "mathias")
+                .build();
+
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken(jwt, jwt.getTokenValue(), List.of());
 
         mockMvc.perform(get("/api/library/me").with(authentication(auth)))
                 .andExpect(status().isBadRequest());

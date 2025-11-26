@@ -22,22 +22,27 @@ public class LibraryEntryEntity {
     @Column(nullable = false, name = "purchased_at")
     private Instant purchasedAt;
 
+    @Column(nullable = false)
+    private boolean favourite = false;
+
     protected LibraryEntryEntity() {
     }
 
-    public LibraryEntryEntity(UUID id, UUID userId, UUID gameId, Instant purchasedAt) {
+    public LibraryEntryEntity(final UUID id, final UUID userId, final UUID gameId, final Instant purchasedAt, final boolean favourite) {
         this.id = id;
         this.userId = userId;
         this.gameId = gameId;
         this.purchasedAt = purchasedAt;
+        this.favourite = favourite;
     }
 
-    public static LibraryEntryEntity fromDomain(LibraryEntry entry) {
+    public static LibraryEntryEntity fromDomain(final LibraryEntry entry) {
         return new LibraryEntryEntity(
                 entry.id(),
                 entry.userId(),
                 entry.gameId(),
-                entry.purchasedAt()
+                entry.purchasedAt(),
+                entry.favourite()
         );
     }
 
@@ -46,7 +51,8 @@ public class LibraryEntryEntity {
                 id,
                 userId,
                 gameId,
-                purchasedAt
+                purchasedAt,
+                favourite
         );
     }
 
@@ -64,5 +70,9 @@ public class LibraryEntryEntity {
 
     public Instant purchasedAt() {
         return purchasedAt;
+    }
+
+    public boolean favourite() {
+        return favourite;
     }
 }
