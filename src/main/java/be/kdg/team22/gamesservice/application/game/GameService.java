@@ -11,6 +11,7 @@ import be.kdg.team22.gamesservice.domain.game.exceptions.PlayersListEmptyExcepti
 import be.kdg.team22.gamesservice.infrastructure.game.engine.ExternalGamesRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -24,7 +25,7 @@ public class GameService {
         this.engine = engine;
     }
 
-    public StartGameResponseModel startGame(StartGameRequest request) {
+    public StartGameResponseModel startGame(final StartGameRequest request) {
 
         if (request.players() == null || request.players().isEmpty()) {
             throw new PlayersListEmptyException();
@@ -41,5 +42,14 @@ public class GameService {
         UUID instanceId = engine.startExternalGame(game, request);
 
         return new StartGameResponseModel(instanceId);
+    }
+
+    public Game findById(final GameId id) {
+        return gameRepository.findById(id)
+                .orElseThrow(() -> new GameNotFoundException(id));
+    }
+
+    public List<Game> findAll() {
+        return gameRepository.findAll();
     }
 }
