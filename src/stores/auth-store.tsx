@@ -1,5 +1,5 @@
-import Keycloak, {type KeycloakConfig} from "keycloak-js";
-import {create} from "zustand";
+import Keycloak, { type KeycloakConfig } from 'keycloak-js';
+import { create } from 'zustand';
 
 interface AuthState {
     keycloak: Keycloak | null;
@@ -38,7 +38,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                 initialized: true,
                 token,
             });
-
             return authenticated;
         } catch (error) {
             console.error(error);

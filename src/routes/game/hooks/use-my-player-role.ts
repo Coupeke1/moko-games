@@ -1,14 +1,10 @@
-import {useGameState} from "@/routes/game/hooks/use-game-state.ts";
-import {useMyProfile} from "@/routes/game/hooks/use-my-profile.ts";
+import type {Player} from "@/routes/game/model/Player.ts";
 
-export function useMyPlayerRole(gameId: string) {
-    const { data: gameState } = useGameState(gameId);
-    const { data: myProfile } = useMyProfile();
-
-    if (!gameState || !myProfile) {
+export function useMyPlayerRole(players: Player[], playerId: string | undefined) {
+    if (!players || players.length <= 0 || !playerId) {
         return null;
     }
 
-    const myPlayer = gameState.players.find(player => player.id === myProfile.id);
+    const myPlayer = players.find(player => player.id === playerId);
     return myPlayer?.role || null;
 }
