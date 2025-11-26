@@ -17,6 +17,7 @@ COPY --from=build /app/dist .
 
 COPY public/runtime-config.js.template /usr/share/nginx/html/runtime-config.js.template
 COPY entrypoint.sh /entrypoint.sh
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 RUN chmod +x /entrypoint.sh
 
