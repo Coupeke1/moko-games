@@ -20,12 +20,12 @@ export default function LibraryCard({ game, onClick }: Props) {
                 <Row gap={Gap.Large} responsive={false}>
                     <Row gap={Gap.None} items={Items.Center} responsive={false}>
                         <ClockIcon />
-                        <p>Tijd</p>
+                        <p>3h 40m</p>
                     </Row>
 
                     <Row gap={Gap.None} items={Items.Center} responsive={false}>
                         <UsersIcon />
-                        <p>Friendcount</p>
+                        <p>3</p>
                     </Row>
                 </Row>
             </section>

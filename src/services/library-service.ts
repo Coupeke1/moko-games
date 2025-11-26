@@ -11,3 +11,19 @@ export async function findGames(): Promise<Game[]> {
         throw new Error("Library could not be fetched");
     }
 }
+
+export async function favouriteGame(id: string) {
+    try {
+
+    } catch {
+        throw new Error(`Game with id '${id}' could not be favourited`);
+    }
+}
+
+export async function unFavouriteGame(id: string) {
+    try {
+
+    } catch {
+        throw new Error(`Game with id '${id}' could not be unfavourited`);
+    }
+}
