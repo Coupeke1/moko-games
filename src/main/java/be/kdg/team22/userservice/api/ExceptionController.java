@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @ControllerAdvice
 public class ExceptionController {
@@ -36,6 +37,13 @@ public class ExceptionController {
     })
     public ResponseEntity<String> handleBadRequest(RuntimeException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<String> handleInvalidUuid(MethodArgumentTypeMismatchException ex) {
+        Throwable cause = ex.getCause();
+        String message = cause != null ? cause.getMessage() : ex.getMessage();
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(GameServiceNotReachableException.class)
