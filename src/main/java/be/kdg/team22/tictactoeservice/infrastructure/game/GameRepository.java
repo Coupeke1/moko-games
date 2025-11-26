@@ -1,4 +1,4 @@
-package be.kdg.team22.tictactoeservice.repository;
+package be.kdg.team22.tictactoeservice.infrastructure.game;
 
 import be.kdg.team22.tictactoeservice.domain.game.Game;
 import be.kdg.team22.tictactoeservice.domain.game.GameId;

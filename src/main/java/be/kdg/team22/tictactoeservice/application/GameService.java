@@ -1,12 +1,13 @@
 package be.kdg.team22.tictactoeservice.application;
 
 import be.kdg.team22.tictactoeservice.api.models.CreateGameModel;
+import be.kdg.team22.tictactoeservice.application.events.GameEventPublisher;
 import be.kdg.team22.tictactoeservice.config.BoardSizeProperties;
 import be.kdg.team22.tictactoeservice.domain.game.Game;
 import be.kdg.team22.tictactoeservice.domain.game.GameId;
 import be.kdg.team22.tictactoeservice.domain.game.Move;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
-import be.kdg.team22.tictactoeservice.repository.GameRepository;
+import be.kdg.team22.tictactoeservice.infrastructure.game.GameRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,10 +16,12 @@ import java.util.List;
 public class GameService {
     private final GameRepository repository;
     private final BoardSizeProperties config;
+    private final GameEventPublisher publisher;
 
-    public GameService(final GameRepository repository, final BoardSizeProperties config) {
+    public GameService(GameRepository repository, BoardSizeProperties config, GameEventPublisher publisher) {
         this.repository = repository;
         this.config = config;
+        this.publisher = publisher;
     }
 
     public Game startGame(final CreateGameModel model) {

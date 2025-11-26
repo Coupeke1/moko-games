@@ -12,7 +12,7 @@ import be.kdg.team22.tictactoeservice.domain.game.exceptions.NotFoundException;
 import be.kdg.team22.tictactoeservice.domain.player.Player;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerRole;
-import be.kdg.team22.tictactoeservice.repository.GameRepository;
+import be.kdg.team22.tictactoeservice.infrastructure.game.GameRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
