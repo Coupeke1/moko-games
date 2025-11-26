@@ -9,7 +9,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "user_library")
 public class LibraryEntryEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

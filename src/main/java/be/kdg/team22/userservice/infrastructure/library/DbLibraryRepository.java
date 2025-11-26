@@ -11,7 +11,6 @@ import java.util.UUID;
 
 @Repository
 public class DbLibraryRepository implements LibraryRepository {
-
     private final JpaLibraryEntryRepository jpa;
 
     public DbLibraryRepository(JpaLibraryEntryRepository jpa) {

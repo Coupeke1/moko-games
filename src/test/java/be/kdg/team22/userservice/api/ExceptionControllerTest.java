@@ -1,5 +1,7 @@
 package be.kdg.team22.userservice.api;
 
+import be.kdg.team22.userservice.domain.library.exceptions.ExternalGameNotFoundException;
+import be.kdg.team22.userservice.domain.library.exceptions.GameServiceNotReachableException;
 import be.kdg.team22.userservice.domain.library.exceptions.LibraryException;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
 import be.kdg.team22.userservice.domain.profile.exceptions.ClaimNotFoundException;
@@ -53,7 +55,7 @@ class ExceptionControllerTest {
     @Test
     @DisplayName("LibraryException.missingGameId → 400 BAD_REQUEST")
     void handleMissingGameId() {
-        ResponseEntity<String> response = controller.handleLibraryErrors(LibraryException.missingGameId());
+        ResponseEntity<String> response = controller.handleBadRequest(LibraryException.missingGameId());
 
         assertThat(response.getStatusCode().value()).isEqualTo(400);
         assertThat(response.getBody()).isEqualTo("gameId cannot be null");
@@ -62,7 +64,7 @@ class ExceptionControllerTest {
     @Test
     @DisplayName("LibraryException.missingUserId → 400 BAD_REQUEST")
     void handleMissingUserId() {
-        ResponseEntity<String> response = controller.handleLibraryErrors(LibraryException.missingUserId());
+        ResponseEntity<String> response = controller.handleBadRequest(LibraryException.missingUserId());
 
         assertThat(response.getStatusCode().value()).isEqualTo(400);
         assertThat(response.getBody()).isEqualTo("userId cannot be null");
@@ -71,7 +73,7 @@ class ExceptionControllerTest {
     @Test
     @DisplayName("LibraryException.missingPurchasedAt → 400 BAD_REQUEST")
     void handleMissingPurchasedAt() {
-        ResponseEntity<String> response = controller.handleLibraryErrors(LibraryException.missingPurchasedAt());
+        ResponseEntity<String> response = controller.handleBadRequest(LibraryException.missingPurchasedAt());
 
         assertThat(response.getStatusCode().value()).isEqualTo(400);
         assertThat(response.getBody()).isEqualTo("purchasedAt cannot be null");
@@ -86,5 +88,30 @@ class ExceptionControllerTest {
 
         assertThat(response.getStatusCode().value()).isEqualTo(500);
         assertThat(response.getBody()).isEqualTo("Internal server error: kaboom");
+    }
+
+    @Test
+    @DisplayName("GameServiceNotReachableException → 503 SERVICE_UNAVAILABLE")
+    void handleGameServiceNotReachable() {
+        GameServiceNotReachableException ex = new GameServiceNotReachableException("http://games");
+
+        ResponseEntity<String> response = controller.handleServiceUnavailable(ex);
+
+        assertThat(response.getStatusCode().value()).isEqualTo(503);
+        assertThat(response.getBody()).isEqualTo("Game-service is not reachable at 'http://games'");
+    }
+    
+    @Test
+    @DisplayName("ExternalGameNotFoundException → 404")
+    void handleNotFound_externalGame() {
+        UUID gameId = UUID.randomUUID();
+        RuntimeException ex = new ExternalGameNotFoundException(gameId);
+
+        ResponseEntity<String> response = controller.handleNotFound(ex);
+
+        assertThat(response.getStatusCode().value()).isEqualTo(404);
+        assertThat(response.getBody()).isEqualTo(
+                String.format("External game with id '%s' was not found", gameId)
+        );
     }
 }

@@ -14,20 +14,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/library")
 public class LibraryController {
+    private final LibraryService service;
 
-    private final LibraryService libraryService;
-
-    public LibraryController(LibraryService libraryService) {
-        this.libraryService = libraryService;
+    public LibraryController(final LibraryService service) {
+        this.service = service;
     }
 
     @GetMapping("/me")
     public ResponseEntity<LibraryGamesModel> getMyLibrary(
-            @AuthenticationPrincipal Jwt token
+            @AuthenticationPrincipal final Jwt token
     ) {
         ProfileId userId = ProfileId.get(token);
 
-        LibraryGamesModel model = libraryService.getLibraryForUser(userId, token);
+        LibraryGamesModel model = service.getLibraryForUser(userId, token);
 
         return ResponseEntity.ok(model);
     }

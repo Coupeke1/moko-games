@@ -1,8 +1,13 @@
 package be.kdg.team22.userservice.infrastructure.games;
 
+import be.kdg.team22.userservice.domain.library.exceptions.ExternalGameNotFoundException;
+import be.kdg.team22.userservice.domain.library.exceptions.GameServiceNotReachableException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
 import java.util.UUID;
 
@@ -15,10 +20,22 @@ public class ExternalGamesRepository {
     }
 
     public GameDetailsResponse getGame(UUID gameId, Jwt token) {
-        return client.get()
-                .uri("/{id}", gameId)
-                .header("Authorization", "Bearer " + token.getTokenValue())
-                .retrieve()
-                .body(GameDetailsResponse.class);
+        try {
+            return client.get()
+                    .uri("/{id}", gameId)
+                    .header("Authorization", "Bearer " + token.getTokenValue())
+                    .retrieve()
+                    .body(GameDetailsResponse.class);
+
+        } catch (HttpClientErrorException ex) {
+
+            if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
+                throw new ExternalGameNotFoundException(gameId);
+            }
+
+            throw ex;
+        } catch (RestClientException ex) {
+            throw new GameServiceNotReachableException(client.toString());
+        }
     }
 }

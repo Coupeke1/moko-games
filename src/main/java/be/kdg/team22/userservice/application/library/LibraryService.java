@@ -20,14 +20,14 @@ public class LibraryService {
     private final ExternalGamesRepository gamesRepository;
 
     public LibraryService(
-            LibraryRepository libraryRepository,
-            ExternalGamesRepository gamesRepository
+            final LibraryRepository libraryRepository,
+            final ExternalGamesRepository gamesRepository
     ) {
         this.libraryRepository = libraryRepository;
         this.gamesRepository = gamesRepository;
     }
 
-    public LibraryGamesModel getLibraryForUser(ProfileId userId, Jwt token) {
+    public LibraryGamesModel getLibraryForUser(final ProfileId userId, final Jwt token) {
 
         List<LibraryEntry> entries = libraryRepository.findByUserId(userId.value());
 
