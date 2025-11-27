@@ -1,18 +1,15 @@
 import {PlayerRoleBadge} from "@/routes/game/components/player-role-badge.tsx";
 import PlayerImage from "@/routes/game/components/player-image.tsx";
-import {GameStateDisplay} from "@/routes/game/components/game-state-display.tsx";
-import type {GameState} from "@/routes/game/model/game-state.ts";
 import type {Profile} from "@/models/profile.ts";
 import type {Player} from "@/routes/game/model/Player.ts";
 import {usePlayerProfile} from "@/routes/game/hooks/use-player-profile.ts";
 
 interface GameWinProps {
-    gameState: GameState;
     myProfile: Profile;
     winningPlayer: Player
 }
 
-export function GameWin({gameState, myProfile, winningPlayer}: GameWinProps) {
+export function GameWin({myProfile, winningPlayer}: GameWinProps) {
     const {data: winningPlayerProfile} = usePlayerProfile(winningPlayer?.id);
 
     return (
@@ -44,17 +41,6 @@ export function GameWin({gameState, myProfile, winningPlayer}: GameWinProps) {
                         </div>
                     )}
                 </div>
-            </div>
-
-            <GameStateDisplay gameState={gameState}/>
-
-            <div className="flex gap-3">
-                <button
-                    //todo: onClick={() => }
-                    className="flex-1 bg-x text-white py-3 px-4 rounded-lg font-medium hover:bg-opacity-90 transition-colors"
-                >
-                    New game
-                </button>
             </div>
         </div>
     )
