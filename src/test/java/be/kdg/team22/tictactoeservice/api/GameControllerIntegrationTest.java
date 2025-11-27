@@ -247,4 +247,37 @@ public class GameControllerIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andReturn().getResponse().getContentAsString();
     }
+
+    @Test
+    void shouldPerformAiTurnAfterHumanPlayerTurn() throws Exception {
+        CreateGameModel onePlayerModel = new CreateGameModel(List.of(UUID.randomUUID()), new GameSettingsModel(
+                3
+        ));
+
+        String createResponse = mockMvc.perform(post("/api/games")
+                        .param("aiPlayer", "true")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(onePlayerModel)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        String gameId = extractId(createResponse);
+
+        Game game = repository.findById(GameId.fromString(gameId)).orElseThrow();
+        MoveModel humanMove = new MoveModel(game.id().value(), game.currentPlayer().id().value(), 0, 0);
+
+        mockMvc.perform(post("/api/games/" + gameId + "/move")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(humanMove)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.board[0][0]").value("X"))
+                .andExpect(jsonPath("$.currentRole").value("O"));
+
+        Thread.sleep(1500);
+
+        mockMvc.perform(get("/api/games/" + gameId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.board[?(@.size() == 3)]").exists())
+                .andExpect(jsonPath("$.currentRole").value("X"));
+    }
 }

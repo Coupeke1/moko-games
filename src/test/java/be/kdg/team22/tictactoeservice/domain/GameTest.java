@@ -26,10 +26,10 @@ public class GameTest {
 
     @BeforeEach
     public void setup() {
-        Player playerX = new Player(PlayerId.create(), PlayerRole.X);
-        Player playerO = new Player(PlayerId.create(), PlayerRole.O);
+        Player playerX = new Player(PlayerId.create(), PlayerRole.X, false);
+        Player playerO = new Player(PlayerId.create(), PlayerRole.O, false);
         game = Game.create(minSize, maxSize, 3,
-                List.of(playerX.id(), playerO.id()));
+                List.of(playerX.id(), playerO.id()), false);
     }
 
     @Test
@@ -64,7 +64,7 @@ public class GameTest {
         PlayerId playerId = PlayerId.create();
         assertThrows(GameSizeException.class, () ->
                 Game.create(minSize, maxSize, 3,
-                        List.of(playerId)));
+                        List.of(playerId), false));
     }
 
     @Test
@@ -75,7 +75,7 @@ public class GameTest {
         }
         assertThrows(GameSizeException.class, () ->
                 Game.create(minSize, maxSize, 3,
-                        playerIds));
+                        playerIds, false));
     }
 
     @Test
@@ -85,7 +85,7 @@ public class GameTest {
         PlayerId playerO = new PlayerId(uuid);
         assertThrows(UniquePlayersException.class, () ->
                 Game.create(minSize, maxSize, 3,
-                        List.of(playerX, playerO)));
+                        List.of(playerX, playerO), false));
     }
 
     @Test
