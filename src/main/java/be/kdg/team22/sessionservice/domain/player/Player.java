@@ -6,16 +6,18 @@ import org.jmolecules.ddd.annotation.Entity;
 public class Player {
     private final PlayerId id;
     private final PlayerName username;
+    private final String image;
     private boolean ready;
 
-    public Player(final PlayerId id, final PlayerName username, final boolean ready) {
+    public Player(final PlayerId id, final PlayerName username, final String image, final boolean ready) {
         this.id = id;
         this.username = username;
         this.ready = ready;
+        this.image = image;
     }
 
-    public Player(final PlayerId id, final PlayerName username) {
-        this(id, username, false);
+    public Player(final PlayerId id, final PlayerName username, final String image) {
+        this(id, username, image, false);
     }
 
     public void setReady() {
@@ -36,5 +38,9 @@ public class Player {
 
     public boolean ready() {
         return ready;
+    }
+
+    public String image() {
+        return image;
     }
 }

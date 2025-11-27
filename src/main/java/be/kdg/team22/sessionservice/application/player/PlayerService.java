@@ -18,6 +18,6 @@ public class PlayerService {
 
     public Player findPlayer(final PlayerId id, final Jwt token) {
         PlayerResponse response = repository.getById(id.value(), token.getTokenValue()).orElseThrow(id::notFound);
-        return new Player(PlayerId.from(response.id()), PlayerName.from(response.username()));
+        return new Player(PlayerId.from(response.id()), PlayerName.from(response.username()), response.image());
     }
 }

@@ -96,6 +96,7 @@ public class LobbyEntity {
                 .map(player -> new PlayerEmbed(
                         player.id().value(),
                         player.username().value(),
+                        player.image(),
                         player.ready()
                 ))
                 .collect(Collectors.toSet());
@@ -124,6 +125,7 @@ public class LobbyEntity {
                 .map(p -> new Player(
                         PlayerId.from(p.id()),
                         PlayerName.from(p.username()),
+                        p.image(),
                         p.ready()
                 ))
                 .collect(Collectors.toList());
