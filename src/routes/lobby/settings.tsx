@@ -1,7 +1,5 @@
-import InviteIcon from "@/components/icons/invite-icon";
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
-import Grid from "@/components/layout/grid/grid";
 import ErrorState from "@/components/state/error";
 import LoadingState from "@/components/state/loading";
 import TabRow from "@/components/tabs/links/row";
@@ -29,7 +27,7 @@ function GameInformation({ id }: { id: string }) {
     )
 }
 
-export default function LobbyPage() {
+export default function LobbySettingsPage() {
     const navigate = useNavigate();
     const { id } = useParams();
 
@@ -48,11 +46,7 @@ export default function LobbyPage() {
                 <GameInformation id={lobby.gameId} />
                 <TabRow tabs={getTabs(lobby.id)} />
 
-                <Grid>
-                    <button className="bg-bg-2 hover:bg-bg-3 transition-colors duration-75 flex flex-col justify-center items-center cursor-pointer select-none x-4 py-2 rounded-lg h-48">
-                        <InviteIcon />
-                    </button>
-                </Grid>
+                <p>Settings</p>
             </Column>
         </Page>
     )

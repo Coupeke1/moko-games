@@ -3,6 +3,7 @@ import Select from "@/components/inputs/select";
 import Column from "@/components/layout/column";
 import Message from "@/components/state/message";
 import type { Game } from "@/models/library/game";
+import LobbySettings from "@/routes/library/components/lobby-settings";
 import { useState } from "react";
 
 function TicTacToeSettings() {

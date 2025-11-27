@@ -13,10 +13,11 @@ import { useFriends } from "@/hooks/use-friends";
 import type { Friend } from "@/models/friends/friend";
 import type { Profile } from "@/models/profile/profile";
 import FriendCard from "@/routes/friends/components/friend-card";
-import TabRow from "@/routes/friends/components/tabs/row";
+import TabRow from "@/components/tabs/links/row";
 import { removeFriend, sendRequest } from "@/services/friends-service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { getTabs } from "@/routes/friends/components/tabs";
 
 function Add() {
     const client = useQueryClient();
@@ -45,7 +46,7 @@ function Add() {
             <section className="sm:col-span-3">
                 <Input placeholder="Search Username..." value={username} onChange={(e) => setUsername(e.target.value)} />
             </section>
-            
+
             <Button onClick={handleAdd}>Add</Button>
         </section>
     );
@@ -90,7 +91,7 @@ export default function FriendsPage() {
     return (
         <Page>
             <Column gap={Gap.Large}>
-                <TabRow />
+                <TabRow tabs={getTabs()} />
                 <Add />
 
                 {

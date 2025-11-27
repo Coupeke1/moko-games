@@ -1,5 +1,5 @@
 import Row from "@/components/layout/row";
-import TabLink from "@/components/tabs/link";
+import TabLink from "@/components/tabs/buttons/link";
 
 interface Props {
     tabs: string[];

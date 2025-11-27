@@ -3,15 +3,15 @@ import Dialog from "@/components/dialog/dialog";
 import HeartIcon from "@/components/icons/heart-icon";
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
-import TabContent from "@/components/tabs/content";
-import TabRow from "@/components/tabs/row";
+import TabContent from "@/components/tabs/buttons/content";
+import TabRow from "@/components/tabs/buttons/row";
 import showToast from "@/components/toast";
 import type { Game } from "@/models/library/game";
 import GameSettings from "@/routes/library/components/game-settings";
 import LobbySettings from "@/routes/library/components/lobby-settings";
 import { createLobby } from "@/services/lobby-service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 
 interface Props {
@@ -31,7 +31,7 @@ export default function GameDialog({ game, close, open, onChange }: Props) {
     const startLobby = useMutation({
         mutationFn: async ({ game, size }: { game: Game; size: number; }) => {
             const lobby = await createLobby(game, size);
-            navigate(`/lobby/${lobby.id}`);
+            navigate(`/lobby/${lobby.id}/players`);
         },
         onSuccess: async () => {
             await client.refetchQueries({ queryKey: ["lobby"] });
@@ -65,7 +65,7 @@ export default function GameDialog({ game, close, open, onChange }: Props) {
                         title: "Info", element: (
                             <Column gap={Gap.Large}>
                                 <article className="flex flex-col items-center justify-center relative overflow-hidden select-none bg-cover bg-center px-4 py-2 rounded-lg h-30" style={{ backgroundImage: `url("${game.image}")` }}>
-                                    <section className="absolute inset-0 bg-black/15 rounded-lg" />
+                                    <section className="absolute inset-0 bg-black/30 rounded-lg" />
 
                                     <section className={`absolute right-2 top-2 cursor-pointer ${game.favourite ? "text-fg" : "text-fg-2"} hover:text-fg transition-colors duration-75`}>
                                         <HeartIcon />

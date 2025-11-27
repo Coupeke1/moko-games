@@ -2,7 +2,16 @@ import { client } from "@/lib/api-client";
 import type { Game } from "@/models/library/game";
 import type { Lobby } from "@/models/lobby/lobby";
 
-const BASE_URL = import.meta.env.VITE_SESSION_SERVICE;
+const BASE_URl = import.meta.env.VITE_SESSION_SERVICE;
+
+export async function findLobby(id: string): Promise<Lobby> {
+    try {
+        const { data } = await client.get<Lobby>(`${BASE_URl}/${id}`);
+        return data;
+    } catch {
+        throw new Error("Lobby could not be fetched");
+    }
+}
 
 export async function createLobby(game: Game, size: number): Promise<Lobby> {
     try {
@@ -17,7 +26,7 @@ export async function createLobby(game: Game, size: number): Promise<Lobby> {
             flyingKings: false
         } : null;
 
-        const { data } = await client.post<Lobby>(BASE_URL, {
+        const { data } = await client.post<Lobby>(BASE_URl, {
             gameId: game.id,
             maxPlayers: size,
             settings: settings

@@ -11,9 +11,10 @@ import showToast from "@/components/toast";
 import { useOutgoingRequests } from "@/hooks/use-requests";
 import type { Profile } from "@/models/profile/profile";
 import FriendCard from "@/routes/friends/components/friend-card";
-import TabRow from "@/routes/friends/components/tabs/row";
+import TabRow from "@/components/tabs/links/row";
 import { cancelRequest } from "@/services/friends-service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { getTabs } from "@/routes/friends/components/tabs";
 
 export default function OutgoingRequestsPage() {
     const client = useQueryClient();
@@ -37,7 +38,7 @@ export default function OutgoingRequestsPage() {
     if (isLoading || requests === undefined) return (
         <Page>
             <Column gap={Gap.Large}>
-                <TabRow />
+                <TabRow tabs={getTabs()} />
                 <LoadingState />
             </Column>
         </Page>
@@ -46,7 +47,7 @@ export default function OutgoingRequestsPage() {
     if (isError) return (
         <Page>
             <Column gap={Gap.Large}>
-                <TabRow />
+                <TabRow tabs={getTabs()} />
                 <ErrorState />
             </Column>
         </Page>
@@ -55,7 +56,7 @@ export default function OutgoingRequestsPage() {
     return (
         <Page>
             <Column gap={Gap.Large}>
-                <TabRow />
+                <TabRow tabs={getTabs()} />
 
                 {
                     requests.length == 0 ? (
