@@ -1,5 +1,6 @@
 package be.kdg.team22.sessionservice.infrastructure.lobby;
 
+import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyRepository;
@@ -30,8 +31,8 @@ public class DbLobbyRepository implements LobbyRepository {
     }
 
     @Override
-    public List<Lobby> findInvitesFromPlayerId(PlayerId id) {
-        return repository.findInvitesFromPlayerId(id.value())
+    public List<Lobby> findInvitesFromPlayerId(PlayerId id, GameId gameId) {
+        return repository.findInvitesFromPlayerId(id.value(), gameId.value())
                 .stream()
                 .map(LobbyEntity::toDomain)
                 .toList();

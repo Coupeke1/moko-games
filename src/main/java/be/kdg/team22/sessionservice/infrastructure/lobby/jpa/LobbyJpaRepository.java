@@ -14,7 +14,8 @@ public interface LobbyJpaRepository extends JpaRepository<LobbyEntity, UUID> {
             FROM LobbyEntity l
             JOIN l.invitedPlayerIds invited
             WHERE invited = :playerId
+              AND l.gameId = :gameId
             """)
-    List<LobbyEntity> findInvitesFromPlayerId(@Param("playerId") UUID playerId);
+    List<LobbyEntity> findInvitesFromPlayerId(@Param("playerId") UUID playerId, @Param("gameId") UUID gameId);
 
 }

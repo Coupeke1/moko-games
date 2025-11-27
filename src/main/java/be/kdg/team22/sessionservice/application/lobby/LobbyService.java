@@ -96,8 +96,8 @@ public class LobbyService {
         return lobby;
     }
 
-    public List<Lobby> getInvitesFromPlayer(PlayerId id) {
-        return repository.findInvitesFromPlayerId(id);
+    public List<Lobby> getInvitesFromPlayer(PlayerId id, GameId game) {
+        return repository.findInvitesFromPlayerId(id, game);
     }
 
     private LobbySettings mapToDomainSettings(final GameSettingsModel model, final Integer maxPlayers) {

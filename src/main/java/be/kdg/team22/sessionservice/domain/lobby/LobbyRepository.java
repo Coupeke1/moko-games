@@ -14,5 +14,5 @@ public interface LobbyRepository {
 
     void save(Lobby lobby);
 
-    List<Lobby> findInvitesFromPlayerId(PlayerId id);
+    List<Lobby> findInvitesFromPlayerId(PlayerId id, GameId game);
 }
