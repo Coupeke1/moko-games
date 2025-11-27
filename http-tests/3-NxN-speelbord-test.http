@@ -1,15 +1,30 @@
-﻿### Genarte Board
+﻿@gameId = "13039904-f3c7-4d96-a9ac-65725c54a5e2"
 
-POST localhost:8086/api/games?size=3
-Accept: application/json
+### Generate Board
+POST localhost:8086/api/games
+Content-Type: application/json
 
+{
+  "players": [
+    "642999ad-c546-40b6-876c-1048971c7942",
+    "cf36d3e1-a1e0-4c18-89eb-95fa76fc81ee"
+  ],
+  "settings": {
+    "boardSize": 3
+  }
+}
+
+### Next turn
+POST localhost:8086/api/games/{{gameId}}/move
+Content-Type: application/json
+
+{
+  "row": 0,
+  "col": 1,
+  "gameId": "{{gameId}}",
+  "playerId": "cf36d3e1-a1e0-4c18-89eb-95fa76fc81ee"
+}
 
 ### Get Game
-
-GET localhost:8086/api/games/972fe1f2-2a8a-4f7e-b365-edc63429f052
+GET localhost:8086/api/games/{{gameId}}
 Accept: application/json
-
-
-### Generate Invalid Board
-
-POST localhost:8086/api/games?size=2
