@@ -36,6 +36,8 @@ export default function SettingsDialog({ profile, close, open, onChange }: Props
     useEffect(() => {
         setDescription(profile.description);
         setImage(profile.image);
+        setAchievements(profile.modules.achievements ? "displayed" : "hidden");
+        setFavourites(profile.modules.favourites ? "displayed" : "hidden");
     }, [profile, open]);
 
     const save = useMutation({
