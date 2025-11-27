@@ -9,7 +9,6 @@ import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.InviteNotFoundException;
-import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +17,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/lobbies")
@@ -132,24 +129,17 @@ public class LobbyController {
         lobbyPlayerService.acceptInvite(player, lobby, token);
     }
 
-    @GetMapping("/invited")
-    public ResponseEntity<List<LobbyInviteModel>> getInvited(
-            @AuthenticationPrincipal final Jwt token
+    @GetMapping("/{lobbyId}/invited")
+    public ResponseEntity<List<UUID>> getInvitedFromLobby(
+            @PathVariable UUID lobbyId
     ) {
-        PlayerId player = PlayerId.get(token);
-        List<Lobby> lobbies = queryService.getInvitesForPlayer(player);
+        Lobby lobby = lobbyService.findLobby(new LobbyId(lobbyId));
 
-        return ResponseEntity.ok(lobbies.stream().map(lobby -> {
-            // owner = whoever sent the invite
-            Player owner = playerService.findPlayer(player, token);
-
-            // resolve invited players
-            Set<Player> invited = lobby.invitedPlayers().stream()
-                    .map(id -> playerService.findPlayer(id, token))
-                    .collect(Collectors.toSet());
-
-            return LobbyInviteModel.from(lobby, owner, invited);
-        }).toList());
+        return ResponseEntity.ok(
+                lobby.invitedPlayers().stream()
+                        .map(PlayerId::value)
+                        .toList()
+        );
     }
 
     @GetMapping("/{lobbyId}/invited/{userId}")
