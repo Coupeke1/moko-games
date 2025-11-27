@@ -1,0 +1,8 @@
+window.__APP_CONFIG__ = {
+    authUrl: "$VITE_AUTH_URL",
+    authRealm: "$VITE_AUTH_REALM",
+    authClientId: "$VITE_AUTH_CLIENT",
+
+    ticTacToeService: "$VITE_TIC_TAC_TOE_SERVICE",
+    userService: "$VITE_USER_SERVICE"
+}
