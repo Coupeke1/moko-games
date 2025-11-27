@@ -20,10 +20,11 @@ services:
       - service-social
       - service-tic-tac-toe
       - idp-keycloak
+      - service-games
 
   # Frontend
   frontend-platform:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/platform-frontend:branch-env-var-injection
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/platform-frontend:main-latest
     restart: always
     environment:
       VITE_AUTH_URL: http://localhost/auth
@@ -71,6 +72,7 @@ services:
 
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
 
+      CROS_ALLOWED_ORIGINS: http://localhost
       GAME_SERVICE_URL: http://service-games:8084
     expose:
       - "8080"
@@ -89,7 +91,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=session_service
       SPRING_DATASOURCE_USER: user
       SPRING_DATASOURCE_PASSWORD: password
-
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
 
       SPRING_RABBITMQ_HOST: app-rabbitmq
@@ -118,7 +119,6 @@ services:
   #      SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=communication_service
   #      SPRING_DATASOURCE_USER: user
   #      SPRING_DATASOURCE_PASSWORD: password
-  #
   #      SPRING_JPA_HIBERNATE_DDL_AUTO: update
   #
   #      SPRING_RABBITMQ_HOST: app-rabbitmq
@@ -144,7 +144,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=social_service
       SPRING_DATASOURCE_USER: user
       SPRING_DATASOURCE_PASSWORD: password
-
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
 
       SPRING_RABBITMQ_HOST: app-rabbitmq
@@ -154,7 +153,8 @@ services:
 
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
 
-      USER_SERVICE_URL: http://service-user:8080
+      CROS_ALLOWED_ORIGINS: http://localhost
+      USER_SERVICE_URL: http://service-user:8080/api/profiles
     expose:
       - "8083"
     networks:
@@ -172,7 +172,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=games_service
       SPRING_DATASOURCE_USER: user
       SPRING_DATASOURCE_PASSWORD: password
-
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
 
       SPRING_RABBITMQ_HOST: app-rabbitmq
@@ -198,7 +197,6 @@ services:
   #      SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=store_service
   #      SPRING_DATASOURCE_USER: user
   #      SPRING_DATASOURCE_PASSWORD: password
-  #
   #      SPRING_JPA_HIBERNATE_DDL_AUTO: update
   #
   #      SPRING_RABBITMQ_HOST: app-rabbitmq

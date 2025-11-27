@@ -16,3 +16,8 @@ scope = openid
 ### 2) GET /api/profiles/me
 GET http://localhost:80/user-service/api/profiles/me
 Authorization: Bearer {{access_token}}
+
+
+### 3) GET api/library/me
+GET http://localhost:80/user-service/api/library/me
+Authorization: Bearer {{access_token}}
