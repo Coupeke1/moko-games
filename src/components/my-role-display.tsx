@@ -1,13 +1,13 @@
-import {PlayerRoleBadge} from "@/routes/game/components/player-role-badge.tsx";
 import type {Profile} from "@/models/profile.ts";
-import PlayerImage from "@/routes/game/components/player-image.tsx";
+import PlayerRoleBadge from "@/components/player-role-badge.tsx";
+import PlayerImage from "@/components/player-image.tsx";
 
-interface MyRoleDisplayProps {
+interface Props {
     profile: Profile;
     role: string | null;
 }
 
-export function MyRoleDisplay({profile, role}: MyRoleDisplayProps) {
+export default function MyRoleDisplay({profile, role}: Props) {
     if (!role) {
         return (
             <div className="bg-yellow-500 text-white px-4 py-2 rounded-lg text-sm">

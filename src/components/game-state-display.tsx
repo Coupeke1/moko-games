@@ -1,11 +1,11 @@
-import type {GameState} from "@/routes/game/model/game-state.ts";
-import {Row} from "@/components/layout/row.tsx";
+import type {GameState} from "@/models/game-state";
+import Row from "@/components/layout/row.tsx";
 
-interface GameStateDisplayProps {
+interface Props {
     gameState: GameState;
 }
 
-export function GameStateDisplay({gameState}: GameStateDisplayProps) {
+export default function GameStateDisplay({gameState}: Props) {
     return (
         <section className="game-info bg-bg-2 p-4 rounded-lg flex flex-col gap-2">
             <Row label="Game Status" value={gameState.status}/>

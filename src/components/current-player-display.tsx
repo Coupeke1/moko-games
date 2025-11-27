@@ -1,14 +1,14 @@
 import type {Profile} from "@/models/profile.ts";
-import type {Player} from "@/routes/game/model/Player.ts";
-import PlayerImage from "@/routes/game/components/player-image.tsx";
+import type {Player} from "@/models/player";
+import PlayerImage from "@/components/player-image.tsx";
 
-interface PlayerDisplayProps {
+interface Props {
     role: string;
     player?: Player;
     profile?: Profile;
 }
 
-export function CurrentPlayerDisplay({role, player, profile}: PlayerDisplayProps) {
+export default function CurrentPlayerDisplay({role, player, profile}: Props) {
     return (
         <div className="items-center">
             <div className={`player-role text-5xl font-bold

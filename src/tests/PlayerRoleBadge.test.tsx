@@ -1,6 +1,6 @@
 ﻿import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { PlayerRoleBadge } from "@/routes/game/components/player-role-badge.tsx"; // adjust the path if needed
+import PlayerRoleBadge from "@/components/player-role-badge.tsx"; // adjust the path if needed
 
 describe("PlayerRoleBadge component", () => {
     it("renders the role when provided", () => {

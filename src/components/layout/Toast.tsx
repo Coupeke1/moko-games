@@ -1,12 +1,12 @@
 import {useEffect} from "react";
 
-interface ToastProps {
+interface Props {
     message: string;
     onClose: () => void;
     duration?: number; // ms
 }
 
-export function Toast({ message, onClose, duration = 4000 }: ToastProps) {
+export default function Toast({ message, onClose, duration = 4000 }: Props) {
     useEffect(() => {
         if (!duration) return;
         const t = setTimeout(onClose, duration);

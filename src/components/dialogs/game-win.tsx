@@ -1,15 +1,15 @@
-import {PlayerRoleBadge} from "@/routes/game/components/player-role-badge.tsx";
-import PlayerImage from "@/routes/game/components/player-image.tsx";
 import type {Profile} from "@/models/profile.ts";
-import type {Player} from "@/routes/game/model/Player.ts";
-import {usePlayerProfile} from "@/routes/game/hooks/use-player-profile.ts";
+import type {Player} from "@/models/player";
+import {usePlayerProfile} from "@/hooks/use-player-profile";
+import PlayerRoleBadge from "@/components/player-role-badge.tsx";
+import PlayerImage from "@/components/player-image.tsx";
 
 interface GameWinProps {
     myProfile: Profile;
     winningPlayer: Player
 }
 
-export function GameWin({myProfile, winningPlayer}: GameWinProps) {
+export default function GameWin({myProfile, winningPlayer}: GameWinProps) {
     const {data: winningPlayerProfile} = usePlayerProfile(winningPlayer?.id);
 
     return (

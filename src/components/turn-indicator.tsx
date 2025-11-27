@@ -1,12 +1,12 @@
-import type {GameState} from "@/routes/game/model/game-state.ts";
-import {CurrentPlayerDisplay} from "@/routes/game/components/current-player-display.tsx";
-import {usePlayerProfile} from "@/routes/game/hooks/use-player-profile.ts";
+import type {GameState} from "@/models/game-state";
+import {usePlayerProfile} from "@/hooks/use-player-profile";
+import CurrentPlayerDisplay from "@/components/current-player-display.tsx";
 
-interface TurnIndicatorProps {
+interface Props {
     gameState: GameState;
 }
 
-export function TurnIndicator({gameState}: TurnIndicatorProps) {
+export default function TurnIndicator({gameState}: Props) {
     const {currentRole, players} = gameState;
     const currentPlayer = players.find(player => player.role === currentRole);
     const { data: profile } = usePlayerProfile(currentPlayer?.id);

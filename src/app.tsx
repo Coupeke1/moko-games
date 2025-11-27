@@ -1,8 +1,8 @@
-import GamePage from "@/routes/game/game.tsx"
-import { BrowserRouter, Route, Routes } from "react-router"
+import { useAuthStore } from "@/stores/auth-store";
+import GamePage from "@/routes/game"
+import LoadingState from "@/components/state/loading";
 import Auth from "@/components/auth.tsx";
-import { useAuthStore } from "./stores/auth-store";
-import LoadingState from "./components/state/loading";
+import { BrowserRouter, Route, Routes } from "react-router"
 
 function App() {
     const initialized = useAuthStore(state => state.initialized);

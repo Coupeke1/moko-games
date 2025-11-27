@@ -1,8 +1,8 @@
-interface PlayerRoleBadgeProps {
+interface Props {
     role: string | null;
 }
 
-export function PlayerRoleBadge({ role }: PlayerRoleBadgeProps) {
+export default function PlayerRoleBadge({ role }: Props) {
     if (!role) {
         return null;
     }

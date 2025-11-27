@@ -1,19 +1,19 @@
 import {useParams} from "react-router";
-import {useGameState} from "@/routes/game/hooks/use-game-state.ts";
-import {TurnIndicator} from "@/routes/game/components/turn-indicator.tsx";
-import {MyRoleDisplay} from "@/routes/game/components/my-role-display.tsx";
-import {useMyPlayerRole} from "@/routes/game/hooks/use-my-player-role.ts";
-import {useMyProfile} from "@/routes/game/hooks/use-my-profile.ts";
+import {GameStatus} from "@/models/game-status";
+import {useResetGame} from "@/hooks/use-reset-game";
+import {useMyPlayerRole} from "@/hooks/use-my-player-role";
+import {useMyProfile} from "@/hooks/use-my-profile";
+import {useMakeMove} from "@/hooks/use-make-move";
+import {useGameState} from "@/hooks/use-game-state";
+import TurnIndicator from "@/components/turn-indicator.tsx";
+import MyRoleDisplay from "@/components/my-role-display.tsx";
 import LoadingState from "@/components/state/loading.tsx";
 import ErrorState from "@/components/state/error.tsx";
 import Page from "@/components/layout/page.tsx";
-import {GameGrid} from "@/routes/game/components/game-grid.tsx";
-import {useMakeMove} from "@/routes/game/hooks/use-make-move.ts";
-import {Toast} from "@/components/layout/Toast.tsx";
-import {GameStateDisplay} from "@/routes/game/components/game-state-display.tsx";
-import {GameStatus} from "@/routes/game/model/game-status.ts";
-import {GameEndModal} from "@/routes/game/components/modals/game-end-modal.tsx";
-import {useResetGame} from "@/routes/game/hooks/use-reset-game.ts";
+import GameGrid from "@/components/game-grid.tsx";
+import Toast from "@/components/layout/Toast.tsx";
+import GameStateDisplay from "@/components/game-state-display.tsx";
+import GameEndModal from "@/components/dialogs/game-end-modal";
 
 export default function GamePage() {
     const {id} = useParams<{ id: string }>()
@@ -50,7 +50,7 @@ export default function GamePage() {
             </header>
 
             <div className="flex items-start justify-center gap-30 w-full max-w-6xl">
-                <div className="w-80 flex-shrink-0 mt-2">
+                <div className="w-80 shrink-0 mt-2">
                     <MyRoleDisplay
                         profile={profile}
                         role={myRole}/>
@@ -66,7 +66,7 @@ export default function GamePage() {
                     </div>
                 </div>
 
-                <div className="w-80 flex-shrink-0 flex flex-col gap-4 mt-2">
+                <div className="w-80 shrink-0 flex flex-col gap-4 mt-2">
                     <TurnIndicator gameState={gameState}/>
                     <GameStateDisplay gameState={gameState}/>
                 </div>

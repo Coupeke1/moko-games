@@ -1,9 +1,9 @@
-interface GameGridProps {
+interface Props {
     board: string[][];
     onCellClick?: (rowIndex: number, colIndex: number) => void;
 }
 
-export function GameGrid({board, onCellClick}: GameGridProps) {
+export default function GameGrid({board, onCellClick}: Props) {
     const size = board.length;
 
     return (
