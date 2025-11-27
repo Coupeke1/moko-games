@@ -1,10 +1,14 @@
 package be.kdg.team22.tictactoeservice.infrastructure.ai;
 
+import be.kdg.team22.tictactoeservice.domain.game.exceptions.AiMoveRequestFailed;
+import be.kdg.team22.tictactoeservice.domain.game.exceptions.AiServiceNotReachableException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
 @Component
 public class ExternalAiRepository {
@@ -16,17 +20,21 @@ public class ExternalAiRepository {
 
     public AiMoveResponse requestMove(AiMoveRequest request) {
         try {
-            final AiMoveResponse response = client.post()
-                    .uri("/move")
+            return client.post()
+                    .uri("/move/")
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(request)
+                    .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .body(AiMoveResponse.class);
-            return response;
         } catch (HttpClientErrorException exception) {
             if (exception.getStatusCode() == HttpStatus.NOT_FOUND) {
-                return null;
+                throw new AiMoveRequestFailed(request.toString());
             }
+
             throw exception;
+        } catch (RestClientException ex) {
+            throw new AiServiceNotReachableException(client.toString());
         }
     }
 }

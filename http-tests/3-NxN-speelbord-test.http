@@ -1,5 +1,4 @@
-﻿@gameId = 20a3f90b-6454-4deb-bff5-0fa686977968
-
+﻿@gameId = 2fa47a0b-c139-4f87-bbf9-f7901185a302
 ### Generate Board
 POST localhost:8086/api/games
 Content-Type: application/json
@@ -19,8 +18,8 @@ POST localhost:8086/api/games/{{gameId}}/move
 Content-Type: application/json
 
 {
-  "row": 2,
-  "col": 1,
+  "row": 1,
+  "col": 2,
   "gameId": "{{gameId}}",
   "playerId": "642999ad-c546-40b6-876c-1048971c7942"
 }
