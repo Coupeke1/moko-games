@@ -15,7 +15,7 @@ class PlayerEmbedTest {
         String username = "mathias";
         boolean ready = true;
 
-        PlayerEmbed embed = new PlayerEmbed(id, username, ready);
+        PlayerEmbed embed = new PlayerEmbed(id, username, "", ready);
 
         assertThat(embed.id()).isEqualTo(id);
         assertThat(embed.username()).isEqualTo(username);
@@ -25,7 +25,7 @@ class PlayerEmbedTest {
     @Test
     void constructor_allowsFalseReady() {
         UUID id = UUID.randomUUID();
-        PlayerEmbed embed = new PlayerEmbed(id, "piet", false);
+        PlayerEmbed embed = new PlayerEmbed(id, "piet", "", false);
 
         assertThat(embed.ready()).isFalse();
     }

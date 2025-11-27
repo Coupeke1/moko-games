@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class LobbyEntityTest {
 
     private Player p(PlayerId id, String name, boolean ready) {
-        return new Player(id, new PlayerName(name), ready);
+        return new Player(id, new PlayerName(name), "", ready);
     }
 
     @Test
@@ -70,8 +70,8 @@ class LobbyEntityTest {
         UUID gameId = UUID.randomUUID();
         UUID ownerId = UUID.randomUUID();
 
-        PlayerEmbed e1 = new PlayerEmbed(ownerId, "owner", true);
-        PlayerEmbed e2 = new PlayerEmbed(UUID.randomUUID(), "other", false);
+        PlayerEmbed e1 = new PlayerEmbed(ownerId, "owner", "", true);
+        PlayerEmbed e2 = new PlayerEmbed(UUID.randomUUID(), "other", "", false);
 
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 5);
 
@@ -117,7 +117,7 @@ class LobbyEntityTest {
                 id,
                 gameId,
                 ownerId,
-                Set.of(new PlayerEmbed(ownerId, "owner", false)),
+                Set.of(new PlayerEmbed(ownerId, "owner", "", false)),
                 Set.of(),
                 settings,
                 LobbyStatus.OPEN,

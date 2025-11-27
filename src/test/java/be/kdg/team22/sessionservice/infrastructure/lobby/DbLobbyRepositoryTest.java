@@ -38,7 +38,7 @@ class DbLobbyRepositoryTest {
 
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
-        PlayerEmbed embed = new PlayerEmbed(ownerId.value(), "ownerUser", true);
+        PlayerEmbed embed = new PlayerEmbed(ownerId.value(), "ownerUser", "", true);
 
         UUID fakeStartedGameId = UUID.randomUUID();
 
