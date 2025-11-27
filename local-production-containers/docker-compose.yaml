@@ -31,6 +31,8 @@ services:
       VITE_AUTH_CLIENT: platform-frontend
 
       VITE_USER_SERVICE: http://localhost/user-service/api/profiles
+      VITE_LIBRARY_SERVICE: http://localhost/user-service/api/library
+      VITE_SOCIAL_SERVICE: http://localhost/social-service/api/friends
     expose:
       - "80"
     networks:
