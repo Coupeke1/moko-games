@@ -62,6 +62,8 @@ public class Game {
         this.board = Board.create(this.board.size());
 
         this.currentRole = players.first().role();
+        this.moveHistory.values().forEach(List::clear);
+        this.winner = null;
     }
 
     public Player nextPlayer() {
