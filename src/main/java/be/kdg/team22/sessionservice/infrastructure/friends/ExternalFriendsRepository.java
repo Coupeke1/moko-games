@@ -8,6 +8,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,12 +22,12 @@ public class ExternalFriendsRepository {
 
     public List<UUID> getFriendIds(final String token) {
         try {
-            FriendsOverviewResponse response = client.get().uri("").header("Authorization", "Bearer " + token).retrieve().body(FriendsOverviewResponse.class);
+            FriendsResponse[] response = client.get().uri("").header("Authorization", "Bearer " + token).retrieve().body(FriendsResponse[].class);
 
             if (response == null)
                 return List.of();
 
-            return response.friends().stream().map(FriendsResponse::id).toList();
+            return Arrays.stream(response).map(FriendsResponse::id).toList();
         } catch (
                 HttpClientErrorException exception) {
             if (exception.getStatusCode() == HttpStatus.NOT_FOUND)
