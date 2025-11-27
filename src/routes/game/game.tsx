@@ -13,6 +13,7 @@ import {Toast} from "@/components/layout/Toast.tsx";
 import {GameStateDisplay} from "@/routes/game/components/game-state-display.tsx";
 import {GameStatus} from "@/routes/game/model/game-status.ts";
 import {GameEndModal} from "@/routes/game/components/modals/game-end-modal.tsx";
+import {useResetGame} from "@/routes/game/hooks/use-reset-game.ts";
 
 export default function GamePage() {
     const {id} = useParams<{ id: string }>()
@@ -21,6 +22,7 @@ export default function GamePage() {
     const myRole = useMyPlayerRole(gameState?.players, profile?.id)
 
     const {makeMove, errorMsg, closeToast} = useMakeMove(id!, profile, gameState?.status);
+    const onReset = useResetGame(id!);
 
     if (isLoading || !gameState || profileLoading || !profile)
         return (
@@ -75,6 +77,7 @@ export default function GamePage() {
                     gameState={gameState}
                     myProfile={profile}
                     isOpen={true}
+                    onReset={onReset}
                 />
             )}
 
