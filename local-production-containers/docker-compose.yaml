@@ -99,8 +99,8 @@ services:
 
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
 
-      USER_SERVICE_URL: http://user-service:8080
-      SOCIAL_SERVICE_URL: http://social-service:8083
+      USER_SERVICE_URL: http://service-user:8080
+      SOCIAL_SERVICE_URL: http://service-social:8083
     expose:
       - "8081"
     networks:
@@ -153,6 +153,8 @@ services:
       SPRING_RABBITMQ_PASSWORD: password
 
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
+
+      USER_SERVICE_URL: http://service-user:8080
     expose:
       - "8083"
     networks:
