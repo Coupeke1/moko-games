@@ -202,4 +202,16 @@ public class LobbyController {
     ) {
         lobbyPlayerService.setUnready(PlayerId.get(token), LobbyId.from(lobbyId));
     }
+
+
+    @GetMapping("/invited/me")
+    public ResponseEntity<List<LobbyResponseModel>> getInvitesFromPlayer(@AuthenticationPrincipal Jwt token) {
+        PlayerId player = PlayerId.get(token);
+        return ResponseEntity.ok(
+                lobbyService.getInvitesFromPlayer(player)
+                        .stream()
+                        .map(LobbyResponseModel::from)
+                        .toList()
+        );
+    }
 }

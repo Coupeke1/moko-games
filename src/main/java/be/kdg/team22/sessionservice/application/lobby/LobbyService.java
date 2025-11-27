@@ -96,6 +96,10 @@ public class LobbyService {
         return lobby;
     }
 
+    public List<Lobby> getInvitesFromPlayer(PlayerId id) {
+        return repository.findInvitesFromPlayerId(id);
+    }
+
     private LobbySettings mapToDomainSettings(final GameSettingsModel model, final Integer maxPlayers) {
         int resolvedMaxPlayers = maxPlayers != null ? maxPlayers : 4;
 

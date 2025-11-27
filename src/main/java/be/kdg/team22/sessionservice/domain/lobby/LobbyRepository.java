@@ -1,5 +1,6 @@
 package be.kdg.team22.sessionservice.domain.lobby;
 
+import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import org.jmolecules.ddd.annotation.Repository;
 
 import java.util.List;
@@ -12,4 +13,6 @@ public interface LobbyRepository {
     List<Lobby> findAll();
 
     void save(Lobby lobby);
+
+    List<Lobby> findInvitesFromPlayerId(PlayerId id);
 }
