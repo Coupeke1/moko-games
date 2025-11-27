@@ -9,7 +9,7 @@ function App() {
     const token = useAuthStore(state => state.token);
 
     return (
-        <BrowserRouter>
+        <BrowserRouter basename="/tic-tac-toe">
             <Auth />
             {!initialized || !token ? (
                 <LoadingState />
