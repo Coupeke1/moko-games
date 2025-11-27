@@ -12,7 +12,7 @@ class PlayerTest {
     @Test
     void validPlayer_createsSuccessfully() {
         PlayerId playerId = PlayerId.create();
-        Player p = new Player(playerId, new PlayerName("mathias"));
+        Player p = new Player(playerId, new PlayerName("mathias"), "");
 
         assertThat(p.id()).isEqualTo(playerId);
         assertThat(p.username().toString()).isEqualTo("mathias");

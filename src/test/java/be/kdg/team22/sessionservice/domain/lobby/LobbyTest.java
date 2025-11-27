@@ -28,7 +28,7 @@ class LobbyTest {
     }
 
     private Player lp(PlayerId id, PlayerName username) {
-        return new Player(id, username);
+        return new Player(id, username, "");
     }
 
     private LobbySettings settings(int max) {
@@ -52,7 +52,7 @@ class LobbyTest {
     void fullConstructor_requiresOwnerInPlayers() {
         PlayerId owner = pid();
 
-        List<Player> players = List.of(new Player(PlayerId.create(), new PlayerName("p1")));
+        List<Player> players = List.of(new Player(PlayerId.create(), new PlayerName("p1"), ""));
 
         assertThatThrownBy(() -> new Lobby(LobbyId.create(), game(), owner, players, Set.of(), settings(4), LobbyStatus.OPEN, Instant.now(), Instant.now())).isInstanceOf(OwnerNotFoundException.class);
     }

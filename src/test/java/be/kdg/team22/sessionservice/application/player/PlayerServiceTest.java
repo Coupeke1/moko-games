@@ -35,7 +35,7 @@ class PlayerServiceTest {
         UUID id = UUID.randomUUID();
         PlayerId pid = PlayerId.from(id);
 
-        PlayerResponse response = new PlayerResponse(id, "mathias");
+        PlayerResponse response = new PlayerResponse(id, "mathias", "");
 
         when(repo.getById(id, "TOKEN-123")).thenReturn(Optional.of(response));
 
@@ -64,7 +64,7 @@ class PlayerServiceTest {
         UUID id = UUID.randomUUID();
         PlayerId pid = PlayerId.from(id);
 
-        when(repo.getById(any(), any())).thenReturn(Optional.of(new PlayerResponse(id, "user")));
+        when(repo.getById(any(), any())).thenReturn(Optional.of(new PlayerResponse(id, "user", "")));
 
         Jwt token = jwtFor();
 

@@ -28,9 +28,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class LobbyPlayerServiceTest {
-    private LobbyRepository repo = mock(LobbyRepository.class);
-    private FriendsService friendsService = mock(FriendsService.class);
-    private PlayerService playerService = mock(PlayerService.class);
+    private final LobbyRepository repo = mock(LobbyRepository.class);
+    private final FriendsService friendsService = mock(FriendsService.class);
+    private final PlayerService playerService = mock(PlayerService.class);
 
     LobbyPlayerService service = new LobbyPlayerService(repo, friendsService, playerService);
 
@@ -45,7 +45,7 @@ class LobbyPlayerServiceTest {
     }
 
     private Lobby newLobby(LobbyId id, PlayerId owner) {
-        Player ownerPlayer = new Player(owner, new PlayerName("owner"));
+        Player ownerPlayer = new Player(owner, new PlayerName("owner"), "");
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
         return new Lobby(new GameId(UUID.randomUUID()), ownerPlayer, settings);
     }
@@ -149,7 +149,7 @@ class LobbyPlayerServiceTest {
     void acceptInvite_success() {
         PlayerId player = PlayerId.from(UUID.randomUUID());
         LobbyId lobbyId = LobbyId.create();
-        Player p = new Player(player, new PlayerName("test"));
+        Player p = new Player(player, new PlayerName("test"), "");
 
         Lobby lobby = newLobby(lobbyId, PlayerId.from(UUID.randomUUID()));
 
@@ -184,7 +184,7 @@ class LobbyPlayerServiceTest {
         Lobby lobby = spy(newLobby(lobbyId, owner));
 
         lobby.invitePlayer(owner, target);
-        lobby.acceptInvite(new Player(target, new PlayerName("target")));
+        lobby.acceptInvite(new Player(target, new PlayerName("target"), ""));
 
         when(repo.findById(lobbyId)).thenReturn(Optional.of(lobby));
 

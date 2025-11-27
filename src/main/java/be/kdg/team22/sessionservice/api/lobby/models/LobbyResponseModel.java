@@ -15,7 +15,7 @@ public record LobbyResponseModel(
         UUID id,
         UUID gameId,
         UUID ownerId,
-        Set<UUID> players,
+        Set<PlayerSummaryModel> players,
         int maxPlayers,
         LobbyStatus status,
         Instant createdAt,
@@ -34,7 +34,7 @@ public record LobbyResponseModel(
                 lobby.gameId().value(),
                 lobby.ownerId().value(),
                 lobby.players().stream()
-                        .map(p -> p.id().value())
+                        .map(PlayerSummaryModel::from)
                         .collect(Collectors.toSet()),
                 lobby.settings().maxPlayers(),
                 lobby.status(),

@@ -46,10 +46,10 @@ class LobbyInviteQueryServiceTest {
         PlayerId invitedUser = new PlayerId(UUID.randomUUID());
 
         PlayerId ownerId = new PlayerId(UUID.randomUUID());
-        Player owner = new Player(ownerId, new PlayerName("ownerUser"));
+        Player owner = new Player(ownerId, new PlayerName("ownerUser"), "");
 
-        Player p1 = new Player(PlayerId.create(), new PlayerName("p1"));
-        Player p2 = new Player(PlayerId.create(), new PlayerName("p2"));
+        Player p1 = new Player(PlayerId.create(), new PlayerName("p1"), "");
+        Player p2 = new Player(PlayerId.create(), new PlayerName("p2"), "");
 
         PlayerId invited1 = new PlayerId(UUID.randomUUID());
 
@@ -73,15 +73,15 @@ class LobbyInviteQueryServiceTest {
         when(lobbyRepo.findAll()).thenReturn(List.of(lobby));
 
         when(userRepo.getById(ownerId.value(), token))
-                .thenReturn(Optional.of(new PlayerResponse(ownerId.value(), "ownerUser")));
+                .thenReturn(Optional.of(new PlayerResponse(ownerId.value(), "ownerUser", "")));
         when(userRepo.getById(p1.id().value(), token))
-                .thenReturn(Optional.of(new PlayerResponse(p1.id().value(), "p1")));
+                .thenReturn(Optional.of(new PlayerResponse(p1.id().value(), "p1", "")));
         when(userRepo.getById(p2.id().value(), token))
-                .thenReturn(Optional.of(new PlayerResponse(p2.id().value(), "p2")));
+                .thenReturn(Optional.of(new PlayerResponse(p2.id().value(), "p2", "")));
         when(userRepo.getById(invited1.value(), token))
-                .thenReturn(Optional.of(new PlayerResponse(invited1.value(), "inv1")));
+                .thenReturn(Optional.of(new PlayerResponse(invited1.value(), "inv1", "")));
         when(userRepo.getById(invitedUser.value(), token))
-                .thenReturn(Optional.of(new PlayerResponse(invitedUser.value(), "inv2")));
+                .thenReturn(Optional.of(new PlayerResponse(invitedUser.value(), "inv2", "")));
 
         List<Lobby> result = service.getInvitesForPlayer(invitedUser);
 

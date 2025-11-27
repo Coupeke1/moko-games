@@ -47,7 +47,7 @@ class LobbyServiceTest {
     }
 
     private Lobby newLobby(GameId gameId, PlayerId owner) {
-        Player p = new Player(owner, new PlayerName("owner"));
+        Player p = new Player(owner, new PlayerName("owner"), "");
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
         return new Lobby(gameId, p, settings);
     }
@@ -60,7 +60,7 @@ class LobbyServiceTest {
 
         CreateLobbyModel model = new CreateLobbyModel(gameId.value(), 4, new TicTacToeSettingsModel(3));
 
-        when(playerService.findPlayer(owner, token)).thenReturn(new Player(owner, new PlayerName("owner")));
+        when(playerService.findPlayer(owner, token)).thenReturn(new Player(owner, new PlayerName("owner"), ""));
 
         Lobby l = service.createLobby(gameId, owner, model, token);
 
@@ -248,7 +248,7 @@ class LobbyServiceTest {
 
         CreateLobbyModel model = new CreateLobbyModel(gameId.value(), null, new TicTacToeSettingsModel(3));
 
-        when(playerService.findPlayer(owner, token)).thenReturn(new Player(owner, new PlayerName("owner")));
+        when(playerService.findPlayer(owner, token)).thenReturn(new Player(owner, new PlayerName("owner"), ""));
 
         doNothing().when(repo).save(any());
 
