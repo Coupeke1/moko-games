@@ -1,7 +1,8 @@
-import {useAuthStore} from "@/stores/auth-store.tsx";
-import {useEffect} from "react";
-import LoadingState from "@/components/state/loading.tsx";
-import {config} from "@/config.ts";
+import Page from "@/components/layout/page";
+import LoadingState from "@/components/state/loading";
+import { config } from "@/config";
+import { useAuthStore } from "@/stores/auth-store";
+import { useEffect } from "react";
 
 const configIdp: Keycloak.KeycloakConfig = {
     url: config.authUrl,
@@ -18,7 +19,9 @@ export default function Auth() {
     }, []);
 
     if (!initialized) return (
-        <LoadingState />
+        <Page>
+            <LoadingState />
+        </Page>
     )
     return <></>;
 }
