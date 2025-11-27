@@ -8,7 +8,6 @@ import be.kdg.team22.sessionservice.application.player.PlayerService;
 import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
-import be.kdg.team22.sessionservice.domain.lobby.exceptions.InviteNotFoundException;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -113,18 +112,13 @@ public class LobbyController {
         lobbyPlayerService.invitePlayers(owner, LobbyId.from(id), players, token);
     }
 
-    @PostMapping("/{id}/players/{playerId}")
+    @PostMapping("/{id}/invite/accept/me")
     public void acceptInvite(
             @PathVariable final UUID id,
-            @PathVariable final UUID playerId,
             @AuthenticationPrincipal final Jwt token
     ) {
         LobbyId lobby = LobbyId.from(id);
         PlayerId player = PlayerId.get(token);
-
-        if (!player.value().equals(playerId)) {
-            throw new InviteNotFoundException(lobby, player);
-        }
 
         lobbyPlayerService.acceptInvite(player, lobby, token);
     }

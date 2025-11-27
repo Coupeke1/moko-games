@@ -262,19 +262,9 @@ class LobbyControllerTest {
 
         doNothing().when(lobbyPlayerService).acceptInvite(eq(PlayerId.from(playerId)), eq(LobbyId.from(lobbyId)), any(Jwt.class));
 
-        mockMvc.perform(post("/api/lobbies/{lobbyId}/players/{playerId}", lobbyId, playerId).with(jwtFor(playerId.toString(), "kaj", "kaj@kdg.be")).with(csrf())).andExpect(status().isOk());
+        mockMvc.perform(post("/api/lobbies/{lobbyId}/invite/accept/me", lobbyId, playerId).with(jwtFor(playerId.toString(), "kaj", "kaj@kdg.be")).with(csrf())).andExpect(status().isOk());
 
         verify(lobbyPlayerService).acceptInvite(eq(PlayerId.from(playerId)), eq(LobbyId.from(lobbyId)), any(Jwt.class));
-    }
-
-    @Test
-    @DisplayName("POST /api/lobbies/{lobbyId}/players/{playerId} – id mismatch returns 404")
-    void acceptInvite_idMismatch_returnsBadRequest() throws Exception {
-        UUID lobbyId = UUID.randomUUID();
-        UUID pathPlayerId = UUID.fromString("aaaaaaaa-0000-0000-0000-000000000000");
-        UUID tokenSub = UUID.fromString("bbbbbbbb-0000-0000-0000-000000000000");
-
-        mockMvc.perform(post("/api/lobbies/{lobbyId}/players/{playerId}", lobbyId, pathPlayerId).with(jwtFor(tokenSub.toString(), "other", "other@kdg.be")).with(csrf())).andExpect(status().isNotFound());
     }
 
     @Test
