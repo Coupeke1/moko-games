@@ -152,6 +152,17 @@ public class LobbyController {
         }).toList());
     }
 
+    @GetMapping("/{lobbyId}/invited/{userId}")
+    public ResponseEntity<Boolean> IsPlayerInvitedForLobby(
+            @AuthenticationPrincipal final Jwt token,
+            @PathVariable final UUID lobbyId,
+            @PathVariable final UUID userId
+    ) {
+        PlayerId player = PlayerId.from(userId);
+        Lobby lobby = lobbyService.findLobby(LobbyId.from(lobbyId));
+        return ResponseEntity.ok(lobby.invitedPlayers().contains(player));
+    }
+
     @DeleteMapping("/{lobbyId}/players/{playerId}")
     public void removePlayer(
             @PathVariable final UUID lobbyId,
