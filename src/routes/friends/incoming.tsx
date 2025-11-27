@@ -1,4 +1,5 @@
 import Button from "@/components/buttons/button";
+import FriendCard from "@/components/cards/friend-card";
 import AcceptIcon from "@/components/icons/accept-icon";
 import RejectIcon from "@/components/icons/reject-icon";
 import Column from "@/components/layout/column";
@@ -9,14 +10,13 @@ import Row from "@/components/layout/row";
 import ErrorState from "@/components/state/error";
 import LoadingState from "@/components/state/loading";
 import Message from "@/components/state/message";
+import TabRow from "@/components/tabs/links/row";
 import showToast from "@/components/toast";
 import { useIncomingRequests } from "@/hooks/use-requests";
 import type { Profile } from "@/models/profile/profile";
-import FriendCard from "@/routes/friends/components/friend-card";
-import TabRow from "@/components/tabs/links/row";
+import { getTabs } from "@/routes/friends/components/tabs";
 import { acceptRequest, rejectRequest } from "@/services/friends-service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { getTabs } from "@/routes/friends/components/tabs";
 
 export default function IncomingRequestsPage() {
     const client = useQueryClient();

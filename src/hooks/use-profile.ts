@@ -3,7 +3,7 @@ import { parseProfile } from '@/services/profile-service';
 import { useAuthStore } from '@/stores/auth-store';
 import { useQuery } from '@tanstack/react-query';
 
-export function useMyProfile() {
+export function useProfile() {
     const { keycloak, authenticated, token } = useAuthStore();
 
     const { data: profile, isLoading, isError } = useQuery({

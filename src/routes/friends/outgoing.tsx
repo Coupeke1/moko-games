@@ -10,7 +10,7 @@ import Message from "@/components/state/message";
 import showToast from "@/components/toast";
 import { useOutgoingRequests } from "@/hooks/use-requests";
 import type { Profile } from "@/models/profile/profile";
-import FriendCard from "@/routes/friends/components/friend-card";
+import FriendCard from "@/components/cards/friend-card";
 import TabRow from "@/components/tabs/links/row";
 import { cancelRequest } from "@/services/friends-service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

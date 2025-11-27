@@ -4,14 +4,14 @@ import Page from "@/components/layout/page";
 import Section from "@/components/section";
 import ErrorState from "@/components/state/error";
 import LoadingState from "@/components/state/loading";
-import { useMyProfile } from "@/hooks/use-my-profile";
+import { useProfile } from "@/hooks/use-profile";
 import AchievementCard from "@/routes/profile/components/achievement-card";
 import ProfileInformation from "@/routes/profile/components/information";
 import SettingsDialog from "@/routes/profile/dialogs/settings-dialog";
 import { useState } from "react";
 
 export default function ProfilePage() {
-    const { profile, isLoading, isError } = useMyProfile();
+    const { profile, isLoading, isError } = useProfile();
     const [settings, setSettings] = useState(false);
 
     if (isLoading || profile === undefined) return <Page><LoadingState /></Page>

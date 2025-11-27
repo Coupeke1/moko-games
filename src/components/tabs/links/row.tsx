@@ -10,7 +10,7 @@ export default function TabRow({ tabs }: Props) {
         <Row responsive={false} wrap={true}>
             {
                 tabs.map((tab: { title: string; path: string }) => (
-                    <TabLink title={tab.title} path={tab.path} />
+                    <TabLink key={tab.title} title={tab.title} path={tab.path} />
                 ))
             }
         </Row>

@@ -8,16 +8,16 @@ import Page from "@/components/layout/page";
 import ErrorState from "@/components/state/error";
 import LoadingState from "@/components/state/loading";
 import Message from "@/components/state/message";
+import TabRow from "@/components/tabs/links/row";
 import showToast from "@/components/toast";
 import { useFriends } from "@/hooks/use-friends";
 import type { Friend } from "@/models/friends/friend";
 import type { Profile } from "@/models/profile/profile";
-import FriendCard from "@/routes/friends/components/friend-card";
-import TabRow from "@/components/tabs/links/row";
+import FriendCard from "@/components/cards/friend-card";
+import { getTabs } from "@/routes/friends/components/tabs";
 import { removeFriend, sendRequest } from "@/services/friends-service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { getTabs } from "@/routes/friends/components/tabs";
 
 function Add() {
     const client = useQueryClient();

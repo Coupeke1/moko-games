@@ -5,9 +5,9 @@ import LoadingState from "@/components/state/loading";
 import Message from "@/components/state/message";
 import { useLibrary } from "@/hooks/use-library";
 import type { Game } from "@/models/library/game";
-import LibraryCard from "@/routes/library/components/card";
+import LibraryCard from "@/routes/library/components/library-card";
 import SearchBar from "@/routes/library/components/search-bar";
-import GameDialog from "@/routes/library/dialogs/game-dialog";
+import GameDialog from "@/routes/library/dialogs/game-dialog/game-dialog";
 import { useState } from "react";
 
 export default function LibraryPage() {
