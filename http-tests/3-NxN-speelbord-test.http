@@ -1,4 +1,4 @@
-﻿@gameId = a17c39ad-bb69-43af-8d1b-8f77fadb79e5
+﻿@gameId = 20a3f90b-6454-4deb-bff5-0fa686977968
 
 ### Generate Board
 POST localhost:8086/api/games
@@ -40,4 +40,32 @@ Content-Type: application/json
   "settings": {
     "boardSize": 3
   }
+}
+
+### AI
+POST http://34.79.40.150/ai-player/move
+Content-Type: application/json
+
+{
+  "game_id": "342f21ec-4367-454e-8d05-e231ba336e36",
+  "game_name": "TICTACTOE",
+  "board": [
+    [
+      " ",
+      " ",
+      " "
+    ],
+    [
+      " ",
+      " ",
+      " "
+    ],
+    [
+      " ",
+      "X",
+      " "
+    ]
+  ],
+  "current_player": "O",
+  "ai_player": "O"
 }

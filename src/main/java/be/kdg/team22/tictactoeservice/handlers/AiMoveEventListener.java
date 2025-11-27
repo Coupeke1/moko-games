@@ -1,37 +1,37 @@
 package be.kdg.team22.tictactoeservice.handlers;
 
-import be.kdg.team22.tictactoeservice.api.models.AiMoveResponse;
 import be.kdg.team22.tictactoeservice.application.GameService;
 import be.kdg.team22.tictactoeservice.domain.game.GameId;
 import be.kdg.team22.tictactoeservice.domain.game.Move;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
 import be.kdg.team22.tictactoeservice.events.AiMoveRequestedEvent;
-import org.springframework.beans.factory.annotation.Value;
+import be.kdg.team22.tictactoeservice.infrastructure.ai.AiMoveRequest;
+import be.kdg.team22.tictactoeservice.infrastructure.ai.AiMoveResponse;
+import be.kdg.team22.tictactoeservice.infrastructure.ai.ExternalAiRepository;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.UUID;
 
 @Component
 public class AiMoveEventListener {
-    @Value("${ai.url.move}")
-    String url;
-
     private final GameService gameService;
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final ExternalAiRepository aiRepository;
 
-    public AiMoveEventListener(GameService gameService) {
+    public AiMoveEventListener(GameService gameService, ExternalAiRepository aiRepository) {
         this.gameService = gameService;
+        this.aiRepository = aiRepository;
     }
 
     @Async
     @EventListener
     public void handleAiMoveRequest(AiMoveRequestedEvent event) {
-        AiMoveResponse response = restTemplate.postForObject(url, event, AiMoveResponse.class);
+        AiMoveRequest request = new AiMoveRequest(event.gameId(), event.gameName(),
+                event.board(), event.currentPlayer().name(), event.aiPlayer().name()
+        );
+        AiMoveResponse response = aiRepository.requestMove(request);
 
-        System.out.println(response);
         if (response != null) {
             GameId gameId = new GameId(UUID.fromString(event.gameId()));
             PlayerId aiPlayerId = gameService.getGame(gameId).players().stream()
