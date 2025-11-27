@@ -5,5 +5,5 @@ export const config = {
 
     userService: window.__APP_CONFIG__?.userService ?? import.meta.env.VITE_USER_SERVICE ?? "",
     socialService: window.__APP_CONFIG__?.socialService ?? import.meta.env.VITE_SOCIAL_SERVICE ?? "",
-    libraryService: window.__APP_CONFIG__?.librarySerivce ?? import.meta.env.VITE_LIBRARY_SERVICE ?? ""
+    libraryService: window.__APP_CONFIG__?.libraryService ?? import.meta.env.VITE_LIBRARY_SERVICE ?? ""
 };
