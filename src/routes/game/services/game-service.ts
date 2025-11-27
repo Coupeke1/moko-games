@@ -2,8 +2,9 @@ import validIdCheck from "@/lib/id.ts";
 import type {GameState} from "@/routes/game/model/game-state.ts";
 import axios from "axios";
 import type {MoveRequest} from "@/routes/game/model/move-request.ts";
+import {config} from "@/config.ts";
 
-const BASE_URL = import.meta.env.VITE_TICTACTOE_API;
+const BASE_URL = config.ticTacToeService;
 
 export async function getGameState(gameId: string): Promise<GameState> {
     try {

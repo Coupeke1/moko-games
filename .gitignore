@@ -19,6 +19,7 @@ out/
 # Environment variables
 .env
 .env.local
+public/runtime-config.js
 
 # IDE
 .vscode/
@@ -29,3 +30,6 @@ out/
 # OS
 .DS_Store
 Thumbs.db
+
+# Tests
+test-results/

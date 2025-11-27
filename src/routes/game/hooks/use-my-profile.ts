@@ -1,7 +1,7 @@
+import type { Profile } from '@/models/profile';
+import { parseProfile } from '@/services/profile-service';
 import { useAuthStore } from '@/stores/auth-store';
 import { useQuery } from '@tanstack/react-query';
-import type {Profile} from "@/models/profile.ts";
-import {parseProfile} from "@/services/profile-service.ts";
 
 export function useMyProfile() {
     const { keycloak, authenticated, token } = useAuthStore();
@@ -10,6 +10,7 @@ export function useMyProfile() {
         queryKey: ["profile", "me", token],
         queryFn: async (): Promise<Profile> => {
             const { keycloak: freshKeycloak, token: freshToken } = useAuthStore.getState();
+
             if (!freshKeycloak || !freshToken)
                 throw new Error("Not authenticated");
 
@@ -26,4 +27,4 @@ export function useMyProfile() {
     });
 
     return { profile, isLoading, isError };
-}
+};

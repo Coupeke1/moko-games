@@ -1,11 +1,13 @@
-import {useAuthStore} from "@/stores/auth-store.tsx";
-import {useEffect} from "react";
-import LoadingState from "@/components/state/loading.tsx";
+import Page from "@/components/layout/page";
+import LoadingState from "@/components/state/loading";
+import { config } from "@/config";
+import { useAuthStore } from "@/stores/auth-store";
+import { useEffect } from "react";
 
-const config: Keycloak.KeycloakConfig = {
-    url: import.meta.env.VITE_AUTH_URL,
-    realm: import.meta.env.VITE_AUTH_REALM,
-    clientId: import.meta.env.VITE_AUTH_CLIENT
+const configIdp: Keycloak.KeycloakConfig = {
+    url: config.authUrl,
+    realm: config.authRealm,
+    clientId: config.authClientId
 };
 
 export default function Auth() {
@@ -13,11 +15,13 @@ export default function Auth() {
     const initialized = useAuthStore((state) => state.initialized);
 
     useEffect(() => {
-        initAuth(config);
+        initAuth(configIdp);
     }, []);
 
     if (!initialized) return (
-        <LoadingState />
+        <Page>
+            <LoadingState />
+        </Page>
     )
     return <></>;
 }
