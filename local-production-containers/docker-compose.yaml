@@ -56,13 +56,12 @@ services:
 
   # Backend Services
   service-user:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/user-service:branch-possible-docker-compose-fix
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/user-service:main-latest
     restart: always
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=user_service
       SPRING_DATASOURCE_USER: user
       SPRING_DATASOURCE_PASSWORD: password
-
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
 
       SPRING_RABBITMQ_HOST: app-rabbitmq
@@ -71,6 +70,8 @@ services:
       SPRING_RABBITMQ_PASSWORD: password
 
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
+
+      GAME_SERVICE_URL: http://service-games:8084
     expose:
       - "8080"
     networks:
@@ -162,31 +163,31 @@ services:
       - app-rabbitmq
       - idp-keycloak
 
-  #  service-games:
-  #    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/games-service:main-latest
-  #    restart: always
-  #    environment:
-  #      SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=games_service
-  #      SPRING_DATASOURCE_USER: user
-  #      SPRING_DATASOURCE_PASSWORD: password
-  #
-  #      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-  #
-  #      SPRING_RABBITMQ_HOST: app-rabbitmq
-  #      SPRING_RABBITMQ_PORT: 5672
-  #      SPRING_RABBITMQ_USERNAME: user
-  #      SPRING_RABBITMQ_PASSWORD: password
-  #
-  #      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
-  #    expose:
-  #      - "8084"
-  #    networks:
-  #      - moko_backend
-  #      - moko_kc
-  #    depends_on:
-  #      - app-postgres
-  #      - app-rabbitmq
-  #      - idp-keycloak
+  service-games:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/games-service:main-latest
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=games_service
+      SPRING_DATASOURCE_USER: user
+      SPRING_DATASOURCE_PASSWORD: password
+
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+      SPRING_RABBITMQ_HOST: app-rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: user
+      SPRING_RABBITMQ_PASSWORD: password
+
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
+    expose:
+      - "8084"
+    networks:
+      - moko_backend
+      - moko_kc
+    depends_on:
+      - app-postgres
+      - app-rabbitmq
+      - idp-keycloak
 
   #  service-store:
   #    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/store-service:main-latest
