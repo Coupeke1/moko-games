@@ -6,6 +6,8 @@ import be.kdg.team22.tictactoeservice.api.models.MoveModel;
 import be.kdg.team22.tictactoeservice.domain.game.Game;
 import be.kdg.team22.tictactoeservice.domain.game.GameId;
 import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
+import be.kdg.team22.tictactoeservice.infrastructure.ai.AiMoveResponse;
+import be.kdg.team22.tictactoeservice.infrastructure.ai.ExternalAiRepository;
 import be.kdg.team22.tictactoeservice.infrastructure.game.GameRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,12 +16,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -28,6 +33,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class GameControllerIntegrationTest {
+    List<UUID> players;
+    CreateGameModel model;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -35,8 +42,8 @@ public class GameControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    List<UUID> players;
-    CreateGameModel model;
+    @MockitoBean
+    private ExternalAiRepository aiRepository;
 
     @BeforeEach
     public void setup() {
@@ -250,9 +257,18 @@ public class GameControllerIntegrationTest {
 
     @Test
     void shouldPerformAiTurnAfterHumanPlayerTurn() throws Exception {
-        CreateGameModel onePlayerModel = new CreateGameModel(List.of(UUID.randomUUID()), new GameSettingsModel(
-                3
-        ));
+        when(aiRepository.requestMove(any()))
+                .thenReturn(new AiMoveResponse(
+                        "TICTACTOE",
+                        "IN_PROGRESS",
+                        0,
+                        1
+                ));
+
+        CreateGameModel onePlayerModel = new CreateGameModel(
+                List.of(UUID.randomUUID()),
+                new GameSettingsModel(3)
+        );
 
         String createResponse = mockMvc.perform(post("/api/games")
                         .param("aiPlayer", "true")
@@ -273,11 +289,11 @@ public class GameControllerIntegrationTest {
                 .andExpect(jsonPath("$.board[0][0]").value("X"))
                 .andExpect(jsonPath("$.currentRole").value("O"));
 
-        Thread.sleep(1500);
+        Thread.sleep(300);
 
         mockMvc.perform(get("/api/games/" + gameId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.board[?(@.size() == 3)]").exists())
+                .andExpect(jsonPath("$.board[0][1]").value("O"))
                 .andExpect(jsonPath("$.currentRole").value("X"));
     }
 }
