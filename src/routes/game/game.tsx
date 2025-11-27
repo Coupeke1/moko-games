@@ -11,6 +11,8 @@ import {GameGrid} from "@/routes/game/components/game-grid.tsx";
 import {useMakeMove} from "@/routes/game/hooks/use-make-move.ts";
 import {Toast} from "@/components/layout/Toast.tsx";
 import {GameStateDisplay} from "@/routes/game/components/game-state-display.tsx";
+import {GameStatus} from "@/routes/game/model/game-status.ts";
+import {GameEndModal} from "@/routes/game/components/modals/game-end-modal.tsx";
 
 export default function GamePage() {
     const {id} = useParams<{ id: string }>()
@@ -18,7 +20,7 @@ export default function GamePage() {
     const {profile, isLoading: profileLoading, isError: profileError} = useMyProfile();
     const myRole = useMyPlayerRole(gameState?.players, profile?.id)
 
-    const {makeMove, errorMsg, closeToast} = useMakeMove(id!, profile);
+    const {makeMove, errorMsg, closeToast} = useMakeMove(id!, profile, gameState?.status);
 
     if (isLoading || !gameState || profileLoading || !profile)
         return (
@@ -67,6 +69,16 @@ export default function GamePage() {
                     <GameStateDisplay gameState={gameState}/>
                 </div>
             </div>
+
+            {gameState.status !== GameStatus.IN_PROGRESS && (
+                <GameEndModal
+                    gameState={gameState}
+                    myProfile={profile}
+                    isOpen={true}
+                />
+            )}
+
+
         </div>
     )
 }

@@ -6,7 +6,7 @@ interface Props {
 export default function PlayerImage({ src, big }: Props) {
     return (
         <section
-            className={`bg-cover ${big ? "min-w-14 min-h-14" : "min-w-10 min-h-10"} rounded-full object-cover bg-fg-2`}
+            className={`bg-cover ${big ? "min-w-20 min-h-20" : "min-w-10 min-h-10"} rounded-full object-cover bg-fg-2`}
             style={{ backgroundImage: `url(${src})` }}
         />
     )
