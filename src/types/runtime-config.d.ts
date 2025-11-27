@@ -6,7 +6,7 @@ declare global {
       authClientId?: string;
       userService?: string;
       socialService?: string;
-      librarySerivce?: string;
+      libraryService?: string;
     };
   }
 }
