@@ -1,10 +1,12 @@
 package be.kdg.team22.sessionservice.infrastructure.lobby;
 
+import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyRepository;
-import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.LobbyJpaRepository;
+import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.LobbyEntity;
+import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.LobbyJpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -26,6 +28,14 @@ public class DbLobbyRepository implements LobbyRepository {
     @Override
     public List<Lobby> findAll() {
         return repository.findAll().stream().map(LobbyEntity::toDomain).toList();
+    }
+
+    @Override
+    public List<Lobby> findInvitesFromPlayerId(PlayerId id, GameId gameId) {
+        return repository.findInvitesFromPlayerId(id.value(), gameId.value())
+                .stream()
+                .map(LobbyEntity::toDomain)
+                .toList();
     }
 
     @Override
