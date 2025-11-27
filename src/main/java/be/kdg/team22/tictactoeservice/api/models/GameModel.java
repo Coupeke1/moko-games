@@ -16,7 +16,8 @@ public record GameModel(
         List<PlayerModel> players,
         Map<UUID, List<MoveModel>> moveHistory,
         PlayerRole currentRole,
-        UUID winner
+        UUID winner,
+        PlayerRole aiPlayer
 ) {
     public static GameModel from(Game game) {
         return new GameModel(
@@ -31,7 +32,8 @@ public record GameModel(
                                         .map(MoveModel::from).toList()
                         )),
                 game.currentRole(),
-                game.winner() == null ? null : game.winner().value()
+                game.winner() == null ? null : game.winner().value(),
+                game.aiPlayer()
         );
     }
 }
