@@ -2,12 +2,18 @@ import type { ReactNode } from "react";
 
 interface Props {
     onClick?: () => void,
+    disabled?: boolean,
     children: ReactNode
 }
 
-export default function BigButton({ onClick, children }: Props) {
+export default function BigButton({ onClick, disabled, children }: Props) {
     return (
-        <button onClick={onClick} type="button" className="p-4 border-3 min-h-32 border-gray-200 dark:border-neutral-400 text-gray-600 dark:text-gray-100 rounded-lg flex items-center justify-center gap-2 cursor-pointer">
+        <button
+            onClick={onClick}
+            type={onClick ? "button" : "submit"}
+            disabled={disabled}
+            className={`rounded-lg bg-bg-2 ${disabled ? "" : "hover:bg-bg-3 transition-colors duration-75"} flex flex-row gap-1 items-center justify-center font-semibold disabled:cursor-not-allowed px-4 py-1 cursor-pointer`}
+        >
             {children}
         </button>
     )

@@ -59,10 +59,10 @@ function Friend({ friend }: { friend: Profile }) {
         mutationFn: async ({ request }: { request: Profile }) => await removeFriend(request.id),
         onSuccess: async () => {
             await client.invalidateQueries({ queryKey: ["friends"] });
-            showToast("Request", "Removed");
+            showToast(friend.username, "Removed");
         },
         onError: (error: Error) => {
-            showToast("Request", error.message);
+            showToast(friend.username, error.message);
         }
     });
 

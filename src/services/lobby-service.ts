@@ -18,13 +18,11 @@ export async function findLobby(id: string): Promise<Lobby> {
 
 export async function createLobby(game: Game, size: number): Promise<Lobby> {
     try {
-        const type = game.title === "Tic Tac Toe" ? "ticTacToe" : game.title === "Checkers" ? "checkers" : null;
-
         const settings = game.title === "Tic Tac Toe" ? {
-            type,
+            type: "ticTacToe",
             boardSize: 3
         } : game.title === "Checkers" ? {
-            type,
+            type: "checkers",
             boardSize: 8,
             flyingKings: false
         } : null;
@@ -52,6 +50,16 @@ export function isPlayerInLobby(user: string, lobby: Lobby): boolean {
     }
     catch {
         throw new Error(`Cannot check if user with id '${user}' is in lobby with id '${lobby.id}'`);
+    }
+}
+
+export function isUserOwner(user: string, lobby: Lobby): boolean {
+    try {
+        const owner: Player = findOwner(lobby);
+        return user === owner.id;
+    }
+    catch {
+        throw new Error(`Cannot check if user with id '${user}' is owner of lobby with id '${lobby.id}'`);
     }
 }
 
@@ -95,5 +103,15 @@ export async function acceptInvite(lobby: string) {
         await client.post(`${BASE_URL}/${lobby}/invite/accept/me`);
     } catch {
         throw new Error(`Invite could not be accepted`);
+    }
+}
+
+export async function removePlayer(player: string, lobby: string) {
+    try {
+        validIdCheck(player);
+        validIdCheck(lobby);
+        await client.delete(`${BASE_URL}/${lobby}/players/${player}`);
+    } catch {
+        throw new Error(`Player with id '${player}' could not be removed from lobby with id '${lobby}'`);
     }
 }

@@ -6,7 +6,7 @@ import FriendsPage from "@/routes/friends/friends"
 import IncomingRequestsPage from "@/routes/friends/incoming"
 import OutgoingRequestsPage from "@/routes/friends/outgoing"
 import LibraryPage from "@/routes/library/library"
-import LobbyPage from "@/routes/lobby/lobby"
+import LobbyPlayersPage from "@/routes/lobby/players"
 import LobbySettingsPage from "@/routes/lobby/settings"
 import NotificationsPage from "@/routes/notifications/notifications"
 import ProfilePage from "@/routes/profile/profile"
@@ -34,7 +34,7 @@ function App() {
                         <Route path="/" element={<Navigate to="/store" />} />
                         <Route path="/store" element={<StorePage />} />
                         <Route path="/library" element={<LibraryPage />} />
-                        <Route path="/lobby/:id/players" element={<LobbyPage />} />
+                        <Route path="/lobby/:id/players" element={<LobbyPlayersPage />} />
                         <Route path="/lobby/:id/settings" element={<LobbySettingsPage />} />
                         <Route path="/profile" element={<ProfilePage />} />
                         <Route path="/friends" element={<FriendsPage />} />

@@ -1,6 +1,8 @@
 import Button from "@/components/buttons/button";
 import FriendCard from "@/components/cards/friend-card";
 import Dialog from "@/components/dialog/dialog";
+import AcceptIcon from "@/components/icons/accept-icon";
+import CancelIcon from "@/components/icons/cancel-icon";
 import PlusIcon from "@/components/icons/plus-icon";
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
@@ -65,7 +67,7 @@ function Friends({ lobby }: { lobby: Lobby }) {
                                 fullWidth={true}
                                 disabled={isInLobby}
                             >
-                                <PlusIcon />
+                                {isInLobby ? <AcceptIcon /> : <PlusIcon />}
                             </Button>
                         } />
                     )
@@ -76,8 +78,6 @@ function Friends({ lobby }: { lobby: Lobby }) {
 }
 
 export default function InviteDialog({ lobby, open, onChange }: Props) {
-    const navigate = useNavigate();
-
     const [current, setCurrent] = useState<string>("Friends");
 
     return (

@@ -23,9 +23,10 @@ export function Invites({ game }: Props) {
 
     const accept = useMutation({
         mutationFn: async ({ invite }: { invite: Lobby }) => await acceptInvite(invite.id),
-        onSuccess: async () => {
+        onSuccess: async (_data, variables) => {
             await client.invalidateQueries({ queryKey: ["lobby", "invites", game.id] });
             showToast("Invite", "Accepted");
+            window.location.replace(`/lobby/${variables.invite.id}/players`);
         },
         onError: (error: Error) => {
             showToast("Invite", error.message);
