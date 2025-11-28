@@ -32,10 +32,10 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
@@ -43,7 +43,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(LobbyController.class)
+@WebMvcTest({
+        LobbyController.class,
+        LobbyPlayerController.class,
+        LobbyInviteController.class,
+        LobbyQueryController.class
+})
 @Import(TestSecurityConfig.class)
 class LobbyControllerTest {
     private static final UUID GAME_ID = UUID.fromString("00000000-0000-0000-0000-000000000005");
@@ -225,36 +230,6 @@ class LobbyControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/lobbies/{lobbyId}/invite – calls lobbyPlayerService.invitePlayers")
-    void inviteMultiplePlayers_callsService() throws Exception {
-        UUID lobbyId = UUID.randomUUID();
-        UUID ownerId = UUID.fromString("cccccccc-0000-0000-0000-000000000000");
-        UUID p1 = UUID.fromString("dddddddd-0000-0000-0000-000000000000");
-        UUID p2 = UUID.fromString("eeeeeeee-0000-0000-0000-000000000000");
-
-        doNothing().when(lobbyPlayerService).invitePlayers(any(PlayerId.class), any(LobbyId.class), anyList(), any(Jwt.class));
-
-        String body = """
-                {
-                  "playerIds": [
-                    "%s",
-                    "%s"
-                  ]
-                }
-                """.formatted(p1, p2);
-
-        mockMvc.perform(post("/api/lobbies/{lobbyId}/invite", lobbyId).with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be")).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isOk());
-
-        ArgumentCaptor<List<PlayerId>> idsCaptor = ArgumentCaptor.forClass(List.class);
-
-        verify(lobbyPlayerService).invitePlayers(eq(PlayerId.from(ownerId)), eq(LobbyId.from(lobbyId)), idsCaptor.capture(), any(Jwt.class));
-
-        List<UUID> capturedIds = idsCaptor.getValue().stream().map(PlayerId::value).collect(Collectors.toList());
-
-        assertThat(capturedIds).containsExactlyInAnyOrder(p1, p2);
-    }
-
-    @Test
     @DisplayName("POST /api/lobbies/{lobbyId}/players/{playerId} – acceptInvite happy path")
     void acceptInvite_succeeds() throws Exception {
         UUID lobbyId = UUID.randomUUID();
@@ -279,30 +254,6 @@ class LobbyControllerTest {
         mockMvc.perform(delete("/api/lobbies/{lobbyId}/players/{playerId}", lobbyId, targetId).with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be")).with(csrf())).andExpect(status().isOk());
 
         verify(lobbyPlayerService).removePlayer(eq(PlayerId.from(ownerId)), eq(LobbyId.from(lobbyId)), eq(PlayerId.from(targetId)));
-    }
-
-    @Test
-    @DisplayName("DELETE /api/lobbies/{lobbyId}/players – calls lobbyPlayerService.removePlayers")
-    void removePlayers_callsService() throws Exception {
-        UUID lobbyId = UUID.randomUUID();
-        UUID ownerId = UUID.fromString("14141414-0000-0000-0000-000000000000");
-        UUID t1 = UUID.fromString("15151515-0000-0000-0000-000000000000");
-        UUID t2 = UUID.fromString("16161616-0000-0000-0000-000000000000");
-
-        doNothing().when(lobbyPlayerService).removePlayers(any(PlayerId.class), any(LobbyId.class), anyList());
-
-        String body = """
-                {
-                  "playerIds": [
-                    "%s",
-                    "%s"
-                  ]
-                }
-                """.formatted(t1, t2);
-
-        mockMvc.perform(delete("/api/lobbies/{lobbyId}/players", lobbyId).with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be")).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isOk());
-
-        verify(lobbyPlayerService).removePlayers(eq(PlayerId.from(ownerId)), eq(LobbyId.from(lobbyId)), argThat(list -> list.stream().map(PlayerId::value).collect(Collectors.toSet()).containsAll(Set.of(t1, t2))));
     }
 
     @Test

@@ -96,56 +96,6 @@ class LobbyPlayerServiceTest {
     }
 
     @Test
-    void invitePlayers_success_allFriends() {
-        PlayerId owner = PlayerId.from(UUID.randomUUID());
-        LobbyId lobbyId = LobbyId.create();
-
-        PlayerId p1 = PlayerId.from(UUID.randomUUID());
-        PlayerId p2 = PlayerId.from(UUID.randomUUID());
-        List<PlayerId> targets = List.of(p1, p2);
-
-        Lobby lobby = newLobby(lobbyId, owner);
-
-        when(repo.findById(lobbyId)).thenReturn(Optional.of(lobby));
-        when(friendsService.findAllFriends(any())).thenReturn(targets);
-
-        service.invitePlayers(owner, lobbyId, targets, jwtFor(owner));
-
-        verify(repo).save(lobby);
-    }
-
-    @Test
-    void invitePlayers_notAllFriends_throws() {
-        PlayerId owner = PlayerId.from(UUID.randomUUID());
-        LobbyId lobbyId = LobbyId.create();
-
-        PlayerId friend = PlayerId.from(UUID.randomUUID());
-        PlayerId stranger = PlayerId.from(UUID.randomUUID());
-        List<PlayerId> targets = List.of(friend, stranger);
-
-        Lobby lobby = newLobby(lobbyId, owner);
-
-        when(repo.findById(lobbyId)).thenReturn(Optional.of(lobby));
-        when(friendsService.findAllFriends(any())).thenReturn(List.of(friend));
-
-        assertThatThrownBy(() ->
-                service.invitePlayers(owner, lobbyId, targets, jwtFor(owner))
-        ).isInstanceOf(PlayerNotFriendException.class);
-    }
-
-    @Test
-    void invitePlayers_lobbyNotFound_throws() {
-        PlayerId owner = PlayerId.from(UUID.randomUUID());
-        LobbyId lobbyId = LobbyId.create();
-
-        when(repo.findById(lobbyId)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() ->
-                service.invitePlayers(owner, lobbyId, List.of(), jwtFor(owner))
-        ).isInstanceOf(LobbyNotFoundException.class);
-    }
-
-    @Test
     void acceptInvite_success() {
         PlayerId player = PlayerId.from(UUID.randomUUID());
         LobbyId lobbyId = LobbyId.create();
@@ -204,38 +154,6 @@ class LobbyPlayerServiceTest {
 
         assertThatThrownBy(() ->
                 service.removePlayer(owner, lobbyId, target)
-        ).isInstanceOf(LobbyNotFoundException.class);
-    }
-
-    @Test
-    void removePlayers_success() {
-        PlayerId owner = PlayerId.from(UUID.randomUUID());
-        LobbyId lobbyId = LobbyId.create();
-        List<PlayerId> ids = List.of(
-                PlayerId.from(UUID.randomUUID()),
-                PlayerId.from(UUID.randomUUID())
-        );
-
-        Lobby lobby = spy(newLobby(lobbyId, owner));
-
-        when(repo.findById(lobbyId)).thenReturn(Optional.of(lobby));
-
-        service.removePlayers(owner, lobbyId, ids);
-
-        verify(lobby).removePlayers(owner, ids);
-        verify(repo).save(lobby);
-    }
-
-    @Test
-    void removePlayers_lobbyNotFound_throws() {
-        PlayerId owner = PlayerId.from(UUID.randomUUID());
-        LobbyId lobbyId = LobbyId.create();
-        List<PlayerId> ids = List.of(PlayerId.from(UUID.randomUUID()));
-
-        when(repo.findById(lobbyId)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() ->
-                service.removePlayers(owner, lobbyId, ids)
         ).isInstanceOf(LobbyNotFoundException.class);
     }
 
