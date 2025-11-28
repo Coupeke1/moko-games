@@ -13,36 +13,41 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Component
 public class ExternalGamesRepository {
+
     public UUID startExternalGame(Game game, StartGameRequest request) {
 
         String engineUrl = game.baseUrl() + game.startEndpoint();
 
         EngineCreateGameRequest engineReq = new EngineCreateGameRequest(
                 request.players(),
-                mapSettings(request.settings())
+                mapSettings(request.settings()),
+                request.aiPlayer()
         );
 
         RestClient client = createRestClient(engineUrl);
 
         try {
             EngineGameResponse response = client.post()
-                    .uri("")
+                    .uri(uriBuilder -> uriBuilder
+                            .queryParam("aiPlayer", request.aiPlayer())
+                            .build()
+                    )
                     .body(engineReq)
                     .retrieve()
                     .body(EngineGameResponse.class);
 
-            return response.id();
+            return Objects.requireNonNull(response).id();
 
         } catch (HttpClientErrorException ex) {
 
             if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
                 throw new EngineGameNotFoundException(request.gameId());
             }
-
             throw ex;
 
         } catch (RestClientException ex) {

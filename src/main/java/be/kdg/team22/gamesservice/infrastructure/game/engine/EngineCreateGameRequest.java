@@ -5,6 +5,7 @@ import java.util.UUID;
 
 public record EngineCreateGameRequest(
         List<UUID> players,
-        Object settings
+        Object settings,
+        boolean aiPlayer
 ) {
 }
