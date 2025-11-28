@@ -4,6 +4,10 @@ import be.kdg.team22.tictactoeservice.application.events.GameEventPublisher;
 import be.kdg.team22.tictactoeservice.config.RabbitMQTopology;
 import be.kdg.team22.tictactoeservice.domain.events.GameDrawEvent;
 import be.kdg.team22.tictactoeservice.domain.events.GameWonEvent;
+import be.kdg.team22.tictactoeservice.domain.events.exceptions.PublishAchievementException;
+import be.kdg.team22.tictactoeservice.domain.events.exceptions.RabbitNotReachableException;
+import org.springframework.amqp.AmqpConnectException;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
@@ -20,29 +24,41 @@ public class RabbitMqGameplayEventPublisher implements GameEventPublisher {
 
     @Override
     public void publishGameWon(GameWonEvent event) {
-        rabbitTemplate.convertAndSend(
-                RabbitMQTopology.EXCHANGE_GAMEPLAY,
-                RabbitMQTopology.ROUTING_TICTACTOE_WON,
-                event,
-                msg -> {
-                    msg.getMessageProperties().setMessageId(UUID.randomUUID().toString());
-                    msg.getMessageProperties().setCorrelationId(event.gameId().toString());
-                    return msg;
-                }
-        );
+        try {
+            rabbitTemplate.convertAndSend(
+                    RabbitMQTopology.EXCHANGE_GAMEPLAY,
+                    RabbitMQTopology.ROUTING_TICTACTOE_WON,
+                    event,
+                    msg -> {
+                        msg.getMessageProperties().setMessageId(UUID.randomUUID().toString());
+                        msg.getMessageProperties().setCorrelationId(event.gameId().toString());
+                        return msg;
+                    }
+            );
+        } catch (AmqpConnectException exception) {
+            throw new RabbitNotReachableException();
+        } catch (AmqpException exception) {
+            throw new PublishAchievementException();
+        }
     }
 
     @Override
     public void publishGameDraw(GameDrawEvent event) {
-        rabbitTemplate.convertAndSend(
-                RabbitMQTopology.EXCHANGE_GAMEPLAY,
-                RabbitMQTopology.ROUTING_TICTACTOE_DRAW,
-                event,
-                msg -> {
-                    msg.getMessageProperties().setMessageId(UUID.randomUUID().toString());
-                    msg.getMessageProperties().setCorrelationId(event.gameId().toString());
-                    return msg;
-                }
-        );
+        try {
+            rabbitTemplate.convertAndSend(
+                    RabbitMQTopology.EXCHANGE_GAMEPLAY,
+                    RabbitMQTopology.ROUTING_TICTACTOE_DRAW,
+                    event,
+                    msg -> {
+                        msg.getMessageProperties().setMessageId(UUID.randomUUID().toString());
+                        msg.getMessageProperties().setCorrelationId(event.gameId().toString());
+                        return msg;
+                    }
+            );
+        } catch (AmqpConnectException exception) {
+            throw new RabbitNotReachableException();
+        } catch (AmqpException exception) {
+            throw new PublishAchievementException();
+        }
     }
 }
