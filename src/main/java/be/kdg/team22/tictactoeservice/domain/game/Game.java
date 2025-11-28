@@ -52,10 +52,6 @@ public class Game {
             throw new UniquePlayersException();
 
         PlayerRole[] roles = PlayerRole.values();
-        int totalPlayers = playerIds.size();
-
-        if (totalPlayers < 2 || totalPlayers > roles.length)
-            throw new GameSizeException(roles.length);
 
         List<Player> players = new ArrayList<>();
         PlayerRole aiRole = null;
@@ -72,6 +68,9 @@ public class Game {
                 aiRole = role;
             }
         }
+
+        if (players.size() < 2 || players.size() > roles.length)
+            throw new GameSizeException(roles.length);
 
         return new Game(size, players, aiRole);
     }

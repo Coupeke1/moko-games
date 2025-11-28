@@ -266,7 +266,7 @@ public class GameControllerIntegrationTest {
                 ));
 
         CreateGameModel onePlayerModel = new CreateGameModel(
-                List.of(UUID.randomUUID()),
+                List.of(UUID.randomUUID(),UUID.randomUUID()),
                 new GameSettingsModel(3)
         );
 
