@@ -55,21 +55,20 @@ public class GameServiceTest {
         when(config.minSize()).thenReturn(3);
         when(config.maxSize()).thenReturn(10);
 
-        playerX = new Player(PlayerId.create(), PlayerRole.X);
-        playerO = new Player(PlayerId.create(), PlayerRole.O);
+        playerX = new Player(PlayerId.create(), PlayerRole.X, false);
+        playerO = new Player(PlayerId.create(), PlayerRole.O, false);
         players = List.of(playerX, playerO);
     }
 
     @Test
     void shouldStartGameWithSize3x3() {
-        Game expected = Game.create(3, 10, 3, players.stream().map(Player::id).toList());
         doNothing().when(repository).save(any());
 
         CreateGameModel model = new CreateGameModel(
                 players.stream().map(p -> p.id().value()).toList(),
                 new GameSettingsModel(3));
 
-        Game game = service.startGame(model);
+        Game game = service.startGame(model, false);
 
         assertNotNull(game);
         assertEquals(3, game.board().size());
@@ -84,7 +83,7 @@ public class GameServiceTest {
                 players.stream().map(p -> p.id().value()).toList(),
                 new GameSettingsModel(4));
 
-        Game game = service.startGame(model);
+        Game game = service.startGame(model, false);
 
         assertEquals(4, game.board().size());
         verify(repository).save(any(Game.class));
@@ -96,12 +95,12 @@ public class GameServiceTest {
                 players.stream().map(p -> p.id().value()).toList(),
                 new GameSettingsModel(2));
 
-        assertThrows(BoardSizeException.class, () -> service.startGame(model));
+        assertThrows(BoardSizeException.class, () -> service.startGame(model, false));
     }
 
     @Test
     void shouldGetExistingGame() {
-        Game stored = Game.create(3, 10, 3, players.stream().map(Player::id).toList());
+        Game stored = Game.create(3, 10, 3, players.stream().map(Player::id).toList(), false);
         when(repository.findById(stored.id())).thenReturn(Optional.of(stored));
 
         Game result = service.getGame(stored.id());
@@ -111,7 +110,7 @@ public class GameServiceTest {
 
     @Test
     void requestMove_noWinner_noDraw_noEventPublished() {
-        Game game = spy(Game.create(3, 10, 3, players.stream().map(Player::id).toList()));
+        Game game = spy(Game.create(3, 10, 3, players.stream().map(Player::id).toList(), false));
         GameId id = game.id();
 
         when(repository.findById(id)).thenReturn(Optional.of(game));
@@ -129,7 +128,7 @@ public class GameServiceTest {
 
     @Test
     void requestMove_whenWin_publishesGameWon() {
-        Game game = spy(Game.create(3, 10, 3, players.stream().map(Player::id).toList()));
+        Game game = spy(Game.create(3, 10, 3, players.stream().map(Player::id).toList(), false));
         GameId id = game.id();
 
         when(repository.findById(id)).thenReturn(Optional.of(game));
@@ -149,7 +148,7 @@ public class GameServiceTest {
 
     @Test
     void requestMove_whenDraw_publishesGameDraw() {
-        Game game = spy(Game.create(3, 10, 3, players.stream().map(Player::id).toList()));
+        Game game = spy(Game.create(3, 10, 3, players.stream().map(Player::id).toList(), false));
         GameId id = game.id();
 
         when(repository.findById(id)).thenReturn(Optional.of(game));
@@ -178,7 +177,7 @@ public class GameServiceTest {
 
     @Test
     void requestMove_whenBecomesWin_publishesOnce() {
-        Game game = spy(Game.create(3, 10, 3, players.stream().map(Player::id).toList()));
+        Game game = spy(Game.create(3, 10, 3, players.stream().map(Player::id).toList(), false));
         GameId id = game.id();
 
         when(repository.findById(id)).thenReturn(Optional.of(game));

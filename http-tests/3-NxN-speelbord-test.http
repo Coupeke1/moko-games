@@ -1,5 +1,4 @@
-﻿@gameId = "13039904-f3c7-4d96-a9ac-65725c54a5e2"
-
+﻿@gameId = 3c8a07e2-13de-4248-a72a-acc5c6eae948
 ### Generate Board
 POST localhost:8086/api/games
 Content-Type: application/json
@@ -19,12 +18,53 @@ POST localhost:8086/api/games/{{gameId}}/move
 Content-Type: application/json
 
 {
-  "row": 0,
-  "col": 1,
+  "row": 2,
+  "col": 0,
   "gameId": "{{gameId}}",
-  "playerId": "cf36d3e1-a1e0-4c18-89eb-95fa76fc81ee"
+  "playerId": "642999ad-c546-40b6-876c-1048971c7942"
 }
 
 ### Get Game
 GET localhost:8086/api/games/{{gameId}}
 Accept: application/json
+
+### Create Game with AI Player
+POST localhost:8086/api/games?aiPlayer=true
+Content-Type: application/json
+
+{
+  "players": [
+    "642999ad-c546-40b6-876c-1048971c7942"
+  ],
+  "settings": {
+    "boardSize": 3
+  }
+}
+
+### AI
+POST http://34.79.40.150/ai-player/move
+Content-Type: application/json
+
+{
+  "game_id": "342f21ec-4367-454e-8d05-e231ba336e36",
+  "game_name": "TICTACTOE",
+  "board": [
+    [
+      " ",
+      " ",
+      " "
+    ],
+    [
+      " ",
+      " ",
+      " "
+    ],
+    [
+      " ",
+      "X",
+      " "
+    ]
+  ],
+  "current_player": "O",
+  "ai_player": "O"
+}

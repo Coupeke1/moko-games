@@ -10,7 +10,10 @@ import be.kdg.team22.tictactoeservice.domain.game.GameId;
 import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
 import be.kdg.team22.tictactoeservice.domain.game.Move;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
+import be.kdg.team22.tictactoeservice.events.AiMoveRequestedEvent;
 import be.kdg.team22.tictactoeservice.infrastructure.game.GameRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -22,15 +25,18 @@ public class GameService {
     private final BoardSizeProperties config;
     private final GameEventPublisher publisher;
 
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+
     public GameService(GameRepository repository, BoardSizeProperties config, GameEventPublisher publisher) {
         this.repository = repository;
         this.config = config;
         this.publisher = publisher;
     }
 
-    public Game startGame(final CreateGameModel model) {
+    public Game startGame(final CreateGameModel model, final boolean aiPlayer) {
         List<PlayerId> players = model.players().stream().map(PlayerId::new).toList();
-        Game game = Game.create(config.minSize(), config.maxSize(), model.settings().boardSize(), players);
+        Game game = Game.create(config.minSize(), config.maxSize(), aiPlayer ? 3 : model.settings().boardSize(), players, aiPlayer);
         repository.save(game);
         return game;
     }
@@ -71,6 +77,10 @@ public class GameService {
                             Instant.now()
                     )
             );
+        }
+
+        if (game.status() == GameStatus.IN_PROGRESS && game.currentPlayer().aiPlayer()) {
+            applicationEventPublisher.publishEvent(AiMoveRequestedEvent.from(game));
         }
 
         return game;

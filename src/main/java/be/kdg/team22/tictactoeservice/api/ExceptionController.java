@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
-public class ApiExceptionHandler {
+public class ExceptionController {
     @ExceptionHandler({
             BoardSizeException.class,
             CellOccupiedException.class,
@@ -37,6 +37,16 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<String> handleIllegalStateException(IllegalStateException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(AiMoveRequestFailedException.class)
+    public ResponseEntity<String> handleAiMoveRequestFailedException(AiMoveRequestFailedException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(AiServiceNotReachableException.class)
+    public ResponseEntity<String> handleAiServiceNotReachableException(AiServiceNotReachableException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 }
