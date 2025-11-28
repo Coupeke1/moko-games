@@ -5,8 +5,12 @@ import be.kdg.team22.sessionservice.application.lobby.LobbyPlayerService;
 import be.kdg.team22.sessionservice.application.lobby.LobbyService;
 import be.kdg.team22.sessionservice.application.player.PlayerService;
 import be.kdg.team22.sessionservice.config.TestSecurityConfig;
+import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
+import be.kdg.team22.sessionservice.domain.lobby.LobbyStatus;
+import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
+import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.domain.player.PlayerName;
@@ -22,6 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -32,8 +37,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(LobbyInviteController.class)
 @Import(TestSecurityConfig.class)
@@ -148,29 +152,34 @@ class LobbyInviteControllerTest {
         UUID ownerId = UUID.randomUUID();
 
         PlayerId ownerPid = PlayerId.from(ownerId);
-        Lobby lobbyMock = mock(Lobby.class);
 
-        when(lobbyMock.id()).thenReturn(LobbyId.from(lobbyId));
-        when(lobbyMock.gameId()).thenReturn(null);
-        when(lobbyMock.ownerId()).thenReturn(ownerPid);
-        when(lobbyMock.players()).thenReturn(Set.of(
-                new Player(ownerPid, new PlayerName("owner"), "", true)
-        ));
-        when(lobbyMock.settings()).thenReturn(null);
-        when(lobbyMock.status()).thenReturn(null);
-        when(lobbyMock.createdAt()).thenReturn(Instant.now());
-        when(lobbyMock.startedGameId()).thenReturn(java.util.Optional.empty());
+        var settings = new LobbySettings(new TicTacToeSettings(3), 2);
 
-        when(lobbyService.findLobby(LobbyId.from(lobbyId))).thenReturn(lobbyMock);
+        Lobby lobby = new Lobby(
+                LobbyId.from(lobbyId),
+                GameId.from(UUID.randomUUID()),
+                ownerPid,
+                List.of(new Player(ownerPid, new PlayerName("owner"), "", true)),
+                Set.of(),
+                settings,
+                LobbyStatus.OPEN,
+                Instant.now(),
+                Instant.now(),
+                null
+        );
 
         doNothing().when(lobbyPlayerService).addBot(ownerPid, LobbyId.from(lobbyId));
+        when(lobbyService.findLobby(LobbyId.from(lobbyId))).thenReturn(lobby);
 
         mockMvc.perform(post("/api/lobbies/{id}/invite/bot", lobbyId)
                         .with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be"))
                         .with(csrf()))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(lobbyId.toString()))
+                .andExpect(jsonPath("$.ownerId").value(ownerId.toString()));
 
         verify(lobbyPlayerService).addBot(ownerPid, LobbyId.from(lobbyId));
         verify(lobbyService, atLeastOnce()).findLobby(LobbyId.from(lobbyId));
     }
+
 }
