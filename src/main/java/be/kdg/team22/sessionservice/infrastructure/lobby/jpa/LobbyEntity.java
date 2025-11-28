@@ -36,6 +36,7 @@ public class LobbyEntity {
     @AttributeOverrides({
             @AttributeOverride(name = "id", column = @Column(name = "player_id", nullable = false)),
             @AttributeOverride(name = "username", column = @Column(name = "username", nullable = false)),
+            @AttributeOverride(name = "image", column = @Column(name = "image")),
             @AttributeOverride(name = "ready", column = @Column(name = "ready", nullable = false))
     })
     private Set<PlayerEmbed> players;
@@ -45,6 +46,16 @@ public class LobbyEntity {
             joinColumns = @JoinColumn(name = "lobby_id"))
     @Column(name = "invited_player_id", nullable = false)
     private Set<UUID> invitedPlayerIds;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "id", column = @Column(name = "ai_player_id")),
+            @AttributeOverride(name = "username", column = @Column(name = "ai_player_username")),
+            @AttributeOverride(name = "image", column = @Column(name = "ai_player_image")),
+            @AttributeOverride(name = "ready", column = @Column(name = "ai_player_ready")),
+            @AttributeOverride(name = "isAi", column = @Column(name = "ai_player_is_ai"))
+    })
+    private PlayerAiEmbed aiPlayer;
 
     @Convert(converter = LobbySettingsConverter.class)
     @Column(name = "settings", nullable = false, columnDefinition = "TEXT")
@@ -76,7 +87,8 @@ public class LobbyEntity {
             LobbyStatus status,
             Instant createdAt,
             Instant updatedAt,
-            UUID startedGameId
+            UUID startedGameId,
+            PlayerAiEmbed aiPlayer
     ) {
         this.id = id;
         this.gameId = gameId;
@@ -88,11 +100,12 @@ public class LobbyEntity {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.startedGameId = startedGameId;
+        this.aiPlayer = aiPlayer;
     }
 
     public static LobbyEntity fromDomain(final Lobby lobby) {
-        Set<PlayerEmbed> players = lobby.players()
-                .stream()
+
+        Set<PlayerEmbed> players = lobby.players().stream()
                 .map(player -> new PlayerEmbed(
                         player.id().value(),
                         player.username().value(),
@@ -106,6 +119,17 @@ public class LobbyEntity {
                 .map(PlayerId::value)
                 .collect(Collectors.toSet());
 
+        PlayerAiEmbed ai = null;
+        if (lobby.hasAi()) {
+            ai = new PlayerAiEmbed(
+                    lobby.aiPlayer().id().value(),
+                    lobby.aiPlayer().username().value(),
+                    lobby.aiPlayer().image(),
+                    lobby.aiPlayer().ready(),
+                    lobby.aiPlayer().isAi()
+            );
+        }
+
         return new LobbyEntity(
                 lobby.id().value(),
                 lobby.gameId().value(),
@@ -116,12 +140,14 @@ public class LobbyEntity {
                 lobby.status(),
                 lobby.createdAt(),
                 lobby.updatedAt(),
-                lobby.startedGameId().map(GameId::value).orElse(null)
+                lobby.startedGameId().map(GameId::value).orElse(null),
+                ai
         );
     }
 
     public Lobby toDomain() {
-        List<Player> players = this.players.stream()
+
+        List<Player> domainPlayers = this.players.stream()
                 .map(p -> new Player(
                         PlayerId.from(p.id()),
                         PlayerName.from(p.username()),
@@ -130,22 +156,33 @@ public class LobbyEntity {
                 ))
                 .collect(Collectors.toList());
 
-        Set<PlayerId> invitedPlayers = this.invitedPlayerIds.stream()
+        Set<PlayerId> invited = this.invitedPlayerIds.stream()
                 .map(PlayerId::from)
                 .collect(Collectors.toSet());
 
-        return new Lobby(
+        Lobby lobby = new Lobby(
                 LobbyId.from(id),
                 GameId.from(gameId),
                 PlayerId.from(ownerId),
-                players,
-                invitedPlayers,
+                domainPlayers,
+                invited,
                 settings,
                 status,
                 createdAt,
                 updatedAt,
                 startedGameId == null ? null : GameId.from(startedGameId)
         );
+
+        if (this.aiPlayer != null) {
+            Player bot = Player.ai(
+                    PlayerId.from(this.aiPlayer.id()),
+                    PlayerName.from(this.aiPlayer.username()),
+                    this.aiPlayer.image()
+            );
+            lobby.addBot(lobby.ownerId(), bot);
+        }
+
+        return lobby;
     }
 
     public UUID id() {

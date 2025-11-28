@@ -16,18 +16,25 @@ public record LobbyResponseModel(
         UUID gameId,
         UUID ownerId,
         Set<PlayerSummaryModel> players,
+        PlayerSummaryModel aiPlayer,
         int maxPlayers,
         LobbyStatus status,
         Instant createdAt,
         GameSettingsModel settings,
         UUID startedGameId
 ) {
+
     public static LobbyResponseModel from(Lobby lobby) {
 
         GameSettingsModel settingsModel = switch (lobby.settings().gameSettings()) {
             case TicTacToeSettings t -> new TicTacToeSettingsModel(t.boardSize());
             case CheckersSettings c -> new CheckersSettingsModel(c.boardSize(), c.flyingKings());
         };
+
+        PlayerSummaryModel aiSummary = null;
+        if (lobby.hasAi()) {
+            aiSummary = PlayerSummaryModel.from(lobby.aiPlayer());
+        }
 
         return new LobbyResponseModel(
                 lobby.id().value(),
@@ -36,6 +43,7 @@ public record LobbyResponseModel(
                 lobby.players().stream()
                         .map(PlayerSummaryModel::from)
                         .collect(Collectors.toSet()),
+                aiSummary, // <── include AI player
                 lobby.settings().maxPlayers(),
                 lobby.status(),
                 lobby.createdAt(),

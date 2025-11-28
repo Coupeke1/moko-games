@@ -113,11 +113,11 @@ public class Lobby {
         }
 
         if (this.aiPlayer != null) {
-            throw new TooManyPlayersForTicTacToeException();
+            throw new TooManyAiPlayersException();
         }
 
         if (players.size() > 1) {
-            throw new TooManyPlayersForTicTacToeException();
+            throw new TooManyPlayersException();
         }
     }
 

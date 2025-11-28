@@ -1,5 +1,6 @@
 package be.kdg.team22.sessionservice.api.lobby;
 
+import be.kdg.team22.sessionservice.api.lobby.models.LobbyResponseModel;
 import be.kdg.team22.sessionservice.application.lobby.LobbyPlayerService;
 import be.kdg.team22.sessionservice.application.lobby.LobbyService;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
@@ -58,15 +59,16 @@ public class LobbyInviteController {
     }
 
     @PostMapping("/{id}/invite/bot")
-    public ResponseEntity<Void> inviteBot(
+    public ResponseEntity<LobbyResponseModel> inviteBot(
             @PathVariable UUID id,
             @AuthenticationPrincipal Jwt token
     ) {
-        lobbyPlayerService.addBot(
-                PlayerId.get(token),
-                LobbyId.from(id)
-        );
+        PlayerId ownerId = PlayerId.get(token);
+        LobbyId lobbyId = LobbyId.from(id);
 
-        return ResponseEntity.ok().build();
+        lobbyPlayerService.addBot(ownerId, lobbyId);
+
+        Lobby updatedLobby = lobbyService.findLobby(lobbyId);
+        return ResponseEntity.ok(LobbyResponseModel.from(updatedLobby));
     }
 }
