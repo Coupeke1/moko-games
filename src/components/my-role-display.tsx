@@ -10,14 +10,14 @@ interface Props {
 export default function MyRoleDisplay({profile, role}: Props) {
     if (!role) {
         return (
-            <div className="bg-yellow-500 text-white px-4 py-2 rounded-lg text-sm">
+            <div className="bg-yellow-500 text-white px-4 py-2 rounded-lg text-sm size-full">
                 No role found for user {profile.id}
             </div>
         );
     }
 
     return (
-        <div className="flex items-center gap-4 bg-bg-2 p-4 rounded-lg">
+        <div className="flex items-center gap-4 bg-bg-2 p-4 rounded-lg size-full">
             <div className="flex flex-col items-center">
                 <div className="flex flex-row items-center gap-2 mb-2">
                     <PlayerImage src={profile.image} big={false}/>
