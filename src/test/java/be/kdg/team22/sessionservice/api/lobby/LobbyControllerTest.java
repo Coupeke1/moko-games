@@ -43,7 +43,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(LobbyController.class)
+@WebMvcTest({
+        LobbyController.class,
+        LobbyPlayerController.class,
+        LobbyInviteController.class,
+        LobbyQueryController.class
+})
 @Import(TestSecurityConfig.class)
 class LobbyControllerTest {
     private static final UUID GAME_ID = UUID.fromString("00000000-0000-0000-0000-000000000005");
