@@ -7,6 +7,7 @@ import be.kdg.team22.userservice.domain.profile.Modules;
 import be.kdg.team22.userservice.domain.profile.Profile;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
 import be.kdg.team22.userservice.domain.profile.ProfileName;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -62,5 +63,11 @@ public class ProfileController {
     public ResponseEntity<ProfileModel> getByUsername(@PathVariable final String username) {
         Profile profile = service.getByUsername(new ProfileName(username));
         return ResponseEntity.ok(ProfileModel.from(profile));
+    }
+
+    @PostMapping("/bot")
+    public ResponseEntity<ProfileModel> createBotProfile() {
+        Profile bot = service.createBotProfile();
+        return ResponseEntity.status(HttpStatus.CREATED).body(ProfileModel.from(bot));
     }
 }
