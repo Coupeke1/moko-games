@@ -19,7 +19,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/lobbies")
 public class LobbyController {
-
     private final LobbyService lobbyService;
 
     public LobbyController(final LobbyService lobbyService) {
