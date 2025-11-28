@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
-public class ApiExceptionHandler {
+public class ExceptionController {
     @ExceptionHandler({
             BoardSizeException.class,
             CellOccupiedException.class,
