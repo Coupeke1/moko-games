@@ -25,7 +25,10 @@ public class PlayerService {
 
     public Player createBot() {
         BotProfileResponse response = repository.createBot().orElseThrow(CantCreateBotException::new);
-        return new Player(PlayerId.from(response.id()), PlayerName.from(response.username()), response.image());
-
+        return Player.ai(
+                PlayerId.from(response.id()),
+                PlayerName.from(response.username()),
+                response.image()
+        );
     }
 }

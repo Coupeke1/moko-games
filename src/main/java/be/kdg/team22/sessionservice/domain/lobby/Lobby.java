@@ -148,17 +148,6 @@ public class Lobby {
         updatedAt = Instant.now();
     }
 
-    public void removePlayers(final PlayerId ownerId, final Collection<PlayerId> targetIds) {
-        ensureOwner(ownerId);
-        ensureModifiable();
-
-        if (targetIds.contains(owner))
-            throw new CannotRemoveOwnerException(id);
-
-        players.removeIf(player -> targetIds.contains(player.id()));
-        updatedAt = Instant.now();
-    }
-
     public void close(final PlayerId ownerId) {
         ensureOwner(ownerId);
         ensureModifiable();
@@ -265,8 +254,8 @@ public class Lobby {
         return Set.copyOf(invitedPlayerIds);
     }
 
-    public Optional<Player> aiPlayer() {
-        return Optional.ofNullable(aiPlayer);
+    public Player aiPlayer() {
+        return aiPlayer;
     }
 
     public boolean hasAi() {

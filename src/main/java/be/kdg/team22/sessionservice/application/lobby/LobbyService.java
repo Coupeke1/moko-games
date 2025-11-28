@@ -77,15 +77,23 @@ public class LobbyService {
         lobby.ensureOwner(ownerId);
         lobby.ensureAllPlayersReady();
 
-        List<UUID> playerIds = lobby.players()
-                .stream().map(p -> p.id().value()).toList();
+        List<UUID> playerIds = new java.util.ArrayList<>(
+                lobby.players().stream()
+                        .map(p -> p.id().value())
+                        .toList()
+        );
+
+        if (lobby.hasAi()) {
+            playerIds.add(lobby.aiPlayer().id().value());
+        }
 
         StartGameResponse response = gamesRepository.startGame(
                 new StartGameRequest(
                         lobbyId.value(),
                         lobby.gameId().value(),
                         playerIds,
-                        lobby.settings().gameSettings()
+                        lobby.settings().gameSettings(),
+                        lobby.hasAi()
                 ),
                 token
         );

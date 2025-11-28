@@ -41,9 +41,7 @@ public class LobbyPlayerService {
     public void addBot(final PlayerId ownerId, final LobbyId lobbyId) {
         Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
 
-        Player profile = playerService.createBot();
-
-        Player bot = new Player(profile.id(), profile.username(), profile.image());
+        Player bot = playerService.createBot();
 
         lobby.addBot(ownerId, bot);
         lobbyRepository.save(lobby);

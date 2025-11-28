@@ -56,4 +56,17 @@ public class LobbyInviteController {
         Lobby lobby = lobbyService.findLobby(LobbyId.from(lobbyId));
         return ResponseEntity.ok(lobby.invitedPlayers().contains(PlayerId.from(userId)));
     }
+
+    @PostMapping("/{id}/invite/bot")
+    public ResponseEntity<Void> inviteBot(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal Jwt token
+    ) {
+        lobbyPlayerService.addBot(
+                PlayerId.get(token),
+                LobbyId.from(id)
+        );
+
+        return ResponseEntity.ok().build();
+    }
 }

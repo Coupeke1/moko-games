@@ -2,26 +2,44 @@ package be.kdg.team22.sessionservice.domain.player;
 
 import org.jmolecules.ddd.annotation.Entity;
 
-import java.util.UUID;
-
 @Entity
 public class Player {
     private final PlayerId id;
     private final PlayerName username;
     private final String image;
-    private boolean ready;
     private final boolean isAi;
+    private boolean ready;
 
-
-    public Player(final PlayerId id, final PlayerName username, final String image, final boolean ready) {
+    public Player(
+            final PlayerId id,
+            final PlayerName username,
+            final String image,
+            final boolean ready,
+            final boolean isAi
+    ) {
         this.id = id;
         this.username = username;
-        this.ready = ready;
         this.image = image;
+        this.ready = ready;
+        this.isAi = isAi;
     }
 
     public Player(final PlayerId id, final PlayerName username, final String image) {
-        this(id, username, image, false);
+        this(id, username, image, false, false);
+    }
+
+    public Player(final PlayerId id, final PlayerName username, final String image, final boolean ready) {
+        this(id, username, image, ready, false);
+    }
+
+    public static Player ai(final PlayerId id, final PlayerName name, final String image) {
+        return new Player(
+                id,
+                name,
+                image,
+                true,
+                true
+        );
     }
 
     public void setReady() {
@@ -40,19 +58,15 @@ public class Player {
         return username;
     }
 
-    public boolean ready() {
-        return ready;
-    }
-
     public String image() {
         return image;
     }
 
-    public static Player ai(String name, String image) {
-        return new Player(
-                PlayerId.from(UUID.randomUUID()),
-                new PlayerName(name),
-                image = image
-        );
+    public boolean ready() {
+        return ready;
+    }
+
+    public boolean isAi() {
+        return isAi;
     }
 }
