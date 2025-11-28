@@ -39,4 +39,14 @@ public class ApiExceptionHandler {
     public ResponseEntity<String> handleIllegalStateException(IllegalStateException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+
+    @ExceptionHandler(AiMoveRequestFailedException.class)
+    public ResponseEntity<String> handleAiMoveRequestFailedException(AiMoveRequestFailedException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(AiServiceNotReachableException.class)
+    public ResponseEntity<String> handleAiServiceNotReachableException(AiServiceNotReachableException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 }
