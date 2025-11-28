@@ -212,4 +212,12 @@ public class LobbyEntity {
     public UUID startedGameId() {
         return startedGameId;
     }
+
+    public PlayerAiEmbed aiPlayer() {
+        return aiPlayer;
+    }
+
+    public Set<UUID> invitedPlayerIds() {
+        return invitedPlayerIds;
+    }
 }

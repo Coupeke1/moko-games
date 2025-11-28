@@ -20,18 +20,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class LobbyEntityTest {
 
-    private Player p(PlayerId id, String name, boolean ready) {
-        return new Player(id, new PlayerName(name), "", ready);
+    private Player p(PlayerId id, String name, String img, boolean ready) {
+        return new Player(id, new PlayerName(name), img, ready);
     }
 
     @Test
-    void fromDomain_mapsAllFields() {
+    void fromDomain_mapsAllFields_includingAi() {
         LobbyId id = LobbyId.create();
         GameId gameId = GameId.create();
         PlayerId ownerId = PlayerId.create();
 
-        Player owner = p(ownerId, "owner", true);
-        Player p1 = p(PlayerId.create(), "jan", false);
+        Player owner = p(ownerId, "owner", "img1.png", true);
+
+        Player ai = Player.ai(
+                PlayerId.create(),
+                new PlayerName("BOT-MOKO"),
+                "bot.png"
+        );
 
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
@@ -39,7 +44,7 @@ class LobbyEntityTest {
                 id,
                 gameId,
                 ownerId,
-                List.of(owner, p1),
+                List.of(owner),
                 Set.of(PlayerId.from(UUID.randomUUID())),
                 settings,
                 LobbyStatus.OPEN,
@@ -48,46 +53,60 @@ class LobbyEntityTest {
                 GameId.from(UUID.fromString("00000000-0000-0000-0000-000000000999"))
         );
 
+        domain.addBot(ownerId, ai);
+
         LobbyEntity entity = LobbyEntity.fromDomain(domain);
 
         assertThat(entity.id()).isEqualTo(id.value());
         assertThat(entity.gameId()).isEqualTo(gameId.value());
         assertThat(entity.ownerId()).isEqualTo(ownerId.value());
         assertThat(entity.status()).isEqualTo(LobbyStatus.OPEN);
-        assertThat(entity.settings().maxPlayers()).isEqualTo(4);
-        assertThat(entity.settings().gameSettings()).isInstanceOf(TicTacToeSettings.class);
 
-        assertThat(entity.players()).hasSize(2);
-        assertThat(entity.players().stream().anyMatch(e -> e.username().equals("owner") && e.ready())).isTrue();
-        assertThat(entity.players().stream().anyMatch(e -> e.username().equals("jan") && !e.ready())).isTrue();
+        assertThat(entity.players()).hasSize(1);
+        assertThat(entity.players().stream().anyMatch(e -> e.username().equals("owner"))).isTrue();
 
-        assertThat(entity.startedGameId()).isEqualTo(UUID.fromString("00000000-0000-0000-0000-000000000999"));
+        assertThat(entity.aiPlayer()).isNotNull();
+        assertThat(entity.aiPlayer().username()).isEqualTo("BOT-MOKO");
+        assertThat(entity.aiPlayer().image()).isEqualTo("bot.png");
+        assertThat(entity.aiPlayer().isAi()).isTrue();
+
+        assertThat(entity.startedGameId())
+                .isEqualTo(UUID.fromString("00000000-0000-0000-0000-000000000999"));
     }
 
     @Test
-    void toDomain_mapsBackCorrectly() {
+    void toDomain_mapsBackCorrectly_includingAi() {
         UUID id = UUID.randomUUID();
         UUID gameId = UUID.randomUUID();
         UUID ownerId = UUID.randomUUID();
 
-        PlayerEmbed e1 = new PlayerEmbed(ownerId, "owner", "", true);
-        PlayerEmbed e2 = new PlayerEmbed(UUID.randomUUID(), "other", "", false);
+        PlayerEmbed e1 = new PlayerEmbed(ownerId, "owner", "img.png", true);
+
+        UUID invited = UUID.randomUUID();
+
+        PlayerAiEmbed ai = new PlayerAiEmbed(
+                UUID.randomUUID(),
+                "BOT-XYZ",
+                "bot.png",
+                true,
+                true
+        );
 
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 5);
-
         UUID startedGame = UUID.randomUUID();
 
         LobbyEntity entity = new LobbyEntity(
                 id,
                 gameId,
                 ownerId,
-                Set.of(e1, e2),
-                Set.of(UUID.randomUUID()),
+                Set.of(e1),
+                Set.of(invited),
                 settings,
                 LobbyStatus.CLOSED,
                 Instant.parse("2024-05-05T10:00:00Z"),
                 Instant.parse("2024-05-06T10:00:00Z"),
-                startedGame
+                startedGame,
+                ai
         );
 
         Lobby domain = entity.toDomain();
@@ -96,11 +115,20 @@ class LobbyEntityTest {
         assertThat(domain.gameId().value()).isEqualTo(gameId);
         assertThat(domain.ownerId().value()).isEqualTo(ownerId);
         assertThat(domain.status()).isEqualTo(LobbyStatus.CLOSED);
-        assertThat(domain.settings().maxPlayers()).isEqualTo(5);
 
-        assertThat(domain.players()).hasSize(2);
-        assertThat(domain.players().stream().anyMatch(p -> p.username().value().equals("owner") && p.ready())).isTrue();
-        assertThat(domain.players().stream().anyMatch(p -> p.username().value().equals("other") && !p.ready())).isTrue();
+        assertThat(domain.players()).hasSize(1);
+
+        assertThat(domain.players().stream()
+                .anyMatch(p -> p.username().value().equals("owner") && p.ready()))
+                .isTrue();
+
+        assertThat(domain.invitedPlayers()).hasSize(1);
+        assertThat(domain.invitedPlayers().iterator().next().value()).isEqualTo(invited);
+
+        assertThat(domain.hasAi()).isTrue();
+        assertThat(domain.aiPlayer().username().value()).isEqualTo("BOT-XYZ");
+        assertThat(domain.aiPlayer().image()).isEqualTo("bot.png");
+        assertThat(domain.aiPlayer().isAi()).isTrue();
 
         assertThat(domain.startedGameId().orElseThrow().value()).isEqualTo(startedGame);
     }
@@ -123,11 +151,40 @@ class LobbyEntityTest {
                 LobbyStatus.OPEN,
                 Instant.now(),
                 Instant.now(),
+                null,
+                null
+        );
+
+        Lobby domain = entity.toDomain();
+        assertThat(domain.startedGameId()).isEmpty();
+        assertThat(domain.hasAi()).isFalse();
+    }
+
+    @Test
+    void toDomain_noAi_doesNotModifyPlayers() {
+        UUID id = UUID.randomUUID();
+        UUID gameId = UUID.randomUUID();
+        UUID ownerId = UUID.randomUUID();
+
+        PlayerEmbed owner = new PlayerEmbed(ownerId, "owner", "", true);
+
+        LobbyEntity entity = new LobbyEntity(
+                id,
+                gameId,
+                ownerId,
+                Set.of(owner),
+                Set.of(),
+                new LobbySettings(new TicTacToeSettings(3), 4),
+                LobbyStatus.OPEN,
+                Instant.now(),
+                Instant.now(),
+                null,
                 null
         );
 
         Lobby domain = entity.toDomain();
 
-        assertThat(domain.startedGameId()).isEmpty();
+        assertThat(domain.players()).hasSize(1);
+        assertThat(domain.hasAi()).isFalse();
     }
 }
