@@ -12,6 +12,7 @@ import be.kdg.team22.tictactoeservice.domain.game.GameId;
 import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
 import be.kdg.team22.tictactoeservice.domain.game.Move;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
+import be.kdg.team22.tictactoeservice.domain.player.exceptions.PlayerIdentityMismatchException;
 import be.kdg.team22.tictactoeservice.events.AiMoveRequestedEvent;
 import be.kdg.team22.tictactoeservice.infrastructure.game.GameRepository;
 import org.slf4j.Logger;
@@ -59,7 +60,9 @@ public class GameService {
         return game;
     }
 
-    public Game requestMove(final GameId id, final Move move) {
+    public Game requestMove(final GameId id, final PlayerId playerId, final Move move) {
+        if (!playerId.equals(move.playerId())) throw new PlayerIdentityMismatchException();
+
         Game game = getGame(id);
         game.requestMove(move);
         repository.save(game);

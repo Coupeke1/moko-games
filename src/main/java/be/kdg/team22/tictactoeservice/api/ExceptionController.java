@@ -1,7 +1,7 @@
 package be.kdg.team22.tictactoeservice.api;
 
 import be.kdg.team22.tictactoeservice.domain.game.exceptions.*;
-import be.kdg.team22.tictactoeservice.domain.player.exceptions.InvalidPlayerException;
+import be.kdg.team22.tictactoeservice.domain.player.exceptions.ClaimNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -19,13 +19,15 @@ public class ExceptionController {
             InvalidCellException.class,
             NotPlayersTurnException.class,
             RoleUnfulfilledException.class,
-            UniquePlayersException.class,
-            InvalidPlayerException.class})
+            UniquePlayersException.class})
     public ResponseEntity<String> handleDomainErrors(final RuntimeException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(NotFoundException.class)
+    @ExceptionHandler({
+            ClaimNotFoundException.class,
+            NotFoundException.class
+    })
     public ResponseEntity<String> handleNotFoundErrors(final RuntimeException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
