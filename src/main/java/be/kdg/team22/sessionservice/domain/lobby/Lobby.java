@@ -2,6 +2,7 @@ package be.kdg.team22.sessionservice.domain.lobby;
 
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.*;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
+import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerAlreadyInLobbyException;
@@ -19,8 +20,8 @@ public class Lobby {
 
     private final List<Player> players;
     private final Set<PlayerId> invitedPlayerIds;
-
     private final Instant createdAt;
+    private Player aiPlayer;
     private Instant updatedAt;
 
     private LobbyStatus status;
@@ -96,6 +97,28 @@ public class Lobby {
 
         invitedPlayerIds.add(targetId);
         updatedAt = Instant.now();
+    }
+
+    public void addBot(PlayerId ownerId, Player botPlayer) {
+        ensureOwner(ownerId);
+        ensureBotConstraints();
+
+        this.aiPlayer = botPlayer;
+
+    }
+
+    private void ensureBotConstraints() {
+        if (!(settings.gameSettings() instanceof TicTacToeSettings)) {
+            throw new UnsupportedOperationException("Bots are only supported for TicTacToe.");
+        }
+
+        if (this.aiPlayer != null) {
+            throw new TooManyPlayersForTicTacToeException();
+        }
+
+        if (players.size() > 1) {
+            throw new TooManyPlayersForTicTacToeException();
+        }
     }
 
     public void invitePlayers(final PlayerId ownerId, final Collection<PlayerId> targetIds) {
@@ -240,5 +263,13 @@ public class Lobby {
 
     public Set<PlayerId> invitedPlayers() {
         return Set.copyOf(invitedPlayerIds);
+    }
+
+    public Optional<Player> aiPlayer() {
+        return Optional.ofNullable(aiPlayer);
+    }
+
+    public boolean hasAi() {
+        return aiPlayer != null;
     }
 }

@@ -21,7 +21,10 @@ public class LobbyPlayerService {
     private final FriendsService friendsService;
     private final PlayerService playerService;
 
-    public LobbyPlayerService(final LobbyRepository lobbyRepository, final FriendsService friendsService, final PlayerService playerService) {
+    public LobbyPlayerService(final LobbyRepository lobbyRepository,
+                              final FriendsService friendsService,
+                              final PlayerService playerService
+    ) {
         this.lobbyRepository = lobbyRepository;
         this.friendsService = friendsService;
         this.playerService = playerService;
@@ -32,6 +35,17 @@ public class LobbyPlayerService {
         ensureFriend(ownerId, playerId, token);
 
         lobby.invitePlayer(ownerId, playerId);
+        lobbyRepository.save(lobby);
+    }
+
+    public void addBot(final PlayerId ownerId, final LobbyId lobbyId) {
+        Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
+
+        Player profile = playerService.createBot();
+
+        Player bot = new Player(profile.id(), profile.username(), profile.image());
+
+        lobby.addBot(ownerId, bot);
         lobbyRepository.save(lobby);
     }
 

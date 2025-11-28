@@ -3,6 +3,7 @@ plugins {
     id("org.springframework.boot") version "3.5.7"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.cyclonedx.bom") version "2.3.0"
+    kotlin("jvm")
 }
 
 group = "be.kdg.team22"
@@ -39,6 +40,7 @@ dependencies {
     testImplementation("org.testcontainers:rabbitmq")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("org.jmolecules.integrations:jmolecules-starter-ddd:0.29.0")
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 tasks.withType<Test> {

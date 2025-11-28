@@ -2,12 +2,16 @@ package be.kdg.team22.sessionservice.domain.player;
 
 import org.jmolecules.ddd.annotation.Entity;
 
+import java.util.UUID;
+
 @Entity
 public class Player {
     private final PlayerId id;
     private final PlayerName username;
     private final String image;
     private boolean ready;
+    private final boolean isAi;
+
 
     public Player(final PlayerId id, final PlayerName username, final String image, final boolean ready) {
         this.id = id;
@@ -42,5 +46,13 @@ public class Player {
 
     public String image() {
         return image;
+    }
+
+    public static Player ai(String name, String image) {
+        return new Player(
+                PlayerId.from(UUID.randomUUID()),
+                new PlayerName(name),
+                image = image
+        );
     }
 }
