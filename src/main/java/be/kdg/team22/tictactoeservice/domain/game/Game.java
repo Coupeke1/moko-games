@@ -18,8 +18,9 @@ public class Game {
     private final Map<PlayerId, List<Move>> moveHistory;
     private PlayerRole currentRole;
     private PlayerId winner;
+    private final PlayerRole aiPlayer;
 
-    private Game(final int requestedSize, final List<Player> players) {
+    private Game(final int requestedSize, final List<Player> players, final PlayerRole aiPlayer) {
         this.id = GameId.create();
         board = Board.create(requestedSize);
         status = GameStatus.IN_PROGRESS;
@@ -29,9 +30,10 @@ public class Game {
         moveHistory = players.stream().collect(Collectors.toMap(Player::id, p -> new ArrayList<>()));
         currentRole = this.players.getFirst().role();
         winner = null;
+        this.aiPlayer = aiPlayer;
     }
 
-    public static Game create(final int minSize, final int maxSize, final int size, final List<PlayerId> playerIds) {
+    public static Game create(final int minSize, final int maxSize, final int size, final List<PlayerId> playerIds, final boolean aiPlayer) {
         if (size < minSize || size > maxSize)
             throw new BoardSizeException(minSize, maxSize);
 
@@ -40,7 +42,7 @@ public class Game {
             throw new UniquePlayersException();
 
         PlayerRole[] roles = PlayerRole.values();
-        if (playerIds.size() < 2 || playerIds.size() > roles.length) {
+        if (playerIds.size() + (aiPlayer ? 1 : 0) < 2 || playerIds.size() + (aiPlayer ? 1 : 0) > roles.length) {
             throw new GameSizeException(roles.length);
         }
 
@@ -48,10 +50,17 @@ public class Game {
         for (int i = 0; i < playerIds.size(); i++) {
             PlayerId playerId = playerIds.get(i);
             PlayerRole role = roles[i % roles.length];
-            players.add(new Player(playerId, role));
+            players.add(new Player(playerId, role, false));
         }
 
-        return new Game(size, players);
+        PlayerRole aiRole = null;
+        if (aiPlayer) {
+            PlayerId aiPlayerId = PlayerId.create();
+            aiRole = PlayerRole.values()[players.size()];
+            players.add(new Player(aiPlayerId, aiRole, true));
+        }
+
+        return new Game(size, players, aiRole);
     }
 
     public void reset() {
@@ -149,5 +158,9 @@ public class Game {
 
     public PlayerId winner() {
         return winner;
+    }
+
+    public PlayerRole aiPlayer() {
+        return aiPlayer;
     }
 }

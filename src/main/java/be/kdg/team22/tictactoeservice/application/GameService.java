@@ -12,9 +12,12 @@ import be.kdg.team22.tictactoeservice.domain.game.GameId;
 import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
 import be.kdg.team22.tictactoeservice.domain.game.Move;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
+import be.kdg.team22.tictactoeservice.events.AiMoveRequestedEvent;
 import be.kdg.team22.tictactoeservice.infrastructure.game.GameRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -28,6 +31,9 @@ public class GameService {
 
     private final Logger logger;
 
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+
     public GameService(GameRepository repository, BoardSizeProperties config, GameEventPublisher publisher) {
         this.repository = repository;
         this.config = config;
@@ -35,9 +41,9 @@ public class GameService {
         logger = LoggerFactory.getLogger(GameService.class);
     }
 
-    public Game startGame(final CreateGameModel model) {
+    public Game startGame(final CreateGameModel model, final boolean aiPlayer) {
         List<PlayerId> players = model.players().stream().map(PlayerId::new).toList();
-        Game game = Game.create(config.minSize(), config.maxSize(), model.settings().boardSize(), players);
+        Game game = Game.create(config.minSize(), config.maxSize(), aiPlayer ? 3 : model.settings().boardSize(), players, aiPlayer);
         repository.save(game);
         return game;
     }
@@ -82,6 +88,10 @@ public class GameService {
             }
         } catch (PublishAchievementException | RabbitNotReachableException exception) {
             logger.error(exception.getMessage());
+        }
+
+        if (game.status() == GameStatus.IN_PROGRESS && game.currentPlayer().aiPlayer()) {
+            applicationEventPublisher.publishEvent(AiMoveRequestedEvent.from(game));
         }
 
         return game;
