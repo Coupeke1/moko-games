@@ -91,6 +91,9 @@ public class Lobby {
         if (players.stream().anyMatch(player -> player.id().equals(targetId)))
             throw new PlayerAlreadyInLobbyException(targetId, id);
 
+        if (invitedPlayerIds.stream().anyMatch(player -> player.equals(targetId)))
+            throw new PlayerAlreadyInvitedException(targetId, id);
+
         invitedPlayerIds.add(targetId);
         updatedAt = Instant.now();
     }

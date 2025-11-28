@@ -1,6 +1,8 @@
 package be.kdg.team22.sessionservice.api.lobby;
 
-import be.kdg.team22.sessionservice.api.lobby.models.*;
+import be.kdg.team22.sessionservice.api.lobby.models.CreateLobbyModel;
+import be.kdg.team22.sessionservice.api.lobby.models.LobbyResponseModel;
+import be.kdg.team22.sessionservice.api.lobby.models.UpdateLobbySettingsModel;
 import be.kdg.team22.sessionservice.application.lobby.LobbyInviteQueryService;
 import be.kdg.team22.sessionservice.application.lobby.LobbyPlayerService;
 import be.kdg.team22.sessionservice.application.lobby.LobbyService;
@@ -98,20 +100,6 @@ public class LobbyController {
         lobbyPlayerService.invitePlayer(owner, LobbyId.from(id), PlayerId.from(playerId), token);
     }
 
-    @PostMapping("/{id}/invite")
-    public void invitePlayers(
-            @PathVariable final UUID id,
-            @RequestBody final InvitePlayersRequestModel request,
-            @AuthenticationPrincipal final Jwt token
-    ) {
-        PlayerId owner = PlayerId.get(token);
-        List<PlayerId> players = request.playerIds().stream()
-                .map(PlayerId::from)
-                .toList();
-
-        lobbyPlayerService.invitePlayers(owner, LobbyId.from(id), players, token);
-    }
-
     @PostMapping("/{id}/invite/accept/me")
     public void acceptInvite(
             @PathVariable final UUID id,
@@ -155,20 +143,6 @@ public class LobbyController {
     ) {
         PlayerId owner = PlayerId.get(token);
         lobbyPlayerService.removePlayer(owner, LobbyId.from(lobbyId), PlayerId.from(playerId));
-    }
-
-    @DeleteMapping("/{id}/players")
-    public void removePlayers(
-            @PathVariable final UUID id,
-            @RequestBody final RemovePlayersRequestModel request,
-            @AuthenticationPrincipal final Jwt token
-    ) {
-        PlayerId owner = PlayerId.get(token);
-        List<PlayerId> players = request.playerIds().stream()
-                .map(PlayerId::from)
-                .toList();
-
-        lobbyPlayerService.removePlayers(owner, LobbyId.from(id), players);
     }
 
     @PostMapping("/{lobbyId}/start")

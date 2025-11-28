@@ -35,21 +35,6 @@ public class LobbyPlayerService {
         lobbyRepository.save(lobby);
     }
 
-    public void invitePlayers(final PlayerId ownerId, final LobbyId lobbyId, final List<PlayerId> playerIds, final Jwt token) {
-        Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
-        List<PlayerId> friends = friendsService.findAllFriends(token);
-
-        for (PlayerId playerId : playerIds) {
-            if (friends.contains(playerId))
-                continue;
-
-            throw new PlayerNotFriendException(ownerId, playerId);
-        }
-
-        lobby.invitePlayers(ownerId, playerIds);
-        lobbyRepository.save(lobby);
-    }
-
     public void acceptInvite(final PlayerId playerId, final LobbyId lobbyId, final Jwt token) {
         Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
         Player player = playerService.findPlayer(playerId, token);
@@ -62,13 +47,6 @@ public class LobbyPlayerService {
         Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
 
         lobby.removePlayer(ownerId, playerId);
-        lobbyRepository.save(lobby);
-    }
-
-    public void removePlayers(final PlayerId ownerId, final LobbyId lobbyId, final List<PlayerId> ids) {
-        Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
-
-        lobby.removePlayers(ownerId, ids);
         lobbyRepository.save(lobby);
     }
 
