@@ -29,7 +29,7 @@ class GameServiceTest {
     private final ExternalGamesRepository engine = mock(ExternalGamesRepository.class);
     private final GameService service = new GameService(gameRepository, engine);
 
-    private Game exampleGame(GameId id) {
+    private Game sampleGame(GameId id) {
         return new Game(
                 id,
                 "checkers",
@@ -43,25 +43,26 @@ class GameServiceTest {
         );
     }
 
-    private StartGameRequest createRequest(GameSettingsModel settings) {
+    private StartGameRequest createRequest(GameSettingsModel settings, boolean ai) {
         return new StartGameRequest(
                 UUID.fromString("11111111-1111-1111-1111-111111111111"),
-                UUID.fromString("22222222-2222-2222-2222-222222222222"), 
+                UUID.fromString("22222222-2222-2222-2222-222222222222"),
                 List.of(
                         UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
                         UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
                 ),
-                settings
+                settings,
+                ai
         );
     }
 
     @Test
-    @DisplayName("startGame → happy path: repository + engine worden aangeroepen")
+    @DisplayName("startGame → happy path")
     void startGame_happyPath() {
         GameId gameId = GameId.from(UUID.fromString("22222222-2222-2222-2222-222222222222"));
-        Game game = exampleGame(gameId);
+        Game game = sampleGame(gameId);
 
-        StartGameRequest request = createRequest(new CheckersSettingsModel(8, true));
+        StartGameRequest request = createRequest(new CheckersSettingsModel(8, true), true);
 
         when(gameRepository.findById(gameId)).thenReturn(Optional.of(game));
 
@@ -77,20 +78,20 @@ class GameServiceTest {
     }
 
     @Test
-    @DisplayName("startGame → empty players → throw PlayersListEmptyException")
+    @DisplayName("startGame → empty players → PlayersListEmptyException")
     void startGame_emptyPlayers() {
         StartGameRequest request = new StartGameRequest(
                 UUID.randomUUID(),
                 UUID.randomUUID(),
-                List.of(),   // leeg!
-                new CheckersSettingsModel(8, true)
+                List.of(),
+                new CheckersSettingsModel(8, true),
+                false
         );
 
         assertThatThrownBy(() -> service.startGame(request))
                 .isInstanceOf(PlayersListEmptyException.class);
 
-        verifyNoInteractions(gameRepository);
-        verifyNoInteractions(engine);
+        verifyNoInteractions(gameRepository, engine);
     }
 
     @Test
@@ -100,7 +101,8 @@ class GameServiceTest {
                 UUID.randomUUID(),
                 UUID.randomUUID(),
                 List.of(UUID.randomUUID()),
-                null
+                null,
+                false
         );
 
         assertThatThrownBy(() -> service.startGame(request))
@@ -111,10 +113,11 @@ class GameServiceTest {
     }
 
     @Test
-    @DisplayName("startGame → gameId bestaat niet → throw GameNotFoundException")
+    @DisplayName("startGame → game not found → GameNotFoundException")
     void startGame_gameNotFound() {
         GameId id = GameId.from(UUID.fromString("22222222-2222-2222-2222-222222222222"));
-        StartGameRequest request = createRequest(new CheckersSettingsModel(8, true));
+
+        StartGameRequest request = createRequest(new CheckersSettingsModel(8, true), false);
 
         when(gameRepository.findById(id)).thenReturn(Optional.empty());
 
@@ -126,10 +129,10 @@ class GameServiceTest {
     }
 
     @Test
-    @DisplayName("findById → returns game when found")
+    @DisplayName("findById → returns entity when present")
     void findById_found() {
         GameId id = GameId.from(UUID.randomUUID());
-        Game game = exampleGame(id);
+        Game game = sampleGame(id);
 
         when(gameRepository.findById(id)).thenReturn(Optional.of(game));
 
@@ -140,7 +143,7 @@ class GameServiceTest {
     }
 
     @Test
-    @DisplayName("findById → throws GameNotFoundException when missing")
+    @DisplayName("findById → throws when missing")
     void findById_notFound() {
         GameId id = GameId.from(UUID.randomUUID());
 
@@ -153,21 +156,16 @@ class GameServiceTest {
     }
 
     @Test
-    @DisplayName("findAll → returns all games")
+    @DisplayName("findAll → returns list from repository")
     void findAll_returnsList() {
-        GameId id1 = GameId.from(UUID.randomUUID());
-        GameId id2 = GameId.from(UUID.randomUUID());
+        Game game1 = sampleGame(GameId.from(UUID.randomUUID()));
+        Game game2 = sampleGame(GameId.from(UUID.randomUUID()));
 
-        List<Game> games = List.of(
-                exampleGame(id1),
-                exampleGame(id2)
-        );
-
-        when(gameRepository.findAll()).thenReturn(games);
+        when(gameRepository.findAll()).thenReturn(List.of(game1, game2));
 
         List<Game> result = service.findAll();
 
-        assertThat(result).containsExactlyElementsOf(games);
+        assertThat(result).containsExactly(game1, game2);
         verify(gameRepository).findAll();
     }
 }

@@ -18,10 +18,10 @@ import org.springframework.web.client.RestClientException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 class ExternalGamesRepositoryTest {
@@ -35,63 +35,60 @@ class ExternalGamesRepositoryTest {
                 "http://engine-service",
                 "/start",
                 "Tic Tac Toe",
-                "A simple tic-tac-toe game",
+                "desc",
                 new BigDecimal("5.00"),
-                "http://image",
+                "img",
                 null
         );
     }
 
-    private StartGameRequest sampleRequest(GameSettingsModel settings) {
+    private StartGameRequest req(GameSettingsModel settings) {
         return new StartGameRequest(
-                UUID.fromString("00000000-0000-0000-0000-000000000222"),
+                UUID.randomUUID(),
                 UUID.fromString("00000000-0000-0000-0000-000000000333"),
-                List.of(
-                        UUID.fromString("11111111-1111-1111-1111-111111111111"),
-                        UUID.fromString("22222222-2222-2222-2222-222222222222")
-                ),
-                settings
+                List.of(UUID.randomUUID(), UUID.randomUUID()),
+                settings,
+                true
         );
     }
 
-    private RestClient mockClientReturning(EngineGameResponse body) {
-        RestClient mockClient = mock(RestClient.class, RETURNS_DEEP_STUBS);
+    private RestClient mockSuccess(EngineGameResponse body) {
+        RestClient mock = mock(RestClient.class, RETURNS_DEEP_STUBS);
 
-        when(mockClient.post()
-                .uri("")
+        when(mock.post()
+                .uri(any(Function.class))                     
                 .body(any(EngineCreateGameRequest.class))
                 .retrieve()
-                .body(eq(EngineGameResponse.class))
+                .body(EngineGameResponse.class)
         ).thenReturn(body);
 
-        return mockClient;
+        return mock;
     }
 
-    private RestClient mockClientThrowing(Exception ex) {
-        RestClient mockClient = mock(RestClient.class, RETURNS_DEEP_STUBS);
+    private RestClient mockFailure(Exception ex) {
+        RestClient mock = mock(RestClient.class, RETURNS_DEEP_STUBS);
 
-        when(mockClient.post()
-                .uri("")
+        when(mock.post()
+                .uri(any(Function.class))
                 .body(any(EngineCreateGameRequest.class))
                 .retrieve()
-                .body(eq(EngineGameResponse.class))
+                .body(EngineGameResponse.class)
         ).thenThrow(ex);
 
-        return mockClient;
+        return mock;
     }
 
     @Test
     @DisplayName("startExternalGame – success returns engine gameId")
-    void startExternalGame_success() {
+    void success() {
         UUID instanceId = UUID.fromString("99999999-aaaa-aaaa-aaaa-999999999999");
-        EngineGameResponse response = new EngineGameResponse(instanceId);
+        RestClient client = mockSuccess(new EngineGameResponse(instanceId));
 
-        RestClient mock = mockClientReturning(response);
-        doReturn(mock).when(repo).createRestClient(anyString());
+        doReturn(client).when(repo).createRestClient(anyString());
 
         UUID result = repo.startExternalGame(
                 sampleGame(),
-                sampleRequest(new TicTacToeSettingsModel(3))
+                req(new TicTacToeSettingsModel(3))
         );
 
         assertThat(result).isEqualTo(instanceId);
@@ -99,39 +96,37 @@ class ExternalGamesRepositoryTest {
 
     @Test
     @DisplayName("startExternalGame – 404 triggers EngineGameNotFoundException")
-    void startExternalGame_notFound() {
-        RestClient mock = mockClientThrowing(new HttpClientErrorException(HttpStatus.NOT_FOUND));
-
-        doReturn(mock).when(repo).createRestClient(anyString());
+    void notFound() {
+        RestClient client = mockFailure(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        doReturn(client).when(repo).createRestClient(anyString());
 
         assertThatThrownBy(() ->
-                repo.startExternalGame(sampleGame(), sampleRequest(new CheckersSettingsModel(8, true)))
+                repo.startExternalGame(sampleGame(), req(new CheckersSettingsModel(8, true)))
         ).isInstanceOf(EngineGameNotFoundException.class);
     }
 
     @Test
     @DisplayName("startExternalGame – other 4xx → rethrow HttpClientErrorException")
-    void startExternalGame_other4xx() {
-        RestClient mock = mockClientThrowing(new HttpClientErrorException(HttpStatus.FORBIDDEN));
+    void other4xx() {
+        RestClient client = mockFailure(new HttpClientErrorException(HttpStatus.FORBIDDEN));
 
-        doReturn(mock).when(repo).createRestClient(anyString());
+        doReturn(client).when(repo).createRestClient(anyString());
 
         assertThatThrownBy(() ->
-                repo.startExternalGame(sampleGame(), sampleRequest(new TicTacToeSettingsModel(3)))
+                repo.startExternalGame(sampleGame(), req(new TicTacToeSettingsModel(3)))
         ).isInstanceOf(HttpClientErrorException.class);
     }
 
     @Test
     @DisplayName("startExternalGame – RestClientException → EngineNotReachableException")
-    void startExternalGame_notReachable() {
-        RestClient mock = mockClientThrowing(new RestClientException("connection refused"));
+    void unreachable() {
+        RestClient client = mockFailure(new RestClientException("connection"));
 
-        doReturn(mock).when(repo).createRestClient(anyString());
+        doReturn(client).when(repo).createRestClient(anyString());
 
         assertThatThrownBy(() ->
-                repo.startExternalGame(sampleGame(), sampleRequest(new CheckersSettingsModel(8, false)))
-        )
-                .isInstanceOf(EngineNotReachableException.class)
+                repo.startExternalGame(sampleGame(), req(new CheckersSettingsModel(8, false)))
+        ).isInstanceOf(EngineNotReachableException.class)
                 .hasMessageContaining("http://engine-service/start");
     }
 }
