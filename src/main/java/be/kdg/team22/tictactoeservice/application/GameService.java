@@ -5,6 +5,8 @@ import be.kdg.team22.tictactoeservice.application.events.GameEventPublisher;
 import be.kdg.team22.tictactoeservice.config.BoardSizeProperties;
 import be.kdg.team22.tictactoeservice.domain.events.GameDrawEvent;
 import be.kdg.team22.tictactoeservice.domain.events.GameWonEvent;
+import be.kdg.team22.tictactoeservice.domain.events.exceptions.PublishAchievementException;
+import be.kdg.team22.tictactoeservice.domain.events.exceptions.RabbitNotReachableException;
 import be.kdg.team22.tictactoeservice.domain.game.Game;
 import be.kdg.team22.tictactoeservice.domain.game.GameId;
 import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
@@ -12,6 +14,8 @@ import be.kdg.team22.tictactoeservice.domain.game.Move;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
 import be.kdg.team22.tictactoeservice.events.AiMoveRequestedEvent;
 import be.kdg.team22.tictactoeservice.infrastructure.game.GameRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -25,6 +29,8 @@ public class GameService {
     private final BoardSizeProperties config;
     private final GameEventPublisher publisher;
 
+    private final Logger logger;
+
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
@@ -32,6 +38,7 @@ public class GameService {
         this.repository = repository;
         this.config = config;
         this.publisher = publisher;
+        logger = LoggerFactory.getLogger(GameService.class);
     }
 
     public Game startGame(final CreateGameModel model, final boolean aiPlayer) {
@@ -57,26 +64,30 @@ public class GameService {
         game.requestMove(move);
         repository.save(game);
 
-        if (game.status() == GameStatus.WON) {
-            publisher.publishGameWon(
-                    new GameWonEvent(
-                            game.id().value(),
-                            game.winner().value(),
-                            Instant.now()
-                    )
-            );
-        }
+        try {
+            if (game.status() == GameStatus.WON) {
+                publisher.publishGameWon(
+                        new GameWonEvent(
+                                game.id().value(),
+                                game.winner().value(),
+                                Instant.now()
+                        )
+                );
+            }
 
-        if (game.status() == GameStatus.TIE) {
-            publisher.publishGameDraw(
-                    new GameDrawEvent(
-                            game.id().value(),
-                            game.players().stream()
-                                    .map(p -> p.id().value())
-                                    .toList(),
-                            Instant.now()
-                    )
-            );
+            if (game.status() == GameStatus.TIE) {
+                publisher.publishGameDraw(
+                        new GameDrawEvent(
+                                game.id().value(),
+                                game.players().stream()
+                                        .map(p -> p.id().value())
+                                        .toList(),
+                                Instant.now()
+                        )
+                );
+            }
+        } catch (PublishAchievementException | RabbitNotReachableException exception) {
+            logger.error(exception.getMessage());
         }
 
         if (game.status() == GameStatus.IN_PROGRESS && game.currentPlayer().aiPlayer()) {

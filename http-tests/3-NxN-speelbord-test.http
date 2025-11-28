@@ -1,4 +1,4 @@
-﻿@gameId = fed5f146-9c38-4d6a-be42-9afe62488d93
+@gameId = fed5f146-9c38-4d6a-be42-9afe62488d93
 ### Generate Board
 POST localhost:8086/api/games
 Content-Type: application/json
