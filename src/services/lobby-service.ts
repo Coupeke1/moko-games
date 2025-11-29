@@ -9,7 +9,6 @@ const BASE_URL = import.meta.env.VITE_SESSION_SERVICE;
 export async function findLobby(id: string): Promise<Lobby> {
     try {
         const { data } = await client.get<Lobby>(`${BASE_URL}/${id}`);
-
         return data;
     } catch {
         throw new Error("Lobby could not be fetched");
@@ -18,19 +17,24 @@ export async function findLobby(id: string): Promise<Lobby> {
 
 export async function createLobby(game: Game, size: number): Promise<Lobby> {
     try {
-        const settings = game.title === "Tic Tac Toe" ? {
-            type: "ticTacToe",
-            boardSize: 3
-        } : game.title === "Checkers" ? {
-            type: "checkers",
-            boardSize: 8,
-            flyingKings: false
-        } : null;
+        const settings =
+            game.title === "Tic Tac Toe"
+                ? {
+                      type: "ticTacToe",
+                      boardSize: 3,
+                  }
+                : game.title === "Checkers"
+                  ? {
+                        type: "checkers",
+                        boardSize: 8,
+                        flyingKings: false,
+                    }
+                  : null;
 
         const { data } = await client.post<Lobby>(BASE_URL, {
             gameId: game.id,
             maxPlayers: size,
-            settings: settings
+            settings: settings,
         });
 
         return data;
@@ -39,17 +43,18 @@ export async function createLobby(game: Game, size: number): Promise<Lobby> {
     }
 }
 
-
 export function isPlayerInLobby(user: string, lobby: Lobby): boolean {
     try {
         validIdCheck(user);
 
-        return lobby.players.find(
-            (player: Player) => player.id === user
-        ) !== undefined;
-    }
-    catch {
-        throw new Error(`Cannot check if user with id '${user}' is in lobby with id '${lobby.id}'`);
+        return (
+            lobby.players.find((player: Player) => player.id === user) !==
+            undefined
+        );
+    } catch {
+        throw new Error(
+            `Cannot check if user with id '${user}' is in lobby with id '${lobby.id}'`,
+        );
     }
 }
 
@@ -57,22 +62,22 @@ export function isUserOwner(user: string, lobby: Lobby): boolean {
     try {
         const owner: Player = findOwner(lobby);
         return user === owner.id;
-    }
-    catch {
-        throw new Error(`Cannot check if user with id '${user}' is owner of lobby with id '${lobby.id}'`);
+    } catch {
+        throw new Error(
+            `Cannot check if user with id '${user}' is owner of lobby with id '${lobby.id}'`,
+        );
     }
 }
 
 export function findOwner(lobby: Lobby): Player {
     try {
         const owner: Player | undefined = lobby.players.find(
-            (player: Player) => player.id === lobby.ownerId
+            (player: Player) => player.id === lobby.ownerId,
         );
 
         if (owner === undefined) throw new Error("Owner not found");
         return owner;
-    }
-    catch {
+    } catch {
         throw new Error(`Cannot fetch owner of lobby with id '${lobby.id}'`);
     }
 }
@@ -90,7 +95,9 @@ export async function sendInvite(user: string, lobby: string) {
 
 export async function findInvites(game: string) {
     try {
-        const { data } = await client.get<Lobby[]>(`${BASE_URL}/invited/${game}/me`);
+        const { data } = await client.get<Lobby[]>(
+            `${BASE_URL}/invited/${game}/me`,
+        );
         return data;
     } catch {
         throw new Error(`Invites to user could not be fetched`);
@@ -112,6 +119,26 @@ export async function removePlayer(player: string, lobby: string) {
         validIdCheck(lobby);
         await client.delete(`${BASE_URL}/${lobby}/players/${player}`);
     } catch {
-        throw new Error(`Player with id '${player}' could not be removed from lobby with id '${lobby}'`);
+        throw new Error(
+            `Player with id '${player}' could not be removed from lobby with id '${lobby}'`,
+        );
+    }
+}
+
+export async function readyPlayer(lobby: string) {
+    try {
+        validIdCheck(lobby);
+        await client.patch(`${BASE_URL}/${lobby}/players/ready`);
+    } catch {
+        throw new Error(`Player could not ready up`);
+    }
+}
+
+export async function unReadyPlayer(lobby: string) {
+    try {
+        validIdCheck(lobby);
+        await client.patch(`${BASE_URL}/${lobby}/players/unready`);
+    } catch {
+        throw new Error(`Player could not cancel ready up`);
     }
 }

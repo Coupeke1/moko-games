@@ -4,7 +4,7 @@ export const Gap = {
     Medium: "gap-2",
     Large: "gap-4",
     ExtraLarge: "gap-6",
-    Gigantic: "gap-12"
+    Gigantic: "gap-12",
 } as const;
 
 export type Gap = (typeof Gap)[keyof typeof Gap];

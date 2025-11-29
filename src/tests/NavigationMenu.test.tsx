@@ -7,10 +7,9 @@ describe("Grid component", () => {
         render(
             <Grid>
                 <div>Test Content</div>
-            </Grid>
+            </Grid>,
         );
 
-        // Check if the child text is rendered
         expect(screen.getByText("Test Content")).toBeInTheDocument();
     });
 });
