@@ -12,34 +12,45 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class ExceptionController {
-    @ExceptionHandler({ClaimNotFoundException.class, LobbyNotFoundException.class, PlayerNotFoundException.class, OwnerNotFoundException.class, InviteNotFoundException.class})
+
+    @ExceptionHandler({
+            ClaimNotFoundException.class,
+            LobbyNotFoundException.class,
+            PlayerNotFoundException.class,
+            OwnerNotFoundException.class,
+            InviteNotFoundException.class,
+            GameNotFoundException.class
+    })
     public ResponseEntity<String> handleNotFound(final RuntimeException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(GameNotValidException.class)
-    public ResponseEntity<String> handleGameInvalid(final GameNotValidException exception) {
+    @ExceptionHandler({
+            GameNotValidException.class,
+            OwnerNotValidException.class,
+            LobbyCreationException.class,
+            IllegalArgumentException.class,
+            CannotJoinClosedLobbyException.class,
+            PlayerAlreadyInLobbyException.class,
+            OwnerCannotLeaveLobbyException.class,
+            PlayerNotInLobbyException.class,
+            LobbyAlreadyStartedException.class,
+            NotLobbyOwnerException.class,
+            LobbyManagementNotAllowedException.class,
+            MaxPlayersTooSmallException.class,
+            LobbySettingsInvalidException.class,
+            PlayersNotReadyException.class,
+            TooManyBotsException.class,
+            TooManyPlayersException.class,
+            UnsupportedOperationException.class
+    })
+    public ResponseEntity<String> handleBadRequest(final RuntimeException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(OwnerNotValidException.class)
-    public ResponseEntity<String> handleOwnerInvalid(final OwnerNotValidException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(LobbyCreationException.class)
-    public ResponseEntity<String> handleCreationError(final LobbyCreationException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgument(final IllegalArgumentException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler({CannotJoinClosedLobbyException.class, PlayerAlreadyInLobbyException.class, OwnerCannotLeaveLobbyException.class, PlayerNotInLobbyException.class, LobbyAlreadyStartedException.class, NotLobbyOwnerException.class, LobbyManagementNotAllowedException.class, MaxPlayersTooSmallException.class})
-    public ResponseEntity<String> handleDomainErrors(final RuntimeException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(NotReachableException.class)
+    public ResponseEntity<String> handleServiceUnreachable(final NotReachableException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
     }
 
     @ExceptionHandler(SettingsConversionException.class)
@@ -47,28 +58,8 @@ public class ExceptionController {
         return new ResponseEntity<>("Settings conversion error: " + exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(LobbySettingsInvalidException.class)
-    public ResponseEntity<String> handleLobbySettingsInvalid(final LobbySettingsInvalidException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleUnknown(final Exception exception) {
         return new ResponseEntity<>("Internal server error: " + exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(PlayersNotReadyException.class)
-    public ResponseEntity<String> handlePlayersNotReady(PlayersNotReadyException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(GameNotFoundException.class)
-    public ResponseEntity<String> handleGameNotFound(final GameNotFoundException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(NotReachableException.class)
-    public ResponseEntity<String> handleGameServiceUnreachable(final NotReachableException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
     }
 }

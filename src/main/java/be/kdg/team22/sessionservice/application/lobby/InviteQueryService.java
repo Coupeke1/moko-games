@@ -10,14 +10,14 @@ import java.util.List;
 
 @Transactional
 @Service
-public class LobbyInviteQueryService {
-    private final LobbyRepository lobbyRepository;
+public class InviteQueryService {
+    private final LobbyRepository repository;
 
-    public LobbyInviteQueryService(final LobbyRepository lobbyRepository) {
-        this.lobbyRepository = lobbyRepository;
+    public InviteQueryService(final LobbyRepository repository) {
+        this.repository = repository;
     }
 
     public List<Lobby> getInvitesForPlayer(final PlayerId playerId) {
-        return lobbyRepository.findAll().stream().filter(lobby -> lobby.isInvited(playerId)).toList();
+        return repository.findAll().stream().filter(lobby -> lobby.isInvited(playerId)).toList();
     }
 }

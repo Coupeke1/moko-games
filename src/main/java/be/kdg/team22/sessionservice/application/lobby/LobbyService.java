@@ -29,11 +29,7 @@ public class LobbyService {
     private final PlayerService playerService;
     private final ExternalGamesRepository gamesRepository;
 
-    public LobbyService(
-            final LobbyRepository repository,
-            final PlayerService playerService,
-            final ExternalGamesRepository gamesRepository
-    ) {
+    public LobbyService(final LobbyRepository repository, final PlayerService playerService, final ExternalGamesRepository gamesRepository) {
         this.repository = repository;
         this.playerService = playerService;
         this.gamesRepository = gamesRepository;
@@ -77,18 +73,13 @@ public class LobbyService {
         lobby.ensureOwner(ownerId);
         lobby.ensureAllPlayersReady();
 
-        List<UUID> playerIds = lobby.players()
-                .stream().map(p -> p.id().value()).toList();
+        List<UUID> playerIds = new java.util.ArrayList<>(lobby.players().stream().map(p -> p.id().value()).toList());
 
-        StartGameResponse response = gamesRepository.startGame(
-                new StartGameRequest(
-                        lobbyId.value(),
-                        lobby.gameId().value(),
-                        playerIds,
-                        lobby.settings().gameSettings()
-                ),
-                token
-        );
+        if (lobby.hasBot()) {
+            playerIds.add(lobby.bot().id().value());
+        }
+
+        StartGameResponse response = gamesRepository.startGame(new StartGameRequest(lobbyId.value(), lobby.gameId().value(), playerIds, lobby.settings().gameSettings(), lobby.hasBot()), token);
 
         lobby.markStarted(GameId.from(response.gameInstanceId()));
 
@@ -104,8 +95,10 @@ public class LobbyService {
         int resolvedMaxPlayers = maxPlayers != null ? maxPlayers : 4;
 
         GameSettings gameSettings = switch (model) {
-            case TicTacToeSettingsModel t -> new TicTacToeSettings(t.boardSize());
-            case CheckersSettingsModel c -> new CheckersSettings(c.boardSize(), c.flyingKings());
+            case TicTacToeSettingsModel t ->
+                    new TicTacToeSettings(t.boardSize());
+            case CheckersSettingsModel c ->
+                    new CheckersSettings(c.boardSize(), c.flyingKings());
         };
 
         return new LobbySettings(gameSettings, resolvedMaxPlayers);

@@ -23,7 +23,12 @@ public class ExternalPlayersRepository {
 
     public Optional<PlayerResponse> getById(final UUID id, final String token) {
         try {
-            return Optional.ofNullable(client.get().uri("/{id}", id).header("Authorization", "Bearer " + token).retrieve().body(PlayerResponse.class));
+            return Optional.ofNullable(
+                    client.get()
+                            .uri("/{id}", id)
+                            .header("Authorization", "Bearer " + token)
+                            .retrieve()
+                            .body(PlayerResponse.class));
         } catch (
                 HttpClientErrorException exception) {
             if (exception.getStatusCode() != HttpStatus.NOT_FOUND)
@@ -31,6 +36,23 @@ public class ExternalPlayersRepository {
 
             throw new PlayerNotFoundException(PlayerId.from(id));
         } catch (RestClientException exception) {
+            throw new NotReachableException();
+        }
+    }
+
+    public Optional<BotProfileResponse> createBot() {
+        try {
+            return Optional.ofNullable(
+                    client.post()
+                            .uri("/bot")
+                            .retrieve()
+                            .body(BotProfileResponse.class));
+        } catch (HttpClientErrorException ex) {
+            if (ex.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                throw ex;
+            }
+            throw ex;
+        } catch (RestClientException ex) {
             throw new NotReachableException();
         }
     }

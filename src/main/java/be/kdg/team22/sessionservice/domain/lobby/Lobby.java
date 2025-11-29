@@ -2,6 +2,7 @@ package be.kdg.team22.sessionservice.domain.lobby;
 
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.*;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
+import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerAlreadyInLobbyException;
@@ -19,8 +20,8 @@ public class Lobby {
 
     private final List<Player> players;
     private final Set<PlayerId> invitedPlayerIds;
-
     private final Instant createdAt;
+    private Player bot;
     private Instant updatedAt;
 
     private LobbyStatus status;
@@ -98,14 +99,33 @@ public class Lobby {
         updatedAt = Instant.now();
     }
 
+    public void addBot(PlayerId ownerId, Player bot) {
+        ensureOwner(ownerId);
+        ensureBotConstraints();
+
+        this.bot = bot;
+    }
+
+    private void ensureBotConstraints() {
+        if (!(settings.gameSettings() instanceof TicTacToeSettings))
+            throw new BotsNotSupportedException();
+
+        if (bot != null)
+            throw new TooManyBotsException();
+
+        if (players.size() > 1)
+            throw new TooManyPlayersException();
+    }
+
     public void invitePlayers(final PlayerId ownerId, final Collection<PlayerId> targetIds) {
         ensureOwner(ownerId);
         ensureModifiable();
 
         for (PlayerId target : targetIds) {
-            if (players.stream().noneMatch(player -> player.id().equals(target))) {
-                invitedPlayerIds.add(target);
-            }
+            if (players.stream().anyMatch(player -> player.id().equals(target)))
+                continue;
+
+            invitedPlayerIds.add(target);
         }
 
         updatedAt = Instant.now();
@@ -119,20 +139,10 @@ public class Lobby {
             throw new CannotRemoveOwnerException(id);
 
         boolean removed = players.removeIf(player -> player.id().equals(targetId));
+
         if (!removed)
             throw new PlayerNotInLobbyException(targetId, id);
 
-        updatedAt = Instant.now();
-    }
-
-    public void removePlayers(final PlayerId ownerId, final Collection<PlayerId> targetIds) {
-        ensureOwner(ownerId);
-        ensureModifiable();
-
-        if (targetIds.contains(owner))
-            throw new CannotRemoveOwnerException(id);
-
-        players.removeIf(player -> targetIds.contains(player.id()));
         updatedAt = Instant.now();
     }
 
@@ -202,6 +212,10 @@ public class Lobby {
         return invitedPlayerIds.contains(id);
     }
 
+    public boolean hasBot() {
+        return bot != null;
+    }
+
     public LobbyId id() {
         return id;
     }
@@ -240,5 +254,9 @@ public class Lobby {
 
     public Set<PlayerId> invitedPlayers() {
         return Set.copyOf(invitedPlayerIds);
+    }
+
+    public Player bot() {
+        return bot;
     }
 }

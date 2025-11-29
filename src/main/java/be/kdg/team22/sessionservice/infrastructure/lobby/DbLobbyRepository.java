@@ -32,10 +32,7 @@ public class DbLobbyRepository implements LobbyRepository {
 
     @Override
     public List<Lobby> findInvitesFromPlayerId(PlayerId id, GameId gameId) {
-        return repository.findInvitesFromPlayerId(id.value(), gameId.value())
-                .stream()
-                .map(LobbyEntity::toDomain)
-                .toList();
+        return repository.findInvitesFromPlayerId(id.value(), gameId.value()).stream().map(LobbyEntity::toDomain).toList();
     }
 
     @Override

@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "lobbies")
 public class LobbyEntity {
-
     @Id
     private UUID id;
 
@@ -31,20 +30,18 @@ public class LobbyEntity {
     private UUID ownerId;
 
     @ElementCollection
-    @CollectionTable(name = "lobby_players", schema = "session_service",
-            joinColumns = @JoinColumn(name = "lobby_id"))
-    @AttributeOverrides({
-            @AttributeOverride(name = "id", column = @Column(name = "player_id", nullable = false)),
-            @AttributeOverride(name = "username", column = @Column(name = "username", nullable = false)),
-            @AttributeOverride(name = "ready", column = @Column(name = "ready", nullable = false))
-    })
+    @CollectionTable(name = "lobby_players", schema = "session_service", joinColumns = @JoinColumn(name = "lobby_id"))
+    @AttributeOverrides({@AttributeOverride(name = "id", column = @Column(name = "player_id", nullable = false)), @AttributeOverride(name = "username", column = @Column(name = "username", nullable = false)), @AttributeOverride(name = "image", column = @Column(name = "image")), @AttributeOverride(name = "ready", column = @Column(name = "ready", nullable = false))})
     private Set<PlayerEmbed> players;
 
     @ElementCollection
-    @CollectionTable(name = "lobby_invited_players", schema = "session_service",
-            joinColumns = @JoinColumn(name = "lobby_id"))
+    @CollectionTable(name = "lobby_invited_players", schema = "session_service", joinColumns = @JoinColumn(name = "lobby_id"))
     @Column(name = "invited_player_id", nullable = false)
     private Set<UUID> invitedPlayerIds;
+
+    @Embedded
+    @AttributeOverrides({@AttributeOverride(name = "id", column = @Column(name = "bot_id")), @AttributeOverride(name = "username", column = @Column(name = "bot_username")), @AttributeOverride(name = "image", column = @Column(name = "bot_image")), @AttributeOverride(name = "ready", column = @Column(name = "bot_ready")), @AttributeOverride(name = "isAi", column = @Column(name = "bot_is_ai"))})
+    private BotEmbed bot;
 
     @Convert(converter = LobbySettingsConverter.class)
     @Column(name = "settings", nullable = false, columnDefinition = "TEXT")
@@ -66,18 +63,7 @@ public class LobbyEntity {
     protected LobbyEntity() {
     }
 
-    public LobbyEntity(
-            UUID id,
-            UUID gameId,
-            UUID ownerId,
-            Set<PlayerEmbed> players,
-            Set<UUID> invitedPlayerIds,
-            LobbySettings settings,
-            LobbyStatus status,
-            Instant createdAt,
-            Instant updatedAt,
-            UUID startedGameId
-    ) {
+    public LobbyEntity(UUID id, UUID gameId, UUID ownerId, Set<PlayerEmbed> players, Set<UUID> invitedPlayerIds, LobbySettings settings, LobbyStatus status, Instant createdAt, Instant updatedAt, UUID startedGameId, BotEmbed bot) {
         this.id = id;
         this.gameId = gameId;
         this.ownerId = ownerId;
@@ -88,64 +74,36 @@ public class LobbyEntity {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.startedGameId = startedGameId;
+        this.bot = bot;
     }
 
     public static LobbyEntity fromDomain(final Lobby lobby) {
-        Set<PlayerEmbed> players = lobby.players()
-                .stream()
-                .map(player -> new PlayerEmbed(
-                        player.id().value(),
-                        player.username().value(),
-                        player.image(),
-                        player.ready()
-                ))
-                .collect(Collectors.toSet());
 
-        Set<UUID> invited = lobby.invitedPlayers()
-                .stream()
-                .map(PlayerId::value)
-                .collect(Collectors.toSet());
+        Set<PlayerEmbed> players = lobby.players().stream().map(player -> new PlayerEmbed(player.id().value(), player.username().value(), player.image(), player.ready())).collect(Collectors.toSet());
 
-        return new LobbyEntity(
-                lobby.id().value(),
-                lobby.gameId().value(),
-                lobby.ownerId().value(),
-                players,
-                invited,
-                lobby.settings(),
-                lobby.status(),
-                lobby.createdAt(),
-                lobby.updatedAt(),
-                lobby.startedGameId().map(GameId::value).orElse(null)
-        );
+        Set<UUID> invited = lobby.invitedPlayers().stream().map(PlayerId::value).collect(Collectors.toSet());
+
+        BotEmbed bot = null;
+        if (lobby.hasBot()) {
+            bot = new BotEmbed(lobby.bot().id().value(), lobby.bot().username().value(), lobby.bot().image(), lobby.bot().ready(), lobby.bot().isBot());
+        }
+
+        return new LobbyEntity(lobby.id().value(), lobby.gameId().value(), lobby.ownerId().value(), players, invited, lobby.settings(), lobby.status(), lobby.createdAt(), lobby.updatedAt(), lobby.startedGameId().map(GameId::value).orElse(null), bot);
     }
 
     public Lobby toDomain() {
-        List<Player> players = this.players.stream()
-                .map(p -> new Player(
-                        PlayerId.from(p.id()),
-                        PlayerName.from(p.username()),
-                        p.image(),
-                        p.ready()
-                ))
-                .collect(Collectors.toList());
+        List<Player> domainPlayers = this.players.stream().map(p -> new Player(PlayerId.from(p.id()), PlayerName.from(p.username()), p.image(), p.ready())).collect(Collectors.toList());
 
-        Set<PlayerId> invitedPlayers = this.invitedPlayerIds.stream()
-                .map(PlayerId::from)
-                .collect(Collectors.toSet());
+        Set<PlayerId> invited = this.invitedPlayerIds.stream().map(PlayerId::from).collect(Collectors.toSet());
 
-        return new Lobby(
-                LobbyId.from(id),
-                GameId.from(gameId),
-                PlayerId.from(ownerId),
-                players,
-                invitedPlayers,
-                settings,
-                status,
-                createdAt,
-                updatedAt,
-                startedGameId == null ? null : GameId.from(startedGameId)
-        );
+        Lobby lobby = new Lobby(LobbyId.from(id), GameId.from(gameId), PlayerId.from(ownerId), domainPlayers, invited, settings, status, createdAt, updatedAt, startedGameId == null ? null : GameId.from(startedGameId));
+
+        if (this.bot != null) {
+            Player bot = Player.bot(PlayerId.from(this.bot.id()), PlayerName.from(this.bot.username()), this.bot.image());
+            lobby.addBot(lobby.ownerId(), bot);
+        }
+
+        return lobby;
     }
 
     public UUID id() {
@@ -174,5 +132,13 @@ public class LobbyEntity {
 
     public UUID startedGameId() {
         return startedGameId;
+    }
+
+    public BotEmbed aiPlayer() {
+        return bot;
+    }
+
+    public Set<UUID> invitedPlayerIds() {
+        return invitedPlayerIds;
     }
 }

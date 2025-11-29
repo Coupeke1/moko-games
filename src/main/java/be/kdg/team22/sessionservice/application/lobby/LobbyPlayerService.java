@@ -35,6 +35,15 @@ public class LobbyPlayerService {
         lobbyRepository.save(lobby);
     }
 
+    public void addBot(final PlayerId ownerId, final LobbyId lobbyId) {
+        Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
+
+        Player bot = playerService.createBot();
+
+        lobby.addBot(ownerId, bot);
+        lobbyRepository.save(lobby);
+    }
+
     public void acceptInvite(final PlayerId playerId, final LobbyId lobbyId, final Jwt token) {
         Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
         Player player = playerService.findPlayer(playerId, token);
