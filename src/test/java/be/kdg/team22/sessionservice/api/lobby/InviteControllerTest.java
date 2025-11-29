@@ -1,6 +1,6 @@
 package be.kdg.team22.sessionservice.api.lobby;
 
-import be.kdg.team22.sessionservice.application.lobby.LobbyInviteQueryService;
+import be.kdg.team22.sessionservice.application.lobby.InviteQueryService;
 import be.kdg.team22.sessionservice.application.lobby.LobbyPlayerService;
 import be.kdg.team22.sessionservice.application.lobby.LobbyService;
 import be.kdg.team22.sessionservice.application.player.PlayerService;
@@ -39,9 +39,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(LobbyInviteController.class)
+@WebMvcTest(InviteController.class)
 @Import(TestSecurityConfig.class)
-class LobbyInviteControllerTest {
+class InviteControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -51,7 +51,7 @@ class LobbyInviteControllerTest {
     @MockitoBean
     private LobbyPlayerService lobbyPlayerService;
     @MockitoBean
-    private LobbyInviteQueryService inviteQueryService;
+    private InviteQueryService inviteQueryService;
     @MockitoBean
     private PlayerService playerService;
     @MockitoBean

@@ -6,7 +6,7 @@ import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.LobbyEntity;
 import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.LobbyJpaRepository;
-import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.PlayerAiEmbed;
+import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.BotEmbed;
 import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.PlayerEmbed;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ class DbLobbyRepositoryTest {
     private LobbyJpaRepository repo;
 
     @Test
-    void saveAndLoadLobby_withAiPlayer() {
+    void saveAndLoadLobby_withBot() {
         UUID id = UUID.randomUUID();
         UUID gameId = UUID.randomUUID();
         UUID ownerId = UUID.randomUUID();
@@ -42,7 +42,7 @@ class DbLobbyRepositoryTest {
         UUID invitedId = UUID.randomUUID();
 
         UUID aiId = UUID.randomUUID();
-        PlayerAiEmbed aiEmbed = new PlayerAiEmbed(
+        BotEmbed aiEmbed = new BotEmbed(
                 aiId,
                 "BOT-MOKO",
                 "bot.png",
@@ -90,7 +90,7 @@ class DbLobbyRepositoryTest {
         assertThat(db.aiPlayer().username()).isEqualTo("BOT-MOKO");
         assertThat(db.aiPlayer().image()).isEqualTo("bot.png");
         assertThat(db.aiPlayer().ready()).isTrue();
-        assertThat(db.aiPlayer().isAi()).isTrue();
+        assertThat(db.aiPlayer().isBot()).isTrue();
 
         LobbySettings mapped = db.settings();
         assertThat(mapped.maxPlayers()).isEqualTo(4);

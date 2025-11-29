@@ -15,56 +15,35 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/lobbies")
-public class LobbyInviteController {
+public class InviteController {
     private final LobbyPlayerService lobbyPlayerService;
     private final LobbyService lobbyService;
 
-    public LobbyInviteController(
-            final LobbyPlayerService lobbyPlayerService,
-            final LobbyService lobbyService
-    ) {
+    public InviteController(final LobbyPlayerService lobbyPlayerService, final LobbyService lobbyService) {
         this.lobbyPlayerService = lobbyPlayerService;
         this.lobbyService = lobbyService;
     }
 
     @PostMapping("/{id}/invite/{playerId}")
-    public void invitePlayer(
-            @PathVariable UUID id,
-            @PathVariable UUID playerId,
-            @AuthenticationPrincipal Jwt token
-    ) {
-        lobbyPlayerService.invitePlayer(
-                PlayerId.get(token),
-                LobbyId.from(id),
-                PlayerId.from(playerId),
-                token
-        );
+    public void invitePlayer(@PathVariable UUID id, @PathVariable UUID playerId, @AuthenticationPrincipal Jwt token) {
+        lobbyPlayerService.invitePlayer(PlayerId.get(token), LobbyId.from(id), PlayerId.from(playerId), token);
     }
 
     @PostMapping("/{id}/invite/accept/me")
-    public void acceptInvite(
-            @PathVariable UUID id,
-            @AuthenticationPrincipal Jwt token
-    ) {
+    public void acceptInvite(@PathVariable UUID id, @AuthenticationPrincipal Jwt token) {
         lobbyPlayerService.acceptInvite(PlayerId.get(token), LobbyId.from(id), token);
     }
 
     @GetMapping("/{lobbyId}/invited/{userId}")
-    public ResponseEntity<Boolean> isPlayerInvited(
-            @PathVariable UUID lobbyId,
-            @PathVariable UUID userId
-    ) {
+    public ResponseEntity<Boolean> isPlayerInvited(@PathVariable UUID lobbyId, @PathVariable UUID userId) {
         Lobby lobby = lobbyService.findLobby(LobbyId.from(lobbyId));
         return ResponseEntity.ok(lobby.invitedPlayers().contains(PlayerId.from(userId)));
     }
 
     @PostMapping("/{id}/invite/bot")
-    public ResponseEntity<LobbyResponseModel> inviteBot(
-            @PathVariable UUID id,
-            @AuthenticationPrincipal Jwt token
-    ) {
-        PlayerId ownerId = PlayerId.get(token);
+    public ResponseEntity<LobbyResponseModel> inviteBot(@PathVariable UUID id, @AuthenticationPrincipal Jwt token) {
         LobbyId lobbyId = LobbyId.from(id);
+        PlayerId ownerId = PlayerId.get(token);
 
         lobbyPlayerService.addBot(ownerId, lobbyId);
 

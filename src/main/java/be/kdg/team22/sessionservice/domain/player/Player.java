@@ -7,21 +7,15 @@ public class Player {
     private final PlayerId id;
     private final PlayerName username;
     private final String image;
-    private final boolean isAi;
+    private final boolean isBot;
     private boolean ready;
 
-    public Player(
-            final PlayerId id,
-            final PlayerName username,
-            final String image,
-            final boolean ready,
-            final boolean isAi
-    ) {
+    public Player(final PlayerId id, final PlayerName username, final String image, final boolean ready, final boolean isBot) {
         this.id = id;
         this.username = username;
         this.image = image;
         this.ready = ready;
-        this.isAi = isAi;
+        this.isBot = isBot;
     }
 
     public Player(final PlayerId id, final PlayerName username, final String image) {
@@ -32,14 +26,8 @@ public class Player {
         this(id, username, image, ready, false);
     }
 
-    public static Player ai(final PlayerId id, final PlayerName name, final String image) {
-        return new Player(
-                id,
-                name,
-                image,
-                true,
-                true
-        );
+    public static Player bot(final PlayerId id, final PlayerName name, final String image) {
+        return new Player(id, name, image, true, true);
     }
 
     public void setReady() {
@@ -66,7 +54,7 @@ public class Player {
         return ready;
     }
 
-    public boolean isAi() {
-        return isAi;
+    public boolean isBot() {
+        return isBot;
     }
 }

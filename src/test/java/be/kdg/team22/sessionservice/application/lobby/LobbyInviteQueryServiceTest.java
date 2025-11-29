@@ -27,7 +27,7 @@ class LobbyInviteQueryServiceTest {
     LobbyRepository lobbyRepo = mock(LobbyRepository.class);
     ExternalPlayersRepository userRepo = mock(ExternalPlayersRepository.class);
 
-    LobbyInviteQueryService service = new LobbyInviteQueryService(lobbyRepo);
+    InviteQueryService service = new InviteQueryService(lobbyRepo);
 
     @Test
     void getInvitesForUser_returnsEmptyList_whenNoLobbiesInvitePlayer() {

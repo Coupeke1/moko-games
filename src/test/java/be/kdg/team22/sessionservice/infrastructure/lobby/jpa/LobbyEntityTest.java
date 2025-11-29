@@ -32,7 +32,7 @@ class LobbyEntityTest {
 
         Player owner = p(ownerId, "owner", "img1.png", true);
 
-        Player ai = Player.ai(
+        Player bot = Player.bot(
                 PlayerId.create(),
                 new PlayerName("BOT-MOKO"),
                 "bot.png"
@@ -53,7 +53,7 @@ class LobbyEntityTest {
                 GameId.from(UUID.fromString("00000000-0000-0000-0000-000000000999"))
         );
 
-        domain.addBot(ownerId, ai);
+        domain.addBot(ownerId, bot);
 
         LobbyEntity entity = LobbyEntity.fromDomain(domain);
 
@@ -68,7 +68,7 @@ class LobbyEntityTest {
         assertThat(entity.aiPlayer()).isNotNull();
         assertThat(entity.aiPlayer().username()).isEqualTo("BOT-MOKO");
         assertThat(entity.aiPlayer().image()).isEqualTo("bot.png");
-        assertThat(entity.aiPlayer().isAi()).isTrue();
+        assertThat(entity.aiPlayer().isBot()).isTrue();
 
         assertThat(entity.startedGameId())
                 .isEqualTo(UUID.fromString("00000000-0000-0000-0000-000000000999"));
@@ -84,7 +84,7 @@ class LobbyEntityTest {
 
         UUID invited = UUID.randomUUID();
 
-        PlayerAiEmbed ai = new PlayerAiEmbed(
+        BotEmbed bot = new BotEmbed(
                 UUID.randomUUID(),
                 "BOT-XYZ",
                 "bot.png",
@@ -106,7 +106,7 @@ class LobbyEntityTest {
                 Instant.parse("2024-05-05T10:00:00Z"),
                 Instant.parse("2024-05-06T10:00:00Z"),
                 startedGame,
-                ai
+                bot
         );
 
         Lobby domain = entity.toDomain();
@@ -125,10 +125,10 @@ class LobbyEntityTest {
         assertThat(domain.invitedPlayers()).hasSize(1);
         assertThat(domain.invitedPlayers().iterator().next().value()).isEqualTo(invited);
 
-        assertThat(domain.hasAi()).isTrue();
-        assertThat(domain.aiPlayer().username().value()).isEqualTo("BOT-XYZ");
-        assertThat(domain.aiPlayer().image()).isEqualTo("bot.png");
-        assertThat(domain.aiPlayer().isAi()).isTrue();
+        assertThat(domain.hasBot()).isTrue();
+        assertThat(domain.bot().username().value()).isEqualTo("BOT-XYZ");
+        assertThat(domain.bot().image()).isEqualTo("bot.png");
+        assertThat(domain.bot().isBot()).isTrue();
 
         assertThat(domain.startedGameId().orElseThrow().value()).isEqualTo(startedGame);
     }
@@ -157,7 +157,7 @@ class LobbyEntityTest {
 
         Lobby domain = entity.toDomain();
         assertThat(domain.startedGameId()).isEmpty();
-        assertThat(domain.hasAi()).isFalse();
+        assertThat(domain.hasBot()).isFalse();
     }
 
     @Test
@@ -185,6 +185,6 @@ class LobbyEntityTest {
         Lobby domain = entity.toDomain();
 
         assertThat(domain.players()).hasSize(1);
-        assertThat(domain.hasAi()).isFalse();
+        assertThat(domain.hasBot()).isFalse();
     }
 }
