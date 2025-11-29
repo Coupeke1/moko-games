@@ -11,9 +11,10 @@ public class EngineCreateGameRequestTest {
     @Test
     public void recordStoresValues() {
         var players = List.of(UUID.randomUUID());
-        var req = new EngineCreateGameRequest(players, "settings");
+        var req = new EngineCreateGameRequest(players, "settings", true);
 
         assertThat(req.players()).isEqualTo(players);
         assertThat(req.settings()).isEqualTo("settings");
+        assertThat(req.aiPlayer()).isTrue();
     }
 }

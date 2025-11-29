@@ -7,6 +7,7 @@ public record StartGameRequest(
         UUID lobbyId,
         UUID gameId,
         List<UUID> players,
-        GameSettingsModel settings
+        GameSettingsModel settings,
+        boolean aiPlayer
 ) {
 }
