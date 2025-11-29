@@ -8,6 +8,8 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @Transactional
 public class ProfileService {
@@ -86,5 +88,18 @@ public class ProfileService {
             return new ProfileEmail(token.getClaimAsString("email"));
 
         throw ClaimNotFoundException.email();
+    }
+
+    public Profile createBotProfile() {
+        ProfileId id = new ProfileId(UUID.randomUUID());
+        ProfileName username = BotNameGenerator.randomName();
+        ProfileEmail email = BotNameGenerator.randomEmail(username);
+        String description = "Hi, I'm a Moko bot.";
+        String image = imageRepository.get().url();
+
+        Profile profile = new Profile(id, username, email, description, image);
+        profileRepository.save(profile);
+
+        return profile;
     }
 }
