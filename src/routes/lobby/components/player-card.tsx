@@ -1,4 +1,9 @@
+import AcceptIcon from "@/components/icons/accept-icon";
+import RejectIcon from "@/components/icons/reject-icon";
 import Column from "@/components/layout/column";
+import { Gap } from "@/components/layout/gap";
+import { Items } from "@/components/layout/items";
+import Row from "@/components/layout/row";
 import type { Player } from "@/models/lobby/player";
 import type { ReactNode } from "react";
 
@@ -21,6 +26,16 @@ export default function PlayerCard({ player, footer }: Props) {
                         {player.username.substring(0, 15)}
                         {player.username.length > 15 ? "..." : ""}
                     </h3>
+                    <Row gap={Gap.Large} responsive={false}>
+                        <Row
+                            gap={Gap.Small}
+                            items={Items.Center}
+                            responsive={false}
+                        >
+                            {player.ready ? <AcceptIcon /> : <RejectIcon />}
+                            {player.ready ? "Ready" : "Not Ready"}
+                        </Row>
+                    </Row>
                 </section>
             </article>
 

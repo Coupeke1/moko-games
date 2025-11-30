@@ -22,51 +22,50 @@ export function Invites({ game }: Props) {
     const { invites, isLoading, isError } = useInvites(game.id);
 
     const accept = useMutation({
-        mutationFn: async ({ invite }: { invite: Lobby }) => await acceptInvite(invite.id),
+        mutationFn: async ({ invite }: { invite: Lobby }) =>
+            await acceptInvite(invite.id),
         onSuccess: async (_data, variables) => {
-            await client.invalidateQueries({ queryKey: ["lobby", "invites", game.id] });
+            await client.invalidateQueries({
+                queryKey: ["lobby", "invites", game.id],
+            });
             showToast("Invite", "Accepted");
             window.location.replace(`/lobby/${variables.invite.id}/players`);
         },
         onError: (error: Error) => {
             showToast("Invite", error.message);
-        }
+        },
     });
 
     function handleAccept(invite: Lobby) {
         accept.mutate({ invite });
-    };
+    }
 
-    if (isLoading || invites === undefined) return <LoadingState />;
+    if (isLoading || !invites) return <LoadingState />;
     if (isError) return <ErrorState />;
 
     return (
         <Column>
-            {
-                invites.length == 0 ? (
-                    <Message>No invites :(</Message>
-                ) : (
-                    <Grid>
-                        {
-                            invites.map((lobby: Lobby) => (
-                                <InviteCard
-                                    key={lobby.id}
-                                    lobby={lobby}
-                                    game={game}
-                                    footer={
-                                        <Button
-                                            onClick={() => handleAccept(lobby)}
-                                            fullWidth={true}
-                                        >
-                                            <AcceptIcon />
-                                        </Button>
-                                    }
-                                />
-                            ))
-                        }
-                    </Grid>
-                )
-            }
+            {invites.length == 0 ? (
+                <Message>No invites :(</Message>
+            ) : (
+                <Grid>
+                    {invites.map((lobby: Lobby) => (
+                        <InviteCard
+                            key={lobby.id}
+                            lobby={lobby}
+                            game={game}
+                            footer={
+                                <Button
+                                    onClick={() => handleAccept(lobby)}
+                                    fullWidth={true}
+                                >
+                                    <AcceptIcon />
+                                </Button>
+                            }
+                        />
+                    ))}
+                </Grid>
+            )}
         </Column>
     );
 }

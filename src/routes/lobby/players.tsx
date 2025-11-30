@@ -47,8 +47,7 @@ function Player({
     const client = useQueryClient();
 
     const remove = useMutation({
-        mutationFn: async ({ player }: { player: Player }) =>
-            await removePlayer(player.id, lobby.id),
+        mutationFn: async () => await removePlayer(player.id, lobby.id),
         onSuccess: async () => {
             await client.invalidateQueries({ queryKey: ["lobby", lobby.id] });
             showToast(player.username, "Removed");
@@ -91,7 +90,7 @@ function Player({
 
         if (isOwner && !playerIsOwner) {
             return (
-                <Button onClick={() => remove} fullWidth={true}>
+                <Button onClick={remove.mutate} fullWidth={true}>
                     <CancelIcon />
                 </Button>
             );
@@ -129,11 +128,12 @@ export default function LobbyPlayersPage() {
         isLoading: profileLoading,
         isError: profileError,
     } = useProfile();
+
     const {
         lobby,
         isLoading: lobbyLoading,
         isError: lobbyError,
-    } = useLobby(id!);
+    } = useLobby(id, profile?.id);
 
     if (lobbyLoading || profileLoading || !lobby || !profile)
         return (
