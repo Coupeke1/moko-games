@@ -1,84 +1,90 @@
 import Button from "@/components/buttons/button";
 import CancelIcon from "@/components/icons/cancel-icon";
+import ClockIcon from "@/components/icons/clock-icon";
+import LevelIcon from "@/components/icons/level-icon";
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
+import { Items } from "@/components/layout/items";
 import Page from "@/components/layout/page";
+import Row from "@/components/layout/row";
 import ErrorState from "@/components/state/error";
 import LoadingState from "@/components/state/loading";
 import Message from "@/components/state/message";
+import TabRow from "@/components/tabs/links/row";
 import showToast from "@/components/toast";
+import UserCard from "@/components/cards/user-card";
 import { useOutgoingRequests } from "@/hooks/use-requests";
 import type { Profile } from "@/models/profile/profile";
-import FriendCard from "@/components/cards/friend-card";
-import TabRow from "@/components/tabs/links/row";
+import { getTabs } from "@/routes/friends/components/tabs";
 import { cancelRequest } from "@/services/friends-service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { getTabs } from "@/routes/friends/components/tabs";
 
 export default function OutgoingRequestsPage() {
     const client = useQueryClient();
     const { requests, isLoading, isError } = useOutgoingRequests();
 
     const cancel = useMutation({
-        mutationFn: async ({ request }: { request: Profile }) => await cancelRequest(request.id),
+        mutationFn: async ({ request }: { request: Profile }) =>
+            await cancelRequest(request.id),
         onSuccess: async () => {
-            await client.invalidateQueries({ queryKey: ["friends", "outgoing"] });
+            await client.invalidateQueries({
+                queryKey: ["friends", "outgoing"],
+            });
             showToast("Request", "Cancelled");
         },
         onError: (error: Error) => {
             showToast("Request", error.message);
-        }
+        },
     });
 
-    function handleCancel(request: Profile) {
-        cancel.mutate({ request });
-    };
+    if (isLoading || requests === undefined)
+        return (
+            <Page>
+                <Column gap={Gap.Large}>
+                    <TabRow tabs={getTabs()} />
+                    <LoadingState />
+                </Column>
+            </Page>
+        );
 
-    if (isLoading || requests === undefined) return (
-        <Page>
-            <Column gap={Gap.Large}>
-                <TabRow tabs={getTabs()} />
-                <LoadingState />
-            </Column>
-        </Page>
-    );
-
-    if (isError) return (
-        <Page>
-            <Column gap={Gap.Large}>
-                <TabRow tabs={getTabs()} />
-                <ErrorState />
-            </Column>
-        </Page>
-    );
+    if (isError)
+        return (
+            <Page>
+                <Column gap={Gap.Large}>
+                    <TabRow tabs={getTabs()} />
+                    <ErrorState />
+                </Column>
+            </Page>
+        );
 
     return (
         <Page>
             <Column gap={Gap.Large}>
                 <TabRow tabs={getTabs()} />
 
-                {
-                    requests.length == 0 ? (
-                        <Message>No outgoing requests :(</Message>
-                    ) : (
-                        <Grid>
-                            {
-                                requests.map((request: Profile) => (
-                                    <FriendCard friend={request} footer={
-                                        <Button
-                                            onClick={() => handleCancel(request)}
-                                            fullWidth={true}
-                                        >
-                                            <CancelIcon />
-                                        </Button>
-                                    } />
-                                ))
-                            }
-                        </Grid>
-                    )
-                }
+                {requests.length == 0 ? (
+                    <Message>No outgoing requests :(</Message>
+                ) : (
+                    <Grid>
+                        {requests.map((request: Profile) => (
+                            <UserCard
+                                user={request}
+                                footer={
+                                    <Button
+                                        onClick={() =>
+                                            cancel.mutate({ request })
+                                        }
+                                        fullWidth={true}
+                                    >
+                                        <CancelIcon />
+                                    </Button>
+                                }
+                            />
+                        ))}
+                    </Grid>
+                )}
             </Column>
         </Page>
-    )
+    );
 }

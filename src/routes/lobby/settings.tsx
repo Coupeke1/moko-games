@@ -1,18 +1,26 @@
+import Button from "@/components/buttons/button";
+import CancelIcon from "@/components/icons/cancel-icon";
+import PlayIcon from "@/components/icons/play-icon";
+import Input from "@/components/inputs/input";
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
+import Grid from "@/components/layout/grid/grid";
+import { GridSize } from "@/components/layout/grid/size";
 import ErrorState from "@/components/state/error";
 import LoadingState from "@/components/state/loading";
 import TabRow from "@/components/tabs/links/row";
-import { useLobby } from "@/hooks/use-lobby";
+import GameInformation from "@/routes/lobby/components/information";
 import Page from "@/routes/lobby/components/page";
 import { getTabs } from "@/routes/lobby/components/tabs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import GameInformation from "@/routes/lobby/components/information";
-import { isUserOwner } from "@/services/lobby-service";
-import { useProfile } from "@/hooks/use-profile";
+import { useLobbyData } from "./hooks/use-lobby";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import showToast from "@/components/toast";
+import { allPlayersReady, updateSettings } from "@/services/lobby-service";
 
 export default function LobbySettingsPage() {
+    const client = useQueryClient();
     const navigate = useNavigate();
     const { id } = useParams();
 
@@ -20,33 +28,45 @@ export default function LobbySettingsPage() {
         if (!id || id.length <= 0) navigate("/library");
     }, [id, navigate]);
 
-    const {
-        profile,
-        isLoading: profileLoading,
-        isError: profileError,
-    } = useProfile();
+    const [size, setSize] = useState<number>(4);
 
-    const {
-        lobby,
-        isLoading: lobbyLoading,
-        isError: lobbyError,
-    } = useLobby(id, profile?.id);
+    const { lobby, profile, game, isOwner, isLoading, isError } =
+        useLobbyData();
 
-    if (lobbyLoading || profileLoading || !lobby || !profile)
+    const save = useMutation({
+        mutationFn: async ({ lobby, game }: { lobby: string; game: string }) =>
+            await updateSettings(lobby, game, size),
+        onSuccess: async (_data, variables) => {
+            await client.invalidateQueries({
+                queryKey: ["lobby", variables.lobby],
+            });
+            showToast("Lobby", "Saved");
+        },
+        onError: (error: Error) => {
+            showToast("Lobby", error.message);
+        },
+    });
+
+    useEffect(() => {
+        if (!lobby) return;
+        setSize(lobby.maxPlayers);
+    }, [lobby]);
+
+    if (isLoading || !lobby || !profile || !game)
         return (
             <Page>
                 <LoadingState />
             </Page>
         );
 
-    if (lobbyError || profileError)
+    if (isError)
         return (
             <Page>
                 <ErrorState />
             </Page>
         );
 
-    const isOwner: boolean = isUserOwner(profile.id, lobby);
+    const ready: boolean = allPlayersReady(lobby);
 
     return (
         <Page>
@@ -54,7 +74,35 @@ export default function LobbySettingsPage() {
                 <GameInformation id={lobby.gameId} />
                 <TabRow tabs={getTabs(lobby.id)} />
 
-                <p>Settings {isOwner ? "owner" : "not owner"}</p>
+                {isOwner && (
+                    <Grid size={GridSize.Small}>
+                        <Button disabled={!ready} fullWidth={true}>
+                            <PlayIcon />
+                        </Button>
+
+                        <Button fullWidth={true}>
+                            <CancelIcon />
+                        </Button>
+                    </Grid>
+                )}
+
+                <Input
+                    label="Max Players"
+                    disabled={!isOwner}
+                    type="number"
+                    value={size.toString()}
+                    onChange={(e) => setSize(Number(e.target.value))}
+                />
+
+                {isOwner && (
+                    <Button
+                        onClick={() =>
+                            save.mutate({ lobby: lobby.id, game: game.title })
+                        }
+                    >
+                        Save
+                    </Button>
+                )}
             </Column>
         </Page>
     );

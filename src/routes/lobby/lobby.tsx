@@ -1,5 +1,6 @@
 import BigButton from "@/components/buttons/big-button";
 import Button from "@/components/buttons/button";
+import UserCard from "@/components/cards/user-card";
 import AcceptIcon from "@/components/icons/accept-icon";
 import CancelIcon from "@/components/icons/cancel-icon";
 import InviteIcon from "@/components/icons/invite-icon";
@@ -8,22 +9,22 @@ import StarIcon from "@/components/icons/star-icon";
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
+import { Items } from "@/components/layout/items";
+import Row from "@/components/layout/row";
 import ErrorState from "@/components/state/error";
 import LoadingState from "@/components/state/loading";
 import Message from "@/components/state/message";
 import TabRow from "@/components/tabs/links/row";
 import showToast from "@/components/toast";
-import { useLobby } from "@/hooks/use-lobby";
-import { useProfile } from "@/hooks/use-profile";
 import type { Lobby } from "@/models/lobby/lobby";
 import type { Player } from "@/models/lobby/player";
 import type { Profile } from "@/models/profile/profile";
 import GameInformation from "@/routes/lobby/components/information";
 import Page from "@/routes/lobby/components/page";
-import PlayerCard from "@/routes/lobby/components/player-card";
 import { getTabs } from "@/routes/lobby/components/tabs";
 import InviteDialog from "@/routes/lobby/dialogs/invite-dialog";
 import {
+    allPlayersReady,
     isUserOwner,
     readyPlayer,
     removePlayer,
@@ -32,6 +33,10 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
+import { useLobbyData } from "./hooks/use-lobby";
+import { GridSize } from "@/components/layout/grid/size";
+import PlayIcon from "@/components/icons/play-icon";
+import SettingsIcon from "@/components/icons/settings-icon";
 
 function Player({
     player,
@@ -111,7 +116,18 @@ function Player({
         );
     }
 
-    return <PlayerCard player={player} footer={PlayerButton()} />;
+    return (
+        <UserCard
+            user={player}
+            statistics={
+                <Row gap={Gap.Small} items={Items.Center} responsive={false}>
+                    {player.ready ? <AcceptIcon /> : <RejectIcon />}
+                    {player.ready ? "Ready" : "Not Ready"}
+                </Row>
+            }
+            footer={PlayerButton()}
+        />
+    );
 }
 
 export default function LobbyPlayersPage() {
@@ -123,62 +139,52 @@ export default function LobbyPlayersPage() {
         if (!id || id.length <= 0) navigate("/library");
     }, [id, navigate]);
 
-    const {
-        profile,
-        isLoading: profileLoading,
-        isError: profileError,
-    } = useProfile();
+    const { lobby, profile, isOwner, isLoading, isError } = useLobbyData();
 
-    const {
-        lobby,
-        isLoading: lobbyLoading,
-        isError: lobbyError,
-    } = useLobby(id, profile?.id);
-
-    if (lobbyLoading || profileLoading || !lobby || !profile)
+    if (isLoading || !lobby || !profile)
         return (
             <Page>
                 <LoadingState />
             </Page>
         );
 
-    if (lobbyError || profileError)
+    if (isError)
         return (
             <Page>
                 <ErrorState />
             </Page>
         );
 
-    const isOwner: boolean = isUserOwner(profile.id, lobby);
-
     return (
         <Page>
             <InviteDialog lobby={lobby} open={invite} onChange={setInvite} />
-
             <Column gap={Gap.Large}>
                 <GameInformation id={lobby.gameId} />
                 <TabRow tabs={getTabs(lobby.id)} />
 
-                {lobby.players.length == 0 ? (
-                    <Message>No players :(</Message>
-                ) : (
-                    <Grid>
-                        {lobby.players.map((player: Player) => (
-                            <Player
-                                player={player}
-                                lobby={lobby}
-                                profile={profile}
-                                isOwner={isOwner}
-                            />
-                        ))}
+                <Column>
+                    {lobby.players.length == 0 ? (
+                        <Message>No players :(</Message>
+                    ) : (
+                        <Grid>
+                            {lobby.players.map((player: Player) => (
+                                <Player
+                                    key={player.id}
+                                    player={player}
+                                    lobby={lobby}
+                                    profile={profile}
+                                    isOwner={isOwner}
+                                />
+                            ))}
 
-                        {isOwner && (
-                            <BigButton onClick={() => setInvite(true)}>
-                                <InviteIcon />
-                            </BigButton>
-                        )}
-                    </Grid>
-                )}
+                            {isOwner && (
+                                <BigButton onClick={() => setInvite(true)}>
+                                    <InviteIcon />
+                                </BigButton>
+                            )}
+                        </Grid>
+                    )}
+                </Column>
             </Column>
         </Page>
     );

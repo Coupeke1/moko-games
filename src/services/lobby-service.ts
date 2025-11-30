@@ -17,24 +17,10 @@ export async function findLobby(id: string): Promise<Lobby> {
 
 export async function createLobby(game: Game, size: number): Promise<Lobby> {
     try {
-        const settings =
-            game.title === "Tic Tac Toe"
-                ? {
-                      type: "ticTacToe",
-                      boardSize: 3,
-                  }
-                : game.title === "Checkers"
-                  ? {
-                        type: "checkers",
-                        boardSize: 8,
-                        flyingKings: false,
-                    }
-                  : null;
-
         const { data } = await client.post<Lobby>(BASE_URL, {
             gameId: game.id,
             maxPlayers: size,
-            settings: settings,
+            settings: getGameSettings(game.title),
         });
 
         return data;
@@ -46,6 +32,8 @@ export async function createLobby(game: Game, size: number): Promise<Lobby> {
 export function isPlayerInLobby(user: string, lobby: Lobby): boolean {
     try {
         validIdCheck(user);
+
+        if (!user) return true;
 
         return (
             lobby.players.find((player: Player) => player.id === user) !==
@@ -141,4 +129,51 @@ export async function unReadyPlayer(lobby: string) {
     } catch {
         throw new Error(`Player could not cancel ready up`);
     }
+}
+
+export function allPlayersReady(lobby: Lobby): boolean {
+    try {
+        return (
+            lobby.players.find((player: Player) => !player.ready) === undefined
+        );
+    } catch {
+        throw new Error(
+            `Cannot check if all players in lobby with id '${lobby.id}' are ready`,
+        );
+    }
+}
+
+export async function updateSettings(
+    lobby: string,
+    title: string,
+    size: number,
+) {
+    try {
+        validIdCheck(lobby);
+
+        await client.put(`${BASE_URL}/${lobby}/settings`, {
+            maxPlayers: size,
+            settings: getGameSettings(title),
+        });
+    } catch {
+        throw new Error(
+            `Could not update settings for lobby with id '${lobby}'`,
+        );
+    }
+}
+
+/* TODO: remove this to work with `game-service` */
+function getGameSettings(title: string) {
+    return title === "Tic Tac Toe"
+        ? {
+              type: "ticTacToe",
+              boardSize: 3,
+          }
+        : title === "Checkers"
+          ? {
+                type: "checkers",
+                boardSize: 8,
+                flyingKings: false,
+            }
+          : null;
 }
