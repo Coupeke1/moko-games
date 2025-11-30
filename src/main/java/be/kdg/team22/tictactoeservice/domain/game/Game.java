@@ -12,28 +12,38 @@ import java.util.stream.Collectors;
 @AggregateRoot
 public class Game {
     private final GameId id;
-    private Board board;
-    private GameStatus status;
     private final TreeSet<Player> players;
     private final Map<PlayerId, List<Move>> moveHistory;
+    private final PlayerRole aiPlayer;
+    private Board board;
+    private GameStatus status;
     private PlayerRole currentRole;
     private PlayerId winner;
-    private final PlayerRole aiPlayer;
 
     private Game(final int requestedSize, final List<Player> players, final PlayerRole aiPlayer) {
         this.id = GameId.create();
-        board = Board.create(requestedSize);
-        status = GameStatus.IN_PROGRESS;
-        this.players = new TreeSet<>(Comparator.comparing((Player player) ->
-                player.role().order()));
+        this.board = Board.create(requestedSize);
+        this.status = GameStatus.IN_PROGRESS;
+
+        this.players = new TreeSet<>(Comparator.comparing((Player p) -> p.role().order()));
         this.players.addAll(players);
-        moveHistory = players.stream().collect(Collectors.toMap(Player::id, p -> new ArrayList<>()));
-        currentRole = this.players.getFirst().role();
-        winner = null;
+
+        this.moveHistory = players.stream()
+                .collect(Collectors.toMap(Player::id, p -> new ArrayList<>()));
+
+        this.currentRole = this.players.getFirst().role();
+        this.winner = null;
+
         this.aiPlayer = aiPlayer;
     }
 
-    public static Game create(final int minSize, final int maxSize, final int size, final List<PlayerId> playerIds, final boolean aiPlayer) {
+    public static Game create(
+            final int minSize,
+            final int maxSize,
+            final int size,
+            final List<PlayerId> playerIds,
+            final boolean aiPlayer
+    ) {
         if (size < minSize || size > maxSize)
             throw new BoardSizeException(minSize, maxSize);
 
@@ -42,23 +52,25 @@ public class Game {
             throw new UniquePlayersException();
 
         PlayerRole[] roles = PlayerRole.values();
-        if (playerIds.size() + (aiPlayer ? 1 : 0) < 2 || playerIds.size() + (aiPlayer ? 1 : 0) > roles.length) {
-            throw new GameSizeException(roles.length);
-        }
 
         List<Player> players = new ArrayList<>();
+        PlayerRole aiRole = null;
+
         for (int i = 0; i < playerIds.size(); i++) {
             PlayerId playerId = playerIds.get(i);
             PlayerRole role = roles[i % roles.length];
-            players.add(new Player(playerId, role, false));
+
+            boolean isAi = aiPlayer && i == playerIds.size() - 1;
+
+            players.add(new Player(playerId, role, isAi));
+
+            if (isAi) {
+                aiRole = role;
+            }
         }
 
-        PlayerRole aiRole = null;
-        if (aiPlayer) {
-            PlayerId aiPlayerId = PlayerId.create();
-            aiRole = PlayerRole.values()[players.size()];
-            players.add(new Player(aiPlayerId, aiRole, true));
-        }
+        if (players.size() < 2 || players.size() > roles.length)
+            throw new GameSizeException(roles.length);
 
         return new Game(size, players, aiRole);
     }
@@ -76,46 +88,40 @@ public class Game {
     }
 
     public Player nextPlayer() {
-        Player currentPlayer = currentPlayer();
+        Player current = currentPlayer();
         List<Player> playerList = new ArrayList<>(players);
-        int currentIndex = playerList.indexOf(currentPlayer);
+        int currentIndex = playerList.indexOf(current);
 
         int nextIndex = (currentIndex + 1) % playerList.size();
-        Player nextPlayer = playerList.get(nextIndex);
-        currentRole = nextPlayer.role();
+        Player next = playerList.get(nextIndex);
+        this.currentRole = next.role();
 
-        return nextPlayer;
+        return next;
     }
 
     public void requestMove(final Move move) {
-        if (status != GameStatus.IN_PROGRESS) {
+        if (status != GameStatus.IN_PROGRESS)
             throw new GameNotInProgressException();
-        }
 
-        if (!currentPlayer().id().equals(move.playerId())) {
+        if (!currentPlayer().id().equals(move.playerId()))
             throw new NotPlayersTurnException(currentPlayer().id().value());
-        }
 
         if (move.row() < 0 || move.col() < 0
-                || move.row() >= board.size() || move.col() >= board.size()) {
+                || move.row() >= board.size() || move.col() >= board.size())
             throw new InvalidCellException(board.size());
-        }
 
-        if (board.cell(move.row(), move.col()) != null) {
+        if (board.cell(move.row(), move.col()) != null)
             throw new CellOccupiedException(move.row(), move.col());
-        }
 
         board = board.setCell(move.row(), move.col(), currentRole);
         moveHistory.get(move.playerId()).add(move);
 
         status = board.checkWinner(move.row(), move.col(), currentRole);
-        if (status == GameStatus.WON) {
+        if (status == GameStatus.WON)
             winner = move.playerId();
-        }
 
-        if (status == GameStatus.IN_PROGRESS) {
+        if (status == GameStatus.IN_PROGRESS)
             nextPlayer();
-        }
     }
 
     public GameId id() {
@@ -150,7 +156,8 @@ public class Game {
     }
 
     public PlayerRole roleOfPlayer(PlayerId id) {
-        return players.stream().filter(p -> p.id().equals(id))
+        return players.stream()
+                .filter(p -> p.id().equals(id))
                 .map(Player::role)
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException(id.value()));
