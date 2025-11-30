@@ -15,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -56,8 +57,8 @@ class DbLobbyRepositoryTest {
                 id,
                 gameId,
                 ownerId,
-                Set.of(owner),
-                Set.of(invitedId),
+                List.of(owner),
+                List.of(invitedId),
                 settings,
                 LobbyStatus.OPEN,
                 Instant.now(),

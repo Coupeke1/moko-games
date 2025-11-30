@@ -25,7 +25,7 @@ class LobbyEntityTest {
     }
 
     @Test
-    void fromDomain_mapsAllFields_includingAi() {
+    void from_mapsAllFields_includingAi() {
         LobbyId id = LobbyId.create();
         GameId gameId = GameId.create();
         PlayerId ownerId = PlayerId.create();
@@ -55,7 +55,7 @@ class LobbyEntityTest {
 
         domain.addBot(ownerId, bot);
 
-        LobbyEntity entity = LobbyEntity.fromDomain(domain);
+        LobbyEntity entity = LobbyEntity.from(domain);
 
         assertThat(entity.id()).isEqualTo(id.value());
         assertThat(entity.gameId()).isEqualTo(gameId.value());
@@ -75,7 +75,7 @@ class LobbyEntityTest {
     }
 
     @Test
-    void toDomain_mapsBackCorrectly_includingAi() {
+    void to_mapsBackCorrectly_includingAi() {
         UUID id = UUID.randomUUID();
         UUID gameId = UUID.randomUUID();
         UUID ownerId = UUID.randomUUID();
@@ -99,8 +99,8 @@ class LobbyEntityTest {
                 id,
                 gameId,
                 ownerId,
-                Set.of(e1),
-                Set.of(invited),
+                List.of(e1),
+                List.of(invited),
                 settings,
                 LobbyStatus.CLOSED,
                 Instant.parse("2024-05-05T10:00:00Z"),
@@ -109,7 +109,7 @@ class LobbyEntityTest {
                 bot
         );
 
-        Lobby domain = entity.toDomain();
+        Lobby domain = entity.to();
 
         assertThat(domain.id().value()).isEqualTo(id);
         assertThat(domain.gameId().value()).isEqualTo(gameId);
@@ -134,7 +134,7 @@ class LobbyEntityTest {
     }
 
     @Test
-    void toDomain_handlesNullStartedGameId() {
+    void to_handlesNullStartedGameId() {
         UUID id = UUID.randomUUID();
         UUID gameId = UUID.randomUUID();
         UUID ownerId = UUID.randomUUID();
@@ -145,8 +145,8 @@ class LobbyEntityTest {
                 id,
                 gameId,
                 ownerId,
-                Set.of(new PlayerEmbed(ownerId, "owner", "", false)),
-                Set.of(),
+                List.of(new PlayerEmbed(ownerId, "owner", "", false)),
+                List.of(),
                 settings,
                 LobbyStatus.OPEN,
                 Instant.now(),
@@ -155,13 +155,13 @@ class LobbyEntityTest {
                 null
         );
 
-        Lobby domain = entity.toDomain();
+        Lobby domain = entity.to();
         assertThat(domain.startedGameId()).isEmpty();
         assertThat(domain.hasBot()).isFalse();
     }
 
     @Test
-    void toDomain_noAi_doesNotModifyPlayers() {
+    void to_noAi_doesNotModifyPlayers() {
         UUID id = UUID.randomUUID();
         UUID gameId = UUID.randomUUID();
         UUID ownerId = UUID.randomUUID();
@@ -172,8 +172,8 @@ class LobbyEntityTest {
                 id,
                 gameId,
                 ownerId,
-                Set.of(owner),
-                Set.of(),
+                List.of(owner),
+                List.of(),
                 new LobbySettings(new TicTacToeSettings(3), 4),
                 LobbyStatus.OPEN,
                 Instant.now(),
@@ -182,7 +182,7 @@ class LobbyEntityTest {
                 null
         );
 
-        Lobby domain = entity.toDomain();
+        Lobby domain = entity.to();
 
         assertThat(domain.players()).hasSize(1);
         assertThat(domain.hasBot()).isFalse();

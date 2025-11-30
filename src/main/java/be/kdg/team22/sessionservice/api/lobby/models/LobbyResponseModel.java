@@ -23,7 +23,6 @@ public record LobbyResponseModel(UUID id,
                                  UUID startedGameId) {
 
     public static LobbyResponseModel from(Lobby lobby) {
-
         GameSettingsModel settingsModel = switch (lobby.settings().gameSettings()) {
             case TicTacToeSettings t ->
                     new TicTacToeSettingsModel(t.boardSize());
@@ -31,11 +30,10 @@ public record LobbyResponseModel(UUID id,
                     new CheckersSettingsModel(c.boardSize(), c.flyingKings());
         };
 
-        PlayerSummaryModel aiSummary = null;
-        if (lobby.hasBot()) {
-            aiSummary = PlayerSummaryModel.from(lobby.bot());
-        }
+        PlayerSummaryModel botModel = null;
+        if (lobby.hasBot())
+            botModel = PlayerSummaryModel.from(lobby.bot());
 
-        return new LobbyResponseModel(lobby.id().value(), lobby.gameId().value(), lobby.ownerId().value(), lobby.players().stream().map(PlayerSummaryModel::from).collect(Collectors.toSet()), aiSummary, lobby.settings().maxPlayers(), lobby.status(), lobby.createdAt(), settingsModel, lobby.startedGameId().map(GameId::value).orElse(null));
+        return new LobbyResponseModel(lobby.id().value(), lobby.gameId().value(), lobby.ownerId().value(), lobby.players().stream().map(PlayerSummaryModel::from).collect(Collectors.toSet()), botModel, lobby.settings().maxPlayers(), lobby.status(), lobby.createdAt(), settingsModel, lobby.startedGameId().map(GameId::value).orElse(null));
     }
 }

@@ -22,21 +22,21 @@ public class DbLobbyRepository implements LobbyRepository {
 
     @Override
     public Optional<Lobby> findById(final LobbyId id) {
-        return repository.findById(id.value()).map(LobbyEntity::toDomain);
+        return repository.findById(id.value()).map(LobbyEntity::to);
     }
 
     @Override
     public List<Lobby> findAll() {
-        return repository.findAll().stream().map(LobbyEntity::toDomain).toList();
+        return repository.findAll().stream().map(LobbyEntity::to).toList();
     }
 
     @Override
     public List<Lobby> findInvitesFromPlayerId(PlayerId id, GameId gameId) {
-        return repository.findInvitesFromPlayerId(id.value(), gameId.value()).stream().map(LobbyEntity::toDomain).toList();
+        return repository.findInvitesFromPlayerId(id.value(), gameId.value()).stream().map(LobbyEntity::to).toList();
     }
 
     @Override
     public void save(final Lobby lobby) {
-        repository.save(LobbyEntity.fromDomain(lobby));
+        repository.save(LobbyEntity.from(lobby));
     }
 }
