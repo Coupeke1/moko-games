@@ -41,7 +41,7 @@ public class AiMoveEventListener {
                     .id();
 
             Move move = new Move(gameId, aiPlayerId, response.row(), response.col());
-            gameService.requestMove(gameId, move);
+            gameService.requestMove(gameId, aiPlayerId, move);
         }
     }
 }
