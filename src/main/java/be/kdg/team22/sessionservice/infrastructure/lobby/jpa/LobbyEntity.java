@@ -83,25 +83,24 @@ public class LobbyEntity {
         List<PlayerEmbed> players = lobby.players().stream().map(player -> new PlayerEmbed(player.id().value(), player.username().value(), player.image(), player.ready())).toList();
         List<UUID> invited = lobby.invitedPlayers().stream().map(PlayerId::value).toList();
 
-        BotEmbed bot = null;
         if (lobby.hasBot()) {
-            bot = new BotEmbed(lobby.bot().id().value(), lobby.bot().username().value(), lobby.bot().image(), lobby.bot().ready(), lobby.bot().isBot());
+            BotEmbed bot = new BotEmbed(lobby.bot().id().value(), lobby.bot().username().value(), lobby.bot().image(), lobby.bot().ready());
+
+            return new LobbyEntity(lobby.id().value(), lobby.gameId().value(), lobby.ownerId().value(), players, invited, lobby.settings(), lobby.status(), lobby.createdAt(), lobby.updatedAt(), lobby.startedGameId().map(GameId::value).orElse(null), bot);
         }
 
-        return new LobbyEntity(lobby.id().value(), lobby.gameId().value(), lobby.ownerId().value(), players, invited, lobby.settings(), lobby.status(), lobby.createdAt(), lobby.updatedAt(), lobby.startedGameId().map(GameId::value).orElse(null), bot);
+        return new LobbyEntity(lobby.id().value(), lobby.gameId().value(), lobby.ownerId().value(), players, invited, lobby.settings(), lobby.status(), lobby.createdAt(), lobby.updatedAt(), lobby.startedGameId().map(GameId::value).orElse(null), null);
     }
 
     public Lobby to() {
-        List<Player> players = this.players.stream().map(p -> new Player(PlayerId.from(p.id()), PlayerName.from(p.username()), p.image(), p.ready())).toList();
-        Set<PlayerId> invited = this.invitedPlayerIds.stream().map(PlayerId::from).collect(Collectors.toSet());
+        List<Player> players = this.players.stream().map(player -> new Player(PlayerId.from(player.id()), PlayerName.from(player.username()), player.image(), player.ready())).toList();
+        Set<PlayerId> invited = invitedPlayerIds.stream().map(PlayerId::from).collect(Collectors.toSet());
 
         Lobby lobby = new Lobby(LobbyId.from(id), GameId.from(gameId), PlayerId.from(ownerId), players, invited, settings, status, createdAt, updatedAt, startedGameId == null ? null : GameId.from(startedGameId));
 
-        if (this.bot != null) {
-            Player bot = Player.bot(PlayerId.from(this.bot.id()), PlayerName.from(this.bot.username()), this.bot.image());
-            lobby.addBot(lobby.ownerId(), bot);
-        }
+        if (bot == null) return lobby;
 
+        lobby.addBot(lobby.ownerId(), Player.bot(PlayerId.from(bot.id()), PlayerName.from(bot.username()), bot.image()));
         return lobby;
     }
 
@@ -133,7 +132,7 @@ public class LobbyEntity {
         return startedGameId;
     }
 
-    public BotEmbed aiPlayer() {
+    public BotEmbed bot() {
         return bot;
     }
 

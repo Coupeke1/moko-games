@@ -10,17 +10,15 @@ public class BotEmbed {
     private String username;
     private String image;
     private boolean ready;
-    private boolean isBot;
 
     protected BotEmbed() {
     }
 
-    public BotEmbed(UUID id, String username, String image, boolean ready, boolean isBot) {
+    public BotEmbed(UUID id, String username, String image, boolean ready) {
         this.id = id;
         this.username = username;
         this.image = image;
         this.ready = ready;
-        this.isBot = isBot;
     }
 
     public UUID id() {
@@ -37,9 +35,5 @@ public class BotEmbed {
 
     public boolean ready() {
         return ready;
-    }
-
-    public boolean isBot() {
-        return isBot;
     }
 }
