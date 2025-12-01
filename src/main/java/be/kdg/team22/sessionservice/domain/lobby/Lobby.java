@@ -68,23 +68,6 @@ public class Lobby {
         this.invitedPlayerIds = new HashSet<>();
     }
 
-    public Lobby(
-            final LobbyId id,
-            final GameId game,
-            final PlayerId owner,
-            final List<Player> players,
-            final Set<PlayerId> invitedPlayers,
-            final LobbySettings settings,
-            final LobbyStatus status,
-            final Instant createdAt,
-            final Instant updatedAt,
-            final GameId startedGameId,
-            final Player aiPlayer
-    ) {
-        this(id, game, owner, players, invitedPlayers, settings, status, createdAt, updatedAt, startedGameId);
-        this.bot = aiPlayer;
-    }
-
     public void acceptInvite(final Player target) {
         ensureModifiable();
 
