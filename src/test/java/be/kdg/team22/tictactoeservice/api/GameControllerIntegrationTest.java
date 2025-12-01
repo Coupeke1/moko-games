@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -25,6 +27,7 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -53,6 +56,17 @@ public class GameControllerIntegrationTest {
                 players,
                 new GameSettingsModel(3)
         );
+    }
+
+    private UsernamePasswordAuthenticationToken authWithUser(UUID id) {
+        Jwt jwt = Jwt.withTokenValue("token-" + id)
+                .header("alg", "none")
+                .subject(id.toString())
+                .claim("preferred_username", "mathias")
+                .claim("email", "m@a")
+                .build();
+
+        return new UsernamePasswordAuthenticationToken(jwt, jwt.getTokenValue(), List.of());
     }
 
     @Test
@@ -223,9 +237,13 @@ public class GameControllerIntegrationTest {
         String gameId = extractId(createResponse);
         Game game = repository.findById(GameId.fromString(gameId)).orElseThrow();
 
-        MoveModel moveModel = new MoveModel(game.id().value(), game.currentPlayer().id().value(), 0, 1);
+        UUID playerUuid = game.currentPlayer().id().value();
+        UsernamePasswordAuthenticationToken auth = authWithUser(playerUuid);
+
+        MoveModel moveModel = new MoveModel(game.id().value(), playerUuid, 0, 1);
 
         mockMvc.perform(post("/api/games/" + gameId + "/move")
+                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(moveModel)))
                 .andExpect(status().isOk())
@@ -246,9 +264,13 @@ public class GameControllerIntegrationTest {
         String gameId = extractId(createResponse);
         Game game = repository.findById(GameId.fromString(gameId)).orElseThrow();
 
-        MoveModel moveModel = new MoveModel(game.id().value(), game.currentPlayer().id().value(), -1, 1);
+        UUID playerUuid = game.currentPlayer().id().value();
+        UsernamePasswordAuthenticationToken auth = authWithUser(playerUuid);
+
+        MoveModel moveModel = new MoveModel(game.id().value(), playerUuid, -1, 1);
 
         mockMvc.perform(post("/api/games/" + gameId + "/move")
+                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(moveModel)))
                 .andExpect(status().isBadRequest())
@@ -266,7 +288,7 @@ public class GameControllerIntegrationTest {
                 ));
 
         CreateGameModel onePlayerModel = new CreateGameModel(
-                List.of(UUID.randomUUID()),
+                List.of(UUID.randomUUID(), UUID.randomUUID()),
                 new GameSettingsModel(3)
         );
 
@@ -280,9 +302,14 @@ public class GameControllerIntegrationTest {
         String gameId = extractId(createResponse);
 
         Game game = repository.findById(GameId.fromString(gameId)).orElseThrow();
-        MoveModel humanMove = new MoveModel(game.id().value(), game.currentPlayer().id().value(), 0, 0);
+
+        UUID playerUuid = game.currentPlayer().id().value();
+        UsernamePasswordAuthenticationToken auth = authWithUser(playerUuid);
+
+        MoveModel humanMove = new MoveModel(game.id().value(), playerUuid, 0, 0);
 
         mockMvc.perform(post("/api/games/" + gameId + "/move")
+                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(humanMove)))
                 .andExpect(status().isOk())
