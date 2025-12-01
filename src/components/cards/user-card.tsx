@@ -25,6 +25,7 @@ export default function UserCard({ user, statistics, footer }: Props) {
                         {user.username.substring(0, 15)}
                         {user.username.length > 15 ? "..." : ""}
                     </h3>
+
                     <Row gap={Gap.Large} responsive={false}>
                         {statistics && statistics}
                     </Row>

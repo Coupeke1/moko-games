@@ -1,5 +1,5 @@
 import Button from "@/components/buttons/button";
-import UserCard from "@/components/cards/user-card";
+import Card from "@/components/cards/user-card";
 import AcceptIcon from "@/components/icons/accept-icon";
 import CancelIcon from "@/components/icons/cancel-icon";
 import RejectIcon from "@/components/icons/reject-icon";
@@ -98,7 +98,7 @@ export default function PlayerCard({
     }
 
     return (
-        <UserCard
+        <Card
             user={player}
             statistics={
                 <Row gap={Gap.Small} items={Items.Center} responsive={false}>
