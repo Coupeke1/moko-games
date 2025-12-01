@@ -1,4 +1,4 @@
-import type { Tab } from "@/components/tabs/tab";
+import type { Tab } from "@/components/tabs/buttons/tab";
 
 interface Props {
     tabs: Tab[];

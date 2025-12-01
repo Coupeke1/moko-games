@@ -17,16 +17,24 @@ interface Props {
     onEdit: () => void;
 }
 
-function Statistic({ title, value }: { title: string; value: string; }) {
+function Statistic({ title, value }: { title: string; value: string }) {
     return (
         <Column gap={Gap.None}>
             <h4 className="text-sm md:text-xs text-fg-2">{title}</h4>
             <p className="text-lg text-right md:text-md">{value}</p>
         </Column>
-    )
+    );
 }
 
-export default function ProfileInformation({ image, username, email, description, level, playTime, onEdit }: Props) {
+export default function ProfileInformation({
+    image,
+    username,
+    email,
+    description,
+    level,
+    playTime,
+    onEdit,
+}: Props) {
     return (
         <Row justify={Justify.Between} items={Items.Stretch}>
             <Row gap={Gap.Large} items={Items.Stretch}>
@@ -45,20 +53,23 @@ export default function ProfileInformation({ image, username, email, description
                         <h3 className="text-fg-2">{email}</h3>
                     </Column>
 
-                    <p className="max-w-xs">{description.substring(0, 64)}{description.length > 64 ? "..." : ""}</p>
+                    <p className="max-w-xs">
+                        {description.substring(0, 64)}
+                        {description.length > 64 ? "..." : ""}
+                    </p>
                 </Column>
             </Row>
 
             <section className="flex flex-col md:justify-between md:items-end p-1">
-                <button onClick={onEdit}>
+                <button
+                    onClick={onEdit}
+                    className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75"
+                >
                     <EditIcon small={false} />
                 </button>
 
                 <Row gap={Gap.Large} responsive={false}>
-                    <Statistic
-                        title="Level"
-                        value={level.toString()}
-                    />
+                    <Statistic title="Level" value={level.toString()} />
 
                     <Statistic
                         title="Time Played"
@@ -67,5 +78,5 @@ export default function ProfileInformation({ image, username, email, description
                 </Row>
             </section>
         </Row>
-    )
+    );
 }

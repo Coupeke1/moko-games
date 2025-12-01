@@ -15,7 +15,7 @@ export async function findGames(): Promise<Game[]> {
 
 export async function favouriteGame(id: string) {
     try {
-
+        // TODO
     } catch {
         throw new Error(`Game with id '${id}' could not be favourited`);
     }
@@ -23,7 +23,7 @@ export async function favouriteGame(id: string) {
 
 export async function unFavouriteGame(id: string) {
     try {
-
+        // TODO
     } catch {
         throw new Error(`Game with id '${id}' could not be unfavourited`);
     }

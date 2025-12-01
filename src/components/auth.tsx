@@ -1,27 +1,37 @@
 import Page from "@/components/layout/page";
 import LoadingState from "@/components/state/loading";
-import { config } from "@/config";
+import { useProfile } from "@/hooks/use-profile";
 import { useAuthStore } from "@/stores/auth-store";
 import { useEffect } from "react";
-
-const configIdp: Keycloak.KeycloakConfig = {
-    url: config.authUrl,
-    realm: config.authRealm,
-    clientId: config.authClientId
-};
+import ErrorState from "@/components/state/error";
+import { config } from "@/config";
 
 export default function Auth() {
     const initAuth = useAuthStore((state) => state.init);
     const initialized = useAuthStore((state) => state.initialized);
+    const { isLoading, isError } = useProfile();
 
     useEffect(() => {
-        initAuth(configIdp);
+        initAuth({
+            url: config.authUrl,
+            realm: config.authRealm,
+            clientId: config.authClientId,
+        } as Keycloak.KeycloakConfig);
     }, []);
 
-    if (!initialized) return (
-        <Page>
-            <LoadingState />
-        </Page>
-    )
+    if (!initialized || isLoading)
+        return (
+            <Page>
+                <LoadingState />
+            </Page>
+        );
+
+    if (isError)
+        return (
+            <Page>
+                <ErrorState />
+            </Page>
+        );
+
     return <></>;
 }
