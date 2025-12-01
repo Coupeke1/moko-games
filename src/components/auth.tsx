@@ -4,12 +4,7 @@ import { useProfile } from "@/hooks/use-profile";
 import { useAuthStore } from "@/stores/auth-store";
 import { useEffect } from "react";
 import ErrorState from "@/components/state/error";
-
-const config: Keycloak.KeycloakConfig = {
-    url: import.meta.env.VITE_AUTH_URL,
-    realm: import.meta.env.VITE_AUTH_REALM,
-    clientId: import.meta.env.VITE_AUTH_CLIENT,
-};
+import { config } from "@/config";
 
 export default function Auth() {
     const initAuth = useAuthStore((state) => state.init);
@@ -17,7 +12,11 @@ export default function Auth() {
     const { isLoading, isError } = useProfile();
 
     useEffect(() => {
-        initAuth(config);
+        initAuth({
+            url: config.authUrl,
+            realm: config.authRealm,
+            clientId: config.authClientId,
+        } as Keycloak.KeycloakConfig);
     }, []);
 
     if (!initialized || isLoading)
