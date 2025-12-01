@@ -1,49 +1,26 @@
 import Dialog from "@/components/dialog/dialog";
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
-import TabContent from "@/components/tabs/buttons/content";
-import TabRow from "@/components/tabs/buttons/row";
+import Grid from "@/components/layout/grid/grid";
 import type { Lobby } from "@/models/lobby/lobby";
-import FriendsTab from "@/routes/lobby/dialogs/invite-dialog/friends-tab";
-import BotsTab from "@/routes/lobby/dialogs/invite-dialog/bots-tab";
-import { useState } from "react";
+import BotsSection from "@/routes/lobby/dialogs/invite-dialog/bots-section";
+import FriendsSection from "@/routes/lobby/dialogs/invite-dialog/friends-section";
 
 interface Props {
     lobby: Lobby;
+    close: () => void;
     open: boolean;
     onChange: (open: boolean) => void;
 }
 
-export default function InviteDialog({ lobby, open, onChange }: Props) {
-    const [current, setCurrent] = useState<string>("Friends");
-
+export default function InviteDialog({ lobby, close, open, onChange }: Props) {
     return (
-        <Dialog
-            title="Invite"
-            onClose={() => setCurrent("Friends")}
-            open={open}
-            onChange={onChange}
-        >
+        <Dialog title="Invite" open={open} onChange={onChange}>
             <Column gap={Gap.Large}>
-                <TabRow
-                    tabs={["Friends", "Bots"]}
-                    current={current}
-                    setCurrent={setCurrent}
-                />
-
-                <TabContent
-                    current={current}
-                    tabs={[
-                        {
-                            title: "Friends",
-                            element: <FriendsTab lobby={lobby} />,
-                        },
-                        {
-                            title: "Bots",
-                            element: <BotsTab />,
-                        },
-                    ]}
-                />
+                <Grid>
+                    <BotsSection lobby={lobby} onInvite={close} />
+                    <FriendsSection lobby={lobby} onInvite={close} />
+                </Grid>
             </Column>
         </Dialog>
     );

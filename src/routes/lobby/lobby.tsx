@@ -11,7 +11,7 @@ import showToast from "@/components/toast";
 import type { Player } from "@/models/lobby/player";
 import GameInformation from "@/routes/lobby/components/information";
 import Page from "@/routes/lobby/components/page";
-import PlayerCard from "@/routes/lobby/components/player";
+import PlayerCard from "@/routes/lobby/components/player-card";
 import InviteDialog from "@/routes/lobby/dialogs/invite-dialog/invite-dialog";
 import SettingsDialog from "@/routes/lobby/dialogs/settings-dialog/settings-dialog";
 import { useLobbyData } from "@/routes/lobby/hooks/use-lobby";
@@ -19,6 +19,7 @@ import { closeLobby } from "@/services/lobby-service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
+import BotCard from "@/routes/lobby/components/bot-card";
 
 export default function LobbyPage() {
     const client = useQueryClient();
@@ -65,7 +66,12 @@ export default function LobbyPage() {
 
     return (
         <Page>
-            <InviteDialog lobby={lobby} open={invite} onChange={setInvite} />
+            <InviteDialog
+                lobby={lobby}
+                close={() => setInvite(false)}
+                open={invite}
+                onChange={setInvite}
+            />
             <SettingsDialog
                 lobby={lobby}
                 game={game}
@@ -97,6 +103,14 @@ export default function LobbyPage() {
                                     isOwner={isOwner}
                                 />
                             ))}
+
+                            {lobby.bot && (
+                                <BotCard
+                                    bot={lobby.bot}
+                                    lobby={lobby}
+                                    isOwner={isOwner}
+                                />
+                            )}
 
                             {isOwner && (
                                 <BigButton onClick={() => setInvite(true)}>
