@@ -5,22 +5,22 @@ import jakarta.persistence.Embeddable;
 import java.util.UUID;
 
 @Embeddable
-public class PlayerAiEmbed {
+public class BotEmbed {
     private UUID id;
     private String username;
     private String image;
     private boolean ready;
-    private boolean isAi;
+    private boolean isBot;
 
-    protected PlayerAiEmbed() {
+    protected BotEmbed() {
     }
 
-    public PlayerAiEmbed(UUID id, String username, String image, boolean ready, boolean isAi) {
+    public BotEmbed(UUID id, String username, String image, boolean ready, boolean isBot) {
         this.id = id;
         this.username = username;
         this.image = image;
         this.ready = ready;
-        this.isAi = isAi;
+        this.isBot = isBot;
     }
 
     public UUID id() {
@@ -39,7 +39,7 @@ public class PlayerAiEmbed {
         return ready;
     }
 
-    public boolean isAi() {
-        return isAi;
+    public boolean isBot() {
+        return isBot;
     }
 }

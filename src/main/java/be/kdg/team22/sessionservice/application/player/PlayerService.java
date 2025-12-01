@@ -1,6 +1,6 @@
 package be.kdg.team22.sessionservice.application.player;
 
-import be.kdg.team22.sessionservice.domain.lobby.exceptions.CantCreateBotException;
+import be.kdg.team22.sessionservice.domain.lobby.exceptions.CannotCreateBotException;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.domain.player.PlayerName;
@@ -24,8 +24,8 @@ public class PlayerService {
     }
 
     public Player createBot() {
-        BotProfileResponse response = repository.createBot().orElseThrow(CantCreateBotException::new);
-        return Player.ai(
+        BotProfileResponse response = repository.createBot().orElseThrow(CannotCreateBotException::new);
+        return Player.bot(
                 PlayerId.from(response.id()),
                 PlayerName.from(response.username()),
                 response.image()

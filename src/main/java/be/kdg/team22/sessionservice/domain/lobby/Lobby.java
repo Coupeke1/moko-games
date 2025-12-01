@@ -21,7 +21,7 @@ public class Lobby {
     private final List<Player> players;
     private final Set<PlayerId> invitedPlayerIds;
     private final Instant createdAt;
-    private Player aiPlayer;
+    private Player bot;
     private Instant updatedAt;
 
     private LobbyStatus status;
@@ -116,12 +116,11 @@ public class Lobby {
         updatedAt = Instant.now();
     }
 
-    public void addBot(PlayerId ownerId, Player botPlayer) {
+    public void addBot(PlayerId ownerId, Player bot) {
         ensureOwner(ownerId);
         ensureBotConstraints();
 
-        this.aiPlayer = botPlayer;
-
+        this.bot = bot;
     }
 
     public void removeBot(PlayerId ownerId) {
@@ -137,17 +136,14 @@ public class Lobby {
     }
 
     private void ensureBotConstraints() {
-        if (!(settings.gameSettings() instanceof TicTacToeSettings)) {
-            throw new UnsupportedOperationException("Bots are only supported for TicTacToe.");
-        }
+        if (!(settings.gameSettings() instanceof TicTacToeSettings))
+            throw new BotsNotSupportedException();
 
-        if (this.aiPlayer != null) {
-            throw new TooManyAiPlayersException();
-        }
+        if (bot != null)
+            throw new TooManyBotsException();
 
-        if (players.size() > 1) {
+        if (players.size() > 1)
             throw new TooManyPlayersException();
-        }
     }
 
     public void invitePlayers(final PlayerId ownerId, final Collection<PlayerId> targetIds) {
@@ -155,9 +151,10 @@ public class Lobby {
         ensureModifiable();
 
         for (PlayerId target : targetIds) {
-            if (players.stream().noneMatch(player -> player.id().equals(target))) {
-                invitedPlayerIds.add(target);
-            }
+            if (players.stream().anyMatch(player -> player.id().equals(target)))
+                continue;
+
+            invitedPlayerIds.add(target);
         }
 
         updatedAt = Instant.now();
@@ -171,6 +168,7 @@ public class Lobby {
             throw new CannotRemoveOwnerException(id);
 
         boolean removed = players.removeIf(player -> player.id().equals(targetId));
+
         if (!removed)
             throw new PlayerNotInLobbyException(targetId, id);
 
@@ -243,6 +241,10 @@ public class Lobby {
         return invitedPlayerIds.contains(id);
     }
 
+    public boolean hasBot() {
+        return bot != null;
+    }
+
     public LobbyId id() {
         return id;
     }
@@ -283,11 +285,7 @@ public class Lobby {
         return Set.copyOf(invitedPlayerIds);
     }
 
-    public Player aiPlayer() {
-        return aiPlayer;
-    }
-
-    public boolean hasAi() {
-        return aiPlayer != null;
+    public Player bot() {
+        return bot;
     }
 }

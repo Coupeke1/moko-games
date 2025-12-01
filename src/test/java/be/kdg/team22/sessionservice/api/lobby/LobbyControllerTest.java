@@ -1,6 +1,6 @@
 package be.kdg.team22.sessionservice.api.lobby;
 
-import be.kdg.team22.sessionservice.application.lobby.LobbyInviteQueryService;
+import be.kdg.team22.sessionservice.application.lobby.InviteQueryService;
 import be.kdg.team22.sessionservice.application.lobby.LobbyPlayerService;
 import be.kdg.team22.sessionservice.application.lobby.LobbyService;
 import be.kdg.team22.sessionservice.application.player.PlayerService;
@@ -58,7 +58,7 @@ class LobbyControllerTest {
     @MockitoBean
     private PlayerService playerService;
     @MockitoBean
-    private LobbyInviteQueryService inviteQueryService;
+    private InviteQueryService inviteQueryService;
     @MockitoBean
     private JwtDecoder jwtDecoder;
 

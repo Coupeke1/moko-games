@@ -19,45 +19,29 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/lobbies")
-public class LobbyQueryController {
-    private final LobbyService lobbyService;
+public class QueryController {
+    private final LobbyService service;
 
-    public LobbyQueryController(final LobbyService lobbyService) {
-        this.lobbyService = lobbyService;
+    public QueryController(final LobbyService service) {
+        this.service = service;
     }
 
     @GetMapping
     public ResponseEntity<List<LobbyResponseModel>> getAll() {
-        return ResponseEntity.ok(
-                lobbyService.findAllLobbies().stream()
-                        .map(LobbyResponseModel::from)
-                        .toList()
-        );
+        return ResponseEntity.ok(service.findAllLobbies().stream().map(LobbyResponseModel::from).toList());
     }
 
     @GetMapping("/{lobbyId}/invited")
     public ResponseEntity<List<UUID>> getInvitedPlayers(@PathVariable UUID lobbyId) {
-        Lobby lobby = lobbyService.findLobby(LobbyId.from(lobbyId));
-        return ResponseEntity.ok(
-                lobby.invitedPlayers().stream()
-                        .map(PlayerId::value)
-                        .toList()
-        );
+        Lobby lobby = service.findLobby(LobbyId.from(lobbyId));
+        return ResponseEntity.ok(lobby.invitedPlayers().stream().map(PlayerId::value).toList());
     }
 
     @GetMapping("/invited/{gameId}/me")
-    public ResponseEntity<List<LobbyResponseModel>> getInvitesForPlayer(
-            @AuthenticationPrincipal Jwt token,
-            @PathVariable UUID gameId
-    ) {
+    public ResponseEntity<List<LobbyResponseModel>> getInvitesForPlayer(@AuthenticationPrincipal Jwt token, @PathVariable UUID gameId) {
         PlayerId player = PlayerId.get(token);
         GameId game = new GameId(gameId);
 
-        return ResponseEntity.ok(
-                lobbyService.getInvitesFromPlayer(player, game)
-                        .stream()
-                        .map(LobbyResponseModel::from)
-                        .toList()
-        );
+        return ResponseEntity.ok(service.getInvitesFromPlayer(player, game).stream().map(LobbyResponseModel::from).toList());
     }
 }

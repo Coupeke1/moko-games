@@ -40,7 +40,7 @@ public class ExceptionController {
             MaxPlayersTooSmallException.class,
             LobbySettingsInvalidException.class,
             PlayersNotReadyException.class,
-            TooManyAiPlayersException.class,
+            TooManyBotsException.class,
             TooManyPlayersException.class,
             UnsupportedOperationException.class
     })
