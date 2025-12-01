@@ -11,20 +11,19 @@ import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
 import { Items } from "@/components/layout/items";
 import Row from "@/components/layout/row";
+import Section from "@/components/section";
 import ErrorState from "@/components/state/error";
 import LoadingState from "@/components/state/loading";
 import Message from "@/components/state/message";
-import TabRow from "@/components/tabs/links/row";
 import showToast from "@/components/toast";
 import type { Lobby } from "@/models/lobby/lobby";
 import type { Player } from "@/models/lobby/player";
 import type { Profile } from "@/models/profile/profile";
 import GameInformation from "@/routes/lobby/components/information";
 import Page from "@/routes/lobby/components/page";
-import { getTabs } from "@/routes/lobby/components/tabs";
 import InviteDialog from "@/routes/lobby/dialogs/invite-dialog";
+import { useLobbyData } from "@/routes/lobby/hooks/use-lobby";
 import {
-    allPlayersReady,
     isUserOwner,
     readyPlayer,
     removePlayer,
@@ -33,10 +32,6 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { useLobbyData } from "./hooks/use-lobby";
-import { GridSize } from "@/components/layout/grid/size";
-import PlayIcon from "@/components/icons/play-icon";
-import SettingsIcon from "@/components/icons/settings-icon";
 
 function Player({
     player,
@@ -130,7 +125,7 @@ function Player({
     );
 }
 
-export default function LobbyPlayersPage() {
+export default function LobbyPage() {
     const navigate = useNavigate();
     const { id } = useParams();
     const [invite, setInvite] = useState(false);
@@ -139,9 +134,10 @@ export default function LobbyPlayersPage() {
         if (!id || id.length <= 0) navigate("/library");
     }, [id, navigate]);
 
-    const { lobby, profile, isOwner, isLoading, isError } = useLobbyData();
+    const { lobby, profile, game, isOwner, isLoading, isError } =
+        useLobbyData();
 
-    if (isLoading || !lobby || !profile)
+    if (isLoading || !lobby || !profile || !game)
         return (
             <Page>
                 <LoadingState />
@@ -159,10 +155,9 @@ export default function LobbyPlayersPage() {
         <Page>
             <InviteDialog lobby={lobby} open={invite} onChange={setInvite} />
             <Column gap={Gap.Large}>
-                <GameInformation id={lobby.gameId} />
-                <TabRow tabs={getTabs(lobby.id)} />
+                <GameInformation game={game} />
 
-                <Column>
+                <Section title="Players">
                     {lobby.players.length == 0 ? (
                         <Message>No players :(</Message>
                     ) : (
@@ -184,7 +179,7 @@ export default function LobbyPlayersPage() {
                             )}
                         </Grid>
                     )}
-                </Column>
+                </Section>
             </Column>
         </Page>
     );

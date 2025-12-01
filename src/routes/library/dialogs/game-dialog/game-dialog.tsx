@@ -27,9 +27,9 @@ export default function GameDialog({ game, close, open, onChange }: Props) {
     const [current, setCurrent] = useState<string>("Info");
 
     const startLobby = useMutation({
-        mutationFn: async ({ game }: { game: Game; }) => {
+        mutationFn: async ({ game }: { game: Game }) => {
             const lobby = await createLobby(game, 4);
-            navigate(`/lobby/${lobby.id}/players`);
+            navigate(`/lobby/${lobby.id}`);
         },
         onSuccess: async () => {
             await client.refetchQueries({ queryKey: ["lobby"] });
@@ -38,17 +38,21 @@ export default function GameDialog({ game, close, open, onChange }: Props) {
         },
         onError: (error: Error) => {
             showToast(game.title, error.message);
-        }
+        },
     });
 
     function handleStartLobby() {
         startLobby.mutate({ game });
-    };
+    }
 
     return (
-        <Dialog title="Game Details" onClose={() => setCurrent("Info")} open={open} onChange={onChange} footer={
-            <Button onClick={handleStartLobby}>Start Lobby</Button>
-        }>
+        <Dialog
+            title="Game Details"
+            onClose={() => setCurrent("Info")}
+            open={open}
+            onChange={onChange}
+            footer={<Button onClick={handleStartLobby}>Start Lobby</Button>}
+        >
             <Column gap={Gap.Large}>
                 <TabRow
                     tabs={["Info", "Invites"]}
@@ -58,12 +62,16 @@ export default function GameDialog({ game, close, open, onChange }: Props) {
 
                 <TabContent
                     current={current}
-                    tabs={[{
-                        title: "Info", element: <Information game={game} />
-                    },
-                    {
-                        title: "Invites", element: <Invites game={game} />
-                    }]}
+                    tabs={[
+                        {
+                            title: "Info",
+                            element: <Information game={game} />,
+                        },
+                        {
+                            title: "Invites",
+                            element: <Invites game={game} />,
+                        },
+                    ]}
                 />
             </Column>
         </Dialog>

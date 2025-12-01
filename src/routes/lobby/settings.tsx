@@ -9,7 +9,6 @@ import { GridSize } from "@/components/layout/grid/size";
 import ErrorState from "@/components/state/error";
 import LoadingState from "@/components/state/loading";
 import TabRow from "@/components/tabs/links/row";
-import GameInformation from "@/routes/lobby/components/information";
 import Page from "@/routes/lobby/components/page";
 import { getTabs } from "@/routes/lobby/components/tabs";
 import { useEffect, useState } from "react";
@@ -71,7 +70,6 @@ export default function LobbySettingsPage() {
     return (
         <Page>
             <Column gap={Gap.Large}>
-                <GameInformation id={lobby.gameId} />
                 <TabRow tabs={getTabs(lobby.id)} />
 
                 {isOwner && (
