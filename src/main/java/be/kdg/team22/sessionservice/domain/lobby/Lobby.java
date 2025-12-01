@@ -82,7 +82,7 @@ public class Lobby {
             final Player aiPlayer
     ) {
         this(id, game, owner, players, invitedPlayers, settings, status, createdAt, updatedAt, startedGameId);
-        this.aiPlayer = aiPlayer;
+        this.bot = aiPlayer;
     }
 
     public void acceptInvite(final Player target) {
@@ -127,11 +127,11 @@ public class Lobby {
         ensureOwner(ownerId);
         ensureModifiable();
 
-        if (this.aiPlayer == null) {
+        if (this.bot == null) {
             throw new NoAiPlayerException(id);
         }
 
-        this.aiPlayer = null;
+        this.bot = null;
         updatedAt = Instant.now();
     }
 
