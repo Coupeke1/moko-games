@@ -2,6 +2,7 @@ import Button from "@/components/buttons/button";
 import UserCard from "@/components/cards/user-card";
 import AcceptIcon from "@/components/icons/accept-icon";
 import PlusIcon from "@/components/icons/plus-icon";
+import ErrorState from "@/components/state/error";
 import LoadingState from "@/components/state/loading";
 import showToast from "@/components/toast";
 import { useFriends } from "@/hooks/use-friends";
@@ -34,7 +35,7 @@ export default function FriendsSection({ lobby, onInvite }: Props) {
     });
 
     if (isLoading || !friends) return <LoadingState />;
-    if (isError) return <LoadingState />;
+    if (isError) return <ErrorState />;
 
     return friends.map((friend: Profile) => {
         const isInLobby: boolean = isPlayerInLobby(friend.id, lobby);
