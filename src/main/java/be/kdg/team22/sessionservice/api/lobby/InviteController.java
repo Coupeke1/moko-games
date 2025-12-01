@@ -51,7 +51,7 @@ public class InviteController {
         return ResponseEntity.ok(LobbyResponseModel.from(updatedLobby));
     }
 
-    @DeleteMapping("/{id}/invite/bot")
+    @DeleteMapping("/{id}/bot")
     public ResponseEntity<LobbyResponseModel> removeBot(
             @PathVariable UUID id,
             @AuthenticationPrincipal Jwt token

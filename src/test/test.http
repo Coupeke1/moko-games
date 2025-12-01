@@ -91,7 +91,7 @@ POST http://localhost:8081/api/lobbies/{{lobby_id}}/invite/bot
 Authorization: Bearer {{owner_token}}
 
 ### 14C) REMOVE BOT from Lobby
-DELETE http://localhost:8081/api/lobbies/{{lobby_id}}/invite/bot
+DELETE http://localhost:8081/api/lobbies/{{lobby_id}}/bot
 Authorization: Bearer {{owner_token}}
 
 

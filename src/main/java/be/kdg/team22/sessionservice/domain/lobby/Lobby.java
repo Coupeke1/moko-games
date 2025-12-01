@@ -111,7 +111,7 @@ public class Lobby {
         ensureModifiable();
 
         if (this.bot == null) {
-            throw new NoAiPlayerException(id);
+            throw new NoBotException(id);
         }
 
         this.bot = null;
