@@ -10,12 +10,14 @@ import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/games")
+@Validated
 public class GameController {
     private final GameService service;
 
