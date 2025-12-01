@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -77,7 +78,7 @@ public class LobbyService {
         if (lobby.players().size() <= 1)
             throw PlayersException.tooLittle();
 
-        List<UUID> playerIds = new java.util.ArrayList<>(lobby.players().stream().map(p -> p.id().value()).toList());
+        List<UUID> playerIds = new ArrayList<>(lobby.players().stream().map(p -> p.id().value()).toList());
 
         if (lobby.hasBot()) {
             playerIds.add(lobby.bot().id().value());
@@ -99,10 +100,8 @@ public class LobbyService {
         int resolvedMaxPlayers = maxPlayers != null ? maxPlayers : 4;
 
         GameSettings gameSettings = switch (model) {
-            case TicTacToeSettingsModel t ->
-                    new TicTacToeSettings(t.boardSize());
-            case CheckersSettingsModel c ->
-                    new CheckersSettings(c.boardSize(), c.flyingKings());
+            case TicTacToeSettingsModel t -> new TicTacToeSettings(t.boardSize());
+            case CheckersSettingsModel c -> new CheckersSettings(c.boardSize(), c.flyingKings());
         };
 
         return new LobbySettings(gameSettings, resolvedMaxPlayers);

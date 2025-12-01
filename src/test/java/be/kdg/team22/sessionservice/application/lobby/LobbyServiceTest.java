@@ -29,6 +29,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -174,6 +175,11 @@ class LobbyServiceTest {
 
         Lobby lobby = spy(newLobby(new GameId(UUID.randomUUID()), owner));
 
+        Player ownerPlayer = new Player(owner, new PlayerName("owner"), "");
+        Player p2 = new Player(PlayerId.create(), new PlayerName("player2"), "");
+
+        when(lobby.players()).thenReturn(Set.of(ownerPlayer, p2));
+
         doNothing().when(lobby).ensureOwner(owner);
         doNothing().when(lobby).ensureAllPlayersReady();
 
@@ -230,14 +236,21 @@ class LobbyServiceTest {
 
         Lobby lobby = spy(newLobby(new GameId(UUID.randomUUID()), owner));
 
+        Player ownerPlayer = new Player(owner, new PlayerName("owner"), "");
+        Player p2 = new Player(PlayerId.create(), new PlayerName("player2"), "");
+
+        when(lobby.players()).thenReturn(Set.of(ownerPlayer, p2));
+
         when(repo.findById(id)).thenReturn(Optional.of(lobby));
 
         doNothing().when(lobby).ensureOwner(owner);
         doNothing().when(lobby).ensureAllPlayersReady();
 
-        when(gameClient.startGame(any(), any())).thenThrow(new GameNotFoundException(UUID.randomUUID()));
+        when(gameClient.startGame(any(), any()))
+                .thenThrow(new GameNotFoundException(UUID.randomUUID()));
 
-        assertThatThrownBy(() -> service.startLobby(id, owner, jwtFor(owner))).isInstanceOf(GameNotFoundException.class);
+        assertThatThrownBy(() -> service.startLobby(id, owner, jwtFor(owner)))
+                .isInstanceOf(GameNotFoundException.class);
     }
 
     @Test

@@ -2,7 +2,7 @@ package be.kdg.team22.sessionservice.domain.lobby.exceptions;
 
 public class PlayersException extends RuntimeException {
     private PlayersException(String message) {
-        super("There are too many players in this lobby");
+        super(message);
     }
 
     public static PlayersException tooMany() {
