@@ -53,7 +53,6 @@ export function Invites({ game }: Props) {
                         <InviteCard
                             key={lobby.id}
                             lobby={lobby}
-                            game={game}
                             footer={
                                 <Button
                                     onClick={() => handleAccept(lobby)}

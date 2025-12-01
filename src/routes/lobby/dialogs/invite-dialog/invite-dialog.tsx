@@ -40,7 +40,7 @@ export default function InviteDialog({ lobby, open, onChange }: Props) {
                         },
                         {
                             title: "Bots",
-                            element: <BotsTab lobby={lobby} />,
+                            element: <BotsTab />,
                         },
                     ]}
                 />

@@ -1,5 +1,3 @@
-import type { Lobby } from "@/models/lobby/lobby";
-
-export default function BotsTab({ lobby }: { lobby: Lobby }) {
+export default function BotsTab() {
     return <p>Bots</p>;
 }
