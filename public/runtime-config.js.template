@@ -1,0 +1,9 @@
+window.__APP_CONFIG__ = {
+    authUrl: "$VITE_AUTH_URL",
+    authRealm: "$VITE_AUTH_REALM",
+    authClientId: "$VITE_AUTH_CLIENT",
+
+    userService: "$VITE_USER_SERVICE",
+    socialService: "$VITE_SOCIAL_SERVICE",
+    libraryService: "$VITE_LIBRARY_SERVICE"
+}

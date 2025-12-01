@@ -1,10 +1,11 @@
+import { config } from "@/config";
 import { client } from "@/lib/api-client";
 import { validIdCheck } from "@/lib/id";
 import type { Friend } from "@/models/friends/friend";
 import type { Profile } from "@/models/profile/profile";
 
-const PROFILE_URL = import.meta.env.VITE_USER_SERVICE;
-const SOCIAL_URL = import.meta.env.VITE_SOCIAL_SERVICE;
+const PROFILE_URL = config.userService;
+const SOCIAL_URL = config.socialService;
 
 export async function findFriends() {
     try {
