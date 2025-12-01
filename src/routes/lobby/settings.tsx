@@ -13,7 +13,7 @@ import Page from "@/routes/lobby/components/page";
 import { getTabs } from "@/routes/lobby/components/tabs";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { useLobbyData } from "./hooks/use-lobby";
+import { useLobbyData } from "@/routes/lobby/hooks/use-lobby";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import showToast from "@/components/toast";
 import { allPlayersReady, updateSettings } from "@/services/lobby-service";

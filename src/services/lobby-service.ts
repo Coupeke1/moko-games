@@ -143,6 +143,15 @@ export function allPlayersReady(lobby: Lobby): boolean {
     }
 }
 
+export async function closeLobby(lobby: string) {
+    try {
+        validIdCheck(lobby);
+        await client.post(`${BASE_URL}/${lobby}/close`);
+    } catch {
+        throw new Error(`Could not close lobby with id '${lobby}'`);
+    }
+}
+
 export async function updateSettings(
     lobby: string,
     title: string,

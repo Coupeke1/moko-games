@@ -58,7 +58,10 @@ function App() {
                     </Routes>
                 )}
 
-                <Toaster position="top-right" />
+                <Toaster
+                    position="top-right"
+                    toastOptions={{ className: "z-200" }}
+                />
             </BrowserRouter>
         </QueryClientProvider>
     );

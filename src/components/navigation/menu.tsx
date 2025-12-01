@@ -1,7 +1,7 @@
 import SmallButton from "@/components/dialog/small-button";
 import CloseIcon from "@/components/icons/bar/close-icon";
 import NavigationLink from "@/components/navigation/link";
-import type { Button, Link } from "./models";
+import type { Button, Link } from "@/components/navigation/models";
 
 interface Props {
     links: Link[];

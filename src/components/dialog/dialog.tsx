@@ -18,7 +18,15 @@ interface Props {
     footer?: ReactNode;
 }
 
-export default function Dialog({ title, open, onChange, onClose, header, children, footer }: Props) {
+export default function Dialog({
+    title,
+    open,
+    onChange,
+    onClose,
+    header,
+    children,
+    footer,
+}: Props) {
     const handleOpenChange = (open: boolean) => {
         onChange(open);
         if (!open && onClose) onClose();
@@ -32,22 +40,29 @@ export default function Dialog({ title, open, onChange, onClose, header, childre
     return (
         <RadixDialog.Root open={open} onOpenChange={handleOpenChange}>
             <RadixDialog.Portal>
-                <RadixDialog.Overlay className="fixed inset-0 bg-black/50 z-50" />
-                <RadixDialog.Content className="flex flex-col fixed left-1/2 top-1/2 xs:w-[75%] w-[90%] max-w-2xl h-[65%] sm:h-[90%] -translate-x-1/2 -translate-y-1/2 rounded-lg bg-bg text-fg z-50 overflow-hidden">
+                <RadixDialog.Overlay className="fixed inset-0 bg-black/50 z-100" />
+                <RadixDialog.Content className="flex flex-col fixed z-100 left-1/2 top-1/2 xs:w-[75%] w-[90%] max-w-2xl h-[65%] sm:h-[90%] -translate-x-1/2 -translate-y-1/2 rounded-lg bg-bg text-fg overflow-hidden">
                     <section className="sticky top-0 bg-bg py-3 px-4 border-b-2 border-bg-2 z-10">
                         <Column>
-                            <Row justify={Justify.Between} items={Items.Center} responsive={false}>
-                                <RadixDialog.Title className="text-xl font-semibold">{title}</RadixDialog.Title>
-                                <RadixDialog.Close asChild onClick={handleCloseClick}>
+                            <Row
+                                justify={Justify.Between}
+                                items={Items.Center}
+                                responsive={false}
+                            >
+                                <RadixDialog.Title className="text-xl font-semibold">
+                                    {title}
+                                </RadixDialog.Title>
+                                <RadixDialog.Close
+                                    asChild
+                                    onClick={handleCloseClick}
+                                >
                                     <SmallButton>
                                         <CloseIcon />
                                     </SmallButton>
                                 </RadixDialog.Close>
                             </Row>
 
-                            {header && (
-                                header
-                            )}
+                            {header && header}
                         </Column>
                     </section>
 
@@ -57,9 +72,7 @@ export default function Dialog({ title, open, onChange, onClose, header, childre
 
                     {footer && (
                         <section className="sticky bottom-0 bg-bg py-4 px-6 border-t-2 border-bg-2 z-10">
-                            <Stack>
-                                {footer}
-                            </Stack>
+                            <Stack>{footer}</Stack>
                         </section>
                     )}
                 </RadixDialog.Content>
