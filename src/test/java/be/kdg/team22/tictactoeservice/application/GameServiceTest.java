@@ -112,14 +112,15 @@ public class GameServiceTest {
     void requestMove_noWinner_noDraw_noEventPublished() {
         Game game = spy(Game.create(3, 10, 3, players.stream().map(Player::id).toList(), false));
         GameId id = game.id();
+        PlayerId playerId = playerX.id();
 
         when(repository.findById(id)).thenReturn(Optional.of(game));
 
-        Move move = new Move(id, playerX.id(), 0, 0);
+        Move move = new Move(id, playerId, 0, 0);
 
         doReturn(GameStatus.IN_PROGRESS).when(game).status();
 
-        service.requestMove(id, move);
+        service.requestMove(id, playerId, move);
 
         verify(repository).save(game);
         verify(publisher, never()).publishGameWon(any());
@@ -130,15 +131,16 @@ public class GameServiceTest {
     void requestMove_whenWin_publishesGameWon() {
         Game game = spy(Game.create(3, 10, 3, players.stream().map(Player::id).toList(), false));
         GameId id = game.id();
+        PlayerId playerId = playerX.id();
 
         when(repository.findById(id)).thenReturn(Optional.of(game));
 
-        Move move = new Move(id, playerX.id(), 0, 0);
+        Move move = new Move(id, playerId, 0, 0);
 
         doReturn(GameStatus.WON).when(game).status();
         doReturn(playerX.id()).when(game).winner();
 
-        service.requestMove(id, move);
+        service.requestMove(id, playerId, move);
 
         verify(repository).save(game);
 
@@ -150,17 +152,18 @@ public class GameServiceTest {
     void requestMove_whenDraw_publishesGameDraw() {
         Game game = spy(Game.create(3, 10, 3, players.stream().map(Player::id).toList(), false));
         GameId id = game.id();
+        PlayerId playerId = playerX.id();
 
         when(repository.findById(id)).thenReturn(Optional.of(game));
 
-        Move move = new Move(id, playerX.id(), 0, 0);
+        Move move = new Move(id, playerId, 0, 0);
 
         doReturn(GameStatus.TIE).when(game).status();
         TreeSet<Player> sorted = new TreeSet<>(Comparator.comparing(p -> p.role().order()));
         sorted.addAll(players);
 
         doReturn(sorted).when(game).players();
-        service.requestMove(id, move);
+        service.requestMove(id, playerId, move);
 
         verify(repository).save(game);
 
@@ -179,17 +182,18 @@ public class GameServiceTest {
     void requestMove_whenBecomesWin_publishesOnce() {
         Game game = spy(Game.create(3, 10, 3, players.stream().map(Player::id).toList(), false));
         GameId id = game.id();
+        PlayerId playerId = playerX.id();
 
         when(repository.findById(id)).thenReturn(Optional.of(game));
 
-        Move move = new Move(id, playerX.id(), 0, 0);
+        Move move = new Move(id, playerId, 0, 0);
 
         doNothing().when(game).requestMove(any());
 
         doReturn(GameStatus.WON).when(game).status();
         doReturn(playerX.id()).when(game).winner();
 
-        service.requestMove(id, move);
+        service.requestMove(id, playerId, move);
 
         verify(publisher, times(1)).publishGameWon(any(GameWonEvent.class));
     }
