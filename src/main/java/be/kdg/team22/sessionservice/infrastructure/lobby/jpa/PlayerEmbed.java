@@ -7,7 +7,6 @@ import java.util.UUID;
 
 @Embeddable
 public class PlayerEmbed {
-
     @Column(name = "player_id", nullable = false)
     private UUID id;
 

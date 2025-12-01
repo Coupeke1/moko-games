@@ -7,15 +7,15 @@ import be.kdg.team22.sessionservice.domain.lobby.settings.CheckersSettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 
 import java.time.Instant;
-import java.util.Set;
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public record LobbyResponseModel(UUID id,
                                  UUID gameId,
                                  UUID ownerId,
-                                 Set<PlayerSummaryModel> players,
-                                 PlayerSummaryModel aiPlayer,
+                                 List<PlayerSummaryModel> players,
+                                 PlayerSummaryModel bot,
                                  int maxPlayers,
                                  LobbyStatus status,
                                  Instant createdAt,
@@ -23,7 +23,6 @@ public record LobbyResponseModel(UUID id,
                                  UUID startedGameId) {
 
     public static LobbyResponseModel from(Lobby lobby) {
-
         GameSettingsModel settingsModel = switch (lobby.settings().gameSettings()) {
             case TicTacToeSettings t ->
                     new TicTacToeSettingsModel(t.boardSize());
@@ -31,11 +30,13 @@ public record LobbyResponseModel(UUID id,
                     new CheckersSettingsModel(c.boardSize(), c.flyingKings());
         };
 
-        PlayerSummaryModel aiSummary = null;
-        if (lobby.hasBot()) {
-            aiSummary = PlayerSummaryModel.from(lobby.bot());
-        }
+        List<PlayerSummaryModel> playerModels = lobby.players().stream().map(PlayerSummaryModel::from).sorted(Comparator.comparing(PlayerSummaryModel::username)).toList();
 
-        return new LobbyResponseModel(lobby.id().value(), lobby.gameId().value(), lobby.ownerId().value(), lobby.players().stream().map(PlayerSummaryModel::from).collect(Collectors.toSet()), aiSummary, lobby.settings().maxPlayers(), lobby.status(), lobby.createdAt(), settingsModel, lobby.startedGameId().map(GameId::value).orElse(null));
+        PlayerSummaryModel botModel = null;
+        if (lobby.hasBot())
+            botModel = PlayerSummaryModel.from(lobby.bot());
+
+
+        return new LobbyResponseModel(lobby.id().value(), lobby.gameId().value(), lobby.ownerId().value(), playerModels, botModel, lobby.settings().maxPlayers(), lobby.status(), lobby.createdAt(), settingsModel, lobby.startedGameId().map(GameId::value).orElse(null));
     }
 }

@@ -50,18 +50,4 @@ public class InviteController {
         Lobby updatedLobby = lobbyService.findLobby(lobbyId);
         return ResponseEntity.ok(LobbyResponseModel.from(updatedLobby));
     }
-
-    @DeleteMapping("/{id}/bot")
-    public ResponseEntity<LobbyResponseModel> removeBot(
-            @PathVariable UUID id,
-            @AuthenticationPrincipal Jwt token
-    ) {
-        PlayerId ownerId = PlayerId.get(token);
-        LobbyId lobbyId = LobbyId.from(id);
-
-        lobbyPlayerService.removeBot(ownerId, lobbyId);
-
-        Lobby updatedLobby = lobbyService.findLobby(lobbyId);
-        return ResponseEntity.ok(LobbyResponseModel.from(updatedLobby));
-    }
 }

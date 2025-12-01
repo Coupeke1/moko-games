@@ -126,7 +126,7 @@ public class Lobby {
             throw new TooManyBotsException();
 
         if (players.size() > 1)
-            throw new TooManyPlayersException();
+            throw PlayersException.tooMany();
     }
 
     public void invitePlayers(final PlayerId ownerId, final Collection<PlayerId> targetIds) {
@@ -171,6 +171,9 @@ public class Lobby {
 
         if (players.size() > settings.maxPlayers())
             throw new MaxPlayersTooSmallException(players.size(), settings.maxPlayers());
+
+        if (settings.maxPlayers() > 8)
+            throw PlayersException.tooMany();
 
         this.settings = settings;
         updatedAt = Instant.now();
@@ -222,6 +225,10 @@ public class Lobby {
 
     public boolean isInvited(final PlayerId id) {
         return invitedPlayerIds.contains(id);
+    }
+
+    public boolean hasJoined(final PlayerId id) {
+        return players.stream().anyMatch(player -> player.id().equals(id));
     }
 
     public boolean hasBot() {

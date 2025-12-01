@@ -4,9 +4,9 @@ import be.kdg.team22.sessionservice.config.TestcontainersConfig;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyStatus;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
+import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.BotEmbed;
 import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.LobbyEntity;
 import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.LobbyJpaRepository;
-import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.BotEmbed;
 import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.PlayerEmbed;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +15,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,30 +41,12 @@ class DbLobbyRepositoryTest {
 
         UUID invitedId = UUID.randomUUID();
 
-        UUID aiId = UUID.randomUUID();
-        BotEmbed aiEmbed = new BotEmbed(
-                aiId,
-                "BOT-MOKO",
-                "bot.png",
-                true,
-                true
-        );
+        UUID botId = UUID.randomUUID();
+        BotEmbed bot = new BotEmbed(botId, "BOT-MOKO", "bot.png", true);
 
         UUID startedGameId = UUID.randomUUID();
 
-        LobbyEntity entity = new LobbyEntity(
-                id,
-                gameId,
-                ownerId,
-                Set.of(owner),
-                Set.of(invitedId),
-                settings,
-                LobbyStatus.OPEN,
-                Instant.now(),
-                Instant.now(),
-                startedGameId,
-                aiEmbed
-        );
+        LobbyEntity entity = new LobbyEntity(id, gameId, ownerId, List.of(owner), List.of(invitedId), settings, LobbyStatus.OPEN, Instant.now(), Instant.now(), startedGameId, bot);
 
         repo.save(entity);
         Optional<LobbyEntity> loaded = repo.findById(id);
@@ -85,13 +67,11 @@ class DbLobbyRepositoryTest {
 
         assertThat(db.invitedPlayerIds()).contains(invitedId);
 
-        assertThat(db.aiPlayer()).isNotNull();
-        assertThat(db.aiPlayer().id()).isEqualTo(aiId);
-        assertThat(db.aiPlayer().username()).isEqualTo("BOT-MOKO");
-        assertThat(db.aiPlayer().image()).isEqualTo("bot.png");
-        assertThat(db.aiPlayer().ready()).isTrue();
-        assertThat(db.aiPlayer().isBot()).isTrue();
-
+        assertThat(db.bot()).isNotNull();
+        assertThat(db.bot().id()).isEqualTo(botId);
+        assertThat(db.bot().username()).isEqualTo("BOT-MOKO");
+        assertThat(db.bot().image()).isEqualTo("bot.png");
+        assertThat(db.bot().ready()).isTrue();
         LobbySettings mapped = db.settings();
         assertThat(mapped.maxPlayers()).isEqualTo(4);
         assertThat(mapped.gameSettings()).isInstanceOf(TicTacToeSettings.class);

@@ -6,8 +6,9 @@ import java.util.UUID;
 
 public record PlayerSummaryModel(UUID id,
                                  String username,
-                                 String image) {
+                                 String image,
+                                 boolean ready) {
     public static PlayerSummaryModel from(Player player) {
-        return new PlayerSummaryModel(player.id().value(), player.username().value(), player.image());
+        return new PlayerSummaryModel(player.id().value(), player.username().value(), player.image(), player.ready());
     }
 }
