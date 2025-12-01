@@ -126,7 +126,7 @@ public class Lobby {
             throw new TooManyBotsException();
 
         if (players.size() > 1)
-            throw new TooManyPlayersException();
+            throw PlayersException.tooMany();
     }
 
     public void invitePlayers(final PlayerId ownerId, final Collection<PlayerId> targetIds) {
@@ -173,7 +173,7 @@ public class Lobby {
             throw new MaxPlayersTooSmallException(players.size(), settings.maxPlayers());
 
         if (settings.maxPlayers() > 8)
-            throw new TooManyPlayersException();
+            throw PlayersException.tooMany();
 
         this.settings = settings;
         updatedAt = Instant.now();
