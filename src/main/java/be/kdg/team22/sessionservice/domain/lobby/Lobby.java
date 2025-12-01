@@ -160,6 +160,9 @@ public class Lobby {
         if (players.size() > settings.maxPlayers())
             throw new MaxPlayersTooSmallException(players.size(), settings.maxPlayers());
 
+        if (settings.maxPlayers() > 8)
+            throw new TooManyPlayersException();
+
         this.settings = settings;
         updatedAt = Instant.now();
     }
@@ -210,6 +213,10 @@ public class Lobby {
 
     public boolean isInvited(final PlayerId id) {
         return invitedPlayerIds.contains(id);
+    }
+
+    public boolean hasJoined(final PlayerId id) {
+        return players.stream().anyMatch(player -> player.id().equals(id));
     }
 
     public boolean hasBot() {

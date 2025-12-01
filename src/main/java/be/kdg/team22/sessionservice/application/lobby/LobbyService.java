@@ -6,6 +6,7 @@ import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyRepository;
+import be.kdg.team22.sessionservice.domain.lobby.exceptions.TooLittlePlayersException;
 import be.kdg.team22.sessionservice.domain.lobby.settings.CheckersSettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.GameSettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
@@ -72,6 +73,9 @@ public class LobbyService {
 
         lobby.ensureOwner(ownerId);
         lobby.ensureAllPlayersReady();
+
+        if (lobby.players().size() <= 0)
+            throw new TooLittlePlayersException();
 
         List<UUID> playerIds = new java.util.ArrayList<>(lobby.players().stream().map(p -> p.id().value()).toList());
 
