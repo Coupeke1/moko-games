@@ -160,7 +160,16 @@ public class LobbyEntity {
                 .map(PlayerId::from)
                 .collect(Collectors.toSet());
 
-        Lobby lobby = new Lobby(
+        Player bot = null;
+        if (this.aiPlayer != null) {
+            bot = Player.ai(
+                    PlayerId.from(this.aiPlayer.id()),
+                    PlayerName.from(this.aiPlayer.username()),
+                    this.aiPlayer.image()
+            );
+        }
+
+        return new Lobby(
                 LobbyId.from(id),
                 GameId.from(gameId),
                 PlayerId.from(ownerId),
@@ -170,19 +179,9 @@ public class LobbyEntity {
                 status,
                 createdAt,
                 updatedAt,
-                startedGameId == null ? null : GameId.from(startedGameId)
+                startedGameId == null ? null : GameId.from(startedGameId),
+                bot
         );
-
-        if (this.aiPlayer != null) {
-            Player bot = Player.ai(
-                    PlayerId.from(this.aiPlayer.id()),
-                    PlayerName.from(this.aiPlayer.username()),
-                    this.aiPlayer.image()
-            );
-            lobby.addBot(lobby.ownerId(), bot);
-        }
-
-        return lobby;
     }
 
     public UUID id() {
