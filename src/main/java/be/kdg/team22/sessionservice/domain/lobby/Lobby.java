@@ -106,6 +106,18 @@ public class Lobby {
         this.bot = bot;
     }
 
+    public void removeBot(PlayerId ownerId) {
+        ensureOwner(ownerId);
+        ensureModifiable();
+
+        if (this.bot == null) {
+            throw new NoBotException(id);
+        }
+
+        this.bot = null;
+        updatedAt = Instant.now();
+    }
+
     private void ensureBotConstraints() {
         if (!(settings.gameSettings() instanceof TicTacToeSettings))
             throw new BotsNotSupportedException();

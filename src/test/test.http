@@ -86,8 +86,12 @@ Authorization: Bearer {{owner_token}}
 POST http://localhost:8081/api/lobbies/{{lobby_id}}/invite/bd169114-8834-4a40-983f-59b4d8bc1334
 Authorization: Bearer {{owner_token}}
 
-### 14B) NEW — ADD BOT to Lobby
+### 14B) ADD BOT to Lobby
 POST http://localhost:8081/api/lobbies/{{lobby_id}}/invite/bot
+Authorization: Bearer {{owner_token}}
+
+### 14C) REMOVE BOT from Lobby
+DELETE http://localhost:8081/api/lobbies/{{lobby_id}}/bot
 Authorization: Bearer {{owner_token}}
 
 
