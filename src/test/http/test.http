@@ -1,0 +1,18 @@
+### Generate Board
+POST localhost:8087/api/games
+Content-Type: application/json
+
+{
+  "players": [
+    "642999ad-c546-40b6-876c-1048971c7942",
+    "cf36d3e1-a1e0-4c18-89eb-95fa76fc81ee"
+  ]
+}
+
+> {%
+    client.global.set("game_id", response.body.id);
+%}
+
+### Get Game
+GET localhost:8087/api/games/{{game_id}}
+Accept: application/json

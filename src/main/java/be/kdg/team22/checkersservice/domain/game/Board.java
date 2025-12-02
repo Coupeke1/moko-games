@@ -70,7 +70,7 @@ public class Board {
                 if ((row + col) % 2 != 0) {
                     int cellNumber = convertCoordinatesToCellNumber(row, col);
                     Piece piece = grid.get(cellNumber);
-                    state[row][col] = piece.toString();
+                    state[row][col] = piece != null ? piece.toString() : "  ";
                 } else {
                     state[row][col] = "  ";
                 }

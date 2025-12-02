@@ -2,6 +2,7 @@ package be.kdg.team22.checkersservice.application;
 
 import be.kdg.team22.checkersservice.api.models.CreateGameModel;
 import be.kdg.team22.checkersservice.domain.game.Game;
+import be.kdg.team22.checkersservice.domain.game.GameId;
 import be.kdg.team22.checkersservice.domain.game.GameRepository;
 import be.kdg.team22.checkersservice.domain.player.PlayerId;
 import org.springframework.stereotype.Service;
@@ -21,5 +22,9 @@ public class GameService {
         Game game = Game.create(players, aiPlayer);
         repository.save(game);
         return game;
+    }
+
+    public Game getById(GameId id) {
+        return repository.findById(id).orElseThrow(id::notFound);
     }
 }
