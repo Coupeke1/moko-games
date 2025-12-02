@@ -3,11 +3,13 @@ package be.kdg.team22.userservice.api.library;
 import be.kdg.team22.userservice.api.library.models.LibraryGameModel;
 import be.kdg.team22.userservice.api.library.models.LibraryGamesModel;
 import be.kdg.team22.userservice.application.library.LibraryService;
+import be.kdg.team22.userservice.config.TestSecurityConfig;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -28,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(LibraryController.class)
+@Import(TestSecurityConfig.class)
 class LibraryControllerTest {
 
     @Autowired
@@ -170,7 +173,6 @@ class LibraryControllerTest {
         UUID userId = UUID.randomUUID();
         UUID gameId = UUID.randomUUID();
         UsernamePasswordAuthenticationToken auth = authWithUser(userId);
-        Jwt jwt = extractJwt(auth);
 
         mockMvc.perform(
                         patch("/api/library/" + gameId + "/favourite")
@@ -187,7 +189,6 @@ class LibraryControllerTest {
         UUID userId = UUID.randomUUID();
         UUID gameId = UUID.randomUUID();
         UsernamePasswordAuthenticationToken auth = authWithUser(userId);
-
         mockMvc.perform(
                         patch("/api/library/" + gameId + "/unfavourite")
                                 .with(authentication(auth))
