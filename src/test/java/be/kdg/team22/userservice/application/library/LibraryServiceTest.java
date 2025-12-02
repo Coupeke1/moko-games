@@ -38,9 +38,7 @@ class LibraryServiceTest {
                 title,
                 "Fun game",
                 BigDecimal.TEN,
-                "img.png",
-                "https://store.example.com"
-        );
+                "img.png");
     }
 
     private LibraryEntry entry(UUID id, UUID userId, UUID gameId, boolean favourite) {

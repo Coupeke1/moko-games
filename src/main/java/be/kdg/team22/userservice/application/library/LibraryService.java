@@ -47,8 +47,7 @@ public class LibraryService {
                             game.title(),
                             game.description(),
                             game.price(),
-                            game.imageUrl(),
-                            game.storeUrl(),
+                            game.image(),
                             entry.purchasedAt(),
                             entry.favourite()
                     );
