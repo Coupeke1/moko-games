@@ -8,12 +8,10 @@ import be.kdg.team22.userservice.domain.profile.ProfileId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/library")
@@ -30,5 +28,26 @@ public class LibraryController {
         LibraryGamesModel model = service.getLibraryForUser(userId, token, filter, favourite, order, limit);
 
         return ResponseEntity.ok(model.games());
+    }
+
+    @PatchMapping("/{gameId}/favourite")
+    public ResponseEntity<Void> favouriteGame(
+            @AuthenticationPrincipal Jwt token,
+            @PathVariable UUID gameId) {
+
+        ProfileId userId = ProfileId.get(token);
+        service.markFavourite(userId, gameId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{gameId}/unfavourite")
+    public ResponseEntity<Void> unfavouriteGame(
+            @AuthenticationPrincipal Jwt token,
+            @PathVariable UUID gameId) {
+
+        ProfileId userId = ProfileId.get(token);
+
+        service.unmarkFavourite(userId, gameId);
+        return ResponseEntity.noContent().build();
     }
 }

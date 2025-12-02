@@ -4,6 +4,7 @@ import be.kdg.team22.userservice.api.library.models.LibraryGameModel;
 import be.kdg.team22.userservice.api.library.models.LibraryGamesModel;
 import be.kdg.team22.userservice.domain.library.LibraryEntry;
 import be.kdg.team22.userservice.domain.library.LibraryRepository;
+import be.kdg.team22.userservice.domain.library.exceptions.LibraryException;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
 import be.kdg.team22.userservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.userservice.infrastructure.games.GameDetailsResponse;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -87,5 +89,23 @@ public class LibraryService {
         }
 
         return new LibraryGamesModel(games);
+    }
+
+    public void markFavourite(ProfileId userId, UUID gameId) {
+        LibraryEntry entry = libraryRepository
+                .findByUserIdAndGameId(userId.value(), gameId)
+                .orElseThrow(LibraryException::notInLibrary);
+
+        LibraryEntry updated = entry.markFavourite();
+        libraryRepository.save(updated);
+    }
+
+    public void unmarkFavourite(ProfileId userId, UUID gameId) {
+        LibraryEntry entry = libraryRepository
+                .findByUserIdAndGameId(userId.value(), gameId)
+                .orElseThrow(LibraryException::notInLibrary);
+
+        LibraryEntry updated = entry.unmarkFavourite();
+        libraryRepository.save(updated);
     }
 }

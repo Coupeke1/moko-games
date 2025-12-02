@@ -83,3 +83,11 @@ Authorization: Bearer {{access_token}}
 ### getting a users achievements
 GET http://localhost:8080/api/achievements/cf36d3e1-a1e0-4c18-89eb-95fa76fc81ee
 Authorization: Bearer {{access_token}}
+
+### mark a game as favourite
+PATCH http://localhost:8080/api/library/00000000-0000-0000-0000-000000000002/favourite
+Authorization: Bearer {{access_token}}
+
+### unfavourite a game
+PATCH http://localhost:8080/api/library/00000000-0000-0000-0000-000000000002/unfavourite
+Authorization: Bearer {{access_token}}
