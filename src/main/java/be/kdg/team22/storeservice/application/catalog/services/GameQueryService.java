@@ -1,0 +1,51 @@
+package be.kdg.team22.storeservice.application.catalog.services;
+
+import be.kdg.team22.storeservice.api.catalog.models.GameCatalogResponse;
+import be.kdg.team22.storeservice.application.catalog.queries.FilterQuery;
+import be.kdg.team22.storeservice.application.catalog.queries.Pagination;
+import be.kdg.team22.storeservice.domain.catalog.GameCatalogEntry;
+import be.kdg.team22.storeservice.domain.catalog.GameCatalogRepository;
+import be.kdg.team22.storeservice.infrastructure.games.ExternalGamesRepository;
+import be.kdg.team22.storeservice.infrastructure.games.GameMetadataResponse;
+import org.springframework.stereotype.Service;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+public class GameQueryService {
+
+    private final GameCatalogRepository repo;
+    private final ExternalGamesRepository games;
+
+    public GameQueryService(GameCatalogRepository repo, ExternalGamesRepository games) {
+        this.repo = repo;
+        this.games = games;
+    }
+
+    public List<GameCatalogResponse> listGamesWithMetadata(FilterQuery filter, Pagination pagination) {
+
+        List<GameCatalogEntry> entries = repo.findAll(filter, pagination);
+
+        List<GameCatalogResponse> combined = entries.stream()
+                .map(entry -> GameCatalogResponse.from(entry, games.fetchMetadata(entry.getId())))
+                .toList();
+
+        if (filter.sortBy.isPresent() && filter.sortBy.get().equals("alphabetic")) {
+            combined = combined.stream()
+                    .sorted(Comparator.comparing(GameCatalogResponse::title))
+                    .toList();
+        }
+
+        return combined;
+    }
+
+    public GameCatalogResponse getGameWithMetadata(UUID id) {
+
+        GameCatalogEntry entry = repo.findById(id).orElseThrow();
+        GameMetadataResponse meta = games.fetchMetadata(id);
+
+        return GameCatalogResponse.from(entry, meta);
+    }
+}

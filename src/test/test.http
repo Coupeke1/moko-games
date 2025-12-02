@@ -1,0 +1,177 @@
+### 1) JWT Token OWNER (mathias)
+POST http://localhost:8180/realms/moko/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = password &
+client_id = store-service &
+client_secret = x3vC0sYqQgIqDaRqqTBNQIUCakxE6ghC &
+username = mathias &
+password = loginmathias &
+scope = openid
+
+> {%
+    client.global.set("owner_token", response.body.access_token);
+%}
+
+
+
+### 2) Create store entry (game must exist in game-service)
+POST http://localhost:8085/api/store/games
+Authorization: Bearer {{owner_token}}
+Content-Type: application/json
+
+{
+  "id": "00000000-0000-0000-0000-000000000001",
+  "price": "14.99",
+  "category": "STRATEGY"
+}
+
+> {%
+    client.global.set("catalog_game_id", response.body.id);
+%}
+
+
+
+### 3) GET store entry by ID
+GET http://localhost:8085/api/store/games/{{catalog_game_id}}
+Authorization: Bearer {{owner_token}}
+
+
+
+### 3b) Record a purchase for this game (nieuw endpoint)
+POST http://localhost:8085/api/store/games/{{catalog_game_id}}/purchase
+Authorization: Bearer {{owner_token}}
+
+
+
+### 3c) GET store entry again to see updated popularity
+GET http://localhost:8085/api/store/games/{{catalog_game_id}}
+Authorization: Bearer {{owner_token}}
+
+
+
+### 4) GET list of store entries (no filters)
+GET http://localhost:8085/api/store/games
+Authorization: Bearer {{owner_token}}
+
+
+
+### 5) GET list of store entries with filters
+GET http://localhost:8085/api/store/games?category=STRATEGY&minPrice=10&maxPrice=30&sort=alphabetic
+Authorization: Bearer {{owner_token}}
+
+
+
+### 6) UPDATE store entry - alleen price en category (geen popularity meer)
+PUT http://localhost:8085/api/store/games/{{catalog_game_id}}
+Authorization: Bearer {{owner_token}}
+Content-Type: application/json
+
+{
+  "price": "9.99",
+  "category": "CARD"
+}
+
+### 7) GET updated store entry
+GET http://localhost:8085/api/store/games/{{catalog_game_id}}
+Authorization: Bearer {{owner_token}}
+
+
+
+### 8) Record multiple purchases to test popularity calculation
+POST http://localhost:8085/api/store/games/{{catalog_game_id}}/purchase
+Authorization: Bearer {{owner_token}}
+
+###
+
+POST http://localhost:8085/api/store/games/{{catalog_game_id}}/purchase
+Authorization: Bearer {{owner_token}}
+
+###
+
+POST http://localhost:8085/api/store/games/{{catalog_game_id}}/purchase
+Authorization: Bearer {{owner_token}}
+
+
+
+### 9) GET store entry to see updated popularity after multiple purchases
+GET http://localhost:8085/api/store/games/{{catalog_game_id}}
+Authorization: Bearer {{owner_token}}
+
+
+
+### 10) Test sorting by popularity
+GET http://localhost:8085/api/store/games?sort=popularity
+Authorization: Bearer {{owner_token}}
+
+
+
+### 11) Test sorting by price (nu BigDecimal sorting)
+GET http://localhost:8085/api/store/games?sort=price
+Authorization: Bearer {{owner_token}}
+
+
+
+### 12) DELETE store entry
+DELETE http://localhost:8085/api/store/games/{{catalog_game_id}}
+Authorization: Bearer {{owner_token}}
+
+
+
+### 13) GET deleted entry → Expect 404
+GET http://localhost:8085/api/store/games/{{catalog_game_id}}
+Authorization: Bearer {{owner_token}}
+
+
+
+### 14) ERROR scenario — Game-service unreachable or invalid ID
+POST http://localhost:8085/api/store/games
+Authorization: Bearer {{owner_token}}
+Content-Type: application/json
+
+{
+  "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+  "price": "19.99",
+  "category": "FAMILY"
+}
+
+
+
+### 15) Create another game for testing filter combinations
+POST http://localhost:8085/api/store/games
+Authorization: Bearer {{owner_token}}
+Content-Type: application/json
+
+{
+  "id": "00000000-0000-0000-0000-000000000002",
+  "price": "25.50",
+  "category": "ARCADE"
+}
+
+> {%
+    client.global.set("catalog_game_id_2", response.body.id);
+%}
+
+
+
+### 16) Test minPrice filter with decimal values
+GET http://localhost:8085/api/store/games?minPrice=15.00
+Authorization: Bearer {{owner_token}}
+
+
+
+### 17) Test maxPrice filter with decimal values
+GET http://localhost:8085/api/store/games?maxPrice=20.00
+Authorization: Bearer {{owner_token}}
+
+
+
+### 18) Test price range filter
+GET http://localhost:8085/api/store/games?minPrice=5.00&maxPrice=15.00
+Authorization: Bearer {{owner_token}}
+
+
+
+### 19) Clean up - delete second test game
+DELETE http://localhost:8085/api/store/games/{{catalog_game_id_2}}
+Authorization: Bearer {{owner_token}}
