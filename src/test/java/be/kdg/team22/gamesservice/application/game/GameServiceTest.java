@@ -39,8 +39,7 @@ class GameServiceTest {
                 "Checkers",
                 "A fun board game",
                 BigDecimal.TEN,
-                "http://img",
-                "http://store"
+                "http://img"
         );
     }
 

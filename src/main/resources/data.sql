@@ -1,6 +1,4 @@
-INSERT INTO games (id, name, base_url, frontend_url, start_endpoint, title, description, price, image_url, store_url,
-                   created_at,
-                   updated_at)
+INSERT INTO games (id, name, base_url, frontend_url, start_endpoint, title, description, price, image_url,created_at,updated_at)
 VALUES ('00000000-0000-0000-0000-000000000001',
         'tic-tac-toe',
         'http://localhost:8086',
@@ -10,7 +8,6 @@ VALUES ('00000000-0000-0000-0000-000000000001',
         'Tic-tac-toe is played on a three-by-three grid by two players.',
         14.99,
         'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse4.mm.bing.net%2Fth%2Fid%2FOIP.od5neF1COpwS6Nizg-DuYwHaFF%3Fpid%3DApi&f=1&ipt=2527b1aa91bb8e312a7a6211eda631300c7c1d4c73368d1c5eda5b5c3b44eed7',
-        'https://www.tictactoe.com/',
         NOW(),
         NOW()),
        ('00000000-0000-0000-0000-000000000002',
@@ -22,6 +19,5 @@ VALUES ('00000000-0000-0000-0000-000000000001',
         'Checkers is played by two opponents on opposite sides of the game board.',
         44.99,
         'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.etsystatic.com%2F9295891%2Fr%2Fil%2Ffe59d4%2F1941663431%2Fil_fullxfull.1941663431_27n8.jpg&f=1&nofb=1&ipt=19a33fabc9ec064ede9375f4c348d4e071701043299d452fd9650d057ea22329',
-        'https://www.checkers.com/',
         NOW(),
         NOW());

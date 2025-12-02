@@ -40,10 +40,7 @@ public class GameEntity {
     private BigDecimal price;
 
     @Column(nullable = false, name = "image_url")
-    private String imageUrl;
-
-    @Column(name = "store_url")
-    private String storeUrl;
+    private String image;
 
     @Column(nullable = false, name = "created_at")
     private Instant createdAt;
@@ -63,8 +60,7 @@ public class GameEntity {
             String title,
             String description,
             BigDecimal price,
-            String imageUrl,
-            String storeUrl,
+            String image,
             Instant createdAt,
             Instant updatedAt
     ) {
@@ -76,8 +72,7 @@ public class GameEntity {
         this.title = title;
         this.description = description;
         this.price = price;
-        this.imageUrl = imageUrl;
-        this.storeUrl = storeUrl;
+        this.image = image;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -92,8 +87,7 @@ public class GameEntity {
                 game.title(),
                 game.description(),
                 game.price(),
-                game.imageUrl(),
-                game.storeUrl(),
+                game.image(),
                 game.createdAt(),
                 game.updatedAt()
         );
@@ -109,8 +103,7 @@ public class GameEntity {
                 title,
                 description,
                 price,
-                imageUrl,
-                storeUrl,
+                image,
                 createdAt,
                 updatedAt
         );
@@ -144,12 +137,8 @@ public class GameEntity {
         return price;
     }
 
-    public String imageUrl() {
-        return imageUrl;
-    }
-
-    public String storeUrl() {
-        return storeUrl;
+    public String image() {
+        return image;
     }
 
     public Instant createdAt() {

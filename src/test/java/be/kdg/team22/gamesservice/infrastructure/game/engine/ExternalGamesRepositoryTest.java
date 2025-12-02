@@ -38,9 +38,7 @@ class ExternalGamesRepositoryTest {
                 "Tic Tac Toe",
                 "desc",
                 new BigDecimal("5.00"),
-                "img",
-                null
-        );
+                "img");
     }
 
     private StartGameRequest req(GameSettingsModel settings) {
@@ -57,7 +55,7 @@ class ExternalGamesRepositoryTest {
         RestClient mock = mock(RestClient.class, RETURNS_DEEP_STUBS);
 
         when(mock.post()
-                .uri(any(Function.class))                     
+                .uri(any(Function.class))
                 .body(any(EngineCreateGameRequest.class))
                 .retrieve()
                 .body(EngineGameResponse.class)

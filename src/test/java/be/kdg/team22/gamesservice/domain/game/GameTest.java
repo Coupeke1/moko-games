@@ -26,9 +26,7 @@ class GameTest {
                 "Title",
                 "Description",
                 BigDecimal.TEN,
-                "http://img",
-                "http://store"
-        );
+                "http://img");
     }
 
     @Test
@@ -44,8 +42,7 @@ class GameTest {
                 "Title",
                 "Desc",
                 BigDecimal.ONE,
-                "http://img",
-                "http://store"
+                "http://img"
         );
 
         assertThat(game.id()).isEqualTo(id);
@@ -55,8 +52,7 @@ class GameTest {
         assertThat(game.title()).isEqualTo("Title");
         assertThat(game.description()).isEqualTo("Desc");
         assertThat(game.price()).isEqualTo(BigDecimal.ONE);
-        assertThat(game.imageUrl()).isEqualTo("http://img");
-        assertThat(game.storeUrl()).isEqualTo("http://store");
+        assertThat(game.image()).isEqualTo("http://img");
 
         assertThat(game.createdAt()).isNotNull();
         assertThat(game.updatedAt()).isEqualTo(game.createdAt());
@@ -78,7 +74,6 @@ class GameTest {
                 "Desc",
                 BigDecimal.TEN,
                 "http://img",
-                "http://store",
                 created,
                 updated
         );
@@ -99,9 +94,7 @@ class GameTest {
                         "Title",
                         "Desc",
                         BigDecimal.TEN,
-                        "http://img",
-                        "http://store"
-                )
+                        "http://img")
         ).isInstanceOf(GameIdNullException.class);
     }
 
@@ -117,8 +110,7 @@ class GameTest {
                         "Title",
                         "Desc",
                         BigDecimal.TEN,
-                        "http://img",
-                        "http://store"
+                        "http://img"
                 )
         ).isInstanceOf(GameNameInvalidException.class);
     }
@@ -135,8 +127,7 @@ class GameTest {
                         "Title",
                         "Desc",
                         BigDecimal.TEN,
-                        "http://img",
-                        "http://store"
+                        "http://img"
                 )
         ).isInstanceOf(GameBaseUrlInvalidException.class);
     }
@@ -153,8 +144,7 @@ class GameTest {
                         "Title",
                         "Desc",
                         BigDecimal.TEN,
-                        "http://img",
-                        "http://store"
+                        "http://img"
                 )
         ).isInstanceOf(GameStartEndpointInvalidException.class);
     }
@@ -171,8 +161,7 @@ class GameTest {
                         "",
                         "Desc",
                         BigDecimal.TEN,
-                        "http://img",
-                        "http://store"
+                        "http://img"
                 )
         ).isInstanceOf(GameMetadataException.class);
     }
@@ -243,15 +232,12 @@ class GameTest {
                 "New title",
                 "New desc",
                 new BigDecimal("20"),
-                "http://newimg",
-                "http://storeurl"
-        );
+                "http://newimg");
 
         assertThat(game.title()).isEqualTo("New title");
         assertThat(game.description()).isEqualTo("New desc");
         assertThat(game.price()).isEqualTo(new BigDecimal("20"));
-        assertThat(game.imageUrl()).isEqualTo("http://newimg");
-        assertThat(game.storeUrl()).isEqualTo("http://storeurl");
+        assertThat(game.image()).isEqualTo("http://newimg");
 
         assertThat(game.updatedAt()).isAfterOrEqualTo(before);
     }
@@ -265,8 +251,7 @@ class GameTest {
                         "Title",
                         "Desc",
                         new BigDecimal("-1"),
-                        "http://img",
-                        "http://store"
+                        "http://img"
                 )
         ).isInstanceOf(GameMetadataException.class);
     }

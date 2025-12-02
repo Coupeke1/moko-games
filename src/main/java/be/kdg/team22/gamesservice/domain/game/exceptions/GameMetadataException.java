@@ -18,11 +18,7 @@ public class GameMetadataException extends RuntimeException {
         return new GameMetadataException("Game price cannot be negative or null");
     }
 
-    public static GameMetadataException invalidImageUrl() {
-        return new GameMetadataException("Game imageUrl cannot be null or blank");
-    }
-
-    public static GameMetadataException invalidStoreUrl() {
-        return new GameMetadataException("Game storeUrl cannot be null or blank");
+    public static GameMetadataException invalidImage() {
+        return new GameMetadataException("Game image cannot be null or blank");
     }
 }

@@ -23,8 +23,7 @@ public class Game {
     private String title;
     private String description;
     private BigDecimal price;
-    private String imageUrl;
-    private String storeUrl;
+    private String image;
 
     public Game(
             final GameId id,
@@ -35,12 +34,11 @@ public class Game {
             final String title,
             final String description,
             final BigDecimal price,
-            final String imageUrl,
-            final String storeUrl,
+            final String image,
             final Instant createdAt,
             final Instant updatedAt
     ) {
-        validate(id, name, baseUrl, frontendUrl, startEndpoint, title, description, price, imageUrl);
+        validate(id, name, baseUrl, frontendUrl, startEndpoint, title, description, price, image);
 
         this.id = id;
         this.name = name;
@@ -51,8 +49,7 @@ public class Game {
         this.title = title;
         this.description = description;
         this.price = price;
-        this.imageUrl = imageUrl;
-        this.storeUrl = storeUrl;
+        this.image = image;
 
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -67,10 +64,9 @@ public class Game {
             final String title,
             final String description,
             final BigDecimal price,
-            final String imageUrl,
-            final String storeUrl
+            final String image
     ) {
-        validate(id, name, baseUrl, frontendUrl, startEndpoint, title, description, price, imageUrl);
+        validate(id, name, baseUrl, frontendUrl, startEndpoint, title, description, price, image);
 
         this.id = id;
         this.name = name;
@@ -80,8 +76,7 @@ public class Game {
         this.title = title;
         this.description = description;
         this.price = price;
-        this.imageUrl = imageUrl;
-        this.storeUrl = storeUrl;
+        this.image = image;
 
         this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
@@ -96,14 +91,14 @@ public class Game {
             final String title,
             final String description,
             final BigDecimal price,
-            final String imageUrl
+            final String image
     ) {
         if (id == null) throw new GameIdNullException();
         if (name == null || name.isBlank()) throw new GameNameInvalidException();
         if (baseUrl == null || baseUrl.isBlank()) throw new GameBaseUrlInvalidException();
         if (frontendUrl == null || frontendUrl.isBlank()) throw new GameFrontendUrlInvalidException();
         if (startEndpoint == null || startEndpoint.isBlank()) throw new GameStartEndpointInvalidException();
-        validateMetaData(title, description, price, imageUrl);
+        validateMetaData(title, description, price, image);
     }
 
     public void rename(final String newName) {
@@ -128,16 +123,14 @@ public class Game {
             final String title,
             final String description,
             final BigDecimal price,
-            final String imageUrl,
-            final String storeUrl
+            final String image
     ) {
-        validateMetaData(title, description, price, imageUrl);
+        validateMetaData(title, description, price, image);
 
         this.title = title;
         this.description = description;
         this.price = price;
-        this.imageUrl = imageUrl;
-        this.storeUrl = storeUrl;
+        this.image = image;
         this.updatedAt = Instant.now();
     }
 
@@ -145,7 +138,7 @@ public class Game {
             final String title,
             final String description,
             final BigDecimal price,
-            final String imageUrl
+            final String image
     ) {
         if (title == null || title.isBlank()) {
             throw GameMetadataException.invalidTitle();
@@ -156,8 +149,8 @@ public class Game {
         if (price == null || price.compareTo(BigDecimal.ZERO) < 0) {
             throw GameMetadataException.invalidPrice();
         }
-        if (imageUrl == null || imageUrl.isBlank()) {
-            throw GameMetadataException.invalidImageUrl();
+        if (image == null || image.isBlank()) {
+            throw GameMetadataException.invalidImage();
         }
     }
 
@@ -193,12 +186,8 @@ public class Game {
         return price;
     }
 
-    public String imageUrl() {
-        return imageUrl;
-    }
-
-    public String storeUrl() {
-        return storeUrl;
+    public String image() {
+        return image;
     }
 
     public Instant createdAt() {
