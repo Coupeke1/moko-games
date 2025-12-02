@@ -35,6 +35,7 @@ class GameServiceTest {
                 "checkers",
                 "http://localhost:8087",
                 "/start",
+                "/start",
                 "Checkers",
                 "A fun board game",
                 BigDecimal.TEN,

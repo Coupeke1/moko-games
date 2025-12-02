@@ -34,6 +34,7 @@ class ExternalGamesRepositoryTest {
                 "tic-tac-toe",
                 "http://engine-service",
                 "/start",
+                "/start",
                 "Tic Tac Toe",
                 "desc",
                 new BigDecimal("5.00"),
