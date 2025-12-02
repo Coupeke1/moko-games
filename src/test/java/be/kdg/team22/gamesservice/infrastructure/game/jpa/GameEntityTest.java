@@ -21,7 +21,6 @@ class GameEntityTest {
                 "/start",
                 "Checkers",
                 "Strategy board game",
-                new BigDecimal("10.00"),
                 "http://image",
                 Instant.parse("2024-01-01T00:00:00Z"),
                 Instant.parse("2024-01-02T00:00:00Z")
@@ -40,7 +39,6 @@ class GameEntityTest {
         assertThat(entity.startEndpoint()).isEqualTo(game.startEndpoint());
         assertThat(entity.title()).isEqualTo(game.title());
         assertThat(entity.description()).isEqualTo(game.description());
-        assertThat(entity.price()).isEqualTo(game.price());
         assertThat(entity.image()).isEqualTo(game.image());
         assertThat(entity.createdAt()).isEqualTo(game.createdAt());
         assertThat(entity.updatedAt()).isEqualTo(game.updatedAt());
@@ -60,7 +58,6 @@ class GameEntityTest {
                 "/start",
                 "Tic Tac Toe",
                 "Classic game",
-                new BigDecimal("5.00"),
                 "http://image",
                 created,
                 updated
@@ -74,7 +71,6 @@ class GameEntityTest {
         assertThat(domain.startEndpoint()).isEqualTo("/start");
         assertThat(domain.title()).isEqualTo("Tic Tac Toe");
         assertThat(domain.description()).isEqualTo("Classic game");
-        assertThat(domain.price()).isEqualTo(new BigDecimal("5.00"));
         assertThat(domain.image()).isEqualTo("http://image");
         assertThat(domain.createdAt()).isEqualTo(created);
         assertThat(domain.updatedAt()).isEqualTo(updated);
@@ -93,7 +89,6 @@ class GameEntityTest {
         assertThat(converted.startEndpoint()).isEqualTo(original.startEndpoint());
         assertThat(converted.title()).isEqualTo(original.title());
         assertThat(converted.description()).isEqualTo(original.description());
-        assertThat(converted.price()).isEqualTo(original.price());
         assertThat(converted.image()).isEqualTo(original.image());
         assertThat(converted.createdAt()).isEqualTo(original.createdAt());
         assertThat(converted.updatedAt()).isEqualTo(original.updatedAt());

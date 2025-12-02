@@ -35,7 +35,6 @@ class DbGameRepositoryTest {
                 "/start",
                 "Title",
                 "Description",
-                new BigDecimal("19.99"),
                 "http://image",
                 Instant.parse("2024-01-01T10:00:00Z"),
                 Instant.parse("2024-01-02T10:00:00Z")
@@ -60,7 +59,6 @@ class DbGameRepositoryTest {
         assertThat(loaded.startEndpoint()).isEqualTo("/start");
         assertThat(loaded.title()).isEqualTo("Title");
         assertThat(loaded.description()).isEqualTo("Description");
-        assertThat(loaded.price()).isEqualByComparingTo("19.99");
         assertThat(loaded.image()).isEqualTo("http://image");
     }
 
@@ -74,7 +72,6 @@ class DbGameRepositoryTest {
                 "/play",
                 "T",
                 "D",
-                new BigDecimal("5.50"),
                 "http://img",
                 Instant.parse("2024-01-01T10:00:00Z"),
                 Instant.parse("2024-01-01T12:00:00Z")
@@ -88,7 +85,6 @@ class DbGameRepositoryTest {
         assertThat(entity.startEndpoint()).isEqualTo("/play");
         assertThat(entity.title()).isEqualTo("T");
         assertThat(entity.description()).isEqualTo("D");
-        assertThat(entity.price()).isEqualTo(new BigDecimal("5.50"));
         assertThat(entity.image()).isEqualTo("http://img");
     }
 
@@ -105,7 +101,6 @@ class DbGameRepositoryTest {
         assertThat(domain.startEndpoint()).isEqualTo("/start");
         assertThat(domain.title()).isEqualTo("Title");
         assertThat(domain.description()).isEqualTo("Description");
-        assertThat(domain.price()).isEqualByComparingTo("19.99");
         assertThat(domain.image()).isEqualTo("http://image");
     }
 }

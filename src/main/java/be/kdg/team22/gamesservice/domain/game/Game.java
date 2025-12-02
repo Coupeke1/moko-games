@@ -22,7 +22,6 @@ public class Game {
     // frontend metadata
     private String title;
     private String description;
-    private BigDecimal price;
     private String image;
 
     public Game(
@@ -33,12 +32,11 @@ public class Game {
             final String startEndpoint,
             final String title,
             final String description,
-            final BigDecimal price,
             final String image,
             final Instant createdAt,
             final Instant updatedAt
     ) {
-        validate(id, name, baseUrl, frontendUrl, startEndpoint, title, description, price, image);
+        validate(id, name, baseUrl, frontendUrl, startEndpoint, title, description, image);
 
         this.id = id;
         this.name = name;
@@ -48,7 +46,6 @@ public class Game {
 
         this.title = title;
         this.description = description;
-        this.price = price;
         this.image = image;
 
         this.createdAt = createdAt;
@@ -63,10 +60,9 @@ public class Game {
             final String startEndpoint,
             final String title,
             final String description,
-            final BigDecimal price,
             final String image
     ) {
-        validate(id, name, baseUrl, frontendUrl, startEndpoint, title, description, price, image);
+        validate(id, name, baseUrl, frontendUrl, startEndpoint, title, description, image);
 
         this.id = id;
         this.name = name;
@@ -76,7 +72,6 @@ public class Game {
 
         this.title = title;
         this.description = description;
-        this.price = price;
         this.image = image;
 
         this.createdAt = Instant.now();
@@ -91,7 +86,6 @@ public class Game {
             final String startEndpoint,
             final String title,
             final String description,
-            final BigDecimal price,
             final String image
     ) {
         if (id == null) throw new GameIdNullException();
@@ -99,7 +93,7 @@ public class Game {
         if (baseUrl == null || baseUrl.isBlank()) throw new GameBaseUrlInvalidException();
         if (frontendUrl == null || frontendUrl.isBlank()) throw new GameFrontendUrlInvalidException();
         if (startEndpoint == null || startEndpoint.isBlank()) throw new GameStartEndpointInvalidException();
-        validateMetaData(title, description, price, image);
+        validateMetaData(title, description, image);
     }
 
     public void rename(final String newName) {
@@ -123,14 +117,12 @@ public class Game {
     public void updateStoreMetadata(
             final String title,
             final String description,
-            final BigDecimal price,
             final String image
     ) {
-        validateMetaData(title, description, price, image);
+        validateMetaData(title, description, image);
 
         this.title = title;
         this.description = description;
-        this.price = price;
         this.image = image;
         this.updatedAt = Instant.now();
     }
@@ -138,7 +130,6 @@ public class Game {
     private void validateMetaData(
             final String title,
             final String description,
-            final BigDecimal price,
             final String image
     ) {
         if (title == null || title.isBlank()) {
@@ -146,9 +137,6 @@ public class Game {
         }
         if (description == null || description.isBlank()) {
             throw GameMetadataException.invalidDescription();
-        }
-        if (price == null || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw GameMetadataException.invalidPrice();
         }
         if (image == null || image.isBlank()) {
             throw GameMetadataException.invalidImage();
@@ -181,10 +169,6 @@ public class Game {
 
     public String description() {
         return description;
-    }
-
-    public BigDecimal price() {
-        return price;
     }
 
     public String image() {
