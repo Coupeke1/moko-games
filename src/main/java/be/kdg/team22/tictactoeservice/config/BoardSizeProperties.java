@@ -5,10 +5,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class BoardSizeProperties {
-    @Value("${board.min-size}")
+    @Value("${tic-tac-toe.board.min-size}")
     private int minSize;
 
-    @Value("${board.max-size}")
+    @Value("${tic-tac-toe.board.max-size}")
     private int maxSize;
 
     public int minSize() {

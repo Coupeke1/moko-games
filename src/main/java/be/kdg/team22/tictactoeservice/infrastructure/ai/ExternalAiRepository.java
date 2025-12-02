@@ -21,7 +21,7 @@ public class ExternalAiRepository {
     public AiMoveResponse requestMove(AiMoveRequest request) {
         try {
             return client.post()
-                    .uri("/move")
+                    .uri("/ai-player/move")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(request)
                     .accept(MediaType.APPLICATION_JSON)

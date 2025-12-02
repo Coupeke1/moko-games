@@ -11,7 +11,7 @@ import org.springframework.web.client.RestClient;
 public class ExternalAiRepositoryConfig {
 
     @Bean("aiService")
-    RestClient aiRestClient(@Value("${ai.url}") final String baseUrl) {
+    RestClient aiRestClient(@Value("${business.ai.url}") final String baseUrl) {
 
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(2000);
