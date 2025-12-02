@@ -5,5 +5,7 @@ window.__APP_CONFIG__ = {
 
     userService: "$VITE_USER_SERVICE",
     socialService: "$VITE_SOCIAL_SERVICE",
-    libraryService: "$VITE_LIBRARY_SERVICE"
+    libraryService: "$VITE_LIBRARY_SERVICE",
+    sessionService: "$VITE_SESSION_SERVICE",
+    gamesService: "$VITE_GAMES_SERVICE"
 }
