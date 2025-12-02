@@ -1,7 +1,8 @@
 import { client } from "@/lib/api-client";
 import type { Game } from "@/models/game/game";
+import {config} from "@/config.ts";
 
-const BASE_URL = import.meta.env.VITE_GAMES_SERVICE;
+const BASE_URL = config.gamesService;
 
 export async function findGame(id: string): Promise<Game> {
     try {

@@ -3,8 +3,9 @@ import { validIdCheck } from "@/lib/id";
 import type { Game } from "@/models/library/game";
 import type { Lobby } from "@/models/lobby/lobby";
 import type { Player } from "@/models/lobby/player";
+import {config} from "@/config.ts";
 
-const BASE_URL = import.meta.env.VITE_SESSION_SERVICE;
+const BASE_URL = config.sessionService;
 
 export async function findLobby(id: string): Promise<Lobby> {
     try {
