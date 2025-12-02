@@ -4,6 +4,7 @@ import be.kdg.team22.storeservice.application.catalog.queries.FilterQuery;
 import be.kdg.team22.storeservice.application.catalog.queries.Pagination;
 import be.kdg.team22.storeservice.domain.catalog.GameCatalogEntry;
 import be.kdg.team22.storeservice.domain.catalog.GameCatalogRepository;
+import be.kdg.team22.storeservice.domain.catalog.GameCategory;
 import be.kdg.team22.storeservice.domain.catalog.exceptions.GameNotFoundException;
 import be.kdg.team22.storeservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.storeservice.infrastructure.games.GameMetadataResponse;
@@ -15,29 +16,29 @@ import java.util.UUID;
 @Service
 public class StoreService {
 
-    private final GameCatalogRepository repo;
-    private final ExternalGamesRepository games;
+    private final GameCatalogRepository catalogRepository;
+    private final ExternalGamesRepository gamesRepository;
 
-    public StoreService(GameCatalogRepository repo, ExternalGamesRepository games) {
-        this.repo = repo;
-        this.games = games;
+    public StoreService(GameCatalogRepository catalogRepository, ExternalGamesRepository gamesRepository) {
+        this.catalogRepository = catalogRepository;
+        this.gamesRepository = gamesRepository;
     }
 
     public List<GameCatalogEntry> list(FilterQuery filter, Pagination pagination) {
-        return repo.findAll(filter, pagination);
+        return catalogRepository.findAll(filter, pagination);
     }
 
     public GameCatalogEntry get(UUID id) {
-        return repo.findById(id)
+        return catalogRepository.findById(id)
                 .orElseThrow(() -> new GameNotFoundException(id));
     }
 
     public GameCatalogEntry create(UUID id,
                                    double price,
-                                   be.kdg.team22.storeservice.domain.catalog.GameCategory category,
+                                   GameCategory category,
                                    Double initialPopularity) {
 
-        GameMetadataResponse metadata = games.fetchMetadata(id);
+        GameMetadataResponse metadata = gamesRepository.fetchMetadata(id);
 
         double popularity = initialPopularity != null ? initialPopularity : 0.0;
 
@@ -49,20 +50,20 @@ public class StoreService {
                 popularity
         );
 
-        repo.save(entry);
+        catalogRepository.save(entry);
         return entry;
     }
 
     public GameCatalogEntry update(UUID id,
                                    double price,
-                                   be.kdg.team22.storeservice.domain.catalog.GameCategory category) {
+                                   GameCategory category) {
         GameCatalogEntry existing = get(id);
         existing.update(existing.getTitle(), price, category);
-        repo.save(existing);
+        catalogRepository.save(existing);
         return existing;
     }
 
     public void delete(UUID id) {
-        repo.delete(id);
+        catalogRepository.delete(id);
     }
 }
