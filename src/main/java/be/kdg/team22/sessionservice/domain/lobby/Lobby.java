@@ -235,6 +235,10 @@ public class Lobby {
         return bot != null;
     }
 
+    public long size() {
+        return players.size() + (hasBot() ? 1 : 0);
+    }
+
     public LobbyId id() {
         return id;
     }

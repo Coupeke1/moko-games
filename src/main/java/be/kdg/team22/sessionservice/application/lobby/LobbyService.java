@@ -75,16 +75,22 @@ public class LobbyService {
         lobby.ensureOwner(ownerId);
         lobby.ensureAllPlayersReady();
 
-        if (lobby.players().size() <= 1)
+        if (lobby.size() <= 1)
             throw PlayersException.tooLittle();
 
-        List<UUID> playerIds = new ArrayList<>(lobby.players().stream().map(p -> p.id().value()).toList());
+        if (lobby.size() > lobby.settings().maxPlayers())
+            throw PlayersException.tooMany();
+
+        List<UUID> players = new ArrayList<>(lobby.players().stream().map(p -> p.id().value()).toList());
 
         if (lobby.hasBot()) {
-            playerIds.add(lobby.bot().id().value());
+            if (lobby.players().size() > 1)
+                throw PlayersException.tooMany();
+
+            players.add(lobby.bot().id().value());
         }
 
-        StartGameResponse response = gamesRepository.startGame(new StartGameRequest(lobbyId.value(), lobby.gameId().value(), playerIds, lobby.settings().gameSettings(), lobby.hasBot()), token);
+        StartGameResponse response = gamesRepository.startGame(new StartGameRequest(lobbyId.value(), lobby.gameId().value(), players, lobby.settings().gameSettings(), lobby.hasBot()), token);
 
         lobby.markStarted(GameId.from(response.gameInstanceId()));
 
@@ -100,8 +106,10 @@ public class LobbyService {
         int resolvedMaxPlayers = maxPlayers != null ? maxPlayers : 4;
 
         GameSettings gameSettings = switch (model) {
-            case TicTacToeSettingsModel t -> new TicTacToeSettings(t.boardSize());
-            case CheckersSettingsModel c -> new CheckersSettings(c.boardSize(), c.flyingKings());
+            case TicTacToeSettingsModel t ->
+                    new TicTacToeSettings(t.boardSize());
+            case CheckersSettingsModel c ->
+                    new CheckersSettings(c.boardSize(), c.flyingKings());
         };
 
         return new LobbySettings(gameSettings, resolvedMaxPlayers);

@@ -1,5 +1,6 @@
 package be.kdg.team22.sessionservice.domain.lobby;
 
+import be.kdg.team22.sessionservice.domain.lobby.exceptions.GameNotStartedException;
 import org.jmolecules.ddd.annotation.ValueObject;
 
 import java.util.UUID;
@@ -7,7 +8,8 @@ import java.util.UUID;
 @ValueObject
 public record GameId(UUID value) {
     public GameId {
-        if (value == null) throw new IllegalArgumentException("GameId cannot be null");
+        if (value == null)
+            throw new IllegalArgumentException("GameId cannot be null");
     }
 
     public static GameId from(UUID uuid) {
