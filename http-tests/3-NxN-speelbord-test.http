@@ -54,7 +54,8 @@ Content-Type: application/json
 
 {
   "players": [
-    "642999ad-c546-40b6-876c-1048971c7942"
+    "51415b39-84d2-4cbd-b4fd-5a4f83231abd",
+    "00000000-0000-0000-0000-000000000000"
   ],
   "settings": {
     "boardSize": 3
