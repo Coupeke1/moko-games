@@ -62,7 +62,7 @@ package:
   script:
     - echo "Building Docker image…"
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-
+    -
       # Base tag for temporary build
       BASE_TAG="temp-build"
 
