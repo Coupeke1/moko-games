@@ -72,6 +72,7 @@ public class Game {
         this.name = name;
         this.baseUrl = baseUrl;
         this.startEndpoint = startEndpoint;
+        this.frontendUrl = frontendUrl;
 
         this.title = title;
         this.description = description;

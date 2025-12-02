@@ -1,0 +1,2 @@
+## getting a game id
+GET http://localhost:8084/api/games/00000000-0000-0000-0000-000000000001
