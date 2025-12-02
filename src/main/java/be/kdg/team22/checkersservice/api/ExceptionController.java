@@ -1,9 +1,6 @@
 package be.kdg.team22.checkersservice.api;
 
-import be.kdg.team22.checkersservice.domain.game.exceptions.GameIdException;
-import be.kdg.team22.checkersservice.domain.game.exceptions.NotFoundException;
-import be.kdg.team22.checkersservice.domain.game.exceptions.PlayerCountException;
-import be.kdg.team22.checkersservice.domain.game.exceptions.UniquePlayersException;
+import be.kdg.team22.checkersservice.domain.game.exceptions.*;
 import be.kdg.team22.checkersservice.domain.player.exceptions.InvalidPlayerException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +10,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class ExceptionController {
     @ExceptionHandler({
+            BoardSizeException.class,
             GameIdException.class,
+            OutsidePlayingFieldException.class,
             PlayerCountException.class,
             UniquePlayersException.class,
             InvalidPlayerException.class,

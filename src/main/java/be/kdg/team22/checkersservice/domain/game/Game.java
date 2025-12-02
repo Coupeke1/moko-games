@@ -18,7 +18,7 @@ public class Game {
     private final TreeSet<Player> players;
     private final PlayerRole aiPlayer;
     private PlayerRole currentRole;
-    private Board board;
+    private final Board board;
     private GameStatus status;
 
     private Game(final List<Player> players, final PlayerRole aiPlayer) {
@@ -27,7 +27,7 @@ public class Game {
         this.players.addAll(players);
         this.aiPlayer = aiPlayer;
         this.currentRole = this.players.getFirst().role();
-        this.board = new Board();
+        this.board = Board.create(8);
         this.status = GameStatus.RUNNING;
     }
 
