@@ -1,7 +1,6 @@
 import type {Profile} from "@/models/profile.ts";
 import type {Player} from "@/models/player";
 import {usePlayerProfile} from "@/hooks/use-player-profile";
-import PlayerRoleBadge from "@/components/player-role-badge.tsx";
 import PlayerImage from "@/components/player-image.tsx";
 
 interface GameWinProps {
@@ -23,7 +22,6 @@ export default function GameWin({myProfile, winningPlayer}: GameWinProps) {
             <div className="bg-bg-3 rounded-lg p-4 mb-6">
                 <div className="flex flex-col items-center gap-3">
                     <div className="text-fg text-lg">Winner</div>
-                    <PlayerRoleBadge role={winningPlayer?.role || null}/>
                     {winningPlayer && (
                         <div className="flex items-center gap-2 mt-2">
                             {!winningPlayerProfile ? (

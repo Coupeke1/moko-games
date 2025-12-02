@@ -1,3 +1,6 @@
+import Circle from "./icons/circle";
+import Cross from "./icons/cross";
+
 interface Props {
     board: string[][];
     onCellClick?: (rowIndex: number, colIndex: number) => void;
@@ -20,15 +23,14 @@ export default function GameGrid({board, onCellClick}: Props) {
                 row.map((cell, colIndex) => (
                     <button
                         key={`${rowIndex}-${colIndex}`}
-                        className={`aspect-square flex items-center justify-center
-                       text-5xl font-bold bg-bg-2 hover:bg-bg-3 transition-colors
-                       ${cell === 'X' ? 'text-x' : 'text-o'}`}
+                        className='aspect-square flex items-center justify-center text-5xl font-bold bg-bg-2 hover:bg-bg-3 transition-colors'
                         onClick={() => {
                             if (cell != ' ') return;
                             onCellClick?.(rowIndex, colIndex)}
                         }
                     >
-                        {cell || ''}
+                        {cell === 'X' && <Cross className="size-32" />}
+                        {cell === 'O' && <Circle className="size-32" />}
                     </button>
                 ))
             )}
