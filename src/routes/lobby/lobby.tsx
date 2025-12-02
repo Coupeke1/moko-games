@@ -15,7 +15,7 @@ import PlayerCard from "@/routes/lobby/components/player-card";
 import InviteDialog from "@/routes/lobby/dialogs/invite-dialog/invite-dialog";
 import SettingsDialog from "@/routes/lobby/dialogs/settings-dialog/settings-dialog";
 import { useLobbyData } from "@/routes/lobby/hooks/use-lobby";
-import { closeLobby } from "@/services/lobby-service";
+import { closeLobby, startGame } from "@/services/lobby-service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
@@ -34,6 +34,26 @@ export default function LobbyPage() {
 
     const { lobby, profile, game, isOwner, isLoading, isError } =
         useLobbyData();
+
+    const start = useMutation({
+        mutationFn: async ({ lobby }: { lobby: string }) =>
+            await startGame(lobby),
+        onSuccess: async (data, variables) => {
+            await client.invalidateQueries({
+                queryKey: ["lobby", variables.lobby],
+            });
+
+            if (!game) return;
+            showToast("Lobby", "Starting...");
+
+            window.location.replace(
+                `${game.frontendUrl}${game.startEndpoint}/${data}`,
+            );
+        },
+        onError: (error: Error) => {
+            showToast("Lobby", error.message);
+        },
+    });
 
     const close = useMutation({
         mutationFn: async ({ lobby }: { lobby: string }) =>
@@ -84,7 +104,7 @@ export default function LobbyPage() {
             <Column gap={Gap.Large}>
                 <GameInformation
                     game={game}
-                    onStart={() => {}}
+                    onStart={() => start.mutate({ lobby: lobby.id })}
                     onQuit={() => close.mutate({ lobby: lobby.id })}
                     onSettings={() => setSettings(true)}
                 />

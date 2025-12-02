@@ -22,7 +22,7 @@ export default function GameInformation({
     return (
         <article
             className="flex flex-col justify-end relative overflow-hidden select-none bg-cover bg-center px-3 py-2 rounded-lg h-30"
-            style={{ backgroundImage: `url("${game.imageUrl}")` }}
+            style={{ backgroundImage: `url("${game.image}")` }}
         >
             <section className="absolute inset-0 bg-linear-to-b from-black/20 via-black/60 to-black/80 from-0% via-45% to-100% rounded-lg" />
 
