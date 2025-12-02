@@ -1,5 +1,5 @@
-import type {GameStatus} from "@/routes/game/model/game-status.ts";
-import type {Player} from "@/routes/game/model/Player.ts";
+import type {GameStatus} from "@/models/game-status";
+import type { Player } from "./player";
 
 export interface GameState {
     id: string;

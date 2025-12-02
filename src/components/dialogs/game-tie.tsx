@@ -1,4 +1,4 @@
-export function GameTie() {
+export default function GameTie() {
     return (
         <div className="text-center">
             <div className="mb-6">

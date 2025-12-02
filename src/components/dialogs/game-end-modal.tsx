@@ -1,17 +1,16 @@
-import type {GameState} from "@/routes/game/model/game-state.ts";
+import type {GameState} from "@/models/game-state";
 import type {Profile} from "@/models/profile.ts";
-import {GameWin} from "@/routes/game/components/modals/game-win.tsx";
-import {GameTie} from "@/routes/game/components/modals/game-tie.tsx";
-import {GameStateDisplay} from "@/routes/game/components/game-state-display.tsx";
+import GameWin from "@/components/dialogs/game-win";
+import GameTie from "@/components/dialogs/game-tie";
 
-interface GameEndModalProps {
+interface Props {
     gameState: GameState;
     myProfile: Profile;
     isOpen: boolean;
     onReset: () => void;
 }
 
-export function GameEndModal({gameState, myProfile, isOpen, onReset}: GameEndModalProps) {
+export default function GameEndModal({gameState, myProfile, isOpen, onReset}: Props) {
     const {winner, players} = gameState;
     const winningPlayer = players.find(player => player.id === winner);
 
@@ -29,7 +28,6 @@ export function GameEndModal({gameState, myProfile, isOpen, onReset}: GameEndMod
                     ) : (
                         <GameWin myProfile={myProfile} winningPlayer={winningPlayer!}/>
                     )}
-                    <GameStateDisplay gameState={gameState}/>
 
                     <div className="flex gap-3">
                         <button

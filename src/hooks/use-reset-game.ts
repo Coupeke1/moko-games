@@ -1,5 +1,5 @@
+import {resetGame} from '@/services/game-service';
 import {useQueryClient} from '@tanstack/react-query';
-import {resetGame} from '@/routes/game/services/game-service';
 
 export function useResetGame(gameId: string) {
     const queryClient = useQueryClient();

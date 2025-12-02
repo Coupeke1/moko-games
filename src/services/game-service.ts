@@ -1,7 +1,7 @@
 import validIdCheck from "@/lib/id.ts";
-import type {GameState} from "@/routes/game/model/game-state.ts";
+import type {GameState} from "@/models/game-state";
 import axios from "axios";
-import type {MoveRequest} from "@/routes/game/model/move-request.ts";
+import type {MoveRequest} from "@/models/move-request";
 import {config} from "@/config.ts";
 
 const BASE_URL = config.ticTacToeService;
