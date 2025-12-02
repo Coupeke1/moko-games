@@ -12,7 +12,7 @@ public record GameModel(
         List<PlayerModel> players,
         PlayerRole aiPlayer,
         PlayerRole currentRole,
-        List<List<String>> board,
+        String[][] board,
         GameStatus status
 ) {
     public static GameModel from(Game game) {
@@ -21,7 +21,7 @@ public record GameModel(
                 game.players().stream().map(PlayerModel::from).toList(),
                 game.aiPlayer(),
                 game.currentRole(),
-                null,
+                game.board().state(),
                 game.status()
         );
     }
