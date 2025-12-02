@@ -5,8 +5,8 @@ Content-Type: application/x-www-form-urlencoded
 grant_type = password &
 client_id = user-service &
 client_secret = ZmXSd2mIzB6hsLrybeD3gH0c11vPwrej &
-username = mathias &
-password = loginmathias &
+username = lee &
+password = loginlee &
 scope = openid
 
 > {%
@@ -41,7 +41,7 @@ Content-Type: application/json
   "row": 2,
   "col": 0,
   "gameId": "{{game_id}}",
-  "playerId": "cf36d3e1-a1e0-4c18-89eb-95fa76fc81ee"
+  "playerId": "51415b39-84d2-4cbd-b4fd-5a4f83231abd"
 }
 
 ### Get Game
@@ -54,7 +54,8 @@ Content-Type: application/json
 
 {
   "players": [
-    "642999ad-c546-40b6-876c-1048971c7942"
+    "51415b39-84d2-4cbd-b4fd-5a4f83231abd",
+    "00000000-0000-0000-0000-000000000000"
   ],
   "settings": {
     "boardSize": 3

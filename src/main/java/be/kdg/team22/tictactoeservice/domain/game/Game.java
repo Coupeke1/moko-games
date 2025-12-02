@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 @AggregateRoot
 public class Game {
     private final GameId id;
-    private final TreeSet<Player> players;
+    private final NavigableSet<Player> players;
     private final Map<PlayerId, List<Move>> moveHistory;
     private final PlayerRole aiPlayer;
     private Board board;
@@ -20,12 +20,31 @@ public class Game {
     private PlayerRole currentRole;
     private PlayerId winner;
 
+    private static final Comparator<Player> PLAYER_COMPARATOR =
+            Comparator.comparingInt(p -> p.role().order());
+
+    public Game(PlayerId winner, PlayerRole currentRole, GameStatus status, Board board, PlayerRole aiPlayer, Map<PlayerId, List<Move>> moveHistory, List<Player> players, GameId id) {
+        this.winner = winner;
+        this.currentRole = currentRole;
+        this.status = status;
+        this.board = board;
+        this.aiPlayer = aiPlayer;
+        this.moveHistory = moveHistory.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> new ArrayList<>(e.getValue())
+                ));
+        this.players = new TreeSet<>(PLAYER_COMPARATOR);
+        this.players.addAll(players);
+        this.id = id;
+    }
+
     private Game(final int requestedSize, final List<Player> players, final PlayerRole aiPlayer) {
         this.id = GameId.create();
         this.board = Board.create(requestedSize);
         this.status = GameStatus.IN_PROGRESS;
 
-        this.players = new TreeSet<>(Comparator.comparing((Player p) -> p.role().order()));
+        this.players = new TreeSet<>(PLAYER_COMPARATOR);
         this.players.addAll(players);
 
         this.moveHistory = players.stream()
@@ -136,7 +155,7 @@ public class Game {
         return status;
     }
 
-    public TreeSet<Player> players() {
+    public NavigableSet<Player> players() {
         return players;
     }
 

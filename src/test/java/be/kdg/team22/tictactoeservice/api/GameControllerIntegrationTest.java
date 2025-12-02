@@ -3,6 +3,7 @@ package be.kdg.team22.tictactoeservice.api;
 import be.kdg.team22.tictactoeservice.api.models.CreateGameModel;
 import be.kdg.team22.tictactoeservice.api.models.GameSettingsModel;
 import be.kdg.team22.tictactoeservice.api.models.MoveModel;
+import be.kdg.team22.tictactoeservice.config.TestcontainersConfig;
 import be.kdg.team22.tictactoeservice.domain.game.Game;
 import be.kdg.team22.tictactoeservice.domain.game.GameId;
 import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -35,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(TestcontainersConfig.class)
 public class GameControllerIntegrationTest {
     List<UUID> players;
     CreateGameModel model;
@@ -240,7 +243,7 @@ public class GameControllerIntegrationTest {
         UUID playerUuid = game.currentPlayer().id().value();
         UsernamePasswordAuthenticationToken auth = authWithUser(playerUuid);
 
-        MoveModel moveModel = new MoveModel(game.id().value(), playerUuid, 0, 1);
+        MoveModel moveModel = new MoveModel(playerUuid, 0, 1);
 
         mockMvc.perform(post("/api/games/" + gameId + "/move")
                         .with(authentication(auth))
@@ -267,7 +270,7 @@ public class GameControllerIntegrationTest {
         UUID playerUuid = game.currentPlayer().id().value();
         UsernamePasswordAuthenticationToken auth = authWithUser(playerUuid);
 
-        MoveModel moveModel = new MoveModel(game.id().value(), playerUuid, -1, 1);
+        MoveModel moveModel = new MoveModel(playerUuid, -1, 1);
 
         mockMvc.perform(post("/api/games/" + gameId + "/move")
                         .with(authentication(auth))
@@ -306,7 +309,7 @@ public class GameControllerIntegrationTest {
         UUID playerUuid = game.currentPlayer().id().value();
         UsernamePasswordAuthenticationToken auth = authWithUser(playerUuid);
 
-        MoveModel humanMove = new MoveModel(game.id().value(), playerUuid, 0, 0);
+        MoveModel humanMove = new MoveModel(playerUuid, 0, 0);
 
         mockMvc.perform(post("/api/games/" + gameId + "/move")
                         .with(authentication(auth))

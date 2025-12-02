@@ -40,7 +40,7 @@ public class AiMoveEventListener {
                     .orElseThrow()
                     .id();
 
-            Move move = new Move(gameId, aiPlayerId, response.row(), response.col());
+            Move move = new Move(aiPlayerId, response.row(), response.col());
             gameService.requestMove(gameId, aiPlayerId, move);
         }
     }

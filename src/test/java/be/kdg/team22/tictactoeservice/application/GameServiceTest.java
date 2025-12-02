@@ -116,7 +116,7 @@ public class GameServiceTest {
 
         when(repository.findById(id)).thenReturn(Optional.of(game));
 
-        Move move = new Move(id, playerId, 0, 0);
+        Move move = new Move(playerId, 0, 0);
 
         doReturn(GameStatus.IN_PROGRESS).when(game).status();
 
@@ -135,7 +135,7 @@ public class GameServiceTest {
 
         when(repository.findById(id)).thenReturn(Optional.of(game));
 
-        Move move = new Move(id, playerId, 0, 0);
+        Move move = new Move(playerId, 0, 0);
 
         doReturn(GameStatus.WON).when(game).status();
         doReturn(playerX.id()).when(game).winner();
@@ -156,7 +156,7 @@ public class GameServiceTest {
 
         when(repository.findById(id)).thenReturn(Optional.of(game));
 
-        Move move = new Move(id, playerId, 0, 0);
+        Move move = new Move(playerId, 0, 0);
 
         doReturn(GameStatus.TIE).when(game).status();
         TreeSet<Player> sorted = new TreeSet<>(Comparator.comparing(p -> p.role().order()));
@@ -186,7 +186,7 @@ public class GameServiceTest {
 
         when(repository.findById(id)).thenReturn(Optional.of(game));
 
-        Move move = new Move(id, playerId, 0, 0);
+        Move move = new Move(playerId, 0, 0);
 
         doNothing().when(game).requestMove(any());
 
