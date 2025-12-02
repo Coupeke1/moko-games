@@ -346,6 +346,7 @@ services:
 
 volumes:
   moko_postgres_data:
+  moko_redis_all:
   moko_rabbitmq_all:
   moko_mysql_data:
 
