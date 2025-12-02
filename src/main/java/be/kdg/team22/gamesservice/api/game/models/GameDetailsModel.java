@@ -14,7 +14,7 @@ public record GameDetailsModel(
         BigDecimal price,
         String imageUrl,
         String storeUrl,
-        String baseUrl,
+        String frontendUrl,
         String startEndpoint,
         Instant createdAt,
         Instant updatedAt
@@ -28,7 +28,7 @@ public record GameDetailsModel(
                 game.price(),
                 game.imageUrl(),
                 game.storeUrl(),
-                game.baseUrl(),
+                game.frontendUrl(),
                 game.startEndpoint(),
                 game.createdAt(),
                 game.updatedAt()

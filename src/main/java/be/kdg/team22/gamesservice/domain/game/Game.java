@@ -16,6 +16,7 @@ public class Game {
     // Engine data
     private String name;
     private String baseUrl;
+    private String frontendUrl;
     private String startEndpoint;
 
     // frontend metadata
@@ -29,6 +30,7 @@ public class Game {
             final GameId id,
             final String name,
             final String baseUrl,
+            final String frontendUrl,
             final String startEndpoint,
             final String title,
             final String description,
@@ -38,11 +40,12 @@ public class Game {
             final Instant createdAt,
             final Instant updatedAt
     ) {
-        validate(id, name, baseUrl, startEndpoint, title, description, price, imageUrl);
+        validate(id, name, baseUrl, frontendUrl, startEndpoint, title, description, price, imageUrl);
 
         this.id = id;
         this.name = name;
         this.baseUrl = baseUrl;
+        this.frontendUrl = frontendUrl;
         this.startEndpoint = startEndpoint;
 
         this.title = title;
@@ -59,6 +62,7 @@ public class Game {
             final GameId id,
             final String name,
             final String baseUrl,
+            final String frontendUrl,
             final String startEndpoint,
             final String title,
             final String description,
@@ -66,7 +70,7 @@ public class Game {
             final String imageUrl,
             final String storeUrl
     ) {
-        validate(id, name, baseUrl, startEndpoint, title, description, price, imageUrl);
+        validate(id, name, baseUrl, frontendUrl, startEndpoint, title, description, price, imageUrl);
 
         this.id = id;
         this.name = name;
@@ -87,6 +91,7 @@ public class Game {
             final GameId id,
             final String name,
             final String baseUrl,
+            final String frontendUrl,
             final String startEndpoint,
             final String title,
             final String description,
@@ -96,8 +101,8 @@ public class Game {
         if (id == null) throw new GameIdNullException();
         if (name == null || name.isBlank()) throw new GameNameInvalidException();
         if (baseUrl == null || baseUrl.isBlank()) throw new GameBaseUrlInvalidException();
+        if (frontendUrl == null || frontendUrl.isBlank()) throw new GameFrontendUrlInvalidException();
         if (startEndpoint == null || startEndpoint.isBlank()) throw new GameStartEndpointInvalidException();
-
         validateMetaData(title, description, price, imageUrl);
     }
 
@@ -166,6 +171,10 @@ public class Game {
 
     public String baseUrl() {
         return baseUrl;
+    }
+
+    public String frontendUrl() {
+        return frontendUrl;
     }
 
     public String startEndpoint() {

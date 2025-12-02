@@ -24,6 +24,9 @@ public class GameEntity {
     @Column(nullable = false, name = "base_url")
     private String baseUrl;
 
+    @Column(nullable = false, name = "frontend_url")
+    private String frontendUrl;
+
     @Column(nullable = false, name = "start_endpoint")
     private String startEndpoint;
 
@@ -55,6 +58,7 @@ public class GameEntity {
             UUID id,
             String name,
             String baseUrl,
+            String frontendUrl,
             String startEndpoint,
             String title,
             String description,
@@ -67,6 +71,7 @@ public class GameEntity {
         this.id = id;
         this.name = name;
         this.baseUrl = baseUrl;
+        this.frontendUrl = frontendUrl;
         this.startEndpoint = startEndpoint;
         this.title = title;
         this.description = description;
@@ -82,6 +87,7 @@ public class GameEntity {
                 game.id().value(),
                 game.name(),
                 game.baseUrl(),
+                game.frontendUrl(),
                 game.startEndpoint(),
                 game.title(),
                 game.description(),
@@ -98,6 +104,7 @@ public class GameEntity {
                 GameId.from(id),
                 name,
                 baseUrl,
+                frontendUrl,
                 startEndpoint,
                 title,
                 description,
@@ -148,6 +155,7 @@ public class GameEntity {
     public Instant createdAt() {
         return createdAt;
     }
+
     public Instant updatedAt() {
         return updatedAt;
     }
