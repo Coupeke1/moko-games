@@ -53,8 +53,17 @@ public class LobbyController {
     }
 
     @PostMapping("/{id}/start")
-    public ResponseEntity<String> start(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token) {
+    public ResponseEntity<String> start(
+            @PathVariable final UUID id,
+            @AuthenticationPrincipal final Jwt token
+    ) {
         Lobby lobby = service.startLobby(LobbyId.from(id), PlayerId.get(token), token);
-        return ResponseEntity.ok(lobby.startedGameId().toString());
+
+        //TODO fix custom exception
+        UUID instanceId = lobby.startedGameId()
+                .map(GameId::value)
+                .orElseThrow(() -> new IllegalStateException("Game did not start"));
+
+        return ResponseEntity.ok(instanceId.toString());
     }
 }
