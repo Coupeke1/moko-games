@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
+@Deprecated
 public class InMemoryGameRepository implements GameRepository {
     private final Map<GameId, Game> games = new ConcurrentHashMap<>();
 

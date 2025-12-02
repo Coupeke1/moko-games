@@ -4,12 +4,16 @@ import be.kdg.team22.tictactoeservice.domain.game.exceptions.*;
 import be.kdg.team22.tictactoeservice.domain.player.Player;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerRole;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @AggregateRoot
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY)
 public class Game {
     private final GameId id;
     private final TreeSet<Player> players;
@@ -19,6 +23,27 @@ public class Game {
     private GameStatus status;
     private PlayerRole currentRole;
     private PlayerId winner;
+
+    @JsonCreator
+    public Game(
+            @JsonProperty("id") GameId id,
+            @JsonProperty("players") TreeSet<Player> players,
+            @JsonProperty("moveHistory") Map<PlayerId, List<Move>> moveHistory,
+            @JsonProperty("aiPlayer") PlayerRole aiPlayer,
+            @JsonProperty("board") Board board,
+            @JsonProperty("status") GameStatus status,
+            @JsonProperty("currentRole") PlayerRole currentRole,
+            @JsonProperty("winner") PlayerId winner
+    ) {
+        this.id = id;
+        this.players = players;
+        this.moveHistory = moveHistory;
+        this.aiPlayer = aiPlayer;
+        this.board = board;
+        this.status = status;
+        this.currentRole = currentRole;
+        this.winner = winner;
+    }
 
     private Game(final int requestedSize, final List<Player> players, final PlayerRole aiPlayer) {
         this.id = GameId.create();
