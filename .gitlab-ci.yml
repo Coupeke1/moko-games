@@ -63,14 +63,16 @@ package:
     - echo "Building Docker image…"
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
 
-    # Build once
-    - BASE_TAG="temp-build"
-    - docker build \
-      --build-arg CI_COMMIT_SHA="$CI_COMMIT_SHA" \
-      --build-arg CI_PIPELINE_CREATED_AT="$CI_PIPELINE_CREATED_AT" \
-      --build-arg CI_COMMIT_REF_NAME="$CI_COMMIT_REF_NAME" \
-      --build-arg CI_COMMIT_TAG="$CI_COMMIT_TAG" \
-      --build-arg CI_PIPELINE_ID="$CI_PIPELINE_ID" \
+      # Base tag for temporary build
+      BASE_TAG="temp-build"
+
+    # Build the image once
+    - docker build
+      --build-arg CI_COMMIT_SHA="$CI_COMMIT_SHA"
+      --build-arg CI_PIPELINE_CREATED_AT="$CI_PIPELINE_CREATED_AT"
+      --build-arg CI_COMMIT_REF_NAME="$CI_COMMIT_REF_NAME"
+      --build-arg CI_COMMIT_TAG="$CI_COMMIT_TAG"
+      --build-arg CI_PIPELINE_ID="$CI_PIPELINE_ID"
       -t $CI_REGISTRY_IMAGE:$BASE_TAG .
 
     # Determine tags
