@@ -7,7 +7,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -36,9 +35,6 @@ public class GameEntity {
     @Column(nullable = false, length = 2000)
     private String description;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
-
     @Column(nullable = false, name = "image_url")
     private String image;
 
@@ -59,7 +55,6 @@ public class GameEntity {
             String startEndpoint,
             String title,
             String description,
-            BigDecimal price,
             String image,
             Instant createdAt,
             Instant updatedAt
@@ -71,7 +66,6 @@ public class GameEntity {
         this.startEndpoint = startEndpoint;
         this.title = title;
         this.description = description;
-        this.price = price;
         this.image = image;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -86,7 +80,6 @@ public class GameEntity {
                 game.startEndpoint(),
                 game.title(),
                 game.description(),
-                game.price(),
                 game.image(),
                 game.createdAt(),
                 game.updatedAt()
@@ -102,7 +95,6 @@ public class GameEntity {
                 startEndpoint,
                 title,
                 description,
-                price,
                 image,
                 createdAt,
                 updatedAt
@@ -131,10 +123,6 @@ public class GameEntity {
 
     public String description() {
         return description;
-    }
-
-    public BigDecimal price() {
-        return price;
     }
 
     public String image() {

@@ -3,7 +3,6 @@ package be.kdg.team22.gamesservice.domain.game;
 import be.kdg.team22.gamesservice.domain.game.exceptions.*;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -25,7 +24,6 @@ class GameTest {
                 "/start",
                 "Title",
                 "Description",
-                BigDecimal.TEN,
                 "http://img");
     }
 
@@ -41,7 +39,6 @@ class GameTest {
                 "/start",
                 "Title",
                 "Desc",
-                BigDecimal.ONE,
                 "http://img"
         );
 
@@ -51,7 +48,6 @@ class GameTest {
         assertThat(game.startEndpoint()).isEqualTo("/start");
         assertThat(game.title()).isEqualTo("Title");
         assertThat(game.description()).isEqualTo("Desc");
-        assertThat(game.price()).isEqualTo(BigDecimal.ONE);
         assertThat(game.image()).isEqualTo("http://img");
 
         assertThat(game.createdAt()).isNotNull();
@@ -72,7 +68,6 @@ class GameTest {
                 "/start",
                 "Title",
                 "Desc",
-                BigDecimal.TEN,
                 "http://img",
                 created,
                 updated
@@ -93,7 +88,6 @@ class GameTest {
                         "/start",
                         "Title",
                         "Desc",
-                        BigDecimal.TEN,
                         "http://img")
         ).isInstanceOf(GameIdNullException.class);
     }
@@ -109,7 +103,6 @@ class GameTest {
                         "/start",
                         "Title",
                         "Desc",
-                        BigDecimal.TEN,
                         "http://img"
                 )
         ).isInstanceOf(GameNameInvalidException.class);
@@ -126,7 +119,6 @@ class GameTest {
                         "/start",
                         "Title",
                         "Desc",
-                        BigDecimal.TEN,
                         "http://img"
                 )
         ).isInstanceOf(GameBaseUrlInvalidException.class);
@@ -143,7 +135,6 @@ class GameTest {
                         " ",
                         "Title",
                         "Desc",
-                        BigDecimal.TEN,
                         "http://img"
                 )
         ).isInstanceOf(GameStartEndpointInvalidException.class);
@@ -160,7 +151,6 @@ class GameTest {
                         "/start",
                         "",
                         "Desc",
-                        BigDecimal.TEN,
                         "http://img"
                 )
         ).isInstanceOf(GameMetadataException.class);
@@ -231,29 +221,13 @@ class GameTest {
         game.updateStoreMetadata(
                 "New title",
                 "New desc",
-                new BigDecimal("20"),
                 "http://newimg");
 
         assertThat(game.title()).isEqualTo("New title");
         assertThat(game.description()).isEqualTo("New desc");
-        assertThat(game.price()).isEqualTo(new BigDecimal("20"));
         assertThat(game.image()).isEqualTo("http://newimg");
 
         assertThat(game.updatedAt()).isAfterOrEqualTo(before);
-    }
-
-    @Test
-    void updateStoreMetadata_invalidPriceThrows() {
-        Game game = createValidGame();
-
-        assertThatThrownBy(() ->
-                game.updateStoreMetadata(
-                        "Title",
-                        "Desc",
-                        new BigDecimal("-1"),
-                        "http://img"
-                )
-        ).isInstanceOf(GameMetadataException.class);
     }
 
     @Test

@@ -37,7 +37,6 @@ class ExternalGamesRepositoryTest {
                 "/start",
                 "Tic Tac Toe",
                 "desc",
-                new BigDecimal("5.00"),
                 "img");
     }
 

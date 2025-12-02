@@ -47,7 +47,6 @@ class GameControllerTest {
                 "/start",
                 "Tic Tac Toe",
                 "desc",
-                BigDecimal.TEN,
                 "http://img");
     }
 
