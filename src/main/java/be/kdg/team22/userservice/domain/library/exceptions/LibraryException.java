@@ -17,4 +17,8 @@ public class LibraryException extends RuntimeException {
     public static LibraryException missingPurchasedAt() {
         return new LibraryException("purchasedAt cannot be null");
     }
+
+    public static LibraryException notInLibrary() {
+        return new LibraryException("This game is not in your library");
+    }
 }

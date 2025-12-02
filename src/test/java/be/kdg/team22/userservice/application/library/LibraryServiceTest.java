@@ -3,6 +3,7 @@ package be.kdg.team22.userservice.application.library;
 import be.kdg.team22.userservice.api.library.models.LibraryGamesModel;
 import be.kdg.team22.userservice.domain.library.LibraryEntry;
 import be.kdg.team22.userservice.domain.library.LibraryRepository;
+import be.kdg.team22.userservice.domain.library.exceptions.LibraryException;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
 import be.kdg.team22.userservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.userservice.infrastructure.games.GameDetailsResponse;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 class LibraryServiceTest {
@@ -179,5 +181,73 @@ class LibraryServiceTest {
 
         assertThat(result.games()).isEmpty();
         verifyNoInteractions(games);
+    }
+
+    @Test
+    @DisplayName("markFavourite → marks entry as favourite and saves it")
+    void markFavourite_success() {
+        ProfileId userId = new ProfileId(UUID.randomUUID());
+        UUID gameId = UUID.randomUUID();
+        UUID entryId = UUID.randomUUID();
+
+        LibraryEntry entry = entry(entryId, userId.value(), gameId, false);
+        LibraryEntry updated = entry.markFavourite();
+
+        when(repo.findByUserIdAndGameId(userId.value(), gameId))
+                .thenReturn(java.util.Optional.of(entry));
+
+        service.markFavourite(userId, gameId);
+
+        verify(repo).findByUserIdAndGameId(userId.value(), gameId);
+        verify(repo).save(updated); // <-- werkt perfect met void
+    }
+
+    @Test
+    @DisplayName("markFavourite → throws when entry does not exist")
+    void markFavourite_notFound() {
+        ProfileId userId = new ProfileId(UUID.randomUUID());
+        UUID gameId = UUID.randomUUID();
+
+        when(repo.findByUserIdAndGameId(userId.value(), gameId))
+                .thenReturn(java.util.Optional.empty());
+
+        assertThatThrownBy(() -> service.markFavourite(userId, gameId))
+                .isInstanceOf(LibraryException.class);
+
+        verify(repo, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("unmarkFavourite → unmarks entry and saves it")
+    void unmarkFavourite_success() {
+        ProfileId userId = new ProfileId(UUID.randomUUID());
+        UUID gameId = UUID.randomUUID();
+        UUID entryId = UUID.randomUUID();
+
+        LibraryEntry entry = entry(entryId, userId.value(), gameId, true);
+        LibraryEntry updated = entry.unmarkFavourite();
+
+        when(repo.findByUserIdAndGameId(userId.value(), gameId))
+                .thenReturn(java.util.Optional.of(entry));
+
+        service.unmarkFavourite(userId, gameId);
+
+        verify(repo).findByUserIdAndGameId(userId.value(), gameId);
+        verify(repo).save(updated);
+    }
+
+    @Test
+    @DisplayName("unmarkFavourite → throws when entry does not exist")
+    void unmarkFavourite_notFound() {
+        ProfileId userId = new ProfileId(UUID.randomUUID());
+        UUID gameId = UUID.randomUUID();
+
+        when(repo.findByUserIdAndGameId(userId.value(), gameId))
+                .thenReturn(java.util.Optional.empty());
+
+        assertThatThrownBy(() -> service.unmarkFavourite(userId, gameId))
+                .isInstanceOf(LibraryException.class);
+
+        verify(repo, never()).save(any());
     }
 }

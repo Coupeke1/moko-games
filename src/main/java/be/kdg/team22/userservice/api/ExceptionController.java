@@ -27,7 +27,7 @@ public class ExceptionController {
 
     @ExceptionHandler(NotAuthenticatedException.class)
     public ResponseEntity<String> handleNotAuthenticated(NotAuthenticatedException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler({
