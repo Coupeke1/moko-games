@@ -57,7 +57,6 @@ Authorization: Bearer {{owner_token}}
 
 
 ### 5) GET list of store entries with filters
-###    Let op: minPrice en maxPrice zijn nu BigDecimal, dus strings werken ook
 GET http://localhost:8085/api/store/games?category=STRATEGY&minPrice=10&maxPrice=30&sort=alphabetic
 Authorization: Bearer {{owner_token}}
 
