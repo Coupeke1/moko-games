@@ -1,7 +1,6 @@
 import type {Profile} from "@/models/profile.ts";
 import type {Player} from "@/models/player";
-import {usePlayerProfile} from "@/hooks/use-player-profile";
-import PlayerImage from "@/components/player-image.tsx";
+import PlayerCard from "../player-card";
 
 interface GameWinProps {
     myProfile: Profile;
@@ -9,8 +8,6 @@ interface GameWinProps {
 }
 
 export default function GameWin({myProfile, winningPlayer}: GameWinProps) {
-    const {data: winningPlayerProfile} = usePlayerProfile(winningPlayer?.id);
-
     return (
         <div className="text-center">
             <div className="mb-6">
@@ -19,24 +16,11 @@ export default function GameWin({myProfile, winningPlayer}: GameWinProps) {
                 </h2>
             </div>
 
-            <div className="bg-bg-3 rounded-lg p-4 mb-6">
-                <div className="flex flex-col items-center gap-3">
+            <div className="bg-bg-2 rounded-lg p-4 mb-6">
+                <div className="grid grid-cols-1 items-center gap-3">
                     <div className="text-fg text-lg">Winner</div>
                     {winningPlayer && (
-                        <div className="flex items-center gap-2 mt-2">
-                            {!winningPlayerProfile ? (
-                                <></>
-                            ) : (
-                                <div className="flex items-center gap-2">
-                                    <div>
-                                        <PlayerImage src={winningPlayerProfile.image} big={true}/>
-                                    </div>
-                                    <div className="text-fg text-lg">
-                                        {winningPlayerProfile.username}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                        <PlayerCard player={winningPlayer} />
                     )}
                 </div>
             </div>

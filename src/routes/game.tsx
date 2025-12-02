@@ -43,7 +43,7 @@ export default function GamePage() {
         <Page>
             <div className="flex flex-col justify-start items-center gap-8 min-h-screen">
                 <div className="grid grid-1 md:grid-cols-2 gap-10 justify-between items-center">
-                    <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
+                    <div className="grid grid-cols-1 gap-4">
                         {gameState.players.map(player =>
                             <PlayerCard
                                 player={player}

@@ -2,7 +2,6 @@ import type {GameState} from "@/models/game-state";
 import type {Profile} from "@/models/profile.ts";
 import GameWin from "@/components/dialogs/game-win";
 import GameTie from "@/components/dialogs/game-tie";
-import GameStateDisplay from "@/components/game-state-display.tsx";
 
 interface Props {
     gameState: GameState;
@@ -29,7 +28,6 @@ export default function GameEndModal({gameState, myProfile, isOpen, onReset}: Pr
                     ) : (
                         <GameWin myProfile={myProfile} winningPlayer={winningPlayer!}/>
                     )}
-                    <GameStateDisplay gameState={gameState}/>
 
                     <div className="flex gap-3">
                         <button
