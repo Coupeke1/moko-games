@@ -58,7 +58,6 @@ class DbGameCatalogEntryRepositoryTest {
 
         repository.save(entity);
 
-        // update fields
         entity.setPrice(BigDecimal.valueOf(19.99));
         entity.setCategory(GameCategory.CARD);
         entity.setPurchaseCount(7);
