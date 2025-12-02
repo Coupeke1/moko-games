@@ -205,10 +205,11 @@ function getGameSettings(title: string) {
           : null;
 }
 
-export async function startGame(lobby: string) {
+export async function startGame(lobby: string): Promise<string> {
     try {
         validIdCheck(lobby);
-        await client.post(`${BASE_URL}/${lobby}/start`);
+        const { data } = await client.post(`${BASE_URL}/${lobby}/start`);
+        return data;
     } catch {
         throw new Error(`Could not start game for lobby with id '${lobby}'`);
     }

@@ -38,11 +38,17 @@ export default function LobbyPage() {
     const start = useMutation({
         mutationFn: async ({ lobby }: { lobby: string }) =>
             await startGame(lobby),
-        onSuccess: async (_data, variables) => {
+        onSuccess: async (data, variables) => {
             await client.invalidateQueries({
                 queryKey: ["lobby", variables.lobby],
             });
+
+            if (!game) return;
             showToast("Lobby", "Starting...");
+
+            window.location.replace(
+                `${game.frontendUrl}${game.startEndpoint}/${data}`,
+            );
         },
         onError: (error: Error) => {
             showToast("Lobby", error.message);
