@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
+@Validated
 @RequestMapping("/api/store/games")
 public class GameCatalogController {
     private final StoreService storeService;
@@ -65,7 +66,7 @@ public class GameCatalogController {
     }
 
     @PostMapping
-    public GameCatalogResponse create(@RequestBody @Validated GameCatalogRequestModel request) {
+    public GameCatalogResponse create(@RequestBody GameCatalogRequestModel request) {
         GameCatalogEntry entry = storeService.create(
                 request.id(),
                 request.price(),
@@ -78,7 +79,7 @@ public class GameCatalogController {
     @PutMapping("/{id}")
     public GameCatalogResponse update(
             @PathVariable UUID id,
-            @RequestBody @Validated UpdateGameCatalogModel request
+            @RequestBody UpdateGameCatalogModel request
     ) {
         GameCatalogEntry entry = storeService.update(
                 id,

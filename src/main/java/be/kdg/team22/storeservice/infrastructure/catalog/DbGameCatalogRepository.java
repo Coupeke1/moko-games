@@ -34,8 +34,8 @@ public class DbGameCatalogRepository implements GameCatalogRepository {
                 .stream()
                 .map(GameCatalogEntryEntity::toDomain)
                 .filter(e -> filter.category.map(c -> e.getCategory() == c).orElse(true))
-                .filter(e -> filter.minPrice.map(min -> e.getPrice().compareTo(min) >= 0).orElse(true))  // Use compareTo
-                .filter(e -> filter.maxPrice.map(max -> e.getPrice().compareTo(max) <= 0).orElse(true))  // Use compareTo
+                .filter(e -> filter.minPrice.map(min -> e.getPrice().compareTo(min) >= 0).orElse(true))
+                .filter(e -> filter.maxPrice.map(max -> e.getPrice().compareTo(max) <= 0).orElse(true))
                 .sorted((a, b) -> SortingUtils.sort(a, b, filter.sortBy))
                 .skip((long) pagination.page() * pagination.size())
                 .limit(pagination.size())
