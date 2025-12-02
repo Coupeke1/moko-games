@@ -1,5 +1,6 @@
 package be.kdg.team22.userservice.api.library;
 
+import be.kdg.team22.userservice.api.ExceptionController;
 import be.kdg.team22.userservice.api.library.models.LibraryGameModel;
 import be.kdg.team22.userservice.api.library.models.LibraryGamesModel;
 import be.kdg.team22.userservice.application.library.LibraryService;
@@ -8,8 +9,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -23,10 +30,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(LibraryController.class)
+@Import({
+        LibraryController.class,
+        ExceptionController.class,
+        LibraryControllerTest.TestSecurityConfig.class
+})
 class LibraryControllerTest {
 
     @Autowired
@@ -63,7 +76,6 @@ class LibraryControllerTest {
                 "desc",
                 BigDecimal.TEN,
                 "img.png",
-                "url",
                 Instant.parse("2024-01-01T10:00:00Z"),
                 true
         );
@@ -161,5 +173,106 @@ class LibraryControllerTest {
 
         mockMvc.perform(get("/api/library/me").with(authentication(auth)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("PATCH /api/library/{gameId}/favourite → marks favourite successfully")
+    void favouriteGame_success() throws Exception {
+        UUID userId = UUID.randomUUID();
+        UUID gameId = UUID.randomUUID();
+        UsernamePasswordAuthenticationToken auth = authWithUser(userId);
+
+        mockMvc.perform(
+                        patch("/api/library/" + gameId + "/favourite")
+                                .with(authentication(auth))
+                )
+                .andExpect(status().isNoContent());
+
+        verify(libraryService).markFavourite(ProfileId.from(userId), gameId);
+    }
+
+    @Test
+    @DisplayName("PATCH /api/library/{gameId}/unfavourite → unmarks favourite successfully")
+    void unfavouriteGame_success() throws Exception {
+        UUID userId = UUID.randomUUID();
+        UUID gameId = UUID.randomUUID();
+        UsernamePasswordAuthenticationToken auth = authWithUser(userId);
+        mockMvc.perform(
+                        patch("/api/library/" + gameId + "/unfavourite")
+                                .with(authentication(auth))
+                )
+                .andExpect(status().isNoContent());
+
+        verify(libraryService).unmarkFavourite(ProfileId.from(userId), gameId);
+    }
+
+    @Test
+    @DisplayName("PATCH favourite → 401 when no JWT")
+    void favourite_noJwt() throws Exception {
+        UUID gameId = UUID.randomUUID();
+
+        mockMvc.perform(patch("/api/library/" + gameId + "/favourite"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("PATCH unfavourite → 401 when no JWT")
+    void unfavourite_noJwt() throws Exception {
+        UUID gameId = UUID.randomUUID();
+
+        mockMvc.perform(patch("/api/library/" + gameId + "/unfavourite"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("PATCH favourite → 400 when JWT subject is not a UUID")
+    void favourite_invalidJwt() throws Exception {
+        UUID gameId = UUID.randomUUID();
+
+        Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "none")
+                .subject("NOT_A_UUID")
+                .claim("preferred_username", "mathias")
+                .build();
+
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken(jwt, jwt.getTokenValue(), List.of());
+
+        mockMvc.perform(
+                        patch("/api/library/" + gameId + "/favourite")
+                                .with(authentication(auth))
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("PATCH unfavourite → 400 when JWT subject is not a UUID")
+    void unfavourite_invalidJwt() throws Exception {
+        UUID gameId = UUID.randomUUID();
+
+        Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "none")
+                .subject("NOT_A_UUID")
+                .claim("preferred_username", "mathias")
+                .build();
+
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken(jwt, jwt.getTokenValue(), List.of());
+
+        mockMvc.perform(
+                        patch("/api/library/" + gameId + "/unfavourite")
+                                .with(authentication(auth))
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Configuration
+    static class TestSecurityConfig {
+        @Bean
+        SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+            http.csrf(AbstractHttpConfigurer::disable);
+            http.authorizeHttpRequests(a -> a.anyRequest().permitAll());
+            return http.build();
+        }
     }
 }

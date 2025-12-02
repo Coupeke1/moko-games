@@ -7,6 +7,7 @@ import be.kdg.team22.userservice.infrastructure.library.jpa.LibraryEntryEntity;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -23,5 +24,16 @@ public class DbLibraryRepository implements LibraryRepository {
                 .stream()
                 .map(LibraryEntryEntity::toDomain)
                 .toList();
+    }
+
+    @Override
+    public Optional<LibraryEntry> findByUserIdAndGameId(UUID userId, UUID gameId) {
+        return jpa.findByUserIdAndGameId(userId, gameId)
+                .map(LibraryEntryEntity::toDomain);
+    }
+
+    @Override
+    public void save(LibraryEntry entry) {
+        jpa.save(LibraryEntryEntity.fromDomain(entry));
     }
 }

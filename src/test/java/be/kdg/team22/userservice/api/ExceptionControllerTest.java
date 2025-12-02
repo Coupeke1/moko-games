@@ -48,7 +48,7 @@ class ExceptionControllerTest {
 
         ResponseEntity<String> response = controller.handleNotAuthenticated(ex);
 
-        assertThat(response.getStatusCode().value()).isEqualTo(403);
+        assertThat(response.getStatusCode().value()).isEqualTo(401);
         assertThat(response.getBody()).isEqualTo("User is not authenticated");
     }
 
