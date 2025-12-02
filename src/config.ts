@@ -1,6 +1,8 @@
 export const config = {
     authUrl:
-        window.__APP_CONFIG__?.authUrl ?? import.meta.env.VITE_AUTH_URL ?? "",
+        window.__APP_CONFIG__?.authUrl ??
+        import.meta.env.VITE_AUTH_URL ??
+        "",
     authRealm:
         window.__APP_CONFIG__?.authRealm ??
         import.meta.env.VITE_AUTH_REALM ??
@@ -22,4 +24,12 @@ export const config = {
         window.__APP_CONFIG__?.libraryService ??
         import.meta.env.VITE_LIBRARY_SERVICE ??
         "",
+    sessionService:
+        window.__APP_CONFIG__?.sessionService ??
+        import.meta.env.VITE_SESSION_SERVICE ??
+        "",
+    gamesService:
+        window.__APP_CONFIG__?.gamesService ??
+        import.meta.env.VITE_GAMES_SERVICE ??
+        ""
 };

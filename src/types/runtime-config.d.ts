@@ -7,6 +7,8 @@ declare global {
             userService?: string;
             socialService?: string;
             libraryService?: string;
+            sessionService?: string;
+            gamesService?: string;
         };
     }
 }
