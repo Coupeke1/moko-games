@@ -25,7 +25,7 @@ services:
 
   # Frontend
   frontend-platform:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/platform-frontend:main-latest
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/platform-frontend:branch-fix-env-vars
     restart: always
     environment:
       VITE_AUTH_URL: http://localhost/auth
@@ -35,6 +35,9 @@ services:
       VITE_USER_SERVICE: http://localhost/user-service/api/profiles
       VITE_LIBRARY_SERVICE: http://localhost/user-service/api/library
       VITE_SOCIAL_SERVICE: http://localhost/social-service/api/friends
+      VITE_SESSION_SERVICE: http://localhost/session-service/api/lobbies
+      VITE_GAMES_SERVICE: http://localhost/game-service/api/games
+
     expose:
       - "80"
     networks:
