@@ -1,6 +1,6 @@
 ﻿import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import Page from "@/components/layout/page.tsx"; // adjust the path if needed
+import Page from "@/components/layout/page.tsx";
 
 describe("Page component", () => {
   it("renders children correctly", () => {
