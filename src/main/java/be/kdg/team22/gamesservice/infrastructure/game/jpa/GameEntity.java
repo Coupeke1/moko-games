@@ -24,6 +24,9 @@ public class GameEntity {
     @Column(nullable = false, name = "base_url")
     private String baseUrl;
 
+    @Column(nullable = false, name = "frontend_url")
+    private String frontendUrl;
+
     @Column(nullable = false, name = "start_endpoint")
     private String startEndpoint;
 
@@ -37,10 +40,7 @@ public class GameEntity {
     private BigDecimal price;
 
     @Column(nullable = false, name = "image_url")
-    private String imageUrl;
-
-    @Column(name = "store_url")
-    private String storeUrl;
+    private String image;
 
     @Column(nullable = false, name = "created_at")
     private Instant createdAt;
@@ -55,24 +55,24 @@ public class GameEntity {
             UUID id,
             String name,
             String baseUrl,
+            String frontendUrl,
             String startEndpoint,
             String title,
             String description,
             BigDecimal price,
-            String imageUrl,
-            String storeUrl,
+            String image,
             Instant createdAt,
             Instant updatedAt
     ) {
         this.id = id;
         this.name = name;
         this.baseUrl = baseUrl;
+        this.frontendUrl = frontendUrl;
         this.startEndpoint = startEndpoint;
         this.title = title;
         this.description = description;
         this.price = price;
-        this.imageUrl = imageUrl;
-        this.storeUrl = storeUrl;
+        this.image = image;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -82,12 +82,12 @@ public class GameEntity {
                 game.id().value(),
                 game.name(),
                 game.baseUrl(),
+                game.frontendUrl(),
                 game.startEndpoint(),
                 game.title(),
                 game.description(),
                 game.price(),
-                game.imageUrl(),
-                game.storeUrl(),
+                game.image(),
                 game.createdAt(),
                 game.updatedAt()
         );
@@ -98,12 +98,12 @@ public class GameEntity {
                 GameId.from(id),
                 name,
                 baseUrl,
+                frontendUrl,
                 startEndpoint,
                 title,
                 description,
                 price,
-                imageUrl,
-                storeUrl,
+                image,
                 createdAt,
                 updatedAt
         );
@@ -137,17 +137,14 @@ public class GameEntity {
         return price;
     }
 
-    public String imageUrl() {
-        return imageUrl;
-    }
-
-    public String storeUrl() {
-        return storeUrl;
+    public String image() {
+        return image;
     }
 
     public Instant createdAt() {
         return createdAt;
     }
+
     public Instant updatedAt() {
         return updatedAt;
     }

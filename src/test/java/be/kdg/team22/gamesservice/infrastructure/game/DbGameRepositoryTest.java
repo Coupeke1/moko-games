@@ -32,11 +32,11 @@ class DbGameRepositoryTest {
                 "engine-name",
                 "http://localhost:9999",
                 "/start",
+                "/start",
                 "Title",
                 "Description",
                 new BigDecimal("19.99"),
                 "http://image",
-                "http://store",
                 Instant.parse("2024-01-01T10:00:00Z"),
                 Instant.parse("2024-01-02T10:00:00Z")
         );
@@ -61,8 +61,7 @@ class DbGameRepositoryTest {
         assertThat(loaded.title()).isEqualTo("Title");
         assertThat(loaded.description()).isEqualTo("Description");
         assertThat(loaded.price()).isEqualByComparingTo("19.99");
-        assertThat(loaded.imageUrl()).isEqualTo("http://image");
-        assertThat(loaded.storeUrl()).isEqualTo("http://store");
+        assertThat(loaded.image()).isEqualTo("http://image");
     }
 
     @Test
@@ -72,11 +71,11 @@ class DbGameRepositoryTest {
                 "engine",
                 "http://localhost",
                 "/play",
+                "/play",
                 "T",
                 "D",
                 new BigDecimal("5.50"),
                 "http://img",
-                "http://store",
                 Instant.parse("2024-01-01T10:00:00Z"),
                 Instant.parse("2024-01-01T12:00:00Z")
         );
@@ -90,8 +89,7 @@ class DbGameRepositoryTest {
         assertThat(entity.title()).isEqualTo("T");
         assertThat(entity.description()).isEqualTo("D");
         assertThat(entity.price()).isEqualTo(new BigDecimal("5.50"));
-        assertThat(entity.imageUrl()).isEqualTo("http://img");
-        assertThat(entity.storeUrl()).isEqualTo("http://store");
+        assertThat(entity.image()).isEqualTo("http://img");
     }
 
     @Test
@@ -108,7 +106,6 @@ class DbGameRepositoryTest {
         assertThat(domain.title()).isEqualTo("Title");
         assertThat(domain.description()).isEqualTo("Description");
         assertThat(domain.price()).isEqualByComparingTo("19.99");
-        assertThat(domain.imageUrl()).isEqualTo("http://image");
-        assertThat(domain.storeUrl()).isEqualTo("http://store");
+        assertThat(domain.image()).isEqualTo("http://image");
     }
 }

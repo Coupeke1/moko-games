@@ -18,11 +18,11 @@ class GameEntityTest {
                 "checkers",
                 "http://localhost:9092",
                 "/start",
+                "/start",
                 "Checkers",
                 "Strategy board game",
                 new BigDecimal("10.00"),
                 "http://image",
-                "http://store",
                 Instant.parse("2024-01-01T00:00:00Z"),
                 Instant.parse("2024-01-02T00:00:00Z")
         );
@@ -41,8 +41,7 @@ class GameEntityTest {
         assertThat(entity.title()).isEqualTo(game.title());
         assertThat(entity.description()).isEqualTo(game.description());
         assertThat(entity.price()).isEqualTo(game.price());
-        assertThat(entity.imageUrl()).isEqualTo(game.imageUrl());
-        assertThat(entity.storeUrl()).isEqualTo(game.storeUrl());
+        assertThat(entity.image()).isEqualTo(game.image());
         assertThat(entity.createdAt()).isEqualTo(game.createdAt());
         assertThat(entity.updatedAt()).isEqualTo(game.updatedAt());
     }
@@ -58,11 +57,11 @@ class GameEntityTest {
                 "tic-tac-toe",
                 "http://localhost:9091",
                 "/start",
+                "/start",
                 "Tic Tac Toe",
                 "Classic game",
                 new BigDecimal("5.00"),
                 "http://image",
-                "http://store",
                 created,
                 updated
         );
@@ -76,8 +75,7 @@ class GameEntityTest {
         assertThat(domain.title()).isEqualTo("Tic Tac Toe");
         assertThat(domain.description()).isEqualTo("Classic game");
         assertThat(domain.price()).isEqualTo(new BigDecimal("5.00"));
-        assertThat(domain.imageUrl()).isEqualTo("http://image");
-        assertThat(domain.storeUrl()).isEqualTo("http://store");
+        assertThat(domain.image()).isEqualTo("http://image");
         assertThat(domain.createdAt()).isEqualTo(created);
         assertThat(domain.updatedAt()).isEqualTo(updated);
     }
@@ -96,8 +94,7 @@ class GameEntityTest {
         assertThat(converted.title()).isEqualTo(original.title());
         assertThat(converted.description()).isEqualTo(original.description());
         assertThat(converted.price()).isEqualTo(original.price());
-        assertThat(converted.imageUrl()).isEqualTo(original.imageUrl());
-        assertThat(converted.storeUrl()).isEqualTo(original.storeUrl());
+        assertThat(converted.image()).isEqualTo(original.image());
         assertThat(converted.createdAt()).isEqualTo(original.createdAt());
         assertThat(converted.updatedAt()).isEqualTo(original.updatedAt());
     }

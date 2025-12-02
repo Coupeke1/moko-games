@@ -43,13 +43,12 @@ class GameControllerTest {
                 GameId.from(id),
                 "tic-tac-toe",
                 "http://engine",
+                "/play",
                 "/start",
                 "Tic Tac Toe",
                 "desc",
                 BigDecimal.TEN,
-                "http://img",
-                null
-        );
+                "http://img");
     }
 
     @Test

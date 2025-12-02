@@ -12,9 +12,8 @@ public record GameDetailsModel(
         String title,
         String description,
         BigDecimal price,
-        String imageUrl,
-        String storeUrl,
-        String baseUrl,
+        String image,
+        String frontendUrl,
         String startEndpoint,
         Instant createdAt,
         Instant updatedAt
@@ -26,9 +25,8 @@ public record GameDetailsModel(
                 game.title(),
                 game.description(),
                 game.price(),
-                game.imageUrl(),
-                game.storeUrl(),
-                game.baseUrl(),
+                game.image(),
+                game.frontendUrl(),
                 game.startEndpoint(),
                 game.createdAt(),
                 game.updatedAt()
