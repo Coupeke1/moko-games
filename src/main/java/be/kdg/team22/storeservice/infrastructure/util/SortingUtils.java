@@ -1,0 +1,17 @@
+package be.kdg.team22.storeservice.infrastructure.util;
+
+import be.kdg.team22.storeservice.domain.catalog.GameCatalogEntry;
+
+import java.util.Optional;
+
+public class SortingUtils {
+
+    public static int sort(GameCatalogEntry a, GameCatalogEntry b, Optional<String> sort) {
+        return sort.map(s -> switch (s) {
+            case "price" -> Double.compare(a.getPrice(), b.getPrice());
+            case "popularity" -> Double.compare(a.getPopularityScore(), b.getPopularityScore());
+            case "alphabetic" -> a.getTitle().compareToIgnoreCase(b.getTitle());
+            default -> 0;
+        }).orElse(0);
+    }
+}
