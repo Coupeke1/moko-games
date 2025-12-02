@@ -132,38 +132,38 @@ public class GameTest {
         statusField.setAccessible(true);
         statusField.set(game, GameStatus.WON);
 
-        assertThrows(GameNotInProgressException.class, () -> game.requestMove(new Move(game.id(), game.players().first().id(), 1, 1)));
+        assertThrows(GameNotInProgressException.class, () -> game.requestMove(new Move(game.players().first().id(), 1, 1)));
     }
 
     @Test
     void requestMoveShouldThrowWhenNotPlayersTurn() {
-        assertThrows(NotPlayersTurnException.class, () -> game.requestMove(new Move(game.id(), game.players().stream().toList().get(1).id(), 1, 1)));
+        assertThrows(NotPlayersTurnException.class, () -> game.requestMove(new Move(game.players().stream().toList().get(1).id(), 1, 1)));
     }
 
     @Test
     void requestMoveShouldThrowWhenInvalidCellPos() {
-        assertThrows(InvalidCellException.class, () -> game.requestMove(new Move(game.id(), game.players().first().id(), -1, 1)));
-        assertThrows(InvalidCellException.class, () -> game.requestMove(new Move(game.id(), game.players().first().id(), 1, -1)));
-        assertThrows(InvalidCellException.class, () -> game.requestMove(new Move(game.id(), game.players().first().id(), game.board().size(), 1)));
-        assertThrows(InvalidCellException.class, () -> game.requestMove(new Move(game.id(), game.players().first().id(), 1, game.board().size())));
-        assertThrows(InvalidCellException.class, () -> game.requestMove(new Move(game.id(), game.players().first().id(), game.board().size() + 1, 1)));
-        assertThrows(InvalidCellException.class, () -> game.requestMove(new Move(game.id(), game.players().first().id(), 1, game.board().size() + 1)));
+        assertThrows(InvalidCellException.class, () -> game.requestMove(new Move(game.players().first().id(), -1, 1)));
+        assertThrows(InvalidCellException.class, () -> game.requestMove(new Move(game.players().first().id(), 1, -1)));
+        assertThrows(InvalidCellException.class, () -> game.requestMove(new Move(game.players().first().id(), game.board().size(), 1)));
+        assertThrows(InvalidCellException.class, () -> game.requestMove(new Move(game.players().first().id(), 1, game.board().size())));
+        assertThrows(InvalidCellException.class, () -> game.requestMove(new Move(game.players().first().id(), game.board().size() + 1, 1)));
+        assertThrows(InvalidCellException.class, () -> game.requestMove(new Move(game.players().first().id(), 1, game.board().size() + 1)));
     }
 
     @Test
     void requestMoveShouldThrowWhenCellAlreadyOccupied() {
-        game.requestMove(new Move(game.id(), game.players().first().id(), 1, 1));
-        assertThrows(CellOccupiedException.class, () -> game.requestMove(new Move(game.id(), game.currentPlayer().id(), 1, 1)));
+        game.requestMove(new Move(game.players().first().id(), 1, 1));
+        assertThrows(CellOccupiedException.class, () -> game.requestMove(new Move(game.currentPlayer().id(), 1, 1)));
     }
 
     @Test
     void moveHistoryShouldBeSaved() {
         PlayerId playerXId = game.players().first().id();
         PlayerId playerOId = game.players().stream().toList().get(1).id();
-        Move move = new Move(game.id(), playerXId, 1, 1);
+        Move move = new Move(playerXId, 1, 1);
         game.requestMove(move);
-        game.requestMove(new Move(game.id(), playerOId, 1, 2));
-        game.requestMove(new Move(game.id(), playerXId, 2, 1));
+        game.requestMove(new Move(playerOId, 1, 2));
+        game.requestMove(new Move(playerXId, 2, 1));
         assertEquals(2, game.moveHistory().size());
         assertEquals(2, game.moveHistory().get(playerXId).size());
         assertEquals(1, game.moveHistory().get(playerOId).size());
@@ -193,7 +193,7 @@ public class GameTest {
         gridField.setAccessible(true);
         gridField.set(board, fullGrid);
 
-        Move lastMove = new Move(game.id(), game.players().first().id(), board.size() - 1, board.size() - 1);
+        Move lastMove = new Move(game.players().first().id(), board.size() - 1, board.size() - 1);
 
         game.requestMove(lastMove);
 
@@ -217,7 +217,7 @@ public class GameTest {
         gridField.setAccessible(true);
         gridField.set(board, grid);
 
-        Move winningMove = new Move(game.id(), game.currentPlayer().id(), 0, 2);
+        Move winningMove = new Move(game.currentPlayer().id(), 0, 2);
         game.requestMove(winningMove);
 
         assertEquals(GameStatus.WON, game.status());
@@ -236,7 +236,7 @@ public class GameTest {
         gridField.setAccessible(true);
         gridField.set(board, grid);
 
-        Move winningMove = new Move(game.id(), game.currentPlayer().id(), 0, 0);
+        Move winningMove = new Move(game.currentPlayer().id(), 0, 0);
         game.requestMove(winningMove);
 
         assertEquals(GameStatus.WON, game.status());
@@ -255,7 +255,7 @@ public class GameTest {
         gridField.setAccessible(true);
         gridField.set(board, grid);
 
-        Move winningMove = new Move(game.id(), game.currentPlayer().id(), 2, 0);
+        Move winningMove = new Move(game.currentPlayer().id(), 2, 0);
         game.requestMove(winningMove);
 
         assertEquals(GameStatus.WON, game.status());
@@ -274,7 +274,7 @@ public class GameTest {
         gridField.setAccessible(true);
         gridField.set(board, grid);
 
-        Move winningMove = new Move(game.id(), game.currentPlayer().id(), 0, 0);
+        Move winningMove = new Move(game.currentPlayer().id(), 0, 0);
         game.requestMove(winningMove);
 
         assertEquals(GameStatus.WON, game.status());
@@ -293,7 +293,7 @@ public class GameTest {
         gridField.setAccessible(true);
         gridField.set(board, grid);
 
-        Move winningMove = new Move(game.id(), game.currentPlayer().id(), 2, 2);
+        Move winningMove = new Move(game.currentPlayer().id(), 2, 2);
         game.requestMove(winningMove);
 
         assertEquals(GameStatus.WON, game.status());
@@ -312,7 +312,7 @@ public class GameTest {
         gridField.setAccessible(true);
         gridField.set(board, grid);
 
-        Move winningMove = new Move(game.id(), game.currentPlayer().id(), 2, 0);
+        Move winningMove = new Move(game.currentPlayer().id(), 2, 0);
         game.requestMove(winningMove);
 
         assertEquals(GameStatus.WON, game.status());

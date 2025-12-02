@@ -240,7 +240,7 @@ public class GameControllerIntegrationTest {
         UUID playerUuid = game.currentPlayer().id().value();
         UsernamePasswordAuthenticationToken auth = authWithUser(playerUuid);
 
-        MoveModel moveModel = new MoveModel(game.id().value(), playerUuid, 0, 1);
+        MoveModel moveModel = new MoveModel(playerUuid, 0, 1);
 
         mockMvc.perform(post("/api/games/" + gameId + "/move")
                         .with(authentication(auth))
@@ -267,7 +267,7 @@ public class GameControllerIntegrationTest {
         UUID playerUuid = game.currentPlayer().id().value();
         UsernamePasswordAuthenticationToken auth = authWithUser(playerUuid);
 
-        MoveModel moveModel = new MoveModel(game.id().value(), playerUuid, -1, 1);
+        MoveModel moveModel = new MoveModel(playerUuid, -1, 1);
 
         mockMvc.perform(post("/api/games/" + gameId + "/move")
                         .with(authentication(auth))
@@ -306,7 +306,7 @@ public class GameControllerIntegrationTest {
         UUID playerUuid = game.currentPlayer().id().value();
         UsernamePasswordAuthenticationToken auth = authWithUser(playerUuid);
 
-        MoveModel humanMove = new MoveModel(game.id().value(), playerUuid, 0, 0);
+        MoveModel humanMove = new MoveModel(playerUuid, 0, 0);
 
         mockMvc.perform(post("/api/games/" + gameId + "/move")
                         .with(authentication(auth))
