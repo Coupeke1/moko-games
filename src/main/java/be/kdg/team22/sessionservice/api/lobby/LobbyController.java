@@ -53,8 +53,8 @@ public class LobbyController {
     }
 
     @PostMapping("/{id}/start")
-    public ResponseEntity<LobbyResponseModel> start(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token) {
+    public ResponseEntity<String> start(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token) {
         Lobby lobby = service.startLobby(LobbyId.from(id), PlayerId.get(token), token);
-        return ResponseEntity.ok(LobbyResponseModel.from(lobby));
+        return ResponseEntity.ok(lobby.startedGameId().toString());
     }
 }
