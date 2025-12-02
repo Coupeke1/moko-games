@@ -37,7 +37,7 @@ management:
 
 business:
   ai:
-    url: ${BUSINESS_AI_URL:https://team3.techtitans.be/ai-player}
+    url: ${BUSINESS_AI_URL:https://team3.techtitans.be}
 
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5174,http://localhost:8084}
