@@ -186,9 +186,11 @@ class LobbyServiceTest {
         when(repo.findById(id)).thenReturn(Optional.of(lobby));
 
         UUID newGameInstance = UUID.randomUUID();
-        StartGameResponse response = new StartGameResponse(newGameInstance);
+        StartGameResponse response = new StartGameResponse(newGameInstance, "title", "game", "url", "frontendurl");
 
         when(gameClient.startGame(any(), any())).thenReturn(response);
+        when(lobby.size()).thenReturn(2L);
+        when(lobby.hasBot()).thenReturn(false);
 
         Lobby out = service.startLobby(id, owner, jwtFor(owner));
 
@@ -240,6 +242,8 @@ class LobbyServiceTest {
         Player p2 = new Player(PlayerId.create(), new PlayerName("player2"), "");
 
         when(lobby.players()).thenReturn(Set.of(ownerPlayer, p2));
+        when(lobby.size()).thenReturn(2L);
+        when(lobby.hasBot()).thenReturn(false);
 
         when(repo.findById(id)).thenReturn(Optional.of(lobby));
 

@@ -7,6 +7,7 @@ import be.kdg.team22.sessionservice.application.lobby.LobbyService;
 import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
+import be.kdg.team22.sessionservice.domain.lobby.exceptions.GameNotStartedException;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,8 +54,10 @@ public class LobbyController {
     }
 
     @PostMapping("/{id}/start")
-    public ResponseEntity<LobbyResponseModel> start(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token) {
+    public ResponseEntity<String> start(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token) {
         Lobby lobby = service.startLobby(LobbyId.from(id), PlayerId.get(token), token);
-        return ResponseEntity.ok(LobbyResponseModel.from(lobby));
+
+        GameId gameId = lobby.startedGameId().orElseThrow(() -> new GameNotStartedException(lobby.id()));
+        return ResponseEntity.ok(gameId.value().toString());
     }
 }

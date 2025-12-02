@@ -72,9 +72,28 @@ class LobbyControllerTest {
 
     private Lobby sampleLobby(UUID lobbyId, UUID ownerId) {
         LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
-        Player ownerPlayer = new Player(PlayerId.from(ownerId), new PlayerName("owner"), "");
 
-        return new Lobby(LobbyId.from(lobbyId), GameId.from(GAME_ID), PlayerId.from(ownerId), List.of(ownerPlayer), Set.of(), settings, LobbyStatus.OPEN, Instant.parse("2024-01-01T00:00:00Z"), Instant.parse("2024-01-01T00:00:00Z"));
+        Player ownerPlayer = new Player(PlayerId.from(ownerId), new PlayerName("owner"), "");
+        Player player = new Player(PlayerId.from(ownerId), new PlayerName("player"), "");
+
+        ownerPlayer.setReady();
+        player.setReady();
+
+        Lobby lobby = new Lobby(
+                LobbyId.from(lobbyId),
+                GameId.from(GAME_ID),
+                PlayerId.from(ownerId),
+                List.of(ownerPlayer, player),
+                Set.of(),
+                settings,
+                LobbyStatus.OPEN,
+                Instant.parse("2024-01-01T00:00:00Z"),
+                Instant.parse("2024-01-01T00:00:00Z")
+        );
+
+        lobby.markStarted(GameId.from(UUID.randomUUID()));
+
+        return lobby;
     }
 
     @Test
