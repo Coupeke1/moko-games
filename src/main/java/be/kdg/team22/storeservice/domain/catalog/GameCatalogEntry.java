@@ -6,16 +6,17 @@ import java.util.UUID;
 
 @AggregateRoot
 public class GameCatalogEntry {
+
     private final UUID id;
-    private String title;
     private double price;
     private GameCategory category;
-    private final double popularityScore;
+    private double popularityScore;
 
-    public GameCatalogEntry(UUID id, String title, double price,
-                            GameCategory category, double popularityScore) {
+    public GameCatalogEntry(UUID id,
+                            double price,
+                            GameCategory category,
+                            double popularityScore) {
         this.id = id;
-        this.title = title;
         this.price = price;
         this.category = category;
         this.popularityScore = popularityScore;
@@ -23,10 +24,6 @@ public class GameCatalogEntry {
 
     public UUID getId() {
         return id;
-    }
-
-    public String getTitle() {
-        return title;
     }
 
     public double getPrice() {
@@ -41,8 +38,7 @@ public class GameCatalogEntry {
         return popularityScore;
     }
 
-    public void update(String title, double price, GameCategory category) {
-        this.title = title;
+    public void update(double price, GameCategory category) {
         this.price = price;
         this.category = category;
     }

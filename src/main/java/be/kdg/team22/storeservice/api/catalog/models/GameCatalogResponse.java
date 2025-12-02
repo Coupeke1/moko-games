@@ -2,20 +2,29 @@ package be.kdg.team22.storeservice.api.catalog.models;
 
 import be.kdg.team22.storeservice.domain.catalog.GameCatalogEntry;
 import be.kdg.team22.storeservice.domain.catalog.GameCategory;
+import be.kdg.team22.storeservice.infrastructure.games.GameMetadataResponse;
 
 import java.util.UUID;
 
 public record GameCatalogResponse(
         UUID id,
         String title,
-        double price,
+        String description,
+        String image,
+        String frontendUrl,
+        String startEndpoint,
+        double price,               // store price
         GameCategory category,
         double popularity
 ) {
-    public static GameCatalogResponse from(GameCatalogEntry entry) {
+    public static GameCatalogResponse from(GameCatalogEntry entry, GameMetadataResponse meta) {
         return new GameCatalogResponse(
                 entry.getId(),
-                entry.getTitle(),
+                meta.title(),
+                meta.description(),
+                meta.image(),
+                meta.frontendUrl(),
+                meta.startEndpoint(),
                 entry.getPrice(),
                 entry.getCategory(),
                 entry.getPopularityScore()

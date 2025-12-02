@@ -10,7 +10,6 @@ public class SortingUtils {
         return sort.map(s -> switch (s) {
             case "price" -> Double.compare(a.getPrice(), b.getPrice());
             case "popularity" -> Double.compare(a.getPopularityScore(), b.getPopularityScore());
-            case "alphabetic" -> a.getTitle().compareToIgnoreCase(b.getTitle());
             default -> 0;
         }).orElse(0);
     }

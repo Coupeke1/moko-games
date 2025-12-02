@@ -14,9 +14,6 @@ public class GameCatalogEntryEntity {
     private UUID id;
 
     @Column(nullable = false)
-    private String title;
-
-    @Column(nullable = false)
     private double price;
 
     @Enumerated(EnumType.STRING)
@@ -30,12 +27,10 @@ public class GameCatalogEntryEntity {
     }
 
     public GameCatalogEntryEntity(UUID id,
-                                  String title,
                                   double price,
                                   GameCategory category,
                                   double popularityScore) {
         this.id = id;
-        this.title = title;
         this.price = price;
         this.category = category;
         this.popularityScore = popularityScore;
@@ -44,7 +39,6 @@ public class GameCatalogEntryEntity {
     public static GameCatalogEntryEntity fromDomain(GameCatalogEntry entry) {
         return new GameCatalogEntryEntity(
                 entry.getId(),
-                entry.getTitle(),
                 entry.getPrice(),
                 entry.getCategory(),
                 entry.getPopularityScore()
@@ -54,10 +48,14 @@ public class GameCatalogEntryEntity {
     public GameCatalogEntry toDomain() {
         return new GameCatalogEntry(
                 id,
-                title,
                 price,
                 category,
                 popularityScore
         );
     }
+
+    public UUID getId() { return id; }
+    public double getPrice() { return price; }
+    public GameCategory getCategory() { return category; }
+    public double getPopularityScore() { return popularityScore; }
 }

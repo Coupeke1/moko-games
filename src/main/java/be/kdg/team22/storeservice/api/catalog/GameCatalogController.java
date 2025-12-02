@@ -8,9 +8,12 @@ import be.kdg.team22.storeservice.application.catalog.queries.Pagination;
 import be.kdg.team22.storeservice.application.catalog.services.StoreService;
 import be.kdg.team22.storeservice.domain.catalog.GameCatalogEntry;
 import be.kdg.team22.storeservice.domain.catalog.GameCategory;
+import be.kdg.team22.storeservice.domain.catalog.GameWithMetadata;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -33,17 +36,23 @@ public class GameCatalogController {
             @RequestParam(defaultValue = "10") int size
     ) {
         FilterQuery filter = new FilterQuery();
-        filter.category = category != null ? java.util.Optional.of(category) : java.util.Optional.empty();
-        filter.minPrice = minPrice != null ? java.util.Optional.of(minPrice) : java.util.Optional.empty();
-        filter.maxPrice = maxPrice != null ? java.util.Optional.of(maxPrice) : java.util.Optional.empty();
-        filter.sortBy = sort != null ? java.util.Optional.of(sort) : java.util.Optional.empty();
+        filter.category = Optional.ofNullable(category);
+        filter.minPrice = Optional.ofNullable(minPrice);
+        filter.maxPrice = Optional.ofNullable(maxPrice);
+        filter.sortBy = Optional.ofNullable(sort);
 
         Pagination pagination = new Pagination(page, size);
 
-        List<GameCatalogEntry> entries = service.list(filter, pagination);
+        List<GameWithMetadata> combined = service.list(filter, pagination);
 
-        List<GameCatalogResponse> dto = entries.stream()
-                .map(GameCatalogResponse::from)
+        if ("alphabetic".equals(sort)) {
+            combined = combined.stream()
+                    .sorted(Comparator.comparing(g -> g.metadata().title()))
+                    .toList();
+        }
+
+        List<GameCatalogResponse> dto = combined.stream()
+                .map(gwm -> GameCatalogResponse.from(gwm.entry(), gwm.metadata()))
                 .toList();
 
         boolean last = dto.size() < size;
@@ -53,18 +62,21 @@ public class GameCatalogController {
 
     @GetMapping("/{id}")
     public GameCatalogResponse get(@PathVariable UUID id) {
-        return GameCatalogResponse.from(service.get(id));
+        GameWithMetadata gwm = service.get(id);
+        return GameCatalogResponse.from(gwm.entry(), gwm.metadata());
     }
 
     @PostMapping
     public GameCatalogResponse create(@RequestBody GameCatalogRequestModel request) {
-        var entry = service.create(
+        GameCatalogEntry entry = service.create(
                 request.id(),
                 request.price(),
                 request.category(),
                 request.popularity()
         );
-        return GameCatalogResponse.from(entry);
+
+        GameWithMetadata game = service.get(entry.getId());
+        return GameCatalogResponse.from(game.entry(), game.metadata());
     }
 
     @PutMapping("/{id}")
@@ -72,12 +84,14 @@ public class GameCatalogController {
             @PathVariable UUID id,
             @RequestBody GameCatalogRequestModel request
     ) {
-        var entry = service.update(
+        GameCatalogEntry entry = service.update(
                 id,
                 request.price(),
                 request.category()
         );
-        return GameCatalogResponse.from(entry);
+
+        GameWithMetadata game = service.get(entry.getId());
+        return GameCatalogResponse.from(game.entry(), game.metadata());
     }
 
     @DeleteMapping("/{id}")

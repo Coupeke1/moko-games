@@ -16,7 +16,7 @@ scope = openid
 
 
 ### 2) Create store entry (game must exist in game-service)
-POST http://localhost:8085/api/store/gamesRepository
+POST http://localhost:8085/api/store/games
 Authorization: Bearer {{owner_token}}
 Content-Type: application/json
 
@@ -35,24 +35,24 @@ Content-Type: application/json
 
 ### 3) GET store entry by ID
 
-GET http://localhost:8085/api/store/gamesRepository/{{catalog_game_id}}
+GET http://localhost:8085/api/store/games/{{catalog_game_id}}
 Authorization: Bearer {{owner_token}}
 
 
 
 ### 4) GET list of store entries (no filters)
-GET http://localhost:8085/api/store/gamesRepository
+GET http://localhost:8085/api/store/games
 Authorization: Bearer {{owner_token}}
 
 
 
 ### 5) GET list of store entries with filters
-GET http://localhost:8085/api/store/gamesRepository?category=STRATEGY&minPrice=10&maxPrice=30&sort=alphabetic
+GET http://localhost:8085/api/store/games?category=STRATEGY&minPrice=10&maxPrice=30&sort=alphabetic
 Authorization: Bearer {{owner_token}}
 
 
 ### 6) UPDATE store entry
-PUT http://localhost:8085/api/store/gamesRepository/{{catalog_game_id}}
+PUT http://localhost:8085/api/store/games/{{catalog_game_id}}
 Authorization: Bearer {{owner_token}}
 Content-Type: application/json
 
@@ -65,22 +65,22 @@ Content-Type: application/json
 
 ### 7) GET updated store entry
 
-GET http://localhost:8085/api/store/gamesRepository/{{catalog_game_id}}
+GET http://localhost:8085/api/store/games/{{catalog_game_id}}
 Authorization: Bearer {{owner_token}}
 
 
 ### 8) DELETE store entry
-DELETE http://localhost:8085/api/store/gamesRepository/{{catalog_game_id}}
+DELETE http://localhost:8085/api/store/games/{{catalog_game_id}}
 Authorization: Bearer {{owner_token}}
 
 
 ### 9) GET deleted entry → Expect 404
-GET http://localhost:8085/api/store/gamesRepository/{{catalog_game_id}}
+GET http://localhost:8085/api/store/games/{{catalog_game_id}}
 Authorization: Bearer {{owner_token}}
 
 
 ### 10) ERROR scenario — Game-service unreachable or invalid ID
-POST http://localhost:8085/api/store/gamesRepository
+POST http://localhost:8085/api/store/games
 Authorization: Bearer {{owner_token}}
 Content-Type: application/json
 

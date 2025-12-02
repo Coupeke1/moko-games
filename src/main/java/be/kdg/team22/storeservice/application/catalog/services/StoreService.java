@@ -5,6 +5,7 @@ import be.kdg.team22.storeservice.application.catalog.queries.Pagination;
 import be.kdg.team22.storeservice.domain.catalog.GameCatalogEntry;
 import be.kdg.team22.storeservice.domain.catalog.GameCatalogRepository;
 import be.kdg.team22.storeservice.domain.catalog.GameCategory;
+import be.kdg.team22.storeservice.domain.catalog.GameWithMetadata;
 import be.kdg.team22.storeservice.domain.catalog.exceptions.GameNotFoundException;
 import be.kdg.team22.storeservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.storeservice.infrastructure.games.GameMetadataResponse;
@@ -16,54 +17,57 @@ import java.util.UUID;
 @Service
 public class StoreService {
 
-    private final GameCatalogRepository catalogRepository;
-    private final ExternalGamesRepository gamesRepository;
+    private final GameCatalogRepository repo;
+    private final ExternalGamesRepository games;
 
-    public StoreService(GameCatalogRepository catalogRepository, ExternalGamesRepository gamesRepository) {
-        this.catalogRepository = catalogRepository;
-        this.gamesRepository = gamesRepository;
+    public StoreService(GameCatalogRepository repo, ExternalGamesRepository games) {
+        this.repo = repo;
+        this.games = games;
     }
 
-    public List<GameCatalogEntry> list(FilterQuery filter, Pagination pagination) {
-        return catalogRepository.findAll(filter, pagination);
-    }
-
-    public GameCatalogEntry get(UUID id) {
-        return catalogRepository.findById(id)
+    public GameWithMetadata get(UUID id) {
+        GameCatalogEntry entry = repo.findById(id)
                 .orElseThrow(() -> new GameNotFoundException(id));
+
+        GameMetadataResponse meta = games.fetchMetadata(id);
+
+        return new GameWithMetadata(entry, meta);
+    }
+
+    public List<GameWithMetadata> list(FilterQuery filter, Pagination pagination) {
+        List<GameCatalogEntry> entries = repo.findAll(filter, pagination);
+        return entries.stream()
+                .map(entry -> new GameWithMetadata(entry, games.fetchMetadata(entry.getId())))
+                .toList();
     }
 
     public GameCatalogEntry create(UUID id,
                                    double price,
                                    GameCategory category,
-                                   Double initialPopularity) {
+                                   Double popularity) {
+        games.fetchMetadata(id);
 
-        GameMetadataResponse metadata = gamesRepository.fetchMetadata(id);
+        GameCatalogEntry entry = new GameCatalogEntry(id, price, category,
+                popularity != null ? popularity : 0);
 
-        double popularity = initialPopularity != null ? initialPopularity : 0.0;
-
-        GameCatalogEntry entry = new GameCatalogEntry(
-                id,
-                metadata.title(),
-                price,
-                category,
-                popularity
-        );
-
-        catalogRepository.save(entry);
+        repo.save(entry);
         return entry;
     }
 
     public GameCatalogEntry update(UUID id,
                                    double price,
                                    GameCategory category) {
-        GameCatalogEntry existing = get(id);
-        existing.update(existing.getTitle(), price, category);
-        catalogRepository.save(existing);
+
+        GameCatalogEntry existing = repo.findById(id)
+                .orElseThrow(() -> new GameNotFoundException(id));
+
+        existing.update(price, category);
+
+        repo.save(existing);
         return existing;
     }
 
     public void delete(UUID id) {
-        catalogRepository.delete(id);
+        repo.delete(id);
     }
 }
