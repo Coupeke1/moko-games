@@ -23,6 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -160,6 +161,99 @@ class LibraryControllerTest {
                 new UsernamePasswordAuthenticationToken(jwt, jwt.getTokenValue(), List.of());
 
         mockMvc.perform(get("/api/library/me").with(authentication(auth)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("PATCH /api/library/{gameId}/favourite → marks favourite successfully")
+    void favouriteGame_success() throws Exception {
+        UUID userId = UUID.randomUUID();
+        UUID gameId = UUID.randomUUID();
+        UsernamePasswordAuthenticationToken auth = authWithUser(userId);
+        Jwt jwt = extractJwt(auth);
+
+        mockMvc.perform(
+                        patch("/api/library/" + gameId + "/favourite")
+                                .with(authentication(auth))
+                )
+                .andExpect(status().isNoContent());
+
+        verify(libraryService).markFavourite(ProfileId.from(userId), gameId);
+    }
+
+    @Test
+    @DisplayName("PATCH /api/library/{gameId}/unfavourite → unmarks favourite successfully")
+    void unfavouriteGame_success() throws Exception {
+        UUID userId = UUID.randomUUID();
+        UUID gameId = UUID.randomUUID();
+        UsernamePasswordAuthenticationToken auth = authWithUser(userId);
+
+        mockMvc.perform(
+                        patch("/api/library/" + gameId + "/unfavourite")
+                                .with(authentication(auth))
+                )
+                .andExpect(status().isNoContent());
+
+        verify(libraryService).unmarkFavourite(ProfileId.from(userId), gameId);
+    }
+
+    @Test
+    @DisplayName("PATCH favourite → 401 when no JWT")
+    void favourite_noJwt() throws Exception {
+        UUID gameId = UUID.randomUUID();
+
+        mockMvc.perform(patch("/api/library/" + gameId + "/favourite"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("PATCH unfavourite → 401 when no JWT")
+    void unfavourite_noJwt() throws Exception {
+        UUID gameId = UUID.randomUUID();
+
+        mockMvc.perform(patch("/api/library/" + gameId + "/unfavourite"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("PATCH favourite → 400 when JWT subject is not a UUID")
+    void favourite_invalidJwt() throws Exception {
+        UUID gameId = UUID.randomUUID();
+
+        Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "none")
+                .subject("NOT_A_UUID")
+                .claim("preferred_username", "mathias")
+                .build();
+
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken(jwt, jwt.getTokenValue(), List.of());
+
+        mockMvc.perform(
+                        patch("/api/library/" + gameId + "/favourite")
+                                .with(authentication(auth))
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("PATCH unfavourite → 400 when JWT subject is not a UUID")
+    void unfavourite_invalidJwt() throws Exception {
+        UUID gameId = UUID.randomUUID();
+
+        Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "none")
+                .subject("NOT_A_UUID")
+                .claim("preferred_username", "mathias")
+                .build();
+
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken(jwt, jwt.getTokenValue(), List.of());
+
+        mockMvc.perform(
+                        patch("/api/library/" + gameId + "/unfavourite")
+                                .with(authentication(auth))
+                )
                 .andExpect(status().isBadRequest());
     }
 }
