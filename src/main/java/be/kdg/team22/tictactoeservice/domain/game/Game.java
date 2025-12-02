@@ -4,19 +4,15 @@ import be.kdg.team22.tictactoeservice.domain.game.exceptions.*;
 import be.kdg.team22.tictactoeservice.domain.player.Player;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerRole;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @AggregateRoot
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY)
 public class Game {
     private final GameId id;
-    private final TreeSet<Player> players;
+    private final NavigableSet<Player> players;
     private final Map<PlayerId, List<Move>> moveHistory;
     private final PlayerRole aiPlayer;
     private Board board;
@@ -24,25 +20,23 @@ public class Game {
     private PlayerRole currentRole;
     private PlayerId winner;
 
-    @JsonCreator
-    public Game(
-            @JsonProperty("id") GameId id,
-            @JsonProperty("players") TreeSet<Player> players,
-            @JsonProperty("moveHistory") Map<PlayerId, List<Move>> moveHistory,
-            @JsonProperty("aiPlayer") PlayerRole aiPlayer,
-            @JsonProperty("board") Board board,
-            @JsonProperty("status") GameStatus status,
-            @JsonProperty("currentRole") PlayerRole currentRole,
-            @JsonProperty("winner") PlayerId winner
-    ) {
-        this.id = id;
-        this.players = players;
-        this.moveHistory = moveHistory;
-        this.aiPlayer = aiPlayer;
-        this.board = board;
-        this.status = status;
-        this.currentRole = currentRole;
+    private static final Comparator<Player> PLAYER_COMPARATOR =
+            Comparator.comparingInt(p -> p.role().order());
+
+    public Game(PlayerId winner, PlayerRole currentRole, GameStatus status, Board board, PlayerRole aiPlayer, Map<PlayerId, List<Move>> moveHistory, List<Player> players, GameId id) {
         this.winner = winner;
+        this.currentRole = currentRole;
+        this.status = status;
+        this.board = board;
+        this.aiPlayer = aiPlayer;
+        this.moveHistory = moveHistory.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> new ArrayList<>(e.getValue())
+                ));
+        this.players = new TreeSet<>(PLAYER_COMPARATOR);
+        this.players.addAll(players);
+        this.id = id;
     }
 
     private Game(final int requestedSize, final List<Player> players, final PlayerRole aiPlayer) {
@@ -50,7 +44,7 @@ public class Game {
         this.board = Board.create(requestedSize);
         this.status = GameStatus.IN_PROGRESS;
 
-        this.players = new TreeSet<>(Comparator.comparing((Player p) -> p.role().order()));
+        this.players = new TreeSet<>(PLAYER_COMPARATOR);
         this.players.addAll(players);
 
         this.moveHistory = players.stream()
@@ -161,7 +155,7 @@ public class Game {
         return status;
     }
 
-    public TreeSet<Player> players() {
+    public NavigableSet<Player> players() {
         return players;
     }
 

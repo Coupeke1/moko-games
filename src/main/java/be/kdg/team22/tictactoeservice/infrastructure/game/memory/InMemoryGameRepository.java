@@ -1,7 +1,8 @@
-package be.kdg.team22.tictactoeservice.infrastructure.game;
+package be.kdg.team22.tictactoeservice.infrastructure.game.memory;
 
 import be.kdg.team22.tictactoeservice.domain.game.Game;
 import be.kdg.team22.tictactoeservice.domain.game.GameId;
+import be.kdg.team22.tictactoeservice.infrastructure.game.GameRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Map;

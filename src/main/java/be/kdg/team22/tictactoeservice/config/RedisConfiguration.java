@@ -1,6 +1,6 @@
 package be.kdg.team22.tictactoeservice.config;
 
-import be.kdg.team22.tictactoeservice.domain.game.Game;
+import be.kdg.team22.tictactoeservice.infrastructure.game.redis.model.GameModel;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
@@ -16,28 +16,22 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @EnableRedisRepositories
 public class RedisConfiguration {
     @Bean
-    public ObjectMapper redisObjectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.activateDefaultTyping(
+    public GenericJackson2JsonRedisSerializer gameSerializer() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.activateDefaultTyping(
                 LaissezFaireSubTypeValidator.instance,
                 ObjectMapper.DefaultTyping.NON_FINAL,
                 JsonTypeInfo.As.PROPERTY
         );
-        return objectMapper;
+        return new GenericJackson2JsonRedisSerializer(mapper);
     }
 
     @Bean
-    public GenericJackson2JsonRedisSerializer gameSerializer() {
-        // Only root type is annotated in JSON
-        return new GenericJackson2JsonRedisSerializer(Game.class.getName());
-    }
-
-    @Bean
-    public RedisTemplate<String, Game> gameRedisTemplate(
+    public RedisTemplate<String, GameModel> gameRedisTemplate(
             RedisConnectionFactory redisConnectionFactory,
             GenericJackson2JsonRedisSerializer serializer
     ) {
-        RedisTemplate<String, Game> template = new RedisTemplate<>();
+        RedisTemplate<String, GameModel> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
 
         template.setKeySerializer(new StringRedisSerializer());
