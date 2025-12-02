@@ -10,6 +10,7 @@ import be.kdg.team22.storeservice.application.catalog.services.GameQueryService;
 import be.kdg.team22.storeservice.application.catalog.services.StoreService;
 import be.kdg.team22.storeservice.domain.catalog.GameCatalogEntry;
 import be.kdg.team22.storeservice.domain.catalog.GameCategory;
+import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -66,27 +67,25 @@ public class GameCatalogController {
     }
 
     @PostMapping
-    public GameCatalogResponse create(@RequestBody GameCatalogRequestModel request) {
+    public GameCatalogResponse create(@Valid @RequestBody GameCatalogRequestModel request) {
         GameCatalogEntry entry = storeService.create(
                 request.id(),
                 request.price(),
                 request.category()
         );
-
         return queryService.getGameWithMetadata(entry.getId());
     }
 
     @PutMapping("/{id}")
     public GameCatalogResponse update(
             @PathVariable UUID id,
-            @RequestBody UpdateGameCatalogModel request
+            @Valid @RequestBody UpdateGameCatalogModel request
     ) {
         GameCatalogEntry entry = storeService.update(
                 id,
                 request.price(),
                 request.category()
         );
-
         return queryService.getGameWithMetadata(entry.getId());
     }
 

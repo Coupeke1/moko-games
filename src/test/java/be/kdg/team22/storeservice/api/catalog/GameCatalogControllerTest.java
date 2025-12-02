@@ -149,11 +149,14 @@ class GameCatalogControllerTest {
     @Test
     @DisplayName("POST /api/store/games returns 400 when validation fails")
     void create_validationFails_returns400() throws Exception {
+        GameCatalogEntry entry = sampleEntry();
+
+        when(storeService.create(any(), any(), any()))
+                .thenReturn(entry);
         mockMvc.perform(post("/api/store/games")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "id": null,
                                   "price": -5,
                                   "category": "STRATEGY"
                                 }
@@ -185,6 +188,7 @@ class GameCatalogControllerTest {
     @Test
     @DisplayName("PUT /api/store/games/{id} returns 400 when validation fails")
     void update_validationFails_returns400() throws Exception {
+
         mockMvc.perform(put("/api/store/games/{id}", GAME_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
