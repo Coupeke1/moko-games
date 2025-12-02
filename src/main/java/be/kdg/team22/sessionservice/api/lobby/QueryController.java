@@ -1,6 +1,6 @@
 package be.kdg.team22.sessionservice.api.lobby;
 
-import be.kdg.team22.sessionservice.api.lobby.models.LobbyResponseModel;
+import be.kdg.team22.sessionservice.api.lobby.models.LobbyModel;
 import be.kdg.team22.sessionservice.application.lobby.LobbyService;
 import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
@@ -27,8 +27,8 @@ public class QueryController {
     }
 
     @GetMapping
-    public ResponseEntity<List<LobbyResponseModel>> getAll() {
-        return ResponseEntity.ok(service.findAllLobbies().stream().map(LobbyResponseModel::from).toList());
+    public ResponseEntity<List<LobbyModel>> getAll() {
+        return ResponseEntity.ok(service.findAllLobbies().stream().map(LobbyModel::from).toList());
     }
 
     @GetMapping("/{lobbyId}/invited")
@@ -38,10 +38,10 @@ public class QueryController {
     }
 
     @GetMapping("/invited/{gameId}/me")
-    public ResponseEntity<List<LobbyResponseModel>> getInvitesForPlayer(@AuthenticationPrincipal Jwt token, @PathVariable UUID gameId) {
+    public ResponseEntity<List<LobbyModel>> getInvitesForPlayer(@AuthenticationPrincipal Jwt token, @PathVariable UUID gameId) {
         PlayerId player = PlayerId.get(token);
         GameId game = new GameId(gameId);
 
-        return ResponseEntity.ok(service.getInvitesFromPlayer(player, game).stream().map(LobbyResponseModel::from).toList());
+        return ResponseEntity.ok(service.getInvitesFromPlayer(player, game).stream().map(LobbyModel::from).toList());
     }
 }

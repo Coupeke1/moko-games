@@ -1,7 +1,7 @@
 package be.kdg.team22.sessionservice.api.lobby;
 
 import be.kdg.team22.sessionservice.api.lobby.models.CreateLobbyModel;
-import be.kdg.team22.sessionservice.api.lobby.models.LobbyResponseModel;
+import be.kdg.team22.sessionservice.api.lobby.models.LobbyModel;
 import be.kdg.team22.sessionservice.api.lobby.models.UpdateLobbySettingsModel;
 import be.kdg.team22.sessionservice.application.lobby.LobbyService;
 import be.kdg.team22.sessionservice.domain.lobby.GameId;
@@ -27,30 +27,30 @@ public class LobbyController {
     }
 
     @PostMapping
-    public ResponseEntity<LobbyResponseModel> create(@RequestBody final CreateLobbyModel model, @AuthenticationPrincipal final Jwt token) {
+    public ResponseEntity<LobbyModel> create(@RequestBody final CreateLobbyModel model, @AuthenticationPrincipal final Jwt token) {
         PlayerId owner = PlayerId.get(token);
         GameId game = new GameId(model.gameId());
 
         Lobby lobby = service.createLobby(game, owner, model, token);
-        return ResponseEntity.status(HttpStatus.CREATED).body(LobbyResponseModel.from(lobby));
+        return ResponseEntity.status(HttpStatus.CREATED).body(LobbyModel.from(lobby));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LobbyResponseModel> getById(@PathVariable final UUID id) {
+    public ResponseEntity<LobbyModel> getById(@PathVariable final UUID id) {
         Lobby lobby = service.findLobby(LobbyId.from(id));
-        return ResponseEntity.ok(LobbyResponseModel.from(lobby));
+        return ResponseEntity.ok(LobbyModel.from(lobby));
     }
 
     @PutMapping("/{id}/settings")
-    public ResponseEntity<LobbyResponseModel> updateSettings(@PathVariable final UUID id, @RequestBody final UpdateLobbySettingsModel model, @AuthenticationPrincipal final Jwt token) {
+    public ResponseEntity<LobbyModel> updateSettings(@PathVariable final UUID id, @RequestBody final UpdateLobbySettingsModel model, @AuthenticationPrincipal final Jwt token) {
         Lobby lobby = service.updateSettings(LobbyId.from(id), PlayerId.get(token), model);
-        return ResponseEntity.ok(LobbyResponseModel.from(lobby));
+        return ResponseEntity.ok(LobbyModel.from(lobby));
     }
 
     @PostMapping("/{id}/close")
-    public ResponseEntity<LobbyResponseModel> close(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token) {
+    public ResponseEntity<LobbyModel> close(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token) {
         Lobby lobby = service.closeLobby(LobbyId.from(id), PlayerId.get(token));
-        return ResponseEntity.ok(LobbyResponseModel.from(lobby));
+        return ResponseEntity.ok(LobbyModel.from(lobby));
     }
 
     @PostMapping("/{id}/start")
