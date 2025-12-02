@@ -5,6 +5,7 @@ import be.kdg.team22.checkersservice.api.models.GameModel;
 import be.kdg.team22.checkersservice.application.GameService;
 import be.kdg.team22.checkersservice.domain.game.Game;
 import be.kdg.team22.checkersservice.domain.game.GameId;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class GameController {
     }
 
     @PostMapping({"/", ""})
-    public ResponseEntity<GameModel> create(@RequestParam(defaultValue = "false") final boolean aiPlayer, @RequestBody final CreateGameModel model) {
+    public ResponseEntity<GameModel> create(@RequestParam(defaultValue = "false") final boolean aiPlayer, @Valid @RequestBody final CreateGameModel model) {
         Game game = service.create(model, aiPlayer);
         GameModel gameModel = GameModel.from(game);
 

@@ -12,6 +12,7 @@ public class ExceptionController {
     @ExceptionHandler({
             BoardSizeException.class,
             GameIdException.class,
+            OutsidePlayingFieldException.class,
             PlayerCountException.class,
             UniquePlayersException.class,
             InvalidPlayerException.class,
