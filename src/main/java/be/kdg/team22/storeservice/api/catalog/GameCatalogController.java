@@ -3,12 +3,14 @@ package be.kdg.team22.storeservice.api.catalog;
 import be.kdg.team22.storeservice.api.catalog.models.GameCatalogRequestModel;
 import be.kdg.team22.storeservice.api.catalog.models.GameCatalogResponse;
 import be.kdg.team22.storeservice.api.catalog.models.PagedResponse;
+import be.kdg.team22.storeservice.api.catalog.models.UpdateGameCatalogModel;
 import be.kdg.team22.storeservice.application.catalog.queries.FilterQuery;
 import be.kdg.team22.storeservice.application.catalog.queries.Pagination;
+import be.kdg.team22.storeservice.application.catalog.services.GameQueryService;
 import be.kdg.team22.storeservice.application.catalog.services.StoreService;
 import be.kdg.team22.storeservice.domain.catalog.GameCatalogEntry;
 import be.kdg.team22.storeservice.domain.catalog.GameCategory;
-import be.kdg.team22.storeservice.domain.catalog.GameWithMetadata;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -20,11 +22,12 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/store/games")
 public class GameCatalogController {
+    private final StoreService storeService;
+    private final GameQueryService queryService;
 
-    private final StoreService service;
-
-    public GameCatalogController(StoreService service) {
-        this.service = service;
+    public GameCatalogController(StoreService storeService, GameQueryService queryService) {
+        this.storeService = storeService;
+        this.queryService = queryService;
     }
 
     @GetMapping
@@ -44,59 +47,50 @@ public class GameCatalogController {
 
         Pagination pagination = new Pagination(page, size);
 
-        List<GameWithMetadata> combined = service.list(filter, pagination);
+        List<GameCatalogResponse> games = queryService.listGamesWithMetadata(filter, pagination);
 
         if ("alphabetic".equals(sort)) {
-            combined = combined.stream()
-                    .sorted(Comparator.comparing(g -> g.metadata().title()))
+            games = games.stream()
+                    .sorted(Comparator.comparing(GameCatalogResponse::title))
                     .toList();
         }
 
-        List<GameCatalogResponse> dto = combined.stream()
-                .map(gwm -> GameCatalogResponse.from(gwm.entry(), gwm.metadata()))
-                .toList();
-
-        boolean last = dto.size() < size;
-
-        return new PagedResponse<>(dto, page, size, last);
+        boolean last = games.size() < size;
+        return new PagedResponse<>(games, page, size, last);
     }
 
     @GetMapping("/{id}")
     public GameCatalogResponse get(@PathVariable UUID id) {
-        GameWithMetadata gwm = service.get(id);
-        return GameCatalogResponse.from(gwm.entry(), gwm.metadata());
+        return queryService.getGameWithMetadata(id);
     }
 
     @PostMapping
-    public GameCatalogResponse create(@RequestBody GameCatalogRequestModel request) {
-        GameCatalogEntry entry = service.create(
+    public GameCatalogResponse create(@RequestBody @Validated GameCatalogRequestModel request) {
+        GameCatalogEntry entry = storeService.create(
                 request.id(),
                 request.price(),
-                request.category(),
-                request.popularity()
+                request.category()
         );
 
-        GameWithMetadata game = service.get(entry.getId());
-        return GameCatalogResponse.from(game.entry(), game.metadata());
+        return queryService.getGameWithMetadata(entry.getId());
     }
 
     @PutMapping("/{id}")
     public GameCatalogResponse update(
             @PathVariable UUID id,
-            @RequestBody GameCatalogRequestModel request
+            @RequestBody @Validated UpdateGameCatalogModel request
     ) {
-        GameCatalogEntry entry = service.update(
+        GameCatalogEntry entry = storeService.update(
                 id,
                 request.price(),
                 request.category()
         );
 
-        GameWithMetadata game = service.get(entry.getId());
-        return GameCatalogResponse.from(game.entry(), game.metadata());
+        return queryService.getGameWithMetadata(entry.getId());
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable UUID id) {
-        service.delete(id);
+        storeService.delete(id);
     }
 }

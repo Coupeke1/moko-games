@@ -21,8 +21,8 @@ public class GameCatalogEntryEntity {
     @Column(nullable = false)
     private GameCategory category;
 
-    @Column(nullable = false, name = "popularity_score")
-    private double popularityScore;
+    @Column(nullable = false, name = "purchase_count")
+    private int purchaseCount;
 
     protected GameCatalogEntryEntity() {
     }
@@ -30,11 +30,11 @@ public class GameCatalogEntryEntity {
     public GameCatalogEntryEntity(UUID id,
                                   BigDecimal price,
                                   GameCategory category,
-                                  double popularityScore) {
+                                  int purchaseCount) {
         this.id = id;
         this.price = price;
         this.category = category;
-        this.popularityScore = popularityScore;
+        this.purchaseCount = purchaseCount;
     }
 
     public static GameCatalogEntryEntity fromDomain(GameCatalogEntry entry) {
@@ -42,21 +42,44 @@ public class GameCatalogEntryEntity {
                 entry.getId(),
                 entry.getPrice(),
                 entry.getCategory(),
-                entry.getPopularityScore()
+                entry.getPurchaseCount()
         );
     }
 
     public GameCatalogEntry toDomain() {
         return new GameCatalogEntry(
-                id,
-                price,
-                category,
-                popularityScore
+                this.id,
+                this.price,
+                this.category,
+                this.purchaseCount
         );
     }
 
-    public UUID getId() { return id; }
-    public BigDecimal getPrice() { return price; }
-    public GameCategory getCategory() { return category; }
-    public double getPopularityScore() { return popularityScore; }
+    public UUID getId() {
+        return id;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public GameCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(GameCategory category) {
+        this.category = category;
+    }
+
+    public int getPurchaseCount() {
+        return purchaseCount;
+    }
+
+    public void setPurchaseCount(int purchaseCount) {
+        this.purchaseCount = purchaseCount;
+    }
 }

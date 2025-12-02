@@ -1,5 +1,6 @@
 package be.kdg.team22.storeservice.domain.catalog;
 
+import be.kdg.team22.storeservice.domain.catalog.exceptions.GameCatalogException;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
 import java.math.BigDecimal;
@@ -7,20 +8,48 @@ import java.util.UUID;
 
 @AggregateRoot
 public class GameCatalogEntry {
-
     private final UUID id;
     private BigDecimal price;
     private GameCategory category;
+    private int purchaseCount;
     private double popularityScore;
 
     public GameCatalogEntry(UUID id,
                             BigDecimal price,
-                            GameCategory category,
-                            double popularityScore) {
+                            GameCategory category) {
         this.id = id;
         this.price = price;
         this.category = category;
-        this.popularityScore = popularityScore;
+        this.purchaseCount = 0;
+        this.popularityScore = calculatePopularityScore();
+    }
+
+    public GameCatalogEntry(UUID id,
+                            BigDecimal price,
+                            GameCategory category,
+                            int purchaseCount) {
+        this.id = id;
+        this.price = price;
+        this.category = category;
+        this.purchaseCount = purchaseCount;
+        this.popularityScore = calculatePopularityScore();
+    }
+
+    public void updatePriceAndCategory(BigDecimal newPrice, GameCategory newCategory) {
+        if (newPrice.compareTo(BigDecimal.ZERO) <= 0) {
+            throw GameCatalogException.PriceMustBePositive(newPrice);
+        }
+        this.price = newPrice;
+        this.category = newCategory;
+    }
+
+    public void recordPurchase() {
+        this.purchaseCount++;
+        this.popularityScore = calculatePopularityScore();
+    }
+
+    private double calculatePopularityScore() {
+        return Math.log10(purchaseCount + 1) * 10;
     }
 
     public UUID getId() {
@@ -39,8 +68,8 @@ public class GameCatalogEntry {
         return popularityScore;
     }
 
-    public void update(BigDecimal price, GameCategory category) {
-        this.price = price;
-        this.category = category;
+    public int getPurchaseCount() {
+        return purchaseCount;
     }
+
 }

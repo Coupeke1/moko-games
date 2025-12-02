@@ -12,11 +12,10 @@ public record GameCatalogResponse(
         String title,
         String description,
         String image,
-        String frontendUrl,
-        String startEndpoint,
         BigDecimal price,
         GameCategory category,
-        double popularity
+        double popularity,
+        int purchaseCount
 ) {
     public static GameCatalogResponse from(GameCatalogEntry entry, GameMetadataResponse meta) {
         return new GameCatalogResponse(
@@ -24,11 +23,10 @@ public record GameCatalogResponse(
                 meta.title(),
                 meta.description(),
                 meta.image(),
-                meta.frontendUrl(),
-                meta.startEndpoint(),
                 entry.getPrice(),
                 entry.getCategory(),
-                entry.getPopularityScore()
+                entry.getPopularityScore(),
+                entry.getPurchaseCount()
         );
     }
 }

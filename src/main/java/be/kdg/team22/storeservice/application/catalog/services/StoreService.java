@@ -5,19 +5,18 @@ import be.kdg.team22.storeservice.application.catalog.queries.Pagination;
 import be.kdg.team22.storeservice.domain.catalog.GameCatalogEntry;
 import be.kdg.team22.storeservice.domain.catalog.GameCatalogRepository;
 import be.kdg.team22.storeservice.domain.catalog.GameCategory;
-import be.kdg.team22.storeservice.domain.catalog.GameWithMetadata;
 import be.kdg.team22.storeservice.domain.catalog.exceptions.GameNotFoundException;
 import be.kdg.team22.storeservice.infrastructure.games.ExternalGamesRepository;
-import be.kdg.team22.storeservice.infrastructure.games.GameMetadataResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class StoreService {
-
     private final GameCatalogRepository repo;
     private final ExternalGamesRepository games;
 
@@ -26,46 +25,41 @@ public class StoreService {
         this.games = games;
     }
 
-    public GameWithMetadata get(UUID id) {
-        GameCatalogEntry entry = repo.findById(id)
+    public GameCatalogEntry get(UUID id) {
+        return repo.findById(id)
                 .orElseThrow(() -> new GameNotFoundException(id));
-
-        GameMetadataResponse meta = games.fetchMetadata(id);
-
-        return new GameWithMetadata(entry, meta);
     }
 
-    public List<GameWithMetadata> list(FilterQuery filter, Pagination pagination) {
-        List<GameCatalogEntry> entries = repo.findAll(filter, pagination);
-        return entries.stream()
-                .map(entry -> new GameWithMetadata(entry, games.fetchMetadata(entry.getId())))
-                .toList();
+    public List<GameCatalogEntry> list(FilterQuery filter, Pagination pagination) {
+        return repo.findAll(filter, pagination);
     }
 
-    public GameCatalogEntry create(UUID id,
-                                   BigDecimal price,
-                                   GameCategory category,
-                                   Double popularity) {
+    public GameCatalogEntry create(UUID id, BigDecimal price, GameCategory category) {
         games.fetchMetadata(id);
 
-        GameCatalogEntry entry = new GameCatalogEntry(id, price, category,
-                popularity != null ? popularity : 0);
+        GameCatalogEntry entry = new GameCatalogEntry(id, price, category);
 
         repo.save(entry);
         return entry;
     }
 
-    public GameCatalogEntry update(UUID id,
-                                   BigDecimal price,
-                                   GameCategory category) {
-
+    public GameCatalogEntry update(UUID id, BigDecimal price, GameCategory category) {
         GameCatalogEntry existing = repo.findById(id)
                 .orElseThrow(() -> new GameNotFoundException(id));
 
-        existing.update(price, category);
+        existing.updatePriceAndCategory(price, category);
 
         repo.save(existing);
         return existing;
+    }
+
+    public void recordPurchase(UUID gameId) {
+        GameCatalogEntry entry = repo.findById(gameId)
+                .orElseThrow(() -> new GameNotFoundException(gameId));
+
+        entry.recordPurchase();
+
+        repo.save(entry);
     }
 
     public void delete(UUID id) {
