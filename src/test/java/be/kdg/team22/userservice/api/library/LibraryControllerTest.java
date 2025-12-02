@@ -63,7 +63,6 @@ class LibraryControllerTest {
                 "desc",
                 BigDecimal.TEN,
                 "img.png",
-                "url",
                 Instant.parse("2024-01-01T10:00:00Z"),
                 true
         );

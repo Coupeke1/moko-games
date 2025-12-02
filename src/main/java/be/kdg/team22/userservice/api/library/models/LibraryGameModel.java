@@ -10,7 +10,6 @@ public record LibraryGameModel(
         String description,
         BigDecimal price,
         String image,
-        String url,
         Instant purchasedAt,
         boolean favourite
 ) {

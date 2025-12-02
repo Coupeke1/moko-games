@@ -9,7 +9,6 @@ public record GameDetailsResponse(
         String title,
         String description,
         BigDecimal price,
-        String imageUrl,
-        String storeUrl
+        String image
 ) {
 }
