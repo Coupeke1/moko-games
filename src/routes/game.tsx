@@ -1,7 +1,6 @@
 import { useParams } from "react-router";
 import { GameStatus } from "@/models/game-status";
 import { useResetGame } from "@/hooks/use-reset-game";
-import { useMyPlayerRole } from "@/hooks/use-my-player-role";
 import { useMyProfile } from "@/hooks/use-my-profile";
 import { useMakeMove } from "@/hooks/use-make-move";
 import { useGameState } from "@/hooks/use-game-state";
@@ -9,7 +8,6 @@ import LoadingState from "@/components/state/loading.tsx";
 import ErrorState from "@/components/state/error.tsx";
 import Page from "@/components/layout/page.tsx";
 import GameGrid from "@/components/game-grid.tsx";
-import Toast from "@/components/layout/Toast.tsx";
 import GameEndModal from "@/components/dialogs/game-end-modal";
 import PlayerCard from "@/components/player-card";
 import TurnIndicator from "@/components/turn-indicator";
@@ -18,9 +16,8 @@ export default function GamePage() {
     const { id } = useParams<{ id: string }>()
     const { data: gameState, isLoading, isError } = useGameState(id!);
     const { profile, isLoading: profileLoading, isError: profileError } = useMyProfile();
-    const myRole = useMyPlayerRole(gameState?.players, profile?.id)
 
-    const { makeMove, errorMsg, closeToast } = useMakeMove(id!, profile, gameState?.status);
+    const { makeMove } = useMakeMove(id!, profile, gameState?.status);
     const onReset = useResetGame(id!);
 
     if (isLoading || !gameState || profileLoading || !profile)
@@ -58,10 +55,6 @@ export default function GamePage() {
                         <TurnIndicator gameState={gameState} />
                         <div className="game-board">
                             <GameGrid board={gameState.board} onCellClick={makeMove} />
-
-                            {errorMsg && (
-                                <Toast message={errorMsg} onClose={closeToast} />
-                            )}
                         </div>
                     </div>
                 </div>
@@ -74,8 +67,6 @@ export default function GamePage() {
                         onReset={onReset}
                     />
                 )}
-
-
             </div>
         </Page>
     )
