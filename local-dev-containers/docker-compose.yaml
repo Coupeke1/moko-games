@@ -31,6 +31,18 @@ services:
       - moko_rabbitmq_all:/var/lib/rabbitmq/
       - moko_rabbitmq_all:/var/log/rabbitmq/
 
+  app_redis:
+    image: redis:8.4.0-alpine
+    ports:
+      - "6379:6379"
+    command:
+      - redis-server
+      - --requirepass password
+    networks:
+      - moko_backend
+    volumes:
+      - moko_redis_all:/data
+
   idp_mysql:
     image: mysql:9.5
     environment:
@@ -70,6 +82,7 @@ services:
 volumes:
   moko_postgres_data:
   moko_rabbitmq_all:
+  moko_redis_all:
   moko_mysql_data:
 
 networks:

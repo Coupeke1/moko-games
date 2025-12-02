@@ -25,7 +25,7 @@ services:
 
   # Frontend
   frontend-platform:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/platform-frontend:main-latest
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/platform-frontend:branch-fix-env-vars
     restart: always
     environment:
       VITE_AUTH_URL: http://localhost/auth
@@ -35,13 +35,16 @@ services:
       VITE_USER_SERVICE: http://localhost/user-service/api/profiles
       VITE_LIBRARY_SERVICE: http://localhost/user-service/api/library
       VITE_SOCIAL_SERVICE: http://localhost/social-service/api/friends
+      VITE_SESSION_SERVICE: http://localhost/session-service/api/lobbies
+      VITE_GAMES_SERVICE: http://localhost/game-service/api/games
+
     expose:
       - "80"
     networks:
       - moko_frontend
 
   frontend-tic-tac-toe:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/tic-tac-toe-frontend:branch-9-pipeline-and-dockerfile-setup
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/tic-tac-toe-frontend:branch-11-refactor-frontend
     restart: always
     environment:
       VITE_AUTH_URL: http://localhost/auth
@@ -80,7 +83,7 @@ services:
 
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
 
-      CROS_ALLOWED_ORIGINS: http://localhost
+      CORS_ALLOWED_ORIGINS: http://localhost
       GAME_SERVICE_URL: http://service-games:8084
     expose:
       - "8080"
@@ -161,7 +164,7 @@ services:
 
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
 
-      CROS_ALLOWED_ORIGINS: http://localhost
+      CORS_ALLOWED_ORIGINS: http://localhost
       USER_SERVICE_URL: http://service-user:8080/api/profiles
     expose:
       - "8083"
@@ -226,6 +229,22 @@ services:
   service-tic-tac-toe:
     image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/tic-tac-toe-service:main-latest
     restart: always
+    environment:
+      SPRING_DATA_REDIS_HOST: app-redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_DATABASE: 0
+      SPRING_DATA_REDIS_PASSWORD: password
+
+      SPRING_RABBITMQ_HOST: app-rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: user
+      SPRING_RABBITMQ_PASSWORD: password
+
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
+
+      AI_URL: https://team3.techtitans.be/ai-player
+
+      CORS_ALLOWED_ORIGINS: http://localhost
     expose:
       - "8086"
     networks:
@@ -272,6 +291,16 @@ services:
     volumes:
       - moko_rabbitmq_all:/var/lib/rabbitmq/
       - moko_rabbitmq_all:/var/log/rabbitmq/
+
+  app-redis:
+    image: redis:8.4.0-alpine
+    command:
+      - redis-server
+      - --requirepass password
+    networks:
+      - moko_backend
+    volumes:
+      - moko_redis_all:/data
 
   # Backend IDP
   idp-mysql:
@@ -320,6 +349,7 @@ services:
 
 volumes:
   moko_postgres_data:
+  moko_redis_all:
   moko_rabbitmq_all:
   moko_mysql_data:
 
