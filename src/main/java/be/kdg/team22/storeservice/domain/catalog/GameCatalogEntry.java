@@ -2,18 +2,19 @@ package be.kdg.team22.storeservice.domain.catalog;
 
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @AggregateRoot
 public class GameCatalogEntry {
 
     private final UUID id;
-    private double price;
+    private BigDecimal price;
     private GameCategory category;
     private double popularityScore;
 
     public GameCatalogEntry(UUID id,
-                            double price,
+                            BigDecimal price,
                             GameCategory category,
                             double popularityScore) {
         this.id = id;
@@ -26,7 +27,7 @@ public class GameCatalogEntry {
         return id;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
@@ -38,7 +39,7 @@ public class GameCatalogEntry {
         return popularityScore;
     }
 
-    public void update(double price, GameCategory category) {
+    public void update(BigDecimal price, GameCategory category) {
         this.price = price;
         this.category = category;
     }

@@ -8,7 +8,7 @@ public class SortingUtils {
 
     public static int sort(GameCatalogEntry a, GameCatalogEntry b, Optional<String> sort) {
         return sort.map(s -> switch (s) {
-            case "price" -> Double.compare(a.getPrice(), b.getPrice());
+            case "price" -> a.getPrice().compareTo(b.getPrice());
             case "popularity" -> Double.compare(a.getPopularityScore(), b.getPopularityScore());
             default -> 0;
         }).orElse(0);

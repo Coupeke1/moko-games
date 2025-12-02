@@ -11,6 +11,7 @@ import be.kdg.team22.storeservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.storeservice.infrastructure.games.GameMetadataResponse;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,7 +43,7 @@ public class StoreService {
     }
 
     public GameCatalogEntry create(UUID id,
-                                   double price,
+                                   BigDecimal price,
                                    GameCategory category,
                                    Double popularity) {
         games.fetchMetadata(id);
@@ -55,7 +56,7 @@ public class StoreService {
     }
 
     public GameCatalogEntry update(UUID id,
-                                   double price,
+                                   BigDecimal price,
                                    GameCategory category) {
 
         GameCatalogEntry existing = repo.findById(id)

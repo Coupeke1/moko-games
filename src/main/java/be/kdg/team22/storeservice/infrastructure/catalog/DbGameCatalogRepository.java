@@ -1,6 +1,5 @@
 package be.kdg.team22.storeservice.infrastructure.catalog;
 
-
 import be.kdg.team22.storeservice.application.catalog.queries.FilterQuery;
 import be.kdg.team22.storeservice.application.catalog.queries.Pagination;
 import be.kdg.team22.storeservice.domain.catalog.GameCatalogEntry;
@@ -31,13 +30,12 @@ public class DbGameCatalogRepository implements GameCatalogRepository {
 
     @Override
     public List<GameCatalogEntry> findAll(FilterQuery filter, Pagination pagination) {
-
         return jpa.findAll()
                 .stream()
                 .map(GameCatalogEntryEntity::toDomain)
                 .filter(e -> filter.category.map(c -> e.getCategory() == c).orElse(true))
-                .filter(e -> filter.minPrice.map(min -> e.getPrice() >= min).orElse(true))
-                .filter(e -> filter.maxPrice.map(max -> e.getPrice() <= max).orElse(true))
+                .filter(e -> filter.minPrice.map(min -> e.getPrice().compareTo(min) >= 0).orElse(true))  // Use compareTo
+                .filter(e -> filter.maxPrice.map(max -> e.getPrice().compareTo(max) <= 0).orElse(true))  // Use compareTo
                 .sorted((a, b) -> SortingUtils.sort(a, b, filter.sortBy))
                 .skip((long) pagination.page() * pagination.size())
                 .limit(pagination.size())

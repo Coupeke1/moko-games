@@ -4,6 +4,7 @@ import be.kdg.team22.storeservice.domain.catalog.GameCatalogEntry;
 import be.kdg.team22.storeservice.domain.catalog.GameCategory;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -14,7 +15,7 @@ public class GameCatalogEntryEntity {
     private UUID id;
 
     @Column(nullable = false)
-    private double price;
+    private BigDecimal price;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -27,7 +28,7 @@ public class GameCatalogEntryEntity {
     }
 
     public GameCatalogEntryEntity(UUID id,
-                                  double price,
+                                  BigDecimal price,
                                   GameCategory category,
                                   double popularityScore) {
         this.id = id;
@@ -55,7 +56,7 @@ public class GameCatalogEntryEntity {
     }
 
     public UUID getId() { return id; }
-    public double getPrice() { return price; }
+    public BigDecimal getPrice() { return price; }
     public GameCategory getCategory() { return category; }
     public double getPopularityScore() { return popularityScore; }
 }

@@ -4,6 +4,7 @@ import be.kdg.team22.storeservice.domain.catalog.GameCatalogEntry;
 import be.kdg.team22.storeservice.domain.catalog.GameCategory;
 import be.kdg.team22.storeservice.infrastructure.games.GameMetadataResponse;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public record GameCatalogResponse(
@@ -13,7 +14,7 @@ public record GameCatalogResponse(
         String image,
         String frontendUrl,
         String startEndpoint,
-        double price,               // store price
+        BigDecimal price,
         GameCategory category,
         double popularity
 ) {

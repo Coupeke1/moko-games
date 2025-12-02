@@ -11,6 +11,7 @@ import be.kdg.team22.storeservice.domain.catalog.GameCategory;
 import be.kdg.team22.storeservice.domain.catalog.GameWithMetadata;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -29,8 +30,8 @@ public class GameCatalogController {
     @GetMapping
     public PagedResponse<GameCatalogResponse> list(
             @RequestParam(required = false) GameCategory category,
-            @RequestParam(required = false) Double minPrice,
-            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(required = false) String sort,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
