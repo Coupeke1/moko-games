@@ -289,7 +289,7 @@ services:
       - moko_rabbitmq_all:/var/lib/rabbitmq/
       - moko_rabbitmq_all:/var/log/rabbitmq/
 
-  app_redis:
+  app-redis:
     image: redis:8.4.0-alpine
     command:
       - redis-server
