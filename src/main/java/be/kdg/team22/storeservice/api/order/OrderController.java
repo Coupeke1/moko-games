@@ -31,9 +31,11 @@ public class OrderController {
         return ResponseEntity.ok(OrderResponseModel.from(order));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<OrderResponseModel> getOrder(@PathVariable final UUID id) {
-        final Order order = service.getOrder(new OrderId(id));
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderResponseModel> getOrder(
+            @PathVariable final UUID orderId
+    ) {
+        final Order order = service.getOrder(new OrderId(orderId));
         return ResponseEntity.ok(OrderResponseModel.from(order));
     }
 }

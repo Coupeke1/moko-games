@@ -14,10 +14,7 @@ public class OrderItemEntity {
     @GeneratedValue
     private Long id;
 
-    @Column(nullable = false)
     private UUID gameId;
-
-    @Column(nullable = false)
     private BigDecimal price;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -36,10 +33,7 @@ public class OrderItemEntity {
     }
 
     OrderItem toDomain() {
-        return new OrderItem(
-                this.gameId,
-                this.price
-        );
+        return new OrderItem(gameId, price);
     }
 
     public void setOrder(final OrderEntity order) {

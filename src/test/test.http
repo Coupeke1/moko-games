@@ -183,5 +183,15 @@ Authorization: Bearer {{owner_token}}
 DELETE http://localhost:8085/api/cart
 Authorization: Bearer {{owner_token}}
 
+###B1) Create an order from the user's cart
+
+POST http://localhost:8085/api/orders
+Authorization: Bearer {{owner_token}}
+
+### B2) Get order details by ID
+
+GET http://localhost:8085/api/orders/62c69f5d-cfa2-4d32-8c58-f185fee449fe
+Authorization: Bearer {{owner_token}}
+
 ### Health check
 GET http://localhost:8085/actuator/health
