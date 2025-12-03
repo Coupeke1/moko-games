@@ -183,7 +183,7 @@ services:
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
 
       CORS_ALLOWED_ORIGINS: http://localhost
-      USER_SERVICE_URL: http://service-user:8080/api/profiles
+      USER_SERVICE_URL: http://service-user:8080
     expose:
       - "8083"
     healthcheck:
@@ -278,7 +278,7 @@ services:
 
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
 
-      AI_URL: https://team3.techtitans.be/ai-player
+      AI_URL: https://team3.techtitans.be
 
       CORS_ALLOWED_ORIGINS: http://localhost
     expose:
@@ -313,7 +313,7 @@ services:
 
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
 
-      AI_URL: https://team3.techtitans.be/ai-player
+      AI_URL: https://team3.techtitans.be
 
       CORS_ALLOWED_ORIGINS: http://localhost
     expose:
