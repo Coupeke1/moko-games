@@ -142,3 +142,6 @@ Authorization: Bearer {{owner_token}}
 ### 27) GET Lobby after START
 GET http://localhost:8081/api/lobbies/{{lobby_id}}
 Authorization: Bearer {{owner_token}}
+
+### Health check
+GET http://localhost:8081/actuator/health
