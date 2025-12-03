@@ -48,7 +48,7 @@ public class Board {
         placePlayerPieces(PlayerRole.BLACK, size + 1 - rowsPerPlayer, size);
     }
 
-    public void move(final Move move, final PlayerRole currentRole) {
+    public void move(final Move move) {
         Piece piece = grid.get(move.fromCell());
 
         grid.put(move.fromCell(), null);
@@ -136,5 +136,9 @@ public class Board {
 
     public int size() {
         return size;
+    }
+
+    public Map<Integer, Piece> grid() {
+        return grid;
     }
 }
