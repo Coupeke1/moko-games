@@ -21,7 +21,7 @@ public class Board {
         this.grid = new HashMap<>();
     }
 
-    public Board(int size, Map<Integer, Piece> grid) {
+    public Board(final int size, final Map<Integer, Piece> grid) {
         this.size = size;
         this.grid = grid;
     }
