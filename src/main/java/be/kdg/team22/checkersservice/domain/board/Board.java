@@ -1,12 +1,15 @@
-package be.kdg.team22.checkersservice.domain.game;
+package be.kdg.team22.checkersservice.domain.board;
 
 import be.kdg.team22.checkersservice.domain.game.exceptions.BoardSizeException;
 import be.kdg.team22.checkersservice.domain.game.exceptions.OutsidePlayingFieldException;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
+import org.jmolecules.ddd.annotation.ValueObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
+@ValueObject
 public class Board {
     private final int size;
     private final Map<Integer, Piece> grid;
@@ -79,11 +82,41 @@ public class Board {
         return state;
     }
 
-    private int convertCoordinatesToCellNumber(int row, int col) {
+    public int convertCoordinatesToCellNumber(int row, int col) {
         if ((row + col) % 2 == 0) {
             throw new OutsidePlayingFieldException();
         }
 
         return (row * (size / 2)) + (col / 2) + 1;
+    }
+
+    public int[] convertCellNumberToCoordinates(int cellNumber) {
+        if (cellNumber < 1 || cellNumber > (size * size) / 2) {
+            throw new OutsidePlayingFieldException();
+        }
+
+        int cellsPerRow = size / 2;
+        int row = (cellNumber - 1) / cellsPerRow;
+        int colInRow = (cellNumber - 1) % cellsPerRow;
+
+        int col;
+        if (row % 2 == 0) {
+            col = 2 * colInRow + 1;
+        } else {
+            col = 2 * colInRow;
+        }
+
+        return new int[]{row, col};
+    }
+
+    public Optional<Piece> pieceAt(int cellNumber) {
+        if (cellNumber < 1 || cellNumber > (size * size) / 2) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(grid.get(cellNumber));
+    }
+
+    public int size() {
+        return size;
     }
 }

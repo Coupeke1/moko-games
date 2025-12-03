@@ -1,5 +1,6 @@
 package be.kdg.team22.checkersservice.api;
 
+import be.kdg.team22.checkersservice.domain.board.exceptions.InvalidMoveException;
 import be.kdg.team22.checkersservice.domain.game.exceptions.*;
 import be.kdg.team22.checkersservice.domain.player.exceptions.InvalidPlayerException;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ public class ExceptionController {
             PlayerCountException.class,
             UniquePlayersException.class,
             InvalidPlayerException.class,
+            InvalidMoveException.class
     })
     public ResponseEntity<String> handleDomainErrors(final RuntimeException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
