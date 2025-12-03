@@ -11,6 +11,7 @@ import be.kdg.team22.storeservice.application.catalog.services.StoreService;
 import be.kdg.team22.storeservice.domain.catalog.GameCatalogEntry;
 import be.kdg.team22.storeservice.domain.catalog.GameCategory;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,7 @@ import java.util.UUID;
 @Validated
 @RequestMapping("/api/store/games")
 public class GameCatalogController {
+
     private final StoreService storeService;
     private final GameQueryService queryService;
 
@@ -33,13 +35,13 @@ public class GameCatalogController {
     }
 
     @GetMapping
-    public PagedResponse<GameCatalogResponse> list(
-            @RequestParam(required = false) GameCategory category,
-            @RequestParam(required = false) BigDecimal minPrice,
-            @RequestParam(required = false) BigDecimal maxPrice,
-            @RequestParam(required = false) String sort,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+    public ResponseEntity<PagedResponse<GameCatalogResponse>> list(
+            @RequestParam(required = false) final GameCategory category,
+            @RequestParam(required = false) final BigDecimal minPrice,
+            @RequestParam(required = false) final BigDecimal maxPrice,
+            @RequestParam(required = false) final String sort,
+            @RequestParam(defaultValue = "0") final int page,
+            @RequestParam(defaultValue = "10") final int size
     ) {
         FilterQuery filter = new FilterQuery();
         filter.category = Optional.ofNullable(category);
@@ -48,7 +50,6 @@ public class GameCatalogController {
         filter.sortBy = Optional.ofNullable(sort);
 
         Pagination pagination = new Pagination(page, size);
-
         List<GameCatalogResponse> games = queryService.listGamesWithMetadata(filter, pagination);
 
         if ("alphabetic".equals(sort)) {
@@ -58,39 +59,40 @@ public class GameCatalogController {
         }
 
         boolean last = games.size() < size;
-        return new PagedResponse<>(games, page, size, last);
+        return ResponseEntity.ok(new PagedResponse<>(games, page, size, last));
     }
 
     @GetMapping("/{id}")
-    public GameCatalogResponse get(@PathVariable UUID id) {
-        return queryService.getGameWithMetadata(id);
+    public ResponseEntity<GameCatalogResponse> get(@PathVariable final UUID id) {
+        return ResponseEntity.ok(queryService.getGameWithMetadata(id));
     }
 
     @PostMapping
-    public GameCatalogResponse create(@Valid @RequestBody GameCatalogRequestModel request) {
+    public ResponseEntity<GameCatalogResponse> create(@Valid @RequestBody final GameCatalogRequestModel request) {
         GameCatalogEntry entry = storeService.create(
                 request.id(),
                 request.price(),
                 request.category()
         );
-        return queryService.getGameWithMetadata(entry.getId());
+        return ResponseEntity.ok(queryService.getGameWithMetadata(entry.getId()));
     }
 
     @PutMapping("/{id}")
-    public GameCatalogResponse update(
-            @PathVariable UUID id,
-            @Valid @RequestBody UpdateGameCatalogModel request
+    public ResponseEntity<GameCatalogResponse> update(
+            @PathVariable final UUID id,
+            @Valid @RequestBody final UpdateGameCatalogModel request
     ) {
         GameCatalogEntry entry = storeService.update(
                 id,
                 request.price(),
                 request.category()
         );
-        return queryService.getGameWithMetadata(entry.getId());
+        return ResponseEntity.ok(queryService.getGameWithMetadata(entry.getId()));
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable UUID id) {
+    public ResponseEntity<Void> delete(@PathVariable final UUID id) {
         storeService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -37,13 +37,6 @@ GET http://localhost:8085/api/store/games/{{catalog_game_id}}
 Authorization: Bearer {{owner_token}}
 
 
-
-### 3b) Record a purchase for this game (nieuw endpoint)
-POST http://localhost:8085/api/store/games/{{catalog_game_id}}/purchase
-Authorization: Bearer {{owner_token}}
-
-
-
 ### 3c) GET store entry again to see updated popularity
 GET http://localhost:8085/api/store/games/{{catalog_game_id}}
 Authorization: Bearer {{owner_token}}
@@ -62,7 +55,7 @@ Authorization: Bearer {{owner_token}}
 
 
 
-### 6) UPDATE store entry - alleen price en category (geen popularity meer)
+### 6) UPDATE store entry - alleen price en category
 PUT http://localhost:8085/api/store/games/{{catalog_game_id}}
 Authorization: Bearer {{owner_token}}
 Content-Type: application/json
@@ -74,22 +67,6 @@ Content-Type: application/json
 
 ### 7) GET updated store entry
 GET http://localhost:8085/api/store/games/{{catalog_game_id}}
-Authorization: Bearer {{owner_token}}
-
-
-
-### 8) Record multiple purchases to test popularity calculation
-POST http://localhost:8085/api/store/games/{{catalog_game_id}}/purchase
-Authorization: Bearer {{owner_token}}
-
-###
-
-POST http://localhost:8085/api/store/games/{{catalog_game_id}}/purchase
-Authorization: Bearer {{owner_token}}
-
-###
-
-POST http://localhost:8085/api/store/games/{{catalog_game_id}}/purchase
 Authorization: Bearer {{owner_token}}
 
 
@@ -174,6 +151,36 @@ Authorization: Bearer {{owner_token}}
 
 ### 19) Clean up - delete second test game
 DELETE http://localhost:8085/api/store/games/{{catalog_game_id_2}}
+Authorization: Bearer {{owner_token}}
+
+
+### A1) GET or CREATE cart
+GET http://localhost:8085/api/cart
+Authorization: Bearer {{owner_token}}
+
+> {%
+    client.global.set("cart_id", response.body.id);
+%}
+
+
+
+### A2) Add item to cart
+POST http://localhost:8085/api/cart/items
+Authorization: Bearer {{owner_token}}
+Content-Type: application/json
+
+{
+  "gameId": "00000000-0000-0000-0000-000000000001"
+}
+
+### A4) Remove item from cart
+DELETE http://localhost:8085/api/cart/items/00000000-0000-0000-0000-000000000001
+Authorization: Bearer {{owner_token}}
+
+
+
+### A5) Clear entire cart
+DELETE http://localhost:8085/api/cart
 Authorization: Bearer {{owner_token}}
 
 ### Health check

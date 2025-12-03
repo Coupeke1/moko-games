@@ -20,21 +20,21 @@ public class StoreService {
     private final GameCatalogRepository repo;
     private final ExternalGamesRepository games;
 
-    public StoreService(GameCatalogRepository repo, ExternalGamesRepository games) {
+    public StoreService(final GameCatalogRepository repo, final ExternalGamesRepository games) {
         this.repo = repo;
         this.games = games;
     }
 
-    public GameCatalogEntry get(UUID id) {
+    public GameCatalogEntry get(final UUID id) {
         return repo.findById(id)
                 .orElseThrow(() -> new GameNotFoundException(id));
     }
 
-    public List<GameCatalogEntry> list(FilterQuery filter, Pagination pagination) {
+    public List<GameCatalogEntry> list(final FilterQuery filter, final Pagination pagination) {
         return repo.findAll(filter, pagination);
     }
 
-    public GameCatalogEntry create(UUID id, BigDecimal price, GameCategory category) {
+    public GameCatalogEntry create(final UUID id, final BigDecimal price, final GameCategory category) {
         games.fetchMetadata(id);
 
         GameCatalogEntry entry = new GameCatalogEntry(id, price, category);
@@ -43,7 +43,7 @@ public class StoreService {
         return entry;
     }
 
-    public GameCatalogEntry update(UUID id, BigDecimal price, GameCategory category) {
+    public GameCatalogEntry update(final UUID id, final BigDecimal price, final GameCategory category) {
         GameCatalogEntry existing = repo.findById(id)
                 .orElseThrow(() -> new GameNotFoundException(id));
 
@@ -53,7 +53,7 @@ public class StoreService {
         return existing;
     }
 
-    public void recordPurchase(UUID gameId) {
+    public void recordPurchase(final UUID gameId) {
         GameCatalogEntry entry = repo.findById(gameId)
                 .orElseThrow(() -> new GameNotFoundException(gameId));
 
@@ -62,7 +62,7 @@ public class StoreService {
         repo.save(entry);
     }
 
-    public void delete(UUID id) {
+    public void delete(final UUID id) {
         repo.delete(id);
     }
 }

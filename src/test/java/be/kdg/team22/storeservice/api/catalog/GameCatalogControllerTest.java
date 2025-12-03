@@ -206,7 +206,7 @@ class GameCatalogControllerTest {
         doNothing().when(storeService).delete(GAME_ID);
 
         mockMvc.perform(delete("/api/store/games/{id}", GAME_ID))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         verify(storeService).delete(GAME_ID);
     }
