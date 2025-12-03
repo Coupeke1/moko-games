@@ -1,0 +1,19 @@
+﻿server.port: 8087
+
+spring:
+  application:
+    name: checkers-service
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always
+      status:
+        http-mapping:
+          WARNING: 200
+          DOWN: 503
+          OUT_OF_SERVICE: 503

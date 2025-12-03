@@ -26,3 +26,6 @@ Content-Type: application/json
   "fromCell": 14,
   "toCell": 21
 }
+
+### Health Check
+GET http://localhost:8087/actuator/health
