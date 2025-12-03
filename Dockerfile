@@ -26,7 +26,7 @@ ARG CI_COMMIT_REF_NAME
 ARG CI_COMMIT_TAG
 ARG CI_PIPELINE_ID
 
-LABEL org.opencontainers.image.title="Moko: Ceckers Service" \
+LABEL org.opencontainers.image.title="Moko: Checkers Service" \
       org.opencontainers.image.description="Service that manages the backend of a checkers game on the Moko platform." \
       org.opencontainers.image.version="${CI_COMMIT_TAG:-latest}" \
       org.opencontainers.image.url="https://gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/checkers-service" \
