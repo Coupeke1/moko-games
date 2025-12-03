@@ -3,6 +3,7 @@ package be.kdg.team22.userservice.health;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -18,7 +19,7 @@ public class GameServiceHealthIndicator implements HealthIndicator {
         String url = this.gameServiceUrl + "/actuator/health";
 
         try {
-            var response = restTemplate.getForEntity(url, String.class);
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
 
             if (response.getStatusCode().is2xxSuccessful()) {
                 return Health.up().withDetail("game-service", "reachable").build();
