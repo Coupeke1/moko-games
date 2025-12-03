@@ -45,6 +45,11 @@ management:
   endpoint:
     health:
       show-details: always
+      status:
+        http-mapping:
+          WARNING: 200
+          DOWN: 503
+          OUT_OF_SERVICE: 503
 
 business:
   game-service:

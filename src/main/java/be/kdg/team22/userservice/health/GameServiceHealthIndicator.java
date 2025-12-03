@@ -23,13 +23,14 @@ public class GameServiceHealthIndicator implements HealthIndicator {
             if (response.getStatusCode().is2xxSuccessful()) {
                 return Health.up().withDetail("game-service", "reachable").build();
             } else {
-                return Health.down()
+                return Health.status("WARNING")
                         .withDetail("game-service", "unexpected status: " + response.getStatusCode())
                         .build();
             }
         } catch (RestClientException e) {
-            return Health.down(e)
+            return Health.status("WARNING")
                     .withDetail("game-service", "unreachable")
+                    .withDetail("error", e.getMessage())
                     .build();
         }
     }
