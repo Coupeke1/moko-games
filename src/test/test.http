@@ -37,13 +37,6 @@ GET http://localhost:8085/api/store/games/{{catalog_game_id}}
 Authorization: Bearer {{owner_token}}
 
 
-
-### 3b) Record a purchase for this game (nieuw endpoint)
-POST http://localhost:8085/api/store/games/{{catalog_game_id}}/purchase
-Authorization: Bearer {{owner_token}}
-
-
-
 ### 3c) GET store entry again to see updated popularity
 GET http://localhost:8085/api/store/games/{{catalog_game_id}}
 Authorization: Bearer {{owner_token}}
@@ -62,7 +55,7 @@ Authorization: Bearer {{owner_token}}
 
 
 
-### 6) UPDATE store entry - alleen price en category (geen popularity meer)
+### 6) UPDATE store entry - alleen price en category
 PUT http://localhost:8085/api/store/games/{{catalog_game_id}}
 Authorization: Bearer {{owner_token}}
 Content-Type: application/json
@@ -74,22 +67,6 @@ Content-Type: application/json
 
 ### 7) GET updated store entry
 GET http://localhost:8085/api/store/games/{{catalog_game_id}}
-Authorization: Bearer {{owner_token}}
-
-
-
-### 8) Record multiple purchases to test popularity calculation
-POST http://localhost:8085/api/store/games/{{catalog_game_id}}/purchase
-Authorization: Bearer {{owner_token}}
-
-###
-
-POST http://localhost:8085/api/store/games/{{catalog_game_id}}/purchase
-Authorization: Bearer {{owner_token}}
-
-###
-
-POST http://localhost:8085/api/store/games/{{catalog_game_id}}/purchase
 Authorization: Bearer {{owner_token}}
 
 

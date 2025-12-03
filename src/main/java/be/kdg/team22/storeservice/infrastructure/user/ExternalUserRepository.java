@@ -25,7 +25,7 @@ public class ExternalUserRepository {
                     .uri("/me")
                     .header("Authorization", "Bearer " + jwtToken)
                     .retrieve()
-                    .body(new ParameterizedTypeReference<List<LibraryGameResponse>>() {
+                    .body(new ParameterizedTypeReference<>() {
                     });
 
             if (library == null) return false;
@@ -33,7 +33,7 @@ public class ExternalUserRepository {
             return library.stream().anyMatch(game -> game.id().equals(gameId));
 
         } catch (RestClientException e) {
-            throw ServiceUnavailableException.GameServiceUnavailable();
+            throw ServiceUnavailableException.UserServiceUnavailable();
         }
     }
 }

@@ -17,11 +17,13 @@ public class ExceptionController {
             GameNotFoundException.class
     })
     public ResponseEntity<String> handleNotFound(RuntimeException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     @ExceptionHandler({
             GameAlreadyInCartException.class,
+            GameAlreadyOwnedException.class,
+            InvalidMetadataException.class,
             GameIdCannotBeNullException.class,
             CartEmptyException.class,
             CartIdCannotBeNullException.class,
@@ -29,24 +31,23 @@ public class ExceptionController {
             IllegalArgumentException.class
     })
     public ResponseEntity<String> handleBadRequest(RuntimeException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
     @ExceptionHandler(ServiceUnavailableException.class)
     public ResponseEntity<String> handleServiceUnavailable(ServiceUnavailableException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleUnknown(Exception ex) {
-        return new ResponseEntity<>(
-                "Internal server error: " + ex.getMessage(),
-                HttpStatus.INTERNAL_SERVER_ERROR
-        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleValidation(MethodArgumentNotValidException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleUnknown(Exception ex) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Internal server error: " + ex.getMessage());
     }
 }

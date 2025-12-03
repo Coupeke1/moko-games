@@ -90,7 +90,7 @@ class CartControllerTest {
                         .content(body))
                 .andExpect(status().isOk());
 
-        verify(cartService).addItem(UserId.from(USER_ID), GAME_ID, "");
+        verify(cartService).addItem(UserId.from(USER_ID), GAME_ID, "token");
     }
 
     @Test
