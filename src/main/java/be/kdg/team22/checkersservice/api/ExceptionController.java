@@ -13,11 +13,14 @@ public class ExceptionController {
     @ExceptionHandler({
             BoardSizeException.class,
             GameIdException.class,
+            GameNotRunningException.class,
+            InvalidMoveException.class,
+            InvalidPlayerException.class,
+            NotPlayersTurnException.class,
             OutsidePlayingFieldException.class,
             PlayerCountException.class,
+            RoleUnfulfilledException.class,
             UniquePlayersException.class,
-            InvalidPlayerException.class,
-            InvalidMoveException.class
     })
     public ResponseEntity<String> handleDomainErrors(final RuntimeException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);

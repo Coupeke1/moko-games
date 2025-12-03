@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static be.kdg.team22.checkersservice.domain.board.MoveValidator.isCaptureMove;
+
 @ValueObject
 public class Board {
     private final int size;
@@ -44,6 +46,22 @@ public class Board {
 
         placePlayerPieces(PlayerRole.WHITE, 1, rowsPerPlayer);
         placePlayerPieces(PlayerRole.BLACK, size + 1 - rowsPerPlayer, size);
+    }
+
+    public void move(final Move move, final PlayerRole currentRole) {
+        Piece piece = grid.get(move.fromCell());
+
+        grid.put(move.fromCell(), null);
+        grid.put(move.toCell(), piece);
+
+        if (isCaptureMove(this, move)) {
+            int[] fromCoords = convertCellNumberToCoordinates(move.fromCell());
+            int[] toCoords = convertCellNumberToCoordinates(move.toCell());
+            int middleRow = (fromCoords[0] + toCoords[0]) / 2;
+            int middleCol = (fromCoords[1] + toCoords[1]) / 2;
+            int middleCell = convertCoordinatesToCellNumber(middleRow, middleCol);
+            grid.put(middleCell, null);
+        }
     }
 
     private void placePlayerPieces(final PlayerRole player, final int startRow, final int endRow) {

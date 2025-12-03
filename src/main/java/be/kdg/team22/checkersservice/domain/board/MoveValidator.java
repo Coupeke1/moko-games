@@ -81,7 +81,7 @@ public class MoveValidator {
         }
     }
 
-    private static boolean isCaptureMove(final Board board, final Move move) {
+    public static boolean isCaptureMove(final Board board, final Move move) {
         int[] fromCoords = board.convertCellNumberToCoordinates(move.fromCell());
         int[] toCoords = board.convertCellNumberToCoordinates(move.toCell());
 

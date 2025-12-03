@@ -2,8 +2,8 @@ package be.kdg.team22.checkersservice.domain.game;
 
 import be.kdg.team22.checkersservice.domain.board.Board;
 import be.kdg.team22.checkersservice.domain.board.Move;
-import be.kdg.team22.checkersservice.domain.game.exceptions.PlayerCountException;
-import be.kdg.team22.checkersservice.domain.game.exceptions.UniquePlayersException;
+import be.kdg.team22.checkersservice.domain.board.MoveValidator;
+import be.kdg.team22.checkersservice.domain.game.exceptions.*;
 import be.kdg.team22.checkersservice.domain.player.Player;
 import be.kdg.team22.checkersservice.domain.player.PlayerId;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
@@ -50,7 +50,29 @@ public class Game {
     }
 
     public void requestMove(final Move move) {
+        if (status != GameStatus.RUNNING) {
+            throw new GameNotRunningException();
+        }
 
+        if (!currentPlayer().id().equals(move.playerId())) {
+            throw new NotPlayersTurnException(currentRole);
+        }
+
+        MoveValidator.validateNormalMove(board, currentRole, move);
+
+        board.move(move, currentRole);
+        nextPlayer();
+    }
+
+    public Player currentPlayer() {
+        return players.stream()
+                .filter(p -> p.role().equals(currentRole))
+                .findFirst()
+                .orElseThrow(() -> new RoleUnfulfilledException(currentRole));
+    }
+
+    private void nextPlayer() {
+        currentRole = (currentRole == PlayerRole.BLACK) ? PlayerRole.WHITE : PlayerRole.BLACK;
     }
 
     public GameId id() {
