@@ -205,3 +205,6 @@ Authorization: Bearer {{owner_token}}
 ### A5) Clear entire cart
 DELETE http://localhost:8085/api/cart
 Authorization: Bearer {{owner_token}}
+
+### Health check
+GET http://localhost:8085/actuator/health
