@@ -1,8 +1,8 @@
 import { client } from "@/lib/api-client";
 import type { Game } from "@/models/game/game";
-import {config} from "@/config.ts";
+import { environment } from "@/config.ts";
 
-const BASE_URL = config.gamesService;
+const BASE_URL = environment.gamesService;
 
 export async function findGame(id: string): Promise<Game> {
     try {

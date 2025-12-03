@@ -8,6 +8,7 @@ declare global {
             socialService?: string;
             libraryService?: string;
             sessionService?: string;
+            sessionSocket?: string;
             gamesService?: string;
         };
     }

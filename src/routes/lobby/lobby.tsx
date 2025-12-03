@@ -15,7 +15,7 @@ import PlayerCard from "@/routes/lobby/components/player-card";
 import InviteDialog from "@/routes/lobby/dialogs/invite-dialog/invite-dialog";
 import SettingsDialog from "@/routes/lobby/dialogs/settings-dialog/settings-dialog";
 import { useLobbyData } from "@/routes/lobby/hooks/use-lobby";
-import { closeLobby, startGame } from "@/services/lobby-service";
+import { closeLobby, startGame } from "@/services/lobby/lobby-service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";

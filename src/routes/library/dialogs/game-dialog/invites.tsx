@@ -10,7 +10,7 @@ import { useInvites } from "@/hooks/use-invite";
 import type { Game } from "@/models/library/game";
 import type { Lobby } from "@/models/lobby/lobby";
 import InviteCard from "@/routes/library/components/invite-card";
-import { acceptInvite } from "@/services/lobby-service";
+import { acceptInvite } from "@/services/lobby/lobby-service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface Props {

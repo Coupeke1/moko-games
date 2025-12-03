@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router";
 import { useProfile } from "@/hooks/use-profile";
 import { useLobby } from "@/hooks/use-lobby";
 import { useGame } from "@/hooks/use-game";
-import { isUserOwner } from "@/services/lobby-service";
+import { isUserOwner } from "@/services/lobby/lobby-service";
 
 export function useLobbyData() {
     const navigate = useNavigate();

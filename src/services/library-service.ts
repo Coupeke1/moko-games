@@ -1,8 +1,8 @@
-import { config } from "@/config";
+import { environment } from "@/config";
 import { client } from "@/lib/api-client";
 import type { Game } from "@/models/library/game";
 
-const BASE_URL = config.libraryService;
+const BASE_URL = environment.libraryService;
 
 export async function findGames(): Promise<Game[]> {
     try {

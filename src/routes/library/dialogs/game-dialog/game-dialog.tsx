@@ -8,7 +8,7 @@ import showToast from "@/components/toast";
 import type { Game } from "@/models/library/game";
 import { Information } from "@/routes/library/dialogs/game-dialog/information";
 import { Invites } from "@/routes/library/dialogs/game-dialog/invites";
-import { createLobby } from "@/services/lobby-service";
+import { createLobby } from "@/services/lobby/lobby-service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate } from "react-router";
