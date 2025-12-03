@@ -33,7 +33,7 @@ public class Game {
         this.status = GameStatus.RUNNING;
     }
 
-    public Game(GameId id, TreeSet<Player> players, PlayerRole aiPlayer, PlayerRole currentRole, Board board, GameStatus status) {
+    public Game(final GameId id, final TreeSet<Player> players, final PlayerRole aiPlayer, final PlayerRole currentRole, final Board board, final GameStatus status) {
         this.id = id;
         this.players = players;
         this.aiPlayer = aiPlayer;
