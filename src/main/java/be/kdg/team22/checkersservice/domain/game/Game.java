@@ -60,7 +60,7 @@ public class Game {
 
         MoveValidator.validateNormalMove(board, currentRole, move);
 
-        board.move(move, currentRole);
+        board.move(move);
         nextPlayer();
     }
 
