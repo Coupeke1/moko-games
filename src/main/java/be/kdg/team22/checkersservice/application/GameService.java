@@ -13,7 +13,7 @@ import java.util.List;
 public class GameService {
     private final GameRepository repository;
 
-    public GameService(GameRepository repository) {
+    public GameService(final GameRepository repository) {
         this.repository = repository;
     }
 
@@ -24,7 +24,7 @@ public class GameService {
         return game;
     }
 
-    public Game getById(GameId id) {
+    public Game getById(final GameId id) {
         return repository.findById(id).orElseThrow(id::notFound);
     }
 }

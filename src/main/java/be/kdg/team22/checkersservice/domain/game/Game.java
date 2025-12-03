@@ -1,6 +1,7 @@
 package be.kdg.team22.checkersservice.domain.game;
 
 import be.kdg.team22.checkersservice.domain.board.Board;
+import be.kdg.team22.checkersservice.domain.board.Move;
 import be.kdg.team22.checkersservice.domain.game.exceptions.PlayerCountException;
 import be.kdg.team22.checkersservice.domain.game.exceptions.UniquePlayersException;
 import be.kdg.team22.checkersservice.domain.player.Player;
@@ -32,9 +33,7 @@ public class Game {
         this.status = GameStatus.RUNNING;
     }
 
-    public static Game create(
-            final List<PlayerId> playerIds,
-            final boolean aiPlayer) {
+    public static Game create(final List<PlayerId> playerIds, final boolean aiPlayer) {
         if (playerIds.size() != 2) {
             throw new PlayerCountException();
         }
@@ -48,6 +47,10 @@ public class Game {
         players.add(new Player(playerIds.get(1), PlayerRole.WHITE, aiPlayer));
 
         return new Game(players, aiPlayer ? PlayerRole.WHITE : null);
+    }
+
+    public void requestMove(final Move move) {
+
     }
 
     public GameId id() {

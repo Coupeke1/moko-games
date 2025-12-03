@@ -46,7 +46,7 @@ public class Board {
         placePlayerPieces(PlayerRole.BLACK, size + 1 - rowsPerPlayer, size);
     }
 
-    private void placePlayerPieces(PlayerRole player, int startRow, int endRow) {
+    private void placePlayerPieces(final PlayerRole player, final int startRow, final int endRow) {
         for (int row = startRow; row <= endRow; row++) {
             for (int cell : getCellsInRow(row)) {
                 grid.put(cell, new Piece(player, false));
@@ -54,7 +54,7 @@ public class Board {
         }
     }
 
-    private int[] getCellsInRow(int row) {
+    private int[] getCellsInRow(final int row) {
         final int cellsPerRow = size / 2;
         int[] cells = new int[cellsPerRow];
 
@@ -82,7 +82,7 @@ public class Board {
         return state;
     }
 
-    public int convertCoordinatesToCellNumber(int row, int col) {
+    public int convertCoordinatesToCellNumber(final int row, final int col) {
         if ((row + col) % 2 == 0) {
             throw new OutsidePlayingFieldException();
         }
@@ -90,7 +90,7 @@ public class Board {
         return (row * (size / 2)) + (col / 2) + 1;
     }
 
-    public int[] convertCellNumberToCoordinates(int cellNumber) {
+    public int[] convertCellNumberToCoordinates(final int cellNumber) {
         if (cellNumber < 1 || cellNumber > (size * size) / 2) {
             throw new OutsidePlayingFieldException();
         }
@@ -109,7 +109,7 @@ public class Board {
         return new int[]{row, col};
     }
 
-    public Optional<Piece> pieceAt(int cellNumber) {
+    public Optional<Piece> pieceAt(final int cellNumber) {
         if (cellNumber < 1 || cellNumber > (size * size) / 2) {
             return Optional.empty();
         }

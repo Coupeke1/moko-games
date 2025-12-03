@@ -6,7 +6,7 @@ public class Piece {
     private final PlayerRole color;
     private boolean isKing;
 
-    public Piece(PlayerRole color, boolean isKing) {
+    public Piece(final PlayerRole color, final boolean isKing) {
         this.color = color;
         this.isKing = isKing;
     }

@@ -10,7 +10,7 @@ public class MoveValidator {
     private MoveValidator() {
     }
 
-    public static void validateNormalMove(Board board, PlayerRole currentRole, Move move) {
+    public static void validateNormalMove(final Board board, final PlayerRole currentRole, final Move move) {
         validateCellsWithinBoard(board, move);
         validateStartingPiece(board, currentRole, move);
         validateTargetCellEmpty(board, move);
@@ -24,15 +24,14 @@ public class MoveValidator {
         }
     }
 
-
-    private static void validateCellsWithinBoard(Board board, Move move) {
+    private static void validateCellsWithinBoard(final Board board, final Move move) {
         int maxCells = (board.size() * board.size()) / 2;
         if (move.fromCell() > maxCells || move.toCell() > maxCells) {
             throw new InvalidMoveException("Cell numbers must be between 1 and " + maxCells);
         }
     }
 
-    private static void validateStartingPiece(Board board, PlayerRole currentRole, Move move) {
+    private static void validateStartingPiece(final Board board, final PlayerRole currentRole, final Move move) {
         Optional<Piece> startingPiece = board.pieceAt(move.fromCell());
         if (startingPiece.isEmpty()) {
             throw new InvalidMoveException("No piece at starting cell " + move.fromCell());
@@ -48,14 +47,14 @@ public class MoveValidator {
         }
     }
 
-    private static void validateTargetCellEmpty(Board board, Move move) {
+    private static void validateTargetCellEmpty(final Board board, final Move move) {
         Optional<Piece> targetPiece = board.pieceAt(move.toCell());
         if (targetPiece.isPresent()) {
             throw new InvalidMoveException("Target cell " + move.toCell() + " is not empty");
         }
     }
 
-    private static void validateDiagonalMove(Board board, Move move) {
+    private static void validateDiagonalMove(final Board board, final Move move) {
         int[] fromCoords = board.convertCellNumberToCoordinates(move.fromCell());
         int[] toCoords = board.convertCellNumberToCoordinates(move.toCell());
 
@@ -67,7 +66,7 @@ public class MoveValidator {
         }
     }
 
-    private static void validateForwardMove(Board board, PlayerRole currentRole, Move move) {
+    private static void validateForwardMove(final Board board, final PlayerRole currentRole, final Move move) {
         int[] fromCoords = board.convertCellNumberToCoordinates(move.fromCell());
         int[] toCoords = board.convertCellNumberToCoordinates(move.toCell());
 
@@ -82,7 +81,7 @@ public class MoveValidator {
         }
     }
 
-    private static boolean isCaptureMove(Board board, Move move) {
+    private static boolean isCaptureMove(final Board board, final Move move) {
         int[] fromCoords = board.convertCellNumberToCoordinates(move.fromCell());
         int[] toCoords = board.convertCellNumberToCoordinates(move.toCell());
 
@@ -90,7 +89,7 @@ public class MoveValidator {
         return rowDiff == 2;
     }
 
-    private static void validateSingleStepMove(Board board, Move move) {
+    private static void validateSingleStepMove(final Board board, final Move move) {
         int[] fromCoords = board.convertCellNumberToCoordinates(move.fromCell());
         int[] toCoords = board.convertCellNumberToCoordinates(move.toCell());
 
@@ -100,7 +99,7 @@ public class MoveValidator {
         }
     }
 
-    private static void validateCapture(Board board, PlayerRole currentRole, Move move) {
+    private static void validateCapture(final Board board, final PlayerRole currentRole, final Move move) {
         int[] fromCoords = board.convertCellNumberToCoordinates(move.fromCell());
         int[] toCoords = board.convertCellNumberToCoordinates(move.toCell());
 

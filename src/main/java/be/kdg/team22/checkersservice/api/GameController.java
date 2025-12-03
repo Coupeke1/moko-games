@@ -18,7 +18,7 @@ import java.util.UUID;
 public class GameController {
     private final GameService service;
 
-    public GameController(GameService service) {
+    public GameController(final GameService service) {
         this.service = service;
     }
 
