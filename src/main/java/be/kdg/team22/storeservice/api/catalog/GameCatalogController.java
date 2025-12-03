@@ -11,6 +11,7 @@ import be.kdg.team22.storeservice.application.catalog.services.StoreService;
 import be.kdg.team22.storeservice.domain.catalog.GameCatalogEntry;
 import be.kdg.team22.storeservice.domain.catalog.GameCategory;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,7 @@ import java.util.UUID;
 @Validated
 @RequestMapping("/api/store/games")
 public class GameCatalogController {
+
     private final StoreService storeService;
     private final GameQueryService queryService;
 
@@ -33,7 +35,7 @@ public class GameCatalogController {
     }
 
     @GetMapping
-    public PagedResponse<GameCatalogResponse> list(
+    public ResponseEntity<PagedResponse<GameCatalogResponse>> list(
             @RequestParam(required = false) GameCategory category,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
@@ -48,7 +50,6 @@ public class GameCatalogController {
         filter.sortBy = Optional.ofNullable(sort);
 
         Pagination pagination = new Pagination(page, size);
-
         List<GameCatalogResponse> games = queryService.listGamesWithMetadata(filter, pagination);
 
         if ("alphabetic".equals(sort)) {
@@ -58,26 +59,26 @@ public class GameCatalogController {
         }
 
         boolean last = games.size() < size;
-        return new PagedResponse<>(games, page, size, last);
+        return ResponseEntity.ok(new PagedResponse<>(games, page, size, last));
     }
 
     @GetMapping("/{id}")
-    public GameCatalogResponse get(@PathVariable UUID id) {
-        return queryService.getGameWithMetadata(id);
+    public ResponseEntity<GameCatalogResponse> get(@PathVariable UUID id) {
+        return ResponseEntity.ok(queryService.getGameWithMetadata(id));
     }
 
     @PostMapping
-    public GameCatalogResponse create(@Valid @RequestBody GameCatalogRequestModel request) {
+    public ResponseEntity<GameCatalogResponse> create(@Valid @RequestBody GameCatalogRequestModel request) {
         GameCatalogEntry entry = storeService.create(
                 request.id(),
                 request.price(),
                 request.category()
         );
-        return queryService.getGameWithMetadata(entry.getId());
+        return ResponseEntity.ok(queryService.getGameWithMetadata(entry.getId()));
     }
 
     @PutMapping("/{id}")
-    public GameCatalogResponse update(
+    public ResponseEntity<GameCatalogResponse> update(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateGameCatalogModel request
     ) {
@@ -86,11 +87,12 @@ public class GameCatalogController {
                 request.price(),
                 request.category()
         );
-        return queryService.getGameWithMetadata(entry.getId());
+        return ResponseEntity.ok(queryService.getGameWithMetadata(entry.getId()));
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable UUID id) {
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
         storeService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

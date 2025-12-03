@@ -18,8 +18,14 @@ public class CartService {
     }
 
     public Cart get(UUID userId) {
-        return repo.findByUser(userId)
-                .orElseGet(() -> new Cart(userId));
+        return repo.findByUserId(userId)
+                .orElseGet(() -> create(userId));
+    }
+
+    private Cart create(UUID userId) {
+        Cart cart = new Cart(userId);
+        repo.save(cart);
+        return cart;
     }
 
     public void removeItem(UUID userId, UUID gameId) {

@@ -7,8 +7,7 @@ import java.util.UUID;
 
 @Repository
 public interface CartRepository {
-
-    Optional<Cart> findByUser(UUID userId);
+    Optional<Cart> findByUserId(UUID userId);
 
     void save(Cart cart);
 

@@ -9,6 +9,9 @@ public record CartItemResponse(
         int quantity
 ) {
     public static CartItemResponse from(CartItem item) {
-        return new CartItemResponse(item.gameId(), item.quantity());
+        return new CartItemResponse(
+                item.gameId(),
+                item.quantity()
+        );
     }
 }

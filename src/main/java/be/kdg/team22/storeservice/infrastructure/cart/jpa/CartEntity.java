@@ -39,9 +39,7 @@ public class CartEntity {
     public Cart toDomain() {
         Cart cart = new Cart(this.userId);
 
-        this.items.forEach(i ->
-                cart.addItem(i.getGameId(), i.getQuantity())
-        );
+        this.items.forEach(CartItemEntity::toDomain);
 
         return cart;
     }
