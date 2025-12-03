@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "carts")
@@ -46,7 +47,6 @@ public class CartEntity {
         return new Cart(
                 CartId.from(id),
                 userId,
-                items.stream().map(CartItemEntity::toDomain).toList()
-        );
+                items.stream().map(CartItemEntity::toDomain).collect(Collectors.toSet()));
     }
 }

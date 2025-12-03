@@ -193,22 +193,8 @@ Authorization: Bearer {{owner_token}}
 Content-Type: application/json
 
 {
-  "gameId": "00000000-0000-0000-0000-000000000001",
-  "quantity": 2
+  "gameId": "00000000-0000-0000-0000-000000000001"
 }
-
-
-
-### A3) Update item quantity
-PATCH http://localhost:8085/api/cart/items/00000000-0000-0000-0000-000000000001
-Authorization: Bearer {{owner_token}}
-Content-Type: application/json
-
-{
-  "quantity": 5
-}
-
-
 
 ### A4) Remove item from cart
 DELETE http://localhost:8085/api/cart/items/00000000-0000-0000-0000-000000000001

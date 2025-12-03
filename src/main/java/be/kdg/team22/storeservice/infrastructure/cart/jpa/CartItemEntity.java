@@ -13,9 +13,8 @@ public class CartItemEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(nullable = false)
     private UUID gameId;
-
-    private int quantity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private CartEntity cart;
@@ -23,17 +22,16 @@ public class CartItemEntity {
     protected CartItemEntity() {
     }
 
-    public CartItemEntity(UUID gameId, int quantity) {
+    public CartItemEntity(UUID gameId) {
         this.gameId = gameId;
-        this.quantity = quantity;
     }
 
     public static CartItemEntity fromDomain(CartItem item) {
-        return new CartItemEntity(item.gameId(), item.quantity());
+        return new CartItemEntity(item.gameId());
     }
 
     public CartItem toDomain() {
-        return new CartItem(gameId, quantity);
+        return new CartItem(gameId);
     }
 
     public void setCart(CartEntity cart) {

@@ -1,12 +1,11 @@
 package be.kdg.team22.storeservice.domain.cart;
 
 import be.kdg.team22.storeservice.domain.cart.exceptions.CartItemNotFoundException;
-import be.kdg.team22.storeservice.domain.cart.exceptions.CartItemQuantityException;
+import be.kdg.team22.storeservice.domain.cart.exceptions.GameAlreadyInCartException;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @AggregateRoot
@@ -14,52 +13,17 @@ public class Cart {
 
     private final CartId id;
     private final UUID userId;
+    private final Set<CartItem> items = new HashSet<>();
 
-    private final Map<UUID, CartItem> items = new HashMap<>();
-
-    public Cart(CartId id, UUID userId, List<CartItem> existing) {
+    public Cart(CartId id, UUID userId, Set<CartItem> items) {
         this.id = id;
         this.userId = userId;
-
-        for (CartItem i : existing) {
-            items.put(i.gameId(), i);
-        }
+        this.items.addAll(items);
     }
 
-    public Cart(UUID userId) {
-        this.id = CartId.create();
+    public Cart(CartId id, UUID userId) {
+        this.id = id;
         this.userId = userId;
-    }
-
-    public void addItem(UUID gameId, int quantity) {
-        if (quantity <= 0) throw new CartItemQuantityException(quantity);
-
-        items.merge(
-                gameId,
-                new CartItem(gameId, quantity),
-                (oldItem, newItem) -> oldItem.withAddedQuantity(quantity)
-        );
-    }
-
-    public void updateQuantity(UUID gameId, int quantity) {
-        if (quantity <= 0) throw new CartItemQuantityException(quantity);
-
-        CartItem existing = items.get(gameId);
-        if (existing == null)
-            throw new CartItemNotFoundException(gameId);
-
-        items.put(gameId, existing.withQuantity(quantity));
-    }
-
-    public void removeItem(UUID gameId) {
-        if (!items.containsKey(gameId))
-            throw new CartItemNotFoundException(gameId);
-
-        items.remove(gameId);
-    }
-
-    public void clear() {
-        items.clear();
     }
 
     public CartId id() {
@@ -70,13 +34,29 @@ public class Cart {
         return userId;
     }
 
-    public List<CartItem> items() {
-        return List.copyOf(items.values());
+    public Set<CartItem> items() {
+        return Set.copyOf(items);
     }
 
-    public int totalQuantity() {
-        return items.values().stream()
-                .mapToInt(CartItem::quantity)
-                .sum();
+    public void addItem(UUID gameId) {
+        CartItem item = new CartItem(gameId);
+
+        if (items.contains(item)) throw new GameAlreadyInCartException(gameId, userId);
+
+        items.add(item);
+    }
+
+    public void removeItem(UUID gameId) {
+        boolean removed = items.removeIf(i -> i.gameId().equals(gameId));
+
+        if (!removed) throw new CartItemNotFoundException(gameId, userId);
+    }
+
+    public void clear() {
+        items.clear();
+    }
+
+    public boolean isEmpty() {
+        return items.isEmpty();
     }
 }
