@@ -20,7 +20,7 @@ public class DbCartRepository implements CartRepository {
 
     @Override
     public Optional<Cart> findByUserId(UUID userId) {
-        return jpa.findById(userId)
+        return jpa.findByUserId(userId)
                 .map(CartEntity::toDomain);
     }
 

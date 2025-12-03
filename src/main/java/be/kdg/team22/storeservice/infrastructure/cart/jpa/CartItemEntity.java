@@ -17,6 +17,9 @@ public class CartItemEntity {
 
     private int quantity;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private CartEntity cart;
+
     protected CartItemEntity() {
     }
 
@@ -34,5 +37,6 @@ public class CartItemEntity {
     }
 
     public void setCart(CartEntity cart) {
+        this.cart = cart;
     }
 }

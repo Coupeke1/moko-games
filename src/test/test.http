@@ -175,3 +175,47 @@ Authorization: Bearer {{owner_token}}
 ### 19) Clean up - delete second test game
 DELETE http://localhost:8085/api/store/games/{{catalog_game_id_2}}
 Authorization: Bearer {{owner_token}}
+
+
+### A1) GET or CREATE cart
+GET http://localhost:8085/api/cart
+Authorization: Bearer {{owner_token}}
+
+> {%
+    client.global.set("cart_id", response.body.id);
+%}
+
+
+
+### A2) Add item to cart
+POST http://localhost:8085/api/cart/items
+Authorization: Bearer {{owner_token}}
+Content-Type: application/json
+
+{
+  "gameId": "00000000-0000-0000-0000-000000000001",
+  "quantity": 2
+}
+
+
+
+### A3) Update item quantity
+PATCH http://localhost:8085/api/cart/items/00000000-0000-0000-0000-000000000001
+Authorization: Bearer {{owner_token}}
+Content-Type: application/json
+
+{
+  "quantity": 5
+}
+
+
+
+### A4) Remove item from cart
+DELETE http://localhost:8085/api/cart/items/00000000-0000-0000-0000-000000000001
+Authorization: Bearer {{owner_token}}
+
+
+
+### A5) Clear entire cart
+DELETE http://localhost:8085/api/cart
+Authorization: Bearer {{owner_token}}
