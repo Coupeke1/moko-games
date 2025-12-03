@@ -1,6 +1,7 @@
 package be.kdg.team22.checkersservice.application;
 
 import be.kdg.team22.checkersservice.api.models.CreateGameModel;
+import be.kdg.team22.checkersservice.domain.board.Move;
 import be.kdg.team22.checkersservice.domain.game.Game;
 import be.kdg.team22.checkersservice.domain.game.GameId;
 import be.kdg.team22.checkersservice.domain.game.GameRepository;
@@ -26,5 +27,12 @@ public class GameService {
 
     public Game getById(final GameId id) {
         return repository.findById(id).orElseThrow(id::notFound);
+    }
+
+    public Game requestMove(GameId gameId, Move move) {
+        Game game = getById(gameId);
+        game.requestMove(move);
+        repository.save(game);
+        return game;
     }
 }

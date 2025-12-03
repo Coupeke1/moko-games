@@ -16,3 +16,13 @@ Content-Type: application/json
 ### Get Game
 GET localhost:8087/api/games/{{game_id}}
 Accept: application/json
+
+### Request Move
+POST localhost:8087/api/games/{{game_id}}/move
+Content-Type: application/json
+
+{
+  "playerId": "cf36d3e1-a1e0-4c18-89eb-95fa76fc81ee",
+  "fromCell": 14,
+  "toCell": 21
+}
