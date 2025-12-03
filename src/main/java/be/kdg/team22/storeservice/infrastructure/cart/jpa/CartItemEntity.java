@@ -37,4 +37,8 @@ public class CartItemEntity {
     public void setCart(CartEntity cart) {
         this.cart = cart;
     }
+
+    public CartEntity cart() {
+        return cart;
+    }
 }

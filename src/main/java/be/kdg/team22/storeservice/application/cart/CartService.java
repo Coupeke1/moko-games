@@ -3,6 +3,7 @@ package be.kdg.team22.storeservice.application.cart;
 import be.kdg.team22.storeservice.domain.cart.Cart;
 import be.kdg.team22.storeservice.domain.cart.CartId;
 import be.kdg.team22.storeservice.domain.cart.CartRepository;
+import be.kdg.team22.storeservice.domain.cart.UserId;
 import be.kdg.team22.storeservice.domain.cart.exceptions.CartEmptyException;
 import be.kdg.team22.storeservice.domain.cart.exceptions.CartNotFoundException;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ public class CartService {
         this.repo = repo;
     }
 
-    public Cart getOrCreate(CartId userId) {
+    public Cart getOrCreate(UserId userId) {
         return repo.findByUserId(userId.value())
                 .orElseGet(() -> {
                     Cart c = new Cart(CartId.create(), userId.value());
@@ -29,24 +30,24 @@ public class CartService {
                 });
     }
 
-    public Cart get(CartId userId) {
+    public Cart get(UserId userId) {
         return repo.findByUserId(userId.value())
                 .orElseThrow(() -> new CartNotFoundException(userId.value()));
     }
 
-    public void addItem(CartId userId, UUID gameId) {
+    public void addItem(UserId userId, UUID gameId) {
         Cart cart = getOrCreate(userId);
         cart.addItem(gameId);
         repo.save(cart);
     }
 
-    public void removeItem(CartId userId, UUID gameId) {
+    public void removeItem(UserId userId, UUID gameId) {
         Cart cart = get(userId);
         cart.removeItem(gameId);
         repo.save(cart);
     }
 
-    public void clearCart(CartId userId) {
+    public void clearCart(UserId userId) {
         Cart cart = get(userId);
 
         if (cart.isEmpty()) throw new CartEmptyException(userId.value());

@@ -5,7 +5,7 @@ import be.kdg.team22.storeservice.api.cart.models.AddCartItemRequestModel;
 import be.kdg.team22.storeservice.api.cart.models.CartResponseModel;
 import be.kdg.team22.storeservice.application.cart.CartService;
 import be.kdg.team22.storeservice.domain.cart.Cart;
-import be.kdg.team22.storeservice.domain.cart.CartId;
+import be.kdg.team22.storeservice.domain.cart.UserId;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,7 +28,7 @@ public class CartController {
 
     @GetMapping
     public ResponseEntity<CartResponseModel> getOrCreate(@AuthenticationPrincipal Jwt jwt) {
-        CartId userId = CartId.get(jwt);
+        UserId userId = UserId.get(jwt);
         Cart cart = service.getOrCreate(userId);
         return ResponseEntity.ok(CartResponseModel.from(cart));
     }
@@ -38,7 +38,7 @@ public class CartController {
             @AuthenticationPrincipal Jwt jwt,
             @Valid @RequestBody AddCartItemRequestModel request
     ) {
-        CartId userId = CartId.get(jwt);
+        UserId userId = UserId.get(jwt);
         service.addItem(userId, request.gameId());
         return ResponseEntity.ok().build();
     }
@@ -48,14 +48,14 @@ public class CartController {
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable UUID gameId
     ) {
-        CartId userId = CartId.get(jwt);
+        UserId userId = UserId.get(jwt);
         service.removeItem(userId, gameId);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping
     public ResponseEntity<Void> clear(@AuthenticationPrincipal Jwt jwt) {
-        CartId userId = CartId.get(jwt);
+        UserId userId = UserId.get(jwt);
         service.clearCart(userId);
         return ResponseEntity.noContent().build();
     }

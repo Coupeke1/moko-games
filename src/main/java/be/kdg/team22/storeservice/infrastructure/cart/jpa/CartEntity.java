@@ -49,4 +49,16 @@ public class CartEntity {
                 userId,
                 items.stream().map(CartItemEntity::toDomain).collect(Collectors.toSet()));
     }
+
+    public UUID id() {
+        return id;
+    }
+
+    public UUID userId() {
+        return userId;
+    }
+
+    public List<CartItemEntity> items() {
+        return items;
+    }
 }
