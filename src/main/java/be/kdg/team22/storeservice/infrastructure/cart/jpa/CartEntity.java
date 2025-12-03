@@ -1,58 +1,52 @@
 package be.kdg.team22.storeservice.infrastructure.cart.jpa;
 
 import be.kdg.team22.storeservice.domain.cart.Cart;
+import be.kdg.team22.storeservice.domain.cart.CartId;
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Entity
-@Table(name = "cart")
+@Table(name = "carts")
 public class CartEntity {
 
     @Id
+    private UUID id;
+
+    @Column(nullable = false)
     private UUID userId;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CartItemEntity> items = new ArrayList<>();
+    private List<CartItemEntity> items;
 
     protected CartEntity() {
     }
 
-    public CartEntity(UUID userId, List<CartItemEntity> items) {
+    public CartEntity(UUID id, UUID userId, List<CartItemEntity> items) {
+        this.id = id;
         this.userId = userId;
         this.items = items;
+        this.items.forEach(i -> i.setCart(this));
     }
 
-    public static CartEntity fromDomain(Cart domain) {
-        CartEntity entity = new CartEntity();
-        entity.userId = domain.userId();
+    public static CartEntity fromDomain(Cart cart) {
+        var itemEntities = cart.items().stream()
+                .map(CartItemEntity::fromDomain)
+                .toList();
 
-        entity.items = domain.items().stream()
-                .map(item -> CartItemEntity.fromDomain(item, entity))
-                .collect(Collectors.toList());
-        return entity;
+        return new CartEntity(
+                cart.id().value(),
+                cart.userId(),
+                itemEntities
+        );
     }
 
     public Cart toDomain() {
-        Cart cart = new Cart(this.userId);
-
-        this.items.forEach(CartItemEntity::toDomain);
-
-        return cart;
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public List<CartItemEntity> getItems() {
-        return items;
-    }
-
-    public void setItems(List<CartItemEntity> items) {
-        this.items = items;
+        return new Cart(
+                CartId.from(id),
+                userId,
+                items.stream().map(CartItemEntity::toDomain).toList()
+        );
     }
 }

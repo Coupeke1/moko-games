@@ -19,7 +19,7 @@ public class DbCartRepository implements CartRepository {
     }
 
     @Override
-    public Optional<Cart> findByUser(UUID userId) {
+    public Optional<Cart> findByUserId(UUID userId) {
         return jpa.findById(userId)
                 .map(CartEntity::toDomain);
     }
@@ -27,10 +27,5 @@ public class DbCartRepository implements CartRepository {
     @Override
     public void save(Cart cart) {
         jpa.save(CartEntity.fromDomain(cart));
-    }
-
-    @Override
-    public void delete(UUID userId) {
-        jpa.deleteById(userId);
     }
 }
