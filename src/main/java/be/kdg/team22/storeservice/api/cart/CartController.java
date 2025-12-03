@@ -39,7 +39,7 @@ public class CartController {
             @Valid @RequestBody final AddCartItemRequestModel request
     ) {
         UserId userId = UserId.get(jwt);
-        service.addItem(userId, request.gameId());
+        service.addItem(userId, request.gameId(), jwt.getTokenValue());
         return ResponseEntity.ok().build();
     }
 

@@ -1,7 +1,7 @@
 package be.kdg.team22.storeservice.infrastructure.games;
 
 import be.kdg.team22.storeservice.domain.catalog.exceptions.GameNotFoundException;
-import be.kdg.team22.storeservice.domain.catalog.exceptions.GameServiceUnavailableException;
+import be.kdg.team22.storeservice.domain.exceptions.ServiceUnavailableException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -37,7 +37,7 @@ public class ExternalGamesRepository {
                 throw new GameNotFoundException(gameId);
             throw e;
         } catch (RestClientException e) {
-            throw new GameServiceUnavailableException();
+            throw ServiceUnavailableException.GameServiceUnavailable();
         }
     }
 }

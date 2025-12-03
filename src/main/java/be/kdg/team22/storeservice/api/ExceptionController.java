@@ -2,7 +2,7 @@ package be.kdg.team22.storeservice.api;
 
 import be.kdg.team22.storeservice.domain.cart.exceptions.*;
 import be.kdg.team22.storeservice.domain.catalog.exceptions.GameNotFoundException;
-import be.kdg.team22.storeservice.domain.catalog.exceptions.GameServiceUnavailableException;
+import be.kdg.team22.storeservice.domain.exceptions.ServiceUnavailableException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -17,11 +17,13 @@ public class ExceptionController {
             GameNotFoundException.class
     })
     public ResponseEntity<String> handleNotFound(RuntimeException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     @ExceptionHandler({
             GameAlreadyInCartException.class,
+            GameAlreadyOwnedException.class,
+            InvalidMetadataException.class,
             GameIdCannotBeNullException.class,
             CartEmptyException.class,
             CartIdCannotBeNullException.class,
@@ -29,24 +31,23 @@ public class ExceptionController {
             IllegalArgumentException.class
     })
     public ResponseEntity<String> handleBadRequest(RuntimeException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
-    @ExceptionHandler(GameServiceUnavailableException.class)
-    public ResponseEntity<String> handleServiceUnavailable(GameServiceUnavailableException ex) {
+    @ExceptionHandler(ServiceUnavailableException.class)
+    public ResponseEntity<String> handleServiceUnavailable(ServiceUnavailableException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleUnknown(Exception ex) {
-        return new ResponseEntity<>(
-                "Internal server error: " + ex.getMessage(),
-                HttpStatus.INTERNAL_SERVER_ERROR
-        );
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleValidation(MethodArgumentNotValidException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleUnknown(Exception ex) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Internal server error: " + ex.getMessage());
     }
 }
