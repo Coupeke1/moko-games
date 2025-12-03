@@ -8,9 +8,4 @@ import java.util.UUID;
 public record CartItem(
         UUID gameId
 ) {
-
-
-    public CartItem withQuantity() {
-        return new CartItem(gameId);
-    }
 }
