@@ -1,4 +1,4 @@
-﻿package be.kdg.team22.checkersservice.infrastructure.game.redis;
+package be.kdg.team22.checkersservice.infrastructure.game.redis;
 
 import be.kdg.team22.checkersservice.domain.game.Game;
 import be.kdg.team22.checkersservice.domain.game.GameId;

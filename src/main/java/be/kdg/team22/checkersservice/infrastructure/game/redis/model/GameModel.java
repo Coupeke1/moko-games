@@ -11,13 +11,13 @@ import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 import java.util.*;
 
 public class GameModel {
-    private String id;
-    private List<PlayerModel> players;
-    private PlayerRole aiPlayer;
-    private PlayerRole currentRole;
-    private int size;
-    private Map<Integer, PieceModel> grid;
-    private GameStatus status;
+    public String id;
+    public List<PlayerModel> players;
+    public PlayerRole aiPlayer;
+    public PlayerRole currentRole;
+    public int size;
+    public Map<Integer, PieceModel> grid;
+    public GameStatus status;
 
     public static GameModel fromDomain(Game game) {
         GameModel gameModel = new GameModel();

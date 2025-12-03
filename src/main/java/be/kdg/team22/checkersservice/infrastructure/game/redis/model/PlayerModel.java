@@ -5,9 +5,9 @@ import be.kdg.team22.checkersservice.domain.player.PlayerId;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 
 public class PlayerModel {
-    private String id;
-    private PlayerRole role;
-    private boolean aiPlayer;
+    public String id;
+    public PlayerRole role;
+    public boolean aiPlayer;
 
     public static PlayerModel fromDomain(Player player) {
         PlayerModel playerModel = new PlayerModel();
