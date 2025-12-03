@@ -2,7 +2,7 @@ package be.kdg.team22.storeservice.api;
 
 import be.kdg.team22.storeservice.domain.cart.exceptions.CartNotFoundException;
 import be.kdg.team22.storeservice.domain.cart.exceptions.GameAlreadyInCartException;
-import be.kdg.team22.storeservice.domain.catalog.exceptions.GameServiceUnavailableException;
+import be.kdg.team22.storeservice.domain.exceptions.ServiceUnavailableException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,7 +10,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
@@ -79,17 +78,12 @@ class ExceptionControllerTest {
 
         @GetMapping("/unavailable")
         public void unavailable() {
-            throw new GameServiceUnavailableException();
+            throw ServiceUnavailableException.GameServiceUnavailable();
         }
 
         @GetMapping("/generic")
         public void generic() {
             throw new RuntimeException("boom");
-        }
-
-        @GetMapping("/invalid")
-        public void invalid(@RequestParam int value) {
-            // Spring throws MethodArgumentNotValidException automatically
         }
     }
 }

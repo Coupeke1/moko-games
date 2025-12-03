@@ -6,6 +6,9 @@ import be.kdg.team22.storeservice.domain.cart.CartRepository;
 import be.kdg.team22.storeservice.domain.cart.UserId;
 import be.kdg.team22.storeservice.domain.cart.exceptions.CartEmptyException;
 import be.kdg.team22.storeservice.domain.cart.exceptions.CartNotFoundException;
+import be.kdg.team22.storeservice.domain.cart.exceptions.GameAlreadyOwnedException;
+import be.kdg.team22.storeservice.infrastructure.games.ExternalGamesRepository;
+import be.kdg.team22.storeservice.infrastructure.user.ExternalUserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,9 +19,15 @@ import java.util.UUID;
 public class CartService {
 
     private final CartRepository repo;
+    private final ExternalGamesRepository gamesRepo;
+    private final ExternalUserRepository userRepo;
 
-    public CartService(final CartRepository repo) {
+    public CartService(final CartRepository repo,
+                       final ExternalGamesRepository gamesRepo,
+                       final ExternalUserRepository userRepo) {
         this.repo = repo;
+        this.gamesRepo = gamesRepo;
+        this.userRepo = userRepo;
     }
 
     public Cart getOrCreate(final UserId userId) {
@@ -30,13 +39,21 @@ public class CartService {
                 });
     }
 
-    public Cart get(UserId userId) {
+    public Cart get(final UserId userId) {
         return repo.findByUserId(userId.value())
                 .orElseThrow(() -> new CartNotFoundException(userId.value()));
     }
 
-    public void addItem(UserId userId, UUID gameId) {
-        Cart cart = getOrCreate(userId);
+    public void addItem(final UserId userId, final UUID gameId, final String jwt) {
+
+        gamesRepo.fetchMetadata(gameId);
+
+        boolean owns = userRepo.userOwnsGame(gameId, jwt);
+        if (owns) throw new GameAlreadyOwnedException(gameId, userId.value());
+
+        Cart cart = repo.findByUserId(userId.value())
+                .orElseGet(() -> repo.save(new Cart(new CartId(UUID.randomUUID()), userId.value())));
+
         cart.addItem(gameId);
         repo.save(cart);
     }

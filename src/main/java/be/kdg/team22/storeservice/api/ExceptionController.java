@@ -2,7 +2,7 @@ package be.kdg.team22.storeservice.api;
 
 import be.kdg.team22.storeservice.domain.cart.exceptions.*;
 import be.kdg.team22.storeservice.domain.catalog.exceptions.GameNotFoundException;
-import be.kdg.team22.storeservice.domain.catalog.exceptions.GameServiceUnavailableException;
+import be.kdg.team22.storeservice.domain.exceptions.ServiceUnavailableException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -32,8 +32,8 @@ public class ExceptionController {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(GameServiceUnavailableException.class)
-    public ResponseEntity<String> handleServiceUnavailable(GameServiceUnavailableException ex) {
+    @ExceptionHandler(ServiceUnavailableException.class)
+    public ResponseEntity<String> handleServiceUnavailable(ServiceUnavailableException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
     }
 

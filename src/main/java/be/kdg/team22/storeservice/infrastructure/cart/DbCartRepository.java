@@ -25,7 +25,8 @@ public class DbCartRepository implements CartRepository {
     }
 
     @Override
-    public void save(final Cart cart) {
+    public Cart save(final Cart cart) {
         jpa.save(CartEntity.fromDomain(cart));
+        return cart;
     }
 }

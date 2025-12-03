@@ -3,6 +3,8 @@ package be.kdg.team22.storeservice.application.cart;
 import be.kdg.team22.storeservice.domain.cart.*;
 import be.kdg.team22.storeservice.domain.cart.exceptions.CartEmptyException;
 import be.kdg.team22.storeservice.domain.cart.exceptions.CartNotFoundException;
+import be.kdg.team22.storeservice.infrastructure.games.ExternalGamesRepository;
+import be.kdg.team22.storeservice.infrastructure.user.ExternalUserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,11 +27,15 @@ class CartServiceSociableTest {
     private final UUID GAME_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
     @Mock
     CartRepository repo;
+    @Mock
+    ExternalGamesRepository gamesRepository;
+    @Mock
+    ExternalUserRepository userRepository;
     CartService service;
 
     @BeforeEach
     void setup() {
-        service = new CartService(repo);
+        service = new CartService(repo, gamesRepository, userRepository);
     }
 
     private Cart sampleCart() {
@@ -90,7 +96,7 @@ class CartServiceSociableTest {
         Cart cart = new Cart(CartId.create(), USER_ID);
         when(repo.findByUserId(USER_ID)).thenReturn(Optional.of(cart));
 
-        service.addItem(uid(), GAME_ID);
+        service.addItem(uid(), GAME_ID, "");
 
         assertThat(cart.items())
                 .extracting(CartItem::gameId)
@@ -103,7 +109,7 @@ class CartServiceSociableTest {
     void addItem_createsCartIfMissing() {
         when(repo.findByUserId(USER_ID)).thenReturn(Optional.empty());
 
-        service.addItem(uid(), GAME_ID);
+        service.addItem(uid(), GAME_ID, "");
 
         verify(repo, times(2)).save(any(Cart.class));
     }
