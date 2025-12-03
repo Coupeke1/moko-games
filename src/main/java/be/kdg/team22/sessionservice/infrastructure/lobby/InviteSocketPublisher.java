@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class InviteSocketPublisher {
     private final SimpMessagingTemplate template;
-    private final static String BASE_ROUTE = "/invites";
+    private final static String BASE_ROUTE = "/socket/invites";
 
     public InviteSocketPublisher(final SimpMessagingTemplate template) {
         this.template = template;
