@@ -8,7 +8,7 @@ import org.springframework.web.client.RestClient;
 @Configuration
 class ExternalImageRepositoryConfig {
     @Bean("catService")
-    RestClient productCatalogRestTemplate(@Value("${cat-service.url}") final String url) {
+    RestClient productCatalogRestTemplate(@Value("${business.cat-service.url}") final String url) {
         return RestClient.create(url);
     }
 }

@@ -91,3 +91,6 @@ Authorization: Bearer {{access_token}}
 ### unfavourite a game
 PATCH http://localhost:8080/api/library/00000000-0000-0000-0000-000000000002/unfavourite
 Authorization: Bearer {{access_token}}
+
+### Health check
+GET http://localhost:8080/actuator/health
