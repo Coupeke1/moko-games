@@ -33,6 +33,15 @@ public class Game {
         this.status = GameStatus.RUNNING;
     }
 
+    public Game(final GameId id, final TreeSet<Player> players, final PlayerRole aiPlayer, final PlayerRole currentRole, final Board board, final GameStatus status) {
+        this.id = id;
+        this.players = players;
+        this.aiPlayer = aiPlayer;
+        this.currentRole = currentRole;
+        this.board = board;
+        this.status = status;
+    }
+
     public static Game create(final List<PlayerId> playerIds, final boolean aiPlayer) {
         if (playerIds.size() != 2) {
             throw new PlayerCountException();
