@@ -16,3 +16,6 @@ Content-Type: application/json
 ### Get Game
 GET localhost:8087/api/games/{{game_id}}
 Accept: application/json
+
+### Health Check
+GET http://localhost:8087/actuator/health
