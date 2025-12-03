@@ -51,6 +51,18 @@ public class Board {
     public void move(final Move move) {
         Piece piece = grid.get(move.fromCell());
 
+        int row = convertCellNumberToCoordinates(move.toCell())[0];
+        boolean shouldPromote = false;
+        if (piece.color() == PlayerRole.WHITE && row == size - 1) {
+            shouldPromote = true;
+        } else if (piece.color() == PlayerRole.BLACK && row == 0) {
+            shouldPromote = true;
+        }
+
+        if (shouldPromote && !piece.isKing()) {
+            piece.promoteToKing();
+        }
+
         grid.put(move.fromCell(), null);
         grid.put(move.toCell(), piece);
 

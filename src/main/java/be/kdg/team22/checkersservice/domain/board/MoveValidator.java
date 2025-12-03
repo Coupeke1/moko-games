@@ -10,7 +10,16 @@ public class MoveValidator {
     private MoveValidator() {
     }
 
-    public static void validateNormalMove(final Board board, final PlayerRole currentRole, final Move move) {
+    public static void validateMove(final Board board, final PlayerRole currentRole, final Move move) {
+        Optional<Piece> movingPiece = board.pieceAt(move.fromCell());
+        if (movingPiece.isPresent() && movingPiece.get().isKing()) {
+            //validateKingMove(board, currentRole, move);
+        }  else {
+            validateNormalMove(board, currentRole, move);
+        }
+    }
+
+    private static void validateNormalMove(final Board board, final PlayerRole currentRole, final Move move) {
         validateCellsWithinBoard(board, move);
         validateStartingPiece(board, currentRole, move);
         validateTargetCellEmpty(board, move);
