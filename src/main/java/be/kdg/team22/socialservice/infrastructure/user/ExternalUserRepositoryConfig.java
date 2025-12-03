@@ -8,7 +8,9 @@ import org.springframework.web.client.RestClient;
 @Configuration
 class ExternalUserRepositoryConfig {
     @Bean("userService")
-    RestClient productCatalogRestTemplate(@Value("${user-service.url}") final String url) {
-        return RestClient.create(url);
+    RestClient productCatalogRestTemplate(@Value("${business.user-service.url}") final String baseUrl) {
+        return RestClient.builder()
+                .baseUrl(baseUrl + "/api/profiles")
+                .build();
     }
 }

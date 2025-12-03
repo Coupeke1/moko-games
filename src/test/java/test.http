@@ -134,3 +134,6 @@ Content-Type: application/json
 ### Mathias cancels his own request
 POST http://localhost:8083/api/friends/cancel/{{kaj_id}}
 Authorization: Bearer {{mathias_token}}
+
+### Health check
+GET http://localhost:8083/actuator/health
