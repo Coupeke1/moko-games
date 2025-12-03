@@ -21,6 +21,11 @@ public class Board {
         this.grid = new HashMap<>();
     }
 
+    public Board(int size, Map<Integer, Piece> grid) {
+        this.size = size;
+        this.grid = grid;
+    }
+
     public static Board create(final int size) {
         if (size != 8 && size != 10) {
             throw new BoardSizeException();

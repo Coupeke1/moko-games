@@ -2,7 +2,7 @@ package be.kdg.team22.checkersservice.infrastructure;
 
 import be.kdg.team22.checkersservice.domain.game.Game;
 import be.kdg.team22.checkersservice.domain.game.GameId;
-import be.kdg.team22.checkersservice.infrastructure.game.InMemoryGameRepository;
+import be.kdg.team22.checkersservice.infrastructure.game.memory.InMemoryGameRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
