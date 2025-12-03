@@ -1,5 +1,6 @@
 package be.kdg.team22.checkersservice.domain.game;
 
+import be.kdg.team22.checkersservice.domain.board.Board;
 import be.kdg.team22.checkersservice.domain.game.exceptions.BoardSizeException;
 import be.kdg.team22.checkersservice.domain.game.exceptions.OutsidePlayingFieldException;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
