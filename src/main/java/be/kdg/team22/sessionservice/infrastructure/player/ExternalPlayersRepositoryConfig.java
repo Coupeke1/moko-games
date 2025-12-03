@@ -10,7 +10,7 @@ import org.springframework.web.client.RestClient;
 class ExternalPlayersRepositoryConfig {
     @Bean
     @Qualifier("userService")
-    RestClient userServiceClient(@Value("${user-service.url}") final String baseUrl) {
+    RestClient userServiceClient(@Value("${business.user-service.url}") final String baseUrl) {
         return RestClient.builder()
                 .baseUrl(baseUrl + "/api/profiles")
                 .build();
