@@ -1,5 +1,8 @@
 package be.kdg.team22.checkersservice.domain.game;
 
+import be.kdg.team22.checkersservice.domain.board.Move;
+import be.kdg.team22.checkersservice.domain.game.exceptions.GameNotRunningException;
+import be.kdg.team22.checkersservice.domain.game.exceptions.NotPlayersTurnException;
 import be.kdg.team22.checkersservice.domain.game.exceptions.PlayerCountException;
 import be.kdg.team22.checkersservice.domain.game.exceptions.UniquePlayersException;
 import be.kdg.team22.checkersservice.domain.player.Player;
@@ -8,6 +11,7 @@ import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
@@ -146,5 +150,35 @@ public class GameTest {
         assertEquals(whiteUuid, whitePlayer.id().value());
         assertEquals(PlayerRole.BLACK, blackPlayer.role());
         assertEquals(PlayerRole.WHITE, whitePlayer.role());
+    }
+
+    @Test
+    void requestMoveShouldChangeCurrentRole() {
+        Move move = new Move(playerBlackId, 24, 20);
+
+        game.requestMove(move);
+
+        assertEquals(PlayerRole.WHITE, game.currentRole());
+    }
+
+    @Test
+    void requestMoveShouldThrowWhenNotPlayersTurn() {
+        Move move = new Move(playerWhiteId, 9, 13);
+
+        assertThrows(NotPlayersTurnException.class, () ->
+                game.requestMove(move)
+        );
+    }
+
+    @Test
+    void requestMoveShouldThrowWhenGameNotRunning() throws NoSuchFieldException, IllegalAccessException {
+        Field statusField = Game.class.getDeclaredField("status");
+        statusField.setAccessible(true);
+        statusField.set(game, GameStatus.BLACK_WIN);
+        Move move = new Move(playerBlackId, 24, 20);
+
+        assertThrows(GameNotRunningException.class, () ->
+                game.requestMove(move)
+        );
     }
 }

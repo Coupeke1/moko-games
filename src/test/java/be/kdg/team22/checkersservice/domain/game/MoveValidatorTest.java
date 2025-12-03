@@ -20,134 +20,159 @@ class MoveValidatorTest {
     }
 
     @Test
-    void validateNormalMoveShouldAllowValidForwardMoveForWhite() {
+    void validateMoveShouldAllowValidForwardMoveForWhite() {
         Move move = new Move(null, 9, 13);
 
         assertDoesNotThrow(() ->
-                MoveValidator.validateNormalMove(board, PlayerRole.WHITE, move)
+                MoveValidator.validateMove(board, PlayerRole.WHITE, move)
         );
     }
 
     @Test
-    void validateNormalMoveShouldAllowValidForwardMoveForBlack() {
+    void validateMoveShouldAllowValidForwardMoveForBlack() {
         Move move = new Move(null, 24, 20);
 
         assertDoesNotThrow(() ->
-                MoveValidator.validateNormalMove(board, PlayerRole.BLACK, move)
+                MoveValidator.validateMove(board, PlayerRole.BLACK, move)
         );
     }
 
     @Test
-    void validateNormalMoveShouldThrowWhenMovingEmptyCell() {
+    void validateMoveShouldThrowWhenMovingEmptyCell() {
         Move move = new Move(null, 16, 20);
 
         assertThrows(InvalidMoveException.class, () ->
-                MoveValidator.validateNormalMove(board, PlayerRole.WHITE, move)
+                MoveValidator.validateMove(board, PlayerRole.WHITE, move)
         );
     }
 
     @Test
-    void validateNormalMoveShouldThrowWhenMovingOpponentPiece() {
+    void validateMoveShouldThrowWhenMovingOpponentPiece() {
         Move move = new Move(null, 9, 13);
 
         assertThrows(InvalidMoveException.class, () ->
-                MoveValidator.validateNormalMove(board, PlayerRole.BLACK, move)
+                MoveValidator.validateMove(board, PlayerRole.BLACK, move)
         );
     }
 
     @Test
-    void validateNormalMoveShouldThrowWhenMovingBackwardsAsWhite() {
+    void validateMoveShouldThrowWhenMovingBackwardsAsWhite() {
         Move move = new Move(null, 13, 9);
 
         assertThrows(InvalidMoveException.class, () ->
-                MoveValidator.validateNormalMove(board, PlayerRole.WHITE, move)
+                MoveValidator.validateMove(board, PlayerRole.WHITE, move)
         );
     }
 
     @Test
-    void validateNormalMoveShouldThrowWhenMovingBackwardsAsBlack() {
+    void validateMoveShouldThrowWhenMovingBackwardsAsBlack() {
         Move move = new Move(null, 20, 24);
 
         assertThrows(InvalidMoveException.class, () ->
-                MoveValidator.validateNormalMove(board, PlayerRole.BLACK, move)
+                MoveValidator.validateMove(board, PlayerRole.BLACK, move)
         );
     }
 
     @Test
-    void validateNormalMoveShouldThrowWhenTargetCellOccupied() {
+    void validateMoveShouldThrowWhenTargetCellOccupied() {
         Board testBoard = createTestBoard();
         Move move = new Move(null, 9, 13);
 
         assertThrows(InvalidMoveException.class, () ->
-                MoveValidator.validateNormalMove(testBoard, PlayerRole.WHITE, move)
+                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move)
         );
     }
 
     @Test
-    void validateNormalMoveShouldThrowWhenNotDiagonal() {
+    void validateMoveShouldThrowWhenNotDiagonal() {
         Board testBoard = createTestBoard();
         Move move = new Move(null, 9, 10);
 
         assertThrows(InvalidMoveException.class, () ->
-                MoveValidator.validateNormalMove(testBoard, PlayerRole.WHITE, move)
+                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move)
         );
     }
 
     @Test
-    void validateNormalMoveShouldThrowWhenMovingMoreThanOneStepWithoutCapture() {
+    void validateMoveShouldThrowWhenMovingMoreThanOneStepWithoutCapture() {
         Move move = new Move(null, 9, 17);
 
         assertThrows(InvalidMoveException.class, () ->
-                MoveValidator.validateNormalMove(board, PlayerRole.WHITE, move)
+                MoveValidator.validateMove(board, PlayerRole.WHITE, move)
         );
     }
 
     @Test
-    void validateNormalMoveShouldAllowValidCapture() {
+    void validateMoveShouldAllowValidCapture() {
         Board testBoard = createCaptureBoard();
         Move move = new Move(null, 9, 18);
 
         assertDoesNotThrow(() ->
-                MoveValidator.validateNormalMove(testBoard, PlayerRole.WHITE, move)
+                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move)
         );
     }
 
     @Test
-    void validateNormalMoveShouldThrowWhenNoPieceToCapture() {
+    void validateMoveShouldThrowWhenNoPieceToCapture() {
         Board testBoard = createTestBoard();
         Move move = new Move(null, 9, 18);
 
         assertThrows(InvalidMoveException.class, () ->
-                MoveValidator.validateNormalMove(testBoard, PlayerRole.WHITE, move)
+                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move)
         );
     }
 
     @Test
-    void validateNormalMoveShouldThrowWhenCapturingOwnPiece() {
+    void validateMoveShouldThrowWhenCapturingOwnPiece() {
         Board testBoard = createOwnPieceCaptureBoard();
         Move move = new Move(null, 9, 18);
 
         assertThrows(InvalidMoveException.class, () ->
-                MoveValidator.validateNormalMove(testBoard, PlayerRole.WHITE, move)
+                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move)
         );
     }
 
     @Test
-    void validateNormalMoveShouldThrowWhenCellOutsideBoard() {
+    void validateMoveShouldThrowWhenCellOutsideBoard() {
         Move move = new Move(null, 1, 33);
 
         assertThrows(InvalidMoveException.class, () ->
-                MoveValidator.validateNormalMove(board, PlayerRole.WHITE, move)
+                MoveValidator.validateMove(board, PlayerRole.WHITE, move)
         );
     }
 
     @Test
-    void validateNormalMoveShouldThrowWhenMovingKing() {
-        Board testBoard = createKingBoard();
+    void isCaptureMoveShouldReturnTrueForTwoStepMove() {
+        Board testBoard = createTestBoard();
+        Move move = new Move(null, 9, 18);
+
+        assertTrue(MoveValidator.isCaptureMove(testBoard, move));
+    }
+
+    @Test
+    void isCaptureMoveShouldReturnFalseForOneStepMove() {
         Move move = new Move(null, 9, 13);
 
-        assertThrows(InvalidMoveException.class, () ->
-                MoveValidator.validateNormalMove(testBoard, PlayerRole.WHITE, move)
+        assertFalse(MoveValidator.isCaptureMove(board, move));
+    }
+
+    @Test
+    void validateNormalMoveShouldAllowPromotionMoveForWhite() {
+        Board testBoard = createPromotionBoardWhite();
+        Move move = new Move(null, 25, 29);
+
+        assertDoesNotThrow(() ->
+                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move)
+        );
+    }
+
+    @Test
+    void validateNormalMoveShouldAllowPromotionMoveForBlack() {
+        Board testBoard = createPromotionBoardBlack();
+        Move move = new Move(null, 5, 1);
+
+        assertDoesNotThrow(() ->
+                MoveValidator.validateMove(testBoard, PlayerRole.BLACK, move)
         );
     }
 
@@ -181,11 +206,20 @@ class MoveValidatorTest {
         return testBoard;
     }
 
-    private Board createKingBoard() {
+    private Board createPromotionBoardWhite() {
         Board testBoard = Board.create(8);
         clearBoard(testBoard);
 
-        testBoard.grid().put(9, new Piece(PlayerRole.WHITE, true));
+        testBoard.grid().put(25, new Piece(PlayerRole.WHITE, false));
+
+        return testBoard;
+    }
+
+    private Board createPromotionBoardBlack() {
+        Board testBoard = Board.create(8);
+        clearBoard(testBoard);
+
+        testBoard.grid().put(5, new Piece(PlayerRole.BLACK, false));
 
         return testBoard;
     }
