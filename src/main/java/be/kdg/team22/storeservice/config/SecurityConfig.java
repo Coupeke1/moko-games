@@ -35,11 +35,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         .requestMatchers("/api/cart/**").authenticated()
-                        .requestMatchers("/api/store/games",
-                                "/api/store/games/**").authenticated()
-                        .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
-
+                        .requestMatchers("/api/store/games").authenticated()
                         .requestMatchers("/api/store/games/**").permitAll()
+                        .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
                         .anyRequest().permitAll()
                 )
                 .oauth2ResourceServer(rs -> rs.jwt(
