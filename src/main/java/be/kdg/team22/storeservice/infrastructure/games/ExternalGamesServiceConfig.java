@@ -12,7 +12,7 @@ public class ExternalGamesServiceConfig {
     @Bean
     @Qualifier("gamesService")
     RestClient gamesServiceClient(
-            @Value("${game-service.url}") String baseUrl
+            @Value("${business.game-service.url}") String baseUrl
     ) {
         return RestClient.builder()
                 .baseUrl(baseUrl + "/api/games")

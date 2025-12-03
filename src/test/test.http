@@ -175,3 +175,6 @@ Authorization: Bearer {{owner_token}}
 ### 19) Clean up - delete second test game
 DELETE http://localhost:8085/api/store/games/{{catalog_game_id_2}}
 Authorization: Bearer {{owner_token}}
+
+### Health check
+GET http://localhost:8085/actuator/health
