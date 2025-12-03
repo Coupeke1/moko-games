@@ -36,12 +36,12 @@ public class GameCatalogController {
 
     @GetMapping
     public ResponseEntity<PagedResponse<GameCatalogResponse>> list(
-            @RequestParam(required = false) GameCategory category,
-            @RequestParam(required = false) BigDecimal minPrice,
-            @RequestParam(required = false) BigDecimal maxPrice,
-            @RequestParam(required = false) String sort,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(required = false) final GameCategory category,
+            @RequestParam(required = false) final BigDecimal minPrice,
+            @RequestParam(required = false) final BigDecimal maxPrice,
+            @RequestParam(required = false) final String sort,
+            @RequestParam(defaultValue = "0") final int page,
+            @RequestParam(defaultValue = "10") final int size
     ) {
         FilterQuery filter = new FilterQuery();
         filter.category = Optional.ofNullable(category);
@@ -63,12 +63,12 @@ public class GameCatalogController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GameCatalogResponse> get(@PathVariable UUID id) {
+    public ResponseEntity<GameCatalogResponse> get(@PathVariable final UUID id) {
         return ResponseEntity.ok(queryService.getGameWithMetadata(id));
     }
 
     @PostMapping
-    public ResponseEntity<GameCatalogResponse> create(@Valid @RequestBody GameCatalogRequestModel request) {
+    public ResponseEntity<GameCatalogResponse> create(@Valid @RequestBody final GameCatalogRequestModel request) {
         GameCatalogEntry entry = storeService.create(
                 request.id(),
                 request.price(),
@@ -79,8 +79,8 @@ public class GameCatalogController {
 
     @PutMapping("/{id}")
     public ResponseEntity<GameCatalogResponse> update(
-            @PathVariable UUID id,
-            @Valid @RequestBody UpdateGameCatalogModel request
+            @PathVariable final UUID id,
+            @Valid @RequestBody final UpdateGameCatalogModel request
     ) {
         GameCatalogEntry entry = storeService.update(
                 id,
@@ -91,7 +91,7 @@ public class GameCatalogController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    public ResponseEntity<Void> delete(@PathVariable final UUID id) {
         storeService.delete(id);
         return ResponseEntity.noContent().build();
     }

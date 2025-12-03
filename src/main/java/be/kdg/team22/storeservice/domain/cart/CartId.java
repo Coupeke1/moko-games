@@ -18,7 +18,7 @@ public record CartId(UUID value) {
         }
     }
 
-    public static CartId from(UUID value) {
+    public static CartId from(final UUID value) {
         return new CartId(value);
     }
 
@@ -26,11 +26,11 @@ public record CartId(UUID value) {
         return new CartId(UUID.randomUUID());
     }
 
-    public static CartId create(String value) {
+    public static CartId create(final String value) {
         return new CartId(UUID.fromString(value));
     }
 
-    public static CartId get(Jwt token) {
+    public static CartId get(final Jwt token) {
         String sub = token.getClaimAsString(StandardClaimNames.SUB);
         if (sub == null)
             throw new ClaimNotFoundException("sub");

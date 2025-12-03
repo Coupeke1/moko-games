@@ -22,11 +22,11 @@ public class CartItemEntity {
     protected CartItemEntity() {
     }
 
-    public CartItemEntity(UUID gameId) {
+    public CartItemEntity(final UUID gameId) {
         this.gameId = gameId;
     }
 
-    public static CartItemEntity fromDomain(CartItem item) {
+    public static CartItemEntity fromDomain(final CartItem item) {
         return new CartItemEntity(item.gameId());
     }
 

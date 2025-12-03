@@ -24,14 +24,14 @@ public class CartEntity {
     protected CartEntity() {
     }
 
-    public CartEntity(UUID id, UUID userId, List<CartItemEntity> items) {
+    public CartEntity(final UUID id, final UUID userId, final List<CartItemEntity> items) {
         this.id = id;
         this.userId = userId;
         this.items = items;
         this.items.forEach(i -> i.setCart(this));
     }
 
-    public static CartEntity fromDomain(Cart cart) {
+    public static CartEntity fromDomain(final Cart cart) {
         var itemEntities = cart.items().stream()
                 .map(CartItemEntity::fromDomain)
                 .toList();

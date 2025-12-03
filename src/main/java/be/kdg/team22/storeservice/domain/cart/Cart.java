@@ -15,13 +15,13 @@ public class Cart {
     private final UUID userId;
     private final Set<CartItem> items = new HashSet<>();
 
-    public Cart(CartId id, UUID userId, Set<CartItem> items) {
+    public Cart(final CartId id, final UUID userId, final Set<CartItem> items) {
         this.id = id;
         this.userId = userId;
         this.items.addAll(items);
     }
 
-    public Cart(CartId id, UUID userId) {
+    public Cart(final CartId id, final UUID userId) {
         this.id = id;
         this.userId = userId;
     }
@@ -38,7 +38,7 @@ public class Cart {
         return Set.copyOf(items);
     }
 
-    public void addItem(UUID gameId) {
+    public void addItem(final UUID gameId) {
         CartItem item = new CartItem(gameId);
 
         if (items.contains(item)) throw new GameAlreadyInCartException(gameId, userId);
@@ -46,7 +46,7 @@ public class Cart {
         items.add(item);
     }
 
-    public void removeItem(UUID gameId) {
+    public void removeItem(final UUID gameId) {
         boolean removed = items.removeIf(i -> i.gameId().equals(gameId));
 
         if (!removed) throw new CartItemNotFoundException(gameId, userId);

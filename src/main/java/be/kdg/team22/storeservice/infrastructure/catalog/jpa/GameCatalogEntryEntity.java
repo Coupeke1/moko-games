@@ -27,17 +27,17 @@ public class GameCatalogEntryEntity {
     protected GameCatalogEntryEntity() {
     }
 
-    public GameCatalogEntryEntity(UUID id,
-                                  BigDecimal price,
-                                  GameCategory category,
-                                  int purchaseCount) {
+    public GameCatalogEntryEntity(final UUID id,
+                                  final BigDecimal price,
+                                  final GameCategory category,
+                                  final int purchaseCount) {
         this.id = id;
         this.price = price;
         this.category = category;
         this.purchaseCount = purchaseCount;
     }
 
-    public static GameCatalogEntryEntity fromDomain(GameCatalogEntry entry) {
+    public static GameCatalogEntryEntity fromDomain(final GameCatalogEntry entry) {
         return new GameCatalogEntryEntity(
                 entry.getId(),
                 entry.getPrice(),
@@ -71,7 +71,7 @@ public class GameCatalogEntryEntity {
         return category;
     }
 
-    public void setCategory(GameCategory category) {
+    public void setCategory(final GameCategory category) {
         this.category = category;
     }
 
@@ -79,7 +79,7 @@ public class GameCatalogEntryEntity {
         return purchaseCount;
     }
 
-    public void setPurchaseCount(int purchaseCount) {
+    public void setPurchaseCount(final int purchaseCount) {
         this.purchaseCount = purchaseCount;
     }
 }

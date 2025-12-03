@@ -19,12 +19,12 @@ public class GameQueryService {
     private final GameCatalogRepository repo;
     private final ExternalGamesRepository games;
 
-    public GameQueryService(GameCatalogRepository repo, ExternalGamesRepository games) {
+    public GameQueryService(final GameCatalogRepository repo, final ExternalGamesRepository games) {
         this.repo = repo;
         this.games = games;
     }
 
-    public List<GameCatalogResponse> listGamesWithMetadata(FilterQuery filter, Pagination pagination) {
+    public List<GameCatalogResponse> listGamesWithMetadata(final FilterQuery filter, final Pagination pagination) {
 
         List<GameCatalogEntry> entries = repo.findAll(filter, pagination);
 
@@ -41,7 +41,7 @@ public class GameQueryService {
         return combined;
     }
 
-    public GameCatalogResponse getGameWithMetadata(UUID id) {
+    public GameCatalogResponse getGameWithMetadata(final UUID id) {
 
         GameCatalogEntry entry = repo.findById(id).orElseThrow();
         GameMetadataResponse meta = games.fetchMetadata(id);

@@ -17,11 +17,11 @@ public class CartService {
 
     private final CartRepository repo;
 
-    public CartService(CartRepository repo) {
+    public CartService(final CartRepository repo) {
         this.repo = repo;
     }
 
-    public Cart getOrCreate(UserId userId) {
+    public Cart getOrCreate(final UserId userId) {
         return repo.findByUserId(userId.value())
                 .orElseGet(() -> {
                     Cart c = new Cart(CartId.create(), userId.value());

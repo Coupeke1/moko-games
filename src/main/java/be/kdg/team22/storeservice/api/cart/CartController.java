@@ -22,12 +22,12 @@ public class CartController {
 
     private final CartService service;
 
-    public CartController(CartService service) {
+    public CartController(final CartService service) {
         this.service = service;
     }
 
     @GetMapping
-    public ResponseEntity<CartResponseModel> getOrCreate(@AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<CartResponseModel> getOrCreate(@AuthenticationPrincipal final Jwt jwt) {
         UserId userId = UserId.get(jwt);
         Cart cart = service.getOrCreate(userId);
         return ResponseEntity.ok(CartResponseModel.from(cart));
@@ -35,8 +35,8 @@ public class CartController {
 
     @PostMapping("/items")
     public ResponseEntity<Void> addItem(
-            @AuthenticationPrincipal Jwt jwt,
-            @Valid @RequestBody AddCartItemRequestModel request
+            @AuthenticationPrincipal final Jwt jwt,
+            @Valid @RequestBody final AddCartItemRequestModel request
     ) {
         UserId userId = UserId.get(jwt);
         service.addItem(userId, request.gameId());
@@ -45,8 +45,8 @@ public class CartController {
 
     @DeleteMapping("/items/{gameId}")
     public ResponseEntity<Void> removeItem(
-            @AuthenticationPrincipal Jwt jwt,
-            @PathVariable UUID gameId
+            @AuthenticationPrincipal final Jwt jwt,
+            @PathVariable final UUID gameId
     ) {
         UserId userId = UserId.get(jwt);
         service.removeItem(userId, gameId);
@@ -54,7 +54,7 @@ public class CartController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> clear(@AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<Void> clear(@AuthenticationPrincipal final Jwt jwt) {
         UserId userId = UserId.get(jwt);
         service.clearCart(userId);
         return ResponseEntity.noContent().build();

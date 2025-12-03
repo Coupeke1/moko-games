@@ -14,9 +14,9 @@ public class GameCatalogEntry {
     private int purchaseCount;
     private double popularityScore;
 
-    public GameCatalogEntry(UUID id,
-                            BigDecimal price,
-                            GameCategory category) {
+    public GameCatalogEntry(final UUID id,
+                            final BigDecimal price,
+                            final GameCategory category) {
         this.id = id;
         this.price = price;
         this.category = category;
@@ -24,10 +24,10 @@ public class GameCatalogEntry {
         this.popularityScore = calculatePopularityScore();
     }
 
-    public GameCatalogEntry(UUID id,
-                            BigDecimal price,
-                            GameCategory category,
-                            int purchaseCount) {
+    public GameCatalogEntry(final UUID id,
+                            final BigDecimal price,
+                            final GameCategory category,
+                            final int purchaseCount) {
         this.id = id;
         this.price = price;
         this.category = category;
@@ -35,7 +35,7 @@ public class GameCatalogEntry {
         this.popularityScore = calculatePopularityScore();
     }
 
-    public void updatePriceAndCategory(BigDecimal newPrice, GameCategory newCategory) {
+    public void updatePriceAndCategory(final BigDecimal newPrice, final GameCategory newCategory) {
         if (newPrice.compareTo(BigDecimal.ZERO) <= 0) {
             throw GameCatalogException.PriceMustBePositive(newPrice);
         }
