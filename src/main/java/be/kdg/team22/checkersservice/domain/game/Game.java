@@ -58,7 +58,7 @@ public class Game {
             throw new NotPlayersTurnException(currentRole);
         }
 
-        MoveValidator.validateNormalMove(board, currentRole, move);
+        MoveValidator.validateMove(board, currentRole, move);
 
         board.move(move);
         nextPlayer();
