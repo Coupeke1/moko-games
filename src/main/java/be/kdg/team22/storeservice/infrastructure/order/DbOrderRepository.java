@@ -26,4 +26,9 @@ public class DbOrderRepository implements OrderRepository {
     public Optional<Order> findById(final UUID id) {
         return repository.findById(id).map(OrderEntity::toDomain);
     }
+
+    @Override
+    public Optional<Order> findByPaymentId(final String paymentId) {
+        return repository.findByPaymentId(paymentId).map(OrderEntity::toDomain);
+    }
 }

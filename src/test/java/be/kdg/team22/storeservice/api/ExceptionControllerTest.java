@@ -37,14 +37,15 @@ class ExceptionControllerTest {
     void notFoundHandler() throws Exception {
         mockMvc.perform(get("/test/ex/notfound"))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string(containsString("No cart exists for user")));
+                .andExpect(content().string(containsString("No cart exists for user: ")));
     }
 
     @Test
     @DisplayName("BAD_REQUEST → GameAlreadyInCartException → 400")
     void badRequestHandler1() throws Exception {
         mockMvc.perform(get("/test/ex/badrequest1"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("is already in cart for user")));
     }
 
     @Test
@@ -67,7 +68,8 @@ class ExceptionControllerTest {
     @DisplayName("SERVICE_UNAVAILABLE → 503")
     void unavailableHandler() throws Exception {
         mockMvc.perform(get("/test/ex/unavailable"))
-                .andExpect(status().isServiceUnavailable());
+                .andExpect(status().isServiceUnavailable())
+                .andExpect(content().string(containsString("Game-Service is currently unavailable")));
     }
 
     @Test
@@ -99,10 +101,7 @@ class ExceptionControllerTest {
 
         @GetMapping("/invalid-metadata")
         public void invalidMetadata() {
-            throw new InvalidMetadataException(
-                    UUID.randomUUID(),
-                    "Missing title"
-            );
+            throw new InvalidMetadataException(UUID.randomUUID(), "Missing title");
         }
 
         @GetMapping("/unavailable")

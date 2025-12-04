@@ -1,5 +1,6 @@
 package be.kdg.team22.storeservice.infrastructure.order.jpa;
 
+import be.kdg.team22.storeservice.domain.cart.UserId;
 import be.kdg.team22.storeservice.domain.order.Order;
 import be.kdg.team22.storeservice.domain.order.OrderId;
 import be.kdg.team22.storeservice.domain.order.OrderItem;
@@ -19,14 +20,16 @@ class OrderEntityTest {
     @DisplayName("fromDomain maps Order → OrderEntity correctly")
     void fromDomain_mapsCorrectly() {
         UUID id = UUID.randomUUID();
-
+        UserId userId = UserId.create();
         Order order = new Order(
                 new OrderId(id),
                 List.of(
                         new OrderItem(UUID.randomUUID(), BigDecimal.valueOf(5)),
                         new OrderItem(UUID.randomUUID(), BigDecimal.valueOf(10))
                 ),
-                OrderStatus.PENDING_PAYMENT
+                OrderStatus.PENDING_PAYMENT,
+                userId,
+                "payment"
         );
 
         OrderEntity entity = OrderEntity.fromDomain(order);
@@ -40,12 +43,14 @@ class OrderEntityTest {
     @DisplayName("toDomain maps OrderEntity → Order correctly")
     void toDomain_mapsCorrectly() {
         UUID id = UUID.randomUUID();
-
+        UserId userId = UserId.create();
         OrderItemEntity i1 = new OrderItemEntity(UUID.randomUUID(), BigDecimal.valueOf(5));
         OrderItemEntity i2 = new OrderItemEntity(UUID.randomUUID(), BigDecimal.valueOf(8));
 
         OrderEntity entity = new OrderEntity(
                 id,
+                userId.value(),
+                "paymentId",
                 OrderStatus.PENDING_PAYMENT,
                 BigDecimal.valueOf(13),
                 List.of(i1, i2)
@@ -69,7 +74,9 @@ class OrderEntityTest {
                         new OrderItem(UUID.randomUUID(), BigDecimal.valueOf(7)),
                         new OrderItem(UUID.randomUUID(), BigDecimal.valueOf(3))
                 ),
-                OrderStatus.PENDING_PAYMENT
+                OrderStatus.PENDING_PAYMENT,
+                UserId.create(),
+                "paymentId"
         );
 
         OrderEntity entity = OrderEntity.fromDomain(original);

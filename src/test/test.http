@@ -184,14 +184,24 @@ DELETE http://localhost:8085/api/cart
 Authorization: Bearer {{owner_token}}
 
 ###B1) Create an order from the user's cart
-
 POST http://localhost:8085/api/orders
 Authorization: Bearer {{owner_token}}
 
+> {%
+    client.global.set("order_id", response.body.id);
+%}
 ### B2) Get order details by ID
 
-GET http://localhost:8085/api/orders/62c69f5d-cfa2-4d32-8c58-f185fee449fe
+GET http://localhost:8085/api/orders/{{order_id}}
 Authorization: Bearer {{owner_token}}
 
 ### Health check
 GET http://localhost:8085/actuator/health
+
+### Create payment
+POST http://localhost:8085/api/orders/{{order_id}}/payment
+Authorization: Bearer {{owner_token}}
+
+### verify payment
+POST http://localhost:8085/api/orders/{{order_id}}/verify
+Authorization: Bearer {{owner_token}}

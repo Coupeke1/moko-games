@@ -9,4 +9,8 @@ public record OrderId(UUID value) {
     public static OrderId create() {
         return new OrderId(UUID.randomUUID());
     }
+
+    public static OrderId from(UUID value) {
+        return new OrderId(value);
+    }
 }

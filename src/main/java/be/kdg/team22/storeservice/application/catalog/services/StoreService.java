@@ -56,9 +56,7 @@ public class StoreService {
     public void recordPurchase(final UUID gameId) {
         GameCatalogEntry entry = repo.findById(gameId)
                 .orElseThrow(() -> new GameNotFoundException(gameId));
-
         entry.recordPurchase();
-
         repo.save(entry);
     }
 
