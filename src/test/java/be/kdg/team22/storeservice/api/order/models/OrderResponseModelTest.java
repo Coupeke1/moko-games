@@ -33,7 +33,7 @@ class OrderResponseModelTest {
 
         assertThat(model.id()).isEqualTo(id);
         assertThat(model.totalPrice()).isEqualTo("15"); // 5 + 10
-        assertThat(model.status()).isEqualTo("PENDING_PAYMENT");
+        assertThat(model.status()).isEqualTo(OrderStatus.PENDING_PAYMENT);
         assertThat(model.items()).hasSize(2);
     }
 }
