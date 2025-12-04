@@ -59,6 +59,7 @@ services:
 
       USER_SERVICE_URL: http://host.docker.internal:8080
       SOCIAL_SERVICE_URL: http://host.docker.internal:8083
+      GAME_SERVICE_URL: http://host.docker.internal:8084
     healthcheck:
       test: [ "CMD", "wget", "-qO-", "http://localhost:8081/actuator/health" ]
       interval: 1m
@@ -123,8 +124,6 @@ services:
       SPRING_RABBITMQ_PASSWORD: password
 
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp_keycloak:8080/realms/moko/protocol/openid-connect/certs
-
-      USER_SERVICE_URL: http://host.docker.internal:8080
     healthcheck:
       test: [ "CMD", "wget", "-qO-", "http://localhost:8084/actuator/health" ]
       interval: 1m
