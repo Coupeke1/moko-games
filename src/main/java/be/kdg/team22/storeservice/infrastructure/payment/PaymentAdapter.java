@@ -3,9 +3,9 @@ package be.kdg.team22.storeservice.infrastructure.payment;
 import be.kdg.team22.storeservice.domain.order.Order;
 import be.kdg.team22.storeservice.domain.payment.Payment;
 import be.kdg.team22.storeservice.domain.payment.PaymentProvider;
+import be.kdg.team22.storeservice.domain.payment.exceptions.PaymentProviderException;
 import com.mollie.mollie.Client;
 import com.mollie.mollie.models.components.*;
-import com.mollie.mollie.models.components.PaymentRequest.Builder;
 import com.mollie.mollie.models.operations.CreatePaymentResponse;
 import com.mollie.mollie.models.operations.GetPaymentRequest;
 import com.mollie.mollie.models.operations.GetPaymentResponse;
@@ -35,31 +35,35 @@ public class PaymentAdapter implements PaymentProvider {
 
     @Override
     public Payment createPayment(Order order) {
+        try {
+            PaymentRequest request = PaymentRequest.builder()
+                    .description("Order " + order.id().value())
+                    .amount(Amount.builder()
+                            .currency("EUR")
+                            .value(order.totalPrice().setScale(2, RoundingMode.HALF_UP).toString())
+                            .build())
+                    .redirectUrl(redirectBase + "/payment/success?orderId=" + order.id().value())
+                    .build();
 
-        Builder req = PaymentRequest.builder()
-                .description("Order " + order.id().value())
-                .amount(Amount.builder()
-                        .currency("EUR")
-                        .value(order.totalPrice().setScale(2, RoundingMode.HALF_UP).toString())
-                        .build())
-                .redirectUrl(redirectBase + "/payment/success?orderId=" + order.id().value());
+            CreatePaymentResponse response = client.payments().create()
+                    .paymentRequest(request)
+                    .call();
 
-        if (webhookUrl != null && !webhookUrl.isBlank()) {
-            req.webhookUrl(webhookUrl);
+            PaymentResponse paymentRes = response.paymentResponse().orElseThrow(PaymentProviderException::new);
+            String paymentId = paymentRes.id().orElseThrow(PaymentProviderException::new);
+            String checkoutUrl = paymentRes.links()
+                    .orElseThrow(PaymentProviderException::new)
+                    .checkout()
+                    .orElseThrow(PaymentProviderException::new)
+                    .href();
+
+            return new Payment(paymentId, checkoutUrl);
+
+        } catch (Exception ex) {
+            throw new PaymentProviderException(ex);
         }
-
-        PaymentRequest request = req.build();
-
-        CreatePaymentResponse response = client.payments().create()
-                .paymentRequest(request)
-                .call();
-
-        PaymentResponse paymentRes = response.paymentResponse().orElseThrow();
-        String paymentId = paymentRes.id().orElseThrow();
-        String checkoutUrl = paymentRes.links().orElseThrow().checkout().orElseThrow().href();
-
-        return new Payment(paymentId, checkoutUrl);
     }
+
 
     @Override
     public boolean isPaymentPaid(String paymentId) {

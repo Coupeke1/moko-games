@@ -4,6 +4,7 @@ import be.kdg.team22.storeservice.domain.cart.exceptions.*;
 import be.kdg.team22.storeservice.domain.catalog.exceptions.GameNotFoundException;
 import be.kdg.team22.storeservice.domain.exceptions.ServiceUnavailableException;
 import be.kdg.team22.storeservice.domain.order.exceptions.PaymentIncompleteException;
+import be.kdg.team22.storeservice.domain.payment.exceptions.PaymentProviderException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class ExceptionController {
+
     @ExceptionHandler({
             CartNotFoundException.class,
             CartItemNotFoundException.class,
@@ -34,6 +36,12 @@ public class ExceptionController {
     })
     public ResponseEntity<String> handleBadRequest(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(PaymentProviderException.class)
+    public ResponseEntity<String> handlePaymentProvider(PaymentProviderException ex) {
+        // 502 Bad Gateway = correcte mapping voor externe provider errors
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(ex.getMessage());
     }
 
     @ExceptionHandler(ServiceUnavailableException.class)
