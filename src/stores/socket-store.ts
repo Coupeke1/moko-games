@@ -20,10 +20,9 @@ const createClient = (): RxStomp => {
     return client;
 };
 
-let subscription: Subscription | null = null;
-
 export const useSocketStore = create<SocketState>((set, get) => {
     const client = createClient();
+    let subscription: Subscription | null = null;
 
     const attachConnectionListener = () => {
         if (subscription) return;
@@ -36,7 +35,13 @@ export const useSocketStore = create<SocketState>((set, get) => {
                     error: null,
                 });
             },
-            error: (err) => set({ error: String(err) }),
+            error: (err) => {
+                set({
+                    error: String(err),
+                    isConnected: false,
+                    connecting: false,
+                });
+            },
         });
     };
 
@@ -46,20 +51,19 @@ export const useSocketStore = create<SocketState>((set, get) => {
         connecting: false,
         error: null,
         connections: 0,
-
         connect: () => {
-            const { isConnected, connections: connectionCount } = get();
-            set({ connections: connectionCount + 1 });
-            if (isConnected || connectionCount > 0) return;
+            const { connections: connectionCount, isConnected } = get();
+            const newCount = connectionCount + 1;
+            set({ connections: newCount });
 
-            attachConnectionListener();
-            client.activate();
+            if (connectionCount === 0 && !isConnected) {
+                attachConnectionListener();
+                client.activate();
+            }
         },
-
         disconnect: () => {
             const { connections: connectionCount } = get();
             const count = Math.max(0, connectionCount - 1);
-
             set({ connections: count });
 
             if (count === 0) {

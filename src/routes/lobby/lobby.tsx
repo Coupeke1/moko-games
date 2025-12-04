@@ -16,13 +16,12 @@ import InviteDialog from "@/routes/lobby/dialogs/invite-dialog/invite-dialog";
 import SettingsDialog from "@/routes/lobby/dialogs/settings-dialog/settings-dialog";
 import { useSession } from "@/routes/lobby/hooks/use-session";
 import { closeLobby, startGame } from "@/services/lobby/lobby-service";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
+import { useNavigate } from "react-router";
 import BotCard from "@/routes/lobby/components/bot-card";
 
 export default function LobbyPage() {
-    const client = useQueryClient();
     const navigate = useNavigate();
     const [invite, setInvite] = useState(false);
     const [settings, setSettings] = useState(false);
@@ -32,11 +31,7 @@ export default function LobbyPage() {
     const start = useMutation({
         mutationFn: async ({ lobby }: { lobby: string }) =>
             await startGame(lobby),
-        onSuccess: async (data, variables) => {
-            await client.invalidateQueries({
-                queryKey: ["lobby", variables.lobby],
-            });
-
+        onSuccess: async (data) => {
             if (!game) return;
             showToast("Lobby", "Starting...");
 
@@ -52,10 +47,7 @@ export default function LobbyPage() {
     const close = useMutation({
         mutationFn: async ({ lobby }: { lobby: string }) =>
             await closeLobby(lobby),
-        onSuccess: async (_data, variables) => {
-            await client.invalidateQueries({
-                queryKey: ["lobby", variables.lobby],
-            });
+        onSuccess: async () => {
             showToast("Lobby", "Closed");
             navigate("/library");
         },

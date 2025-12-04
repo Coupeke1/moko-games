@@ -35,7 +35,6 @@ export default function PlayerCard({
     const remove = useMutation({
         mutationFn: async () => await removePlayer(player.id, lobby.id),
         onSuccess: async () => {
-            await client.invalidateQueries({ queryKey: ["lobby", lobby.id] });
             showToast(player.username, "Removed");
         },
         onError: (error: Error) => showToast(player.username, error.message),
@@ -44,7 +43,6 @@ export default function PlayerCard({
     const ready = useMutation({
         mutationFn: async () => await readyPlayer(lobby.id),
         onSuccess: async () => {
-            await client.invalidateQueries({ queryKey: ["lobby", lobby.id] });
             showToast(player.username, "Ready");
         },
         onError: (error: Error) => showToast(player.username, error.message),
@@ -53,7 +51,6 @@ export default function PlayerCard({
     const unReady = useMutation({
         mutationFn: async () => await unReadyPlayer(lobby.id),
         onSuccess: async () => {
-            await client.invalidateQueries({ queryKey: ["lobby", lobby.id] });
             showToast(player.username, "Not Ready");
         },
         onError: (error: Error) => showToast(player.username, error.message),
