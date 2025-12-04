@@ -1,0 +1,30 @@
+﻿server.port: 8088
+
+spring:
+  application:
+    name: game-acl-service
+
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:user}
+    password: ${SPRING_RABBITMQ_PASSWORD:password}
+
+logging:
+  level:
+    sql: ${LOGGING_LEVEL_SQL:debug}
+    web: ${LOGGING_LEVEL_WEB:debug}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always
+      status:
+        http-mapping:
+          WARNING: 200
+          DOWN: 503
+          OUT_OF_SERVICE: 503
