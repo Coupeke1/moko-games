@@ -1,6 +1,7 @@
 package be.kdg.team22.storeservice.application.order;
 
 import be.kdg.team22.storeservice.application.cart.CartService;
+import be.kdg.team22.storeservice.application.catalog.services.StoreService;
 import be.kdg.team22.storeservice.domain.order.Order;
 import be.kdg.team22.storeservice.domain.order.OrderId;
 import be.kdg.team22.storeservice.domain.order.OrderRepository;
@@ -18,14 +19,17 @@ public class PaymentService {
     private final PaymentProvider paymentProvider;
     private final OrderRepository orderRepo;
     private final CartService cartService;
+    private final StoreService storeService;
 
     public PaymentService(
             PaymentProvider paymentProvider,
             OrderRepository orderRepo,
-            CartService cartService) {
+            CartService cartService,
+            StoreService storeService) {
         this.paymentProvider = paymentProvider;
         this.orderRepo = orderRepo;
         this.cartService = cartService;
+        this.storeService = storeService;
     }
 
     public void processWebhook(String paymentId) {
@@ -49,20 +53,16 @@ public class PaymentService {
     }
 
     public Order verifyPayment(OrderId orderId) {
-        System.out.println("VERIFY: checking orderId = " + orderId.value());
-
         Order order = orderRepo.findById(orderId.value())
                 .orElseThrow(() -> new IllegalStateException("Order not found"));
 
         String paymentId = order.paymentId();
-        System.out.println("VERIFY: paymentId in database = " + paymentId);
-
         PaymentStatus status = paymentProvider.getPaymentStatus(paymentId);
-        System.out.println("VERIFY: Mollie returned status = " + status.toString());
 
         if (status == PaymentStatus.PAID) {
             order.updateStatus(OrderStatus.PAID);
             cartService.clearCart(order.userId());
+            order.items().forEach(item -> storeService.recordPurchase(item.gameId()));
             orderRepo.save(order);
             return order;
         }
