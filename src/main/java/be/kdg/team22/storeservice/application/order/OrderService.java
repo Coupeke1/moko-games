@@ -16,7 +16,6 @@ import java.util.List;
 @Service
 @Transactional
 public class OrderService {
-
     private final OrderRepository repo;
     private final CartService cartService;
     private final GameCatalogRepository catalog;
@@ -30,7 +29,6 @@ public class OrderService {
     }
 
     public Order createOrder(final UserId userId) {
-
         final Cart cart = cartService.get(userId);
 
         if (cart.isEmpty())

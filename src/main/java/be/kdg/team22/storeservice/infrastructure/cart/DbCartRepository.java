@@ -11,22 +11,21 @@ import java.util.UUID;
 
 @Repository
 public class DbCartRepository implements CartRepository {
+    private final JpaCartRepository repository;
 
-    private final JpaCartRepository jpa;
-
-    public DbCartRepository(JpaCartRepository jpa) {
-        this.jpa = jpa;
+    public DbCartRepository(JpaCartRepository repository) {
+        this.repository = repository;
     }
 
     @Override
     public Optional<Cart> findByUserId(final UUID userId) {
-        return jpa.findByUserId(userId)
+        return repository.findByUserId(userId)
                 .map(CartEntity::toDomain);
     }
 
     @Override
     public Cart save(final Cart cart) {
-        jpa.save(CartEntity.fromDomain(cart));
+        repository.save(CartEntity.fromDomain(cart));
         return cart;
     }
 }

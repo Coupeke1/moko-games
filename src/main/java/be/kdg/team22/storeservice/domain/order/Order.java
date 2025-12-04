@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class Order {
-
     private final OrderId id;
     private final List<OrderItem> items;
     private final BigDecimal totalPrice;
@@ -47,7 +46,7 @@ public class Order {
         return status;
     }
 
-    public void updateStatus(final OrderStatus newStatus) {
-        this.status = newStatus;
+    public void updateStatus(final OrderStatus status) {
+        this.status = status;
     }
 }
