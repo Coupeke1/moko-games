@@ -18,6 +18,7 @@ public class OrderEntity {
     private UUID id;
 
     private UUID userId;
+    private String paymentId;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
@@ -35,12 +36,14 @@ public class OrderEntity {
     public OrderEntity(
             final UUID id,
             final UUID userId,
+            final String paymentId,
             final OrderStatus status,
             final BigDecimal totalPrice,
             final List<OrderItemEntity> items
     ) {
         this.id = id;
         this.userId = userId;
+        this.paymentId = paymentId;
         this.status = status;
         this.totalPrice = totalPrice;
         this.items = items;
@@ -55,6 +58,7 @@ public class OrderEntity {
         return new OrderEntity(
                 order.id().value(),
                 order.userId().value(),
+                order.paymentId(),
                 order.status(),
                 order.totalPrice(),
                 mapped
@@ -66,7 +70,8 @@ public class OrderEntity {
                 OrderId.from(id),
                 items.stream().map(OrderItemEntity::toDomain).toList(),
                 status,
-                UserId.from(userId)
+                UserId.from(userId),
+                paymentId
         );
     }
 }

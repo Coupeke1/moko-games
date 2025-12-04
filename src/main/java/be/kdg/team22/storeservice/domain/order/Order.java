@@ -29,6 +29,23 @@ public class Order {
         this.userId = userId;
     }
 
+    public Order(final OrderId id,
+                 final List<OrderItem> items,
+                 final OrderStatus status,
+                 final UserId userId,
+                 final String paymentId) {
+
+        if (items == null || items.isEmpty())
+            throw new OrderEmptyException();
+
+        this.id = id;
+        this.items = List.copyOf(items);
+        this.totalPrice = calculateTotal(items);
+        this.status = status;
+        this.userId = userId;
+        this.paymentId = paymentId;
+    }
+
     private BigDecimal calculateTotal(final List<OrderItem> items) {
         return items.stream()
                 .map(OrderItem::price)

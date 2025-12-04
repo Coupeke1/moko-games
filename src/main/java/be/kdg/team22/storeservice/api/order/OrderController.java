@@ -3,7 +3,6 @@ package be.kdg.team22.storeservice.api.order;
 import be.kdg.team22.storeservice.api.order.models.OrderResponseModel;
 import be.kdg.team22.storeservice.api.order.models.PaymentResponse;
 import be.kdg.team22.storeservice.application.order.OrderService;
-import be.kdg.team22.storeservice.application.payment.PaymentService;
 import be.kdg.team22.storeservice.domain.cart.UserId;
 import be.kdg.team22.storeservice.domain.order.Order;
 import be.kdg.team22.storeservice.domain.order.OrderId;
@@ -19,11 +18,9 @@ import java.util.UUID;
 public class OrderController {
 
     private final OrderService service;
-    private final PaymentService paymentService;
 
-    public OrderController(final OrderService service, final PaymentService paymentService) {
+    public OrderController(final OrderService service) {
         this.service = service;
-        this.paymentService = paymentService;
     }
 
     @PostMapping
@@ -44,17 +41,15 @@ public class OrderController {
     }
 
     @PostMapping("/{orderId}/payment")
-    public ResponseEntity<PaymentResponse> createPayment(
+    public ResponseEntity<PaymentResponse> startPayment(
             @PathVariable UUID orderId,
             @AuthenticationPrincipal Jwt jwt) {
-        PaymentResponse response =
-                service.createPayment(new OrderId(orderId), UserId.get(jwt));
-        return ResponseEntity.ok(response);
-    }
 
-    @PostMapping("/mollie/webhook")
-    public ResponseEntity<Void> webhook(@RequestParam("id") String paymentId) {
-        paymentService.process(paymentId);
-        return ResponseEntity.ok().build();
+        PaymentResponse payment = service.createPaymentForOrder(
+                new OrderId(orderId),
+                UserId.get(jwt)
+        );
+
+        return ResponseEntity.ok(payment);
     }
 }

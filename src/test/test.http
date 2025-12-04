@@ -195,3 +195,7 @@ Authorization: Bearer {{owner_token}}
 
 ### Health check
 GET http://localhost:8085/actuator/health
+
+### Create payment
+POST http://localhost:8085/api/orders/074b89d0-f0b3-4b3d-9b18-1463e7d4085c/payment
+Authorization: Bearer {{owner_token}}
