@@ -15,4 +15,8 @@ public class ServiceUnavailableException extends RuntimeException {
     public static ServiceUnavailableException GameServiceUnavailable() {
         return new ServiceUnavailableException("Game-Service is currently unavailable");
     }
+
+    public static ServiceUnavailableException PaymentProviderUnavailable() {
+        return new ServiceUnavailableException("PaymentProvider is currently unavailable");
+    }
 }

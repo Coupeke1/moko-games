@@ -1,5 +1,6 @@
 package be.kdg.team22.storeservice.infrastructure.order.jpa;
 
+import be.kdg.team22.storeservice.domain.cart.UserId;
 import be.kdg.team22.storeservice.domain.order.Order;
 import be.kdg.team22.storeservice.domain.order.OrderId;
 import be.kdg.team22.storeservice.domain.order.OrderStatus;
@@ -16,6 +17,8 @@ public class OrderEntity {
     @Id
     private UUID id;
 
+    private UUID userId;
+
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
@@ -31,11 +34,13 @@ public class OrderEntity {
 
     public OrderEntity(
             final UUID id,
+            final UUID userId,
             final OrderStatus status,
             final BigDecimal totalPrice,
             final List<OrderItemEntity> items
     ) {
         this.id = id;
+        this.userId = userId;
         this.status = status;
         this.totalPrice = totalPrice;
         this.items = items;
@@ -49,6 +54,7 @@ public class OrderEntity {
 
         return new OrderEntity(
                 order.id().value(),
+                order.userId().value(),
                 order.status(),
                 order.totalPrice(),
                 mapped
@@ -57,9 +63,10 @@ public class OrderEntity {
 
     public Order toDomain() {
         return new Order(
-                new OrderId(id),
+                OrderId.from(id),
                 items.stream().map(OrderItemEntity::toDomain).toList(),
-                status
+                status,
+                UserId.from(userId)
         );
     }
 }

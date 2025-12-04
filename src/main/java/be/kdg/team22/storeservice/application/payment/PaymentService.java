@@ -4,6 +4,7 @@ import be.kdg.team22.storeservice.application.cart.CartService;
 import be.kdg.team22.storeservice.domain.order.Order;
 import be.kdg.team22.storeservice.domain.order.OrderRepository;
 import be.kdg.team22.storeservice.domain.order.OrderStatus;
+import be.kdg.team22.storeservice.domain.order.exceptions.OrderNotFoundException;
 import be.kdg.team22.storeservice.infrastructure.payment.ExternalPaymentRepository;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class PaymentService {
         var payment = paymentRepository.getPayment(paymentId);
 
         Order order = orderRepo.findByPaymentId(paymentId)
-                .orElseThrow();
+                .orElseThrow(() -> new OrderNotFoundException(paymentId));
 
         switch (payment.status()) {
             case "paid" -> handlePaid(order);

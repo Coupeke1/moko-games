@@ -12,6 +12,7 @@ import be.kdg.team22.storeservice.domain.order.*;
 import be.kdg.team22.storeservice.domain.order.exceptions.OrderEmptyException;
 import be.kdg.team22.storeservice.domain.order.exceptions.OrderNotFoundException;
 import be.kdg.team22.storeservice.infrastructure.payment.ExternalPaymentRepository;
+import be.kdg.team22.storeservice.infrastructure.payment.MollieProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,15 +25,18 @@ public class OrderService {
     private final CartService cartService;
     private final GameCatalogRepository catalog;
     private final ExternalPaymentRepository paymentRepository;
+    private final MollieProperties properties;
 
-    public OrderService(final OrderRepository repository,
-                        final CartService cartService,
-                        final GameCatalogRepository catalog,
-                        final ExternalPaymentRepository paymentRepository) {
+    public OrderService(OrderRepository repository,
+                        CartService cartService,
+                        GameCatalogRepository catalog,
+                        ExternalPaymentRepository paymentRepository,
+                        MollieProperties properties) {
         this.repository = repository;
         this.cartService = cartService;
         this.catalog = catalog;
         this.paymentRepository = paymentRepository;
+        this.properties = properties;
     }
 
     public Order createOrder(final UserId userId) {
@@ -52,7 +56,8 @@ public class OrderService {
         Order order = new Order(
                 OrderId.create(),
                 items,
-                OrderStatus.PENDING_PAYMENT
+                OrderStatus.PENDING_PAYMENT,
+                userId
         );
 
         repository.save(order);
@@ -80,5 +85,13 @@ public class OrderService {
         repository.save(order);
 
         return new PaymentResponse(mollie.checkoutUrl());
+    }
+
+    private String buildRedirectUrl(OrderId id) {
+        return properties.getRedirectUrl() + "?orderId=" + id.value();
+    }
+
+    private String buildWebhookUrl() {
+        return properties.getWebhookUrl();
     }
 }
