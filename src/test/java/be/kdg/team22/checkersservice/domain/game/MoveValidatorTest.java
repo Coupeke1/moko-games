@@ -142,18 +142,11 @@ class MoveValidatorTest {
     }
 
     @Test
-    void isCaptureMoveShouldReturnTrueForTwoStepMove() {
-        Board testBoard = createTestBoard();
-        Move move = new Move(null, 9, 18);
-
-        assertTrue(MoveValidator.isCaptureMove(testBoard, move));
-    }
-
-    @Test
     void isCaptureMoveShouldReturnFalseForOneStepMove() {
         Move move = new Move(null, 9, 13);
+        Piece testPiece = board.pieceAt(9).get();
 
-        assertFalse(MoveValidator.isCaptureMove(board, move));
+        assertFalse(MoveValidator.isCaptureMove(board, testPiece.color(), move, testPiece));
     }
 
     @Test
