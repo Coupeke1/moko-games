@@ -21,6 +21,7 @@ public class LobbySocketController {
     @SubscribeMapping("/lobbies/{id}")
     public LobbyModel handleSubscription(@DestinationVariable final UUID id) {
         Lobby lobby = service.findLobby(new LobbyId(id));
+        System.out.println("Client subscribed to lobby: " + id);
         return LobbyModel.from(lobby);
     }
 }
