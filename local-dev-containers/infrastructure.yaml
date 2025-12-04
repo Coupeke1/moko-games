@@ -1,7 +1,7 @@
 name: moko_local_infrastructure
 
 services:
-  app_postgres:
+  app-postgres:
     image: postgres:17.7-alpine
     restart: always
     environment:
@@ -17,7 +17,7 @@ services:
       - moko_postgres_data:/var/lib/postgresql/data
       - ./init-scripts/sql:/docker-entrypoint-initdb.d/
 
-  app_rabbitmq:
+  app-rabbitmq:
     image: rabbitmq:4.2-management-alpine
     environment:
       RABBITMQ_DEFAULT_USER: 'user'
@@ -31,7 +31,7 @@ services:
       - moko_rabbitmq_all:/var/lib/rabbitmq/
       - moko_rabbitmq_all:/var/log/rabbitmq/
 
-  app_redis:
+  app-redis:
     image: redis:8.4.0-alpine
     ports:
       - "6379:6379"
@@ -43,7 +43,7 @@ services:
     volumes:
       - moko_redis_all:/data
 
-  idp_mysql:
+  idp-mysql:
     image: mysql:9.5
     environment:
       MYSQL_ROOT_PASSWORD: 'root'
@@ -57,14 +57,14 @@ services:
     networks:
       - moko_kc
 
-  idp_keycloak:
+  idp-keycloak:
     image: quay.io/keycloak/keycloak:26.4
     restart: always
     environment:
       KEYCLOAK_ADMIN: 'admin'
       KEYCLOAK_ADMIN_PASSWORD: 'admin'
       KC_DB: 'mysql'
-      KC_DB_URL_HOST: 'idp_mysql'
+      KC_DB_URL_HOST: 'idp-mysql'
       KC_DB_URL_DATABASE: 'keycloak'
       KC_DB_USERNAME: 'keycloak'
       KC_DB_PASSWORD: 'password'
@@ -76,7 +76,7 @@ services:
     ports:
       - "8180:8080"
     depends_on:
-      - idp_mysql
+      - idp-mysql
     networks:
       - moko_kc
 

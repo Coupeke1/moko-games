@@ -1,0 +1,6 @@
+﻿name: local_moko_development
+
+include:
+  - infrastructure.yaml
+  - platform-services.yaml
+  - game-services.yaml

@@ -19,7 +19,7 @@ done
 
 # If --all is provided, override services
 if [ "$ALL" = true ]; then
-    SERVICES=("user" "session" "social" "games")
+    SERVICES=("user" "session" "social" "games" "tic-tac-toe" "checkers")
     echo "--all provided. Starting ALL services: ${SERVICES[*]}"
 else
     if [ "${#SERVICES[@]}" -eq 0 ]; then
@@ -30,7 +30,7 @@ else
 fi
 
 # Validate services and build profiles
-VALID_SERVICES=("user" "session" "social" "games")
+VALID_SERVICES=("user" "session" "social" "games" "tic-tac-toe" "checkers")
 PROFILES=()
 
 for service in "${SERVICES[@]}"; do
@@ -52,4 +52,4 @@ for service in "${SERVICES[@]}"; do
 done
 
 # Run docker compose
-docker compose -f services.yaml "${PROFILES[@]}" up
+docker compose "${PROFILES[@]}" up

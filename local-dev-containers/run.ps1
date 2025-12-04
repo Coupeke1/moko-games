@@ -5,7 +5,7 @@ param (
 
 # If --all is provided, override services
 if ($All) {
-    $Services = @("user", "session", "social", "games")
+    $Services = @("user", "session", "social", "games", "tic-tac-toe", "checkers")
     Write-Host "--all provided. Starting ALL services: $($Services -join ', ')"
 } else {
     if (-not $Services) {
@@ -16,7 +16,7 @@ if ($All) {
 }
 
 # Validate services and build profiles
-$ValidServices = @("user", "session", "social", "games")
+$ValidServices = @("user", "session", "social", "games", "tic-tac-toe", "checkers")
 $Profiles = @()
 
 foreach ($service in $Services) {
@@ -31,4 +31,4 @@ foreach ($service in $Services) {
 }
 
 # Run docker compose
-docker compose -f services.yaml @Profiles up
+docker compose @Profiles up

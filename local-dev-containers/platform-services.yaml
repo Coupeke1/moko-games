@@ -1,7 +1,4 @@
-include:
-  - infrastructure.yaml
-
-name: moko_local_services
+name: moko_local_backend_services
 
 services:
   service-user:
@@ -12,17 +9,17 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://app_postgres:5432/moko?currentSchema=user_service
+      SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=user_service
       SPRING_DATASOURCE_USER: user
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
 
-      SPRING_RABBITMQ_HOST: app_rabbitmq
+      SPRING_RABBITMQ_HOST: app-rabbitmq
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: user
       SPRING_RABBITMQ_PASSWORD: password
 
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp_keycloak:8080/realms/moko/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
 
       GAME_SERVICE_URL: http://host.docker.internal:8084
     healthcheck:
@@ -45,17 +42,17 @@ services:
     ports:
       - "8081:8081"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://app_postgres:5432/moko?currentSchema=session_service
+      SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=session_service
       SPRING_DATASOURCE_USER: user
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
 
-      SPRING_RABBITMQ_HOST: app_rabbitmq
+      SPRING_RABBITMQ_HOST: app-rabbitmq
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: user
       SPRING_RABBITMQ_PASSWORD: password
 
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp_keycloak:8080/realms/moko/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
 
       USER_SERVICE_URL: http://host.docker.internal:8080
       SOCIAL_SERVICE_URL: http://host.docker.internal:8083
@@ -80,17 +77,17 @@ services:
     ports:
       - "8083:8083"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://app_postgres:5432/moko?currentSchema=social_service
+      SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=social_service
       SPRING_DATASOURCE_USER: user
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
 
-      SPRING_RABBITMQ_HOST: app_rabbitmq
+      SPRING_RABBITMQ_HOST: app-rabbitmq
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: user
       SPRING_RABBITMQ_PASSWORD: password
 
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp_keycloak:8080/realms/moko/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
 
       USER_SERVICE_URL: http://host.docker.internal:8080
     healthcheck:
@@ -113,17 +110,17 @@ services:
     ports:
       - "8084:8084"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://app_postgres:5432/moko?currentSchema=games_service
+      SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=games_service
       SPRING_DATASOURCE_USER: user
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
 
-      SPRING_RABBITMQ_HOST: app_rabbitmq
+      SPRING_RABBITMQ_HOST: app-rabbitmq
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: user
       SPRING_RABBITMQ_PASSWORD: password
 
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp_keycloak:8080/realms/moko/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
     healthcheck:
       test: [ "CMD", "wget", "-qO-", "http://localhost:8084/actuator/health" ]
       interval: 1m
