@@ -12,12 +12,12 @@ import static be.kdg.team22.checkersservice.domain.move.MoveValidator.*;
 public class NormalMoveValidator {
     protected static void validateNormalMove(final Board board, final PlayerRole currentRole, final Move move) {
         validateCellsWithinBoard(board, move);
-        Piece piece = validateStartingPiece(board, currentRole, move);
+        validateStartingPiece(board, currentRole, move);
         validateTargetCellEmpty(board, move);
         validateDiagonalMove(board, move);
         validateForwardMove(board, currentRole, move);
 
-        if (isCaptureMove(board, currentRole, move, piece)){
+        if (isCaptureMove(board, currentRole, move)){
             validateNormalCapture();
         } else {
             validateSingleStepMove(board, move);

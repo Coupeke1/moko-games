@@ -69,10 +69,7 @@ public class Board {
             piece.promoteToKing();
         }
 
-        grid.put(move.fromCell(), null);
-        grid.put(move.toCell(), piece);
-
-        if (isCaptureMove(this, piece.color(), move, piece)) {
+        if (isCaptureMove(this, piece.color(), move)) {
             int[] fromCoords = convertCellNumberToCoordinates(move.fromCell());
             int[] toCoords = convertCellNumberToCoordinates(move.toCell());
             int middleRow = (fromCoords[0] + toCoords[0]) / 2;
@@ -80,6 +77,9 @@ public class Board {
             int middleCell = convertCoordinatesToCellNumber(middleRow, middleCol);
             grid.put(middleCell, null);
         }
+
+        grid.put(move.fromCell(), null);
+        grid.put(move.toCell(), piece);
     }
 
     private void placePlayerPieces(final PlayerRole player, final int startRow, final int endRow) {

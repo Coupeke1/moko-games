@@ -146,7 +146,7 @@ class MoveValidatorTest {
         Move move = new Move(null, 9, 13);
         Piece testPiece = board.pieceAt(9).get();
 
-        assertFalse(MoveValidator.isCaptureMove(board, testPiece.color(), move, testPiece));
+        assertFalse(MoveValidator.isCaptureMove(board, testPiece.color(), move));
     }
 
     @Test
