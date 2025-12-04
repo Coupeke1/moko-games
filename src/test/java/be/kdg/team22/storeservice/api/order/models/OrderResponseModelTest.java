@@ -1,5 +1,6 @@
 package be.kdg.team22.storeservice.api.order.models;
 
+import be.kdg.team22.storeservice.domain.cart.UserId;
 import be.kdg.team22.storeservice.domain.order.Order;
 import be.kdg.team22.storeservice.domain.order.OrderId;
 import be.kdg.team22.storeservice.domain.order.OrderItem;
@@ -19,6 +20,7 @@ class OrderResponseModelTest {
     @DisplayName("from() maps Order aggregate to OrderResponseModel correctly")
     void from_mapsCorrectly() {
         UUID id = UUID.randomUUID();
+        UserId userId = UserId.create();
 
         Order order = new Order(
                 new OrderId(id),
@@ -26,14 +28,17 @@ class OrderResponseModelTest {
                         new OrderItem(UUID.randomUUID(), BigDecimal.valueOf(5)),
                         new OrderItem(UUID.randomUUID(), BigDecimal.valueOf(10))
                 ),
-                OrderStatus.PENDING_PAYMENT
+                OrderStatus.PENDING_PAYMENT,
+                userId,
+                "paymentId"
         );
 
         OrderResponseModel model = OrderResponseModel.from(order);
 
         assertThat(model.id()).isEqualTo(id);
-        assertThat(model.totalPrice()).isEqualTo("15"); // 5 + 10
+        assertThat(model.totalPrice()).isEqualTo("15");
         assertThat(model.status()).isEqualTo(OrderStatus.PENDING_PAYMENT);
+        assertThat(model.items()).hasSize(2);
         assertThat(model.items()).hasSize(2);
     }
 }

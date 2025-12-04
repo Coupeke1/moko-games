@@ -6,6 +6,8 @@ import be.kdg.team22.storeservice.domain.order.Order;
 import be.kdg.team22.storeservice.domain.order.OrderId;
 import be.kdg.team22.storeservice.domain.order.OrderRepository;
 import be.kdg.team22.storeservice.domain.order.OrderStatus;
+import be.kdg.team22.storeservice.domain.order.exceptions.OrderNotFoundException;
+import be.kdg.team22.storeservice.domain.order.exceptions.PaymentIncompleteException;
 import be.kdg.team22.storeservice.domain.payment.PaymentProvider;
 import com.mollie.mollie.models.components.PaymentStatus;
 import jakarta.transaction.Transactional;
@@ -32,18 +34,19 @@ public class PaymentService {
         this.storeService = storeService;
     }
 
-    public void processWebhook(String paymentId) {
+    public void processWebhook(final String paymentId) {
 
         Order order = orderRepo.findByPaymentId(paymentId)
-                .orElseThrow(() -> new IllegalStateException("Order not found for payment"));
+                .orElseThrow(() -> new OrderNotFoundException(paymentId));
 
         PaymentStatus status = paymentProvider.getPaymentStatus(paymentId);
-        String s = status.toString().toLowerCase();
+        String s = status.value();
 
         switch (s) {
             case "paid" -> {
                 order.updateStatus(OrderStatus.PAID);
                 cartService.clearCart(order.userId());
+                order.items().forEach(item -> storeService.recordPurchase(item.gameId()));
             }
             case "canceled" -> order.updateStatus(OrderStatus.CANCELED);
             case "expired" -> order.updateStatus(OrderStatus.EXPIRED);
@@ -52,9 +55,9 @@ public class PaymentService {
         orderRepo.save(order);
     }
 
-    public Order verifyPayment(OrderId orderId) {
+    public Order verifyPayment(final OrderId orderId) {
         Order order = orderRepo.findById(orderId.value())
-                .orElseThrow(() -> new IllegalStateException("Order not found"));
+                .orElseThrow(OrderNotFoundException::new);
 
         String paymentId = order.paymentId();
         PaymentStatus status = paymentProvider.getPaymentStatus(paymentId);
@@ -67,6 +70,6 @@ public class PaymentService {
             return order;
         }
 
-        throw new IllegalStateException("Payment not completed");
+        throw new PaymentIncompleteException();
     }
 }

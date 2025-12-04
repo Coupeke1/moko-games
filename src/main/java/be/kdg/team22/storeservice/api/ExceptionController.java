@@ -3,6 +3,7 @@ package be.kdg.team22.storeservice.api;
 import be.kdg.team22.storeservice.domain.cart.exceptions.*;
 import be.kdg.team22.storeservice.domain.catalog.exceptions.GameNotFoundException;
 import be.kdg.team22.storeservice.domain.exceptions.ServiceUnavailableException;
+import be.kdg.team22.storeservice.domain.order.exceptions.PaymentIncompleteException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -28,7 +29,8 @@ public class ExceptionController {
             CartEmptyException.class,
             CartIdCannotBeNullException.class,
             ClaimNotFoundException.class,
-            IllegalArgumentException.class
+            IllegalArgumentException.class,
+            PaymentIncompleteException.class
     })
     public ResponseEntity<String> handleBadRequest(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());

@@ -45,8 +45,8 @@ public class OrderController {
 
     @PostMapping("/{orderId}/payment")
     public ResponseEntity<PaymentResponse> startPayment(
-            @PathVariable UUID orderId,
-            @AuthenticationPrincipal Jwt jwt) {
+            @PathVariable final UUID orderId,
+            @AuthenticationPrincipal final Jwt jwt) {
 
         PaymentResponse payment = service.createPaymentForOrder(
                 new OrderId(orderId),
@@ -57,7 +57,7 @@ public class OrderController {
 
     @PostMapping("/{orderId}/verify")
     public ResponseEntity<OrderResponseModel> verifyPayment(
-            @PathVariable UUID orderId
+            @PathVariable final UUID orderId
     ) {
         Order order = paymentService.verifyPayment(new OrderId(orderId));
         return ResponseEntity.ok(OrderResponseModel.from(order));
@@ -65,7 +65,7 @@ public class OrderController {
 
     @PostMapping("/webhook")
     public ResponseEntity<Void> webhook(
-            @RequestParam("id") String paymentId
+            @RequestParam("id") final String paymentId
     ) {
         paymentService.processWebhook(paymentId);
         return ResponseEntity.ok().build();

@@ -1,6 +1,7 @@
 package be.kdg.team22.storeservice.infrastructure.order.jpa;
 
 import be.kdg.team22.storeservice.domain.order.OrderItem;
+import be.kdg.team22.storeservice.domain.order.OrderStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -45,13 +46,16 @@ class OrderItemEntityTest {
     void setOrder_linksCorrectly() {
         UUID orderId = UUID.randomUUID();
         UUID gameId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
         BigDecimal price = BigDecimal.TEN;
 
         OrderItemEntity itemEntity = new OrderItemEntity(gameId, price);
 
         new OrderEntity(
                 orderId,
-                be.kdg.team22.storeservice.domain.order.OrderStatus.PENDING_PAYMENT,
+                userId,
+                "paymentId",
+                OrderStatus.PENDING_PAYMENT,
                 BigDecimal.valueOf(10),
                 java.util.List.of(itemEntity)
         );
