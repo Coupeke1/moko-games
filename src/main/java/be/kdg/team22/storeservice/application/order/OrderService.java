@@ -1,5 +1,7 @@
 package be.kdg.team22.storeservice.application.order;
 
+import be.kdg.team22.storeservice.api.order.models.MolliePaymentResponse;
+import be.kdg.team22.storeservice.api.order.models.PaymentResponse;
 import be.kdg.team22.storeservice.application.cart.CartService;
 import be.kdg.team22.storeservice.domain.cart.Cart;
 import be.kdg.team22.storeservice.domain.cart.UserId;
@@ -8,6 +10,8 @@ import be.kdg.team22.storeservice.domain.catalog.GameCatalogRepository;
 import be.kdg.team22.storeservice.domain.catalog.exceptions.GameNotFoundException;
 import be.kdg.team22.storeservice.domain.order.*;
 import be.kdg.team22.storeservice.domain.order.exceptions.OrderEmptyException;
+import be.kdg.team22.storeservice.domain.order.exceptions.OrderNotFoundException;
+import be.kdg.team22.storeservice.infrastructure.payment.ExternalPaymentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,16 +20,19 @@ import java.util.List;
 @Service
 @Transactional
 public class OrderService {
-    private final OrderRepository repo;
+    private final OrderRepository repository;
     private final CartService cartService;
     private final GameCatalogRepository catalog;
+    private final ExternalPaymentRepository paymentRepository;
 
-    public OrderService(final OrderRepository repo,
+    public OrderService(final OrderRepository repository,
                         final CartService cartService,
-                        final GameCatalogRepository catalog) {
-        this.repo = repo;
+                        final GameCatalogRepository catalog,
+                        final ExternalPaymentRepository paymentRepository) {
+        this.repository = repository;
         this.cartService = cartService;
         this.catalog = catalog;
+        this.paymentRepository = paymentRepository;
     }
 
     public Order createOrder(final UserId userId) {
@@ -48,13 +55,30 @@ public class OrderService {
                 OrderStatus.PENDING_PAYMENT
         );
 
-        repo.save(order);
+        repository.save(order);
 
         return order;
     }
 
     public Order getOrder(final OrderId id) {
-        return repo.findById(id.value())
-                .orElseThrow();
+        return repository.findById(id.value())
+                .orElseThrow(OrderNotFoundException::new);
+    }
+
+    public PaymentResponse createPayment(final OrderId id, final UserId userId) {
+        Order order = repository.findById(id.value())
+                .orElseThrow(OrderNotFoundException::new);
+
+        MolliePaymentResponse mollie = paymentRepository.createPayment(
+                order.totalPrice(),
+                buildRedirectUrl(id),
+                buildWebhookUrl(),
+                "Order " + id.value()
+        );
+
+        order.attachPaymentId(mollie.id());
+        repository.save(order);
+
+        return new PaymentResponse(mollie.checkoutUrl());
     }
 }

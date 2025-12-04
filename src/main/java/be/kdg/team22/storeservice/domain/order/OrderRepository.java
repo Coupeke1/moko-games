@@ -7,4 +7,7 @@ public interface OrderRepository {
     void save(final Order order);
 
     Optional<Order> findById(final UUID id);
+
+    Optional<Order> findByPaymentId(String paymentId);
+
 }

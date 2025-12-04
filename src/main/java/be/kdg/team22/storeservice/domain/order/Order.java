@@ -11,6 +11,8 @@ public class Order {
     private final BigDecimal totalPrice;
     private OrderStatus status;
 
+    private String paymentId;
+
     public Order(final OrderId id,
                  final List<OrderItem> items,
                  final OrderStatus status) {
@@ -48,5 +50,13 @@ public class Order {
 
     public void updateStatus(final OrderStatus status) {
         this.status = status;
+    }
+
+    public void attachPaymentId(final String paymentId) {
+        this.paymentId = paymentId;
+    }
+
+    public String paymentId() {
+        return paymentId;
     }
 }
