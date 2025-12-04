@@ -52,7 +52,7 @@ business:
   user-service:
     url: ${USER_SERVICE_URL:http://localhost:8080}
 mollie:
-  api-key: ${MOLLIE_API_KEY}
-  webhook-url: ${WEBHOOK_URL:https://store-service/api/payments/mollie/webhook}
+  api-key: ${MOLLIE_API_KEY:test_m7sCMkpbCxQ7hAjqKWc2C3v3pBNfKW}
+  webhook-url: ${WEBHOOK_URL:http://localhost:8085/api/orders/webhook}
 frontend-url: ${FRONTEND_URL:http://localhost:5173}
 cors.allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174}

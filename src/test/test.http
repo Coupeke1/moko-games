@@ -188,14 +188,17 @@ Authorization: Bearer {{owner_token}}
 POST http://localhost:8085/api/orders
 Authorization: Bearer {{owner_token}}
 
+> {%
+    client.global.set("order_id", response.body.id);
+%}
 ### B2) Get order details by ID
 
-GET http://localhost:8085/api/orders/62c69f5d-cfa2-4d32-8c58-f185fee449fe
+GET http://localhost:8085/api/orders/{{order_id}}
 Authorization: Bearer {{owner_token}}
 
 ### Health check
 GET http://localhost:8085/actuator/health
 
 ### Create payment
-POST http://localhost:8085/api/orders/db2de8b3-3da0-46c5-a0a6-b45f7d42bea6/payment
+POST http://localhost:8085/api/orders/{{order_id}}/payment
 Authorization: Bearer {{owner_token}}
