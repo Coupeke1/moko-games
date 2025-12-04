@@ -23,7 +23,7 @@ public class PaymentAdapter implements PaymentProvider {
     public PaymentAdapter(
             @Value("${mollie.api-key}") String apiKey,
             @Value("${frontend-url}") String redirectBase,
-            @Value("${mollie.webhook-url:}") String webhookUrl
+            @Value("${mollie.webhook-url}") String webhookUrl
     ) {
         this.client = Client.builder()
                 .security(Security.builder().apiKey(apiKey).build())
