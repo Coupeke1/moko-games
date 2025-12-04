@@ -72,7 +72,7 @@ public class Board {
         grid.put(move.fromCell(), null);
         grid.put(move.toCell(), piece);
 
-        if (isCaptureMove(this, move)) {
+        if (isCaptureMove(this, piece.color(), move, piece)) {
             int[] fromCoords = convertCellNumberToCoordinates(move.fromCell());
             int[] toCoords = convertCellNumberToCoordinates(move.toCell());
             int middleRow = (fromCoords[0] + toCoords[0]) / 2;

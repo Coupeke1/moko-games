@@ -8,6 +8,7 @@ import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 
 import java.util.Optional;
 
+import static be.kdg.team22.checkersservice.domain.move.KingMoveValidator.isKingCaptureMove;
 import static be.kdg.team22.checkersservice.domain.move.KingMoveValidator.validateKingMove;
 import static be.kdg.team22.checkersservice.domain.move.NormalMoveValidator.isNormalCaptureMove;
 import static be.kdg.team22.checkersservice.domain.move.NormalMoveValidator.validateNormalMove;
@@ -88,27 +89,8 @@ public class MoveValidator {
         if (!piece.isKing()) {
             return isNormalCaptureMove(board, currentRole, rowDiff, fromCoords, toCoords);
         } else {
-            if (rowDiff == 1) {
-                return false;
-            } else if (rowDiff >= 2) {
-                int[][] cellsBetween = board.cellsBetween(fromCoords, toCoords);
-
-                int opponentPieceCount = 0;
-                for (int[] cell : cellsBetween) {
-                    int cellNumber = board.convertCoordinatesToCellNumber(cell[0], cell[1]);
-                    Optional<Piece> cellPiece = board.pieceAt(cellNumber);
-
-                    if (cellPiece.isPresent()) {
-                        if (cellPiece.get().color().equals(currentRole)) {
-                            throw new InvalidMoveException("There is a piece of your own in the way");
-                        } else {
-                            opponentPieceCount++;
-                        }
-                    }
-                }
-            }
+            return isKingCaptureMove(board, currentRole, rowDiff, fromCoords, toCoords);
         }
-        return false;
     }
 
     private static void validateCapture(final Board board, final PlayerRole currentRole, final Move move) {
