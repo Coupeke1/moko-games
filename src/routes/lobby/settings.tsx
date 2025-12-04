@@ -13,7 +13,7 @@ import Page from "@/routes/lobby/components/page";
 import { getTabs } from "@/routes/lobby/components/tabs";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { useLobbyData } from "@/routes/lobby/hooks/use-lobby";
+import { useSession } from "@/routes/lobby/hooks/use-session";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import showToast from "@/components/toast";
 import { allPlayersReady, updateSettings } from "@/services/lobby-service";
@@ -29,8 +29,7 @@ export default function LobbySettingsPage() {
 
     const [size, setSize] = useState<number>(4);
 
-    const { lobby, profile, game, isOwner, isLoading, isError } =
-        useLobbyData();
+    const { lobby, profile, game, isOwner, isLoading, isError } = useSession();
 
     const save = useMutation({
         mutationFn: async ({ lobby, game }: { lobby: string; game: string }) =>

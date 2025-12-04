@@ -9,6 +9,7 @@ export function watchLobby(id: string): Observable<Lobby> {
     const isConnected = useSocketStore.getState().isConnected;
 
     if (!isConnected) useSocketStore.getState().connect();
+
     const destination = `/app/lobbies/${id}`;
 
     return client

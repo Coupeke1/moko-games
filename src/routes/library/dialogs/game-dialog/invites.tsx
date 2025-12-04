@@ -29,7 +29,7 @@ export function Invites({ game }: Props) {
                 queryKey: ["lobby", "invites", game.id],
             });
             showToast("Invite", "Accepted");
-            window.location.replace(`/lobby/${variables.invite.id}/players`);
+            window.location.replace(`/lobby/${variables.invite.id}`);
         },
         onError: (error: Error) => {
             showToast("Invite", error.message);

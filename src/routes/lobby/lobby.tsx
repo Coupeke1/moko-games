@@ -14,7 +14,7 @@ import Page from "@/routes/lobby/components/page";
 import PlayerCard from "@/routes/lobby/components/player-card";
 import InviteDialog from "@/routes/lobby/dialogs/invite-dialog/invite-dialog";
 import SettingsDialog from "@/routes/lobby/dialogs/settings-dialog/settings-dialog";
-import { useLobbyData } from "@/routes/lobby/hooks/use-lobby";
+import { useSession } from "@/routes/lobby/hooks/use-session";
 import { closeLobby, startGame } from "@/services/lobby/lobby-service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -24,16 +24,10 @@ import BotCard from "@/routes/lobby/components/bot-card";
 export default function LobbyPage() {
     const client = useQueryClient();
     const navigate = useNavigate();
-    const { id } = useParams();
     const [invite, setInvite] = useState(false);
     const [settings, setSettings] = useState(false);
 
-    useEffect(() => {
-        if (!id || id.length <= 0) navigate("/library");
-    }, [id, navigate]);
-
-    const { lobby, profile, game, isOwner, isLoading, isError } =
-        useLobbyData();
+    const { lobby, profile, game, isOwner, isLoading, isError } = useSession();
 
     const start = useMutation({
         mutationFn: async ({ lobby }: { lobby: string }) =>

@@ -9,9 +9,9 @@ type SocketState = {
     isConnected: boolean;
     connecting: boolean;
     error: string | null;
-
+    connections: number;
     connect: () => void;
-    disconnect: () => Promise<void>;
+    disconnect: () => void;
 };
 
 const createClient = (): RxStomp => {
@@ -20,9 +20,10 @@ const createClient = (): RxStomp => {
     return client;
 };
 
+let subscription: Subscription | null = null;
+
 export const useSocketStore = create<SocketState>((set, get) => {
     const client = createClient();
-    let subscription: Subscription | null = null;
 
     const attachConnectionListener = () => {
         if (subscription) return;
@@ -44,20 +45,29 @@ export const useSocketStore = create<SocketState>((set, get) => {
         isConnected: false,
         connecting: false,
         error: null,
+        connections: 0,
 
         connect: () => {
-            const { isConnected } = get();
-            if (isConnected) return;
+            const { isConnected, connections: connectionCount } = get();
+            set({ connections: connectionCount + 1 });
+            if (isConnected || connectionCount > 0) return;
 
             attachConnectionListener();
             client.activate();
         },
 
-        disconnect: async () => {
-            subscription?.unsubscribe();
-            subscription = null;
-            await client.deactivate();
-            set({ isConnected: false, connecting: false });
+        disconnect: () => {
+            const { connections: connectionCount } = get();
+            const count = Math.max(0, connectionCount - 1);
+
+            set({ connections: count });
+
+            if (count === 0) {
+                subscription?.unsubscribe();
+                subscription = null;
+                client.deactivate();
+                set({ isConnected: false, connecting: false });
+            }
         },
     };
 });
