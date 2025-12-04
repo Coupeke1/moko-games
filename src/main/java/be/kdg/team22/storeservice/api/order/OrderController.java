@@ -55,6 +55,14 @@ public class OrderController {
         return ResponseEntity.ok(payment);
     }
 
+    @PostMapping("/{orderId}/verify")
+    public ResponseEntity<OrderResponseModel> verifyPayment(
+            @PathVariable UUID orderId
+    ) {
+        Order order = paymentService.verifyPayment(new OrderId(orderId));
+        return ResponseEntity.ok(OrderResponseModel.from(order));
+    }
+
     @PostMapping("/webhook")
     public ResponseEntity<Void> webhook(
             @RequestParam("id") String paymentId

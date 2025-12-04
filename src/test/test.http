@@ -184,7 +184,6 @@ DELETE http://localhost:8085/api/cart
 Authorization: Bearer {{owner_token}}
 
 ###B1) Create an order from the user's cart
-
 POST http://localhost:8085/api/orders
 Authorization: Bearer {{owner_token}}
 
@@ -201,4 +200,8 @@ GET http://localhost:8085/actuator/health
 
 ### Create payment
 POST http://localhost:8085/api/orders/{{order_id}}/payment
+Authorization: Bearer {{owner_token}}
+
+### verify payment
+POST http://localhost:8085/api/orders/{{order_id}}/verify
 Authorization: Bearer {{owner_token}}
