@@ -1,7 +1,7 @@
 package be.kdg.team22.checkersservice.application;
 
 import be.kdg.team22.checkersservice.api.models.CreateGameModel;
-import be.kdg.team22.checkersservice.domain.board.Move;
+import be.kdg.team22.checkersservice.domain.move.Move;
 import be.kdg.team22.checkersservice.domain.game.Game;
 import be.kdg.team22.checkersservice.domain.game.GameId;
 import be.kdg.team22.checkersservice.infrastructure.game.GameRepository;

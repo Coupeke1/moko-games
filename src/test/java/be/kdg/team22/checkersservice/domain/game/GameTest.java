@@ -1,6 +1,6 @@
 package be.kdg.team22.checkersservice.domain.game;
 
-import be.kdg.team22.checkersservice.domain.board.Move;
+import be.kdg.team22.checkersservice.domain.move.Move;
 import be.kdg.team22.checkersservice.domain.game.exceptions.GameNotRunningException;
 import be.kdg.team22.checkersservice.domain.game.exceptions.NotPlayersTurnException;
 import be.kdg.team22.checkersservice.domain.game.exceptions.PlayerCountException;

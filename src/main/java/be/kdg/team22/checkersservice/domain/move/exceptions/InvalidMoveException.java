@@ -1,4 +1,4 @@
-package be.kdg.team22.checkersservice.domain.board.exceptions;
+package be.kdg.team22.checkersservice.domain.move.exceptions;
 
 public class InvalidMoveException extends RuntimeException {
     public InvalidMoveException(final String message) {

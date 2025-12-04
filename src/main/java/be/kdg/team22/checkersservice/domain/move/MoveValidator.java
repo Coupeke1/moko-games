@@ -1,10 +1,16 @@
-package be.kdg.team22.checkersservice.domain.board;
+package be.kdg.team22.checkersservice.domain.move;
 
-import be.kdg.team22.checkersservice.domain.board.exceptions.InvalidMoveException;
+import be.kdg.team22.checkersservice.domain.board.Board;
+import be.kdg.team22.checkersservice.domain.board.Piece;
+import be.kdg.team22.checkersservice.domain.move.exceptions.InvalidMoveException;
 import be.kdg.team22.checkersservice.domain.game.exceptions.OutsidePlayingFieldException;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 
 import java.util.Optional;
+
+import static be.kdg.team22.checkersservice.domain.move.KingMoveValidator.validateKingMove;
+import static be.kdg.team22.checkersservice.domain.move.NormalMoveValidator.isNormalCaptureMove;
+import static be.kdg.team22.checkersservice.domain.move.NormalMoveValidator.validateNormalMove;
 
 public class MoveValidator {
     private MoveValidator() {
@@ -13,57 +19,41 @@ public class MoveValidator {
     public static void validateMove(final Board board, final PlayerRole currentRole, final Move move) {
         Optional<Piece> movingPiece = board.pieceAt(move.fromCell());
         if (movingPiece.isPresent() && movingPiece.get().isKing()) {
-            //validateKingMove(board, currentRole, move);
-        }  else {
+            validateKingMove(board, currentRole, move);
+        } else {
             validateNormalMove(board, currentRole, move);
         }
     }
 
-    private static void validateNormalMove(final Board board, final PlayerRole currentRole, final Move move) {
-        validateCellsWithinBoard(board, move);
-        validateStartingPiece(board, currentRole, move);
-        validateTargetCellEmpty(board, move);
-        validateDiagonalMove(board, move);
-        validateForwardMove(board, currentRole, move);
-
-        if (isCaptureMove(board, move)) {
-            validateCapture(board, currentRole, move);
-        } else {
-            validateSingleStepMove(board, move);
-        }
-    }
-
-    private static void validateCellsWithinBoard(final Board board, final Move move) {
+    protected static void validateCellsWithinBoard(final Board board, final Move move) {
         int maxCells = (board.size() * board.size()) / 2;
-        if (move.fromCell() > maxCells || move.toCell() > maxCells) {
+        if (move.fromCell() > maxCells || move.toCell() > maxCells || move.fromCell() <= 0 || move.toCell() <= 0) {
             throw new InvalidMoveException("Cell numbers must be between 1 and " + maxCells);
         }
     }
 
-    private static void validateStartingPiece(final Board board, final PlayerRole currentRole, final Move move) {
-        Optional<Piece> startingPiece = board.pieceAt(move.fromCell());
-        if (startingPiece.isEmpty()) {
+    protected static Piece validateStartingPiece(final Board board, final PlayerRole currentRole, final Move move) {
+        Optional<Piece> optionalPiece = board.pieceAt(move.fromCell());
+        if (optionalPiece.isEmpty()) {
             throw new InvalidMoveException("No piece at starting cell " + move.fromCell());
         }
 
-        Piece piece = startingPiece.get();
+        Piece piece = optionalPiece.get();
         if (piece.color() != currentRole) {
             throw new InvalidMoveException("Piece at cell " + move.fromCell() + " does not belong to current player");
         }
 
-        if (piece.isKing()) {
-            throw new InvalidMoveException("Piece at cell " + move.fromCell() + " is a king, use king move validation");
-        }
+        return piece;
     }
 
-    private static void validateTargetCellEmpty(final Board board, final Move move) {
+    protected static void validateTargetCellEmpty(final Board board, final Move move) {
         Optional<Piece> targetPiece = board.pieceAt(move.toCell());
         if (targetPiece.isPresent()) {
             throw new InvalidMoveException("Target cell " + move.toCell() + " is not empty");
         }
     }
 
-    private static void validateDiagonalMove(final Board board, final Move move) {
+    protected static void validateDiagonalMove(final Board board, final Move move) {
         int[] fromCoords = board.convertCellNumberToCoordinates(move.fromCell());
         int[] toCoords = board.convertCellNumberToCoordinates(move.toCell());
 
@@ -75,7 +65,7 @@ public class MoveValidator {
         }
     }
 
-    private static void validateForwardMove(final Board board, final PlayerRole currentRole, final Move move) {
+    protected static void validateForwardMove(final Board board, final PlayerRole currentRole, final Move move) {
         int[] fromCoords = board.convertCellNumberToCoordinates(move.fromCell());
         int[] toCoords = board.convertCellNumberToCoordinates(move.toCell());
 
@@ -90,22 +80,35 @@ public class MoveValidator {
         }
     }
 
-    public static boolean isCaptureMove(final Board board, final Move move) {
+    public static boolean isCaptureMove(final Board board, final PlayerRole currentRole, final Move move, final Piece piece) {
         int[] fromCoords = board.convertCellNumberToCoordinates(move.fromCell());
         int[] toCoords = board.convertCellNumberToCoordinates(move.toCell());
 
         int rowDiff = Math.abs(toCoords[0] - fromCoords[0]);
-        return rowDiff == 2;
-    }
+        if (!piece.isKing()) {
+            return isNormalCaptureMove(board, currentRole, rowDiff, fromCoords, toCoords);
+        } else {
+            if (rowDiff == 1) {
+                return false;
+            } else if (rowDiff >= 2) {
+                int[][] cellsBetween = board.cellsBetween(fromCoords, toCoords);
 
-    private static void validateSingleStepMove(final Board board, final Move move) {
-        int[] fromCoords = board.convertCellNumberToCoordinates(move.fromCell());
-        int[] toCoords = board.convertCellNumberToCoordinates(move.toCell());
+                int opponentPieceCount = 0;
+                for (int[] cell : cellsBetween) {
+                    int cellNumber = board.convertCoordinatesToCellNumber(cell[0], cell[1]);
+                    Optional<Piece> cellPiece = board.pieceAt(cellNumber);
 
-        int rowDiff = Math.abs(toCoords[0] - fromCoords[0]);
-        if (rowDiff != 1) {
-            throw new InvalidMoveException("Normal move must be exactly one step");
+                    if (cellPiece.isPresent()) {
+                        if (cellPiece.get().color().equals(currentRole)) {
+                            throw new InvalidMoveException("There is a piece of your own in the way");
+                        } else {
+                            opponentPieceCount++;
+                        }
+                    }
+                }
+            }
         }
+        return false;
     }
 
     private static void validateCapture(final Board board, final PlayerRole currentRole, final Move move) {

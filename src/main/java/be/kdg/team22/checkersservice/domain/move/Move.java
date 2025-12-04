@@ -1,6 +1,6 @@
-package be.kdg.team22.checkersservice.domain.board;
+package be.kdg.team22.checkersservice.domain.move;
 
-import be.kdg.team22.checkersservice.domain.board.exceptions.InvalidMoveException;
+import be.kdg.team22.checkersservice.domain.move.exceptions.InvalidMoveException;
 import be.kdg.team22.checkersservice.domain.player.PlayerId;
 import org.jmolecules.ddd.annotation.ValueObject;
 

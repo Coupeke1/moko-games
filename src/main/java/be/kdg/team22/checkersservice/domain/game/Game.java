@@ -1,8 +1,8 @@
 package be.kdg.team22.checkersservice.domain.game;
 
 import be.kdg.team22.checkersservice.domain.board.Board;
-import be.kdg.team22.checkersservice.domain.board.Move;
-import be.kdg.team22.checkersservice.domain.board.MoveValidator;
+import be.kdg.team22.checkersservice.domain.move.Move;
+import be.kdg.team22.checkersservice.domain.move.MoveValidator;
 import be.kdg.team22.checkersservice.domain.game.exceptions.*;
 import be.kdg.team22.checkersservice.domain.player.Player;
 import be.kdg.team22.checkersservice.domain.player.PlayerId;

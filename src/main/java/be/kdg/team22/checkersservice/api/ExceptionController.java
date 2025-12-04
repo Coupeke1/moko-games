@@ -1,6 +1,6 @@
 package be.kdg.team22.checkersservice.api;
 
-import be.kdg.team22.checkersservice.domain.board.exceptions.InvalidMoveException;
+import be.kdg.team22.checkersservice.domain.move.exceptions.InvalidMoveException;
 import be.kdg.team22.checkersservice.domain.game.exceptions.*;
 import be.kdg.team22.checkersservice.domain.player.exceptions.InvalidPlayerException;
 import org.springframework.http.HttpStatus;
