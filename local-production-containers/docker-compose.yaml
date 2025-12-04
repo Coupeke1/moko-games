@@ -27,6 +27,7 @@ services:
   frontend-platform:
     image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/platform-frontend:main-latest
     restart: always
+    pull_policy: always
     environment:
       VITE_AUTH_URL: http://localhost/auth
       VITE_AUTH_REALM: moko
@@ -46,6 +47,7 @@ services:
   frontend-tic-tac-toe:
     image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/tic-tac-toe-frontend:main-latest
     restart: always
+    pull_policy: always
     environment:
       VITE_AUTH_URL: http://localhost/auth
       VITE_AUTH_REALM: moko
@@ -70,6 +72,7 @@ services:
   service-user:
     image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/user-service:main-latest
     restart: always
+    pull_policy: always
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=user_service
       SPRING_DATASOURCE_USER: user
@@ -104,6 +107,7 @@ services:
   service-session:
     image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/session-service:main-latest
     restart: always
+    pull_policy: always
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=session_service
       SPRING_DATASOURCE_USER: user
@@ -169,6 +173,7 @@ services:
   service-social:
     image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/social-service:main-latest
     restart: always
+    pull_policy: always
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=social_service
       SPRING_DATASOURCE_USER: user
@@ -203,6 +208,7 @@ services:
   service-games:
     image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/games-service:main-latest
     restart: always
+    pull_policy: always
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=games_service
       SPRING_DATASOURCE_USER: user
@@ -234,6 +240,7 @@ services:
   service-store:
     image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/store-service:main-latest
     restart: always
+    pull_policy: always
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=store_service
       SPRING_DATASOURCE_USER: user
@@ -265,6 +272,7 @@ services:
   service-tic-tac-toe:
     image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/tic-tac-toe-service:main-latest
     restart: always
+    pull_policy: always
     environment:
       SPRING_DATA_REDIS_HOST: app-redis
       SPRING_DATA_REDIS_PORT: 6379
@@ -300,6 +308,7 @@ services:
   service-checkers:
     image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/checkers-service:main-latest
     restart: always
+    pull_policy: always
     environment:
       SPRING_DATA_REDIS_HOST: app-redis
       SPRING_DATA_REDIS_PORT: 6379
