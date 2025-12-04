@@ -183,7 +183,7 @@ chmod +x run.sh
 
 The scripts use Docker Compose with these configuration files:
 - `infrastructure.yaml` - Core infrastructure services
-- `platform-services.yaml` - Platform services (user, session, social)
-- `game-services.yaml` - Game services (games, tic-tac-toe, checkers)
+- `platform-services.yaml` - Platform services (user, session, social, games)
+- `game-services.yaml` - Game services (tic-tac-toe, checkers)
 
 Each service is organized as a Docker Compose profile for flexible orchestration.
