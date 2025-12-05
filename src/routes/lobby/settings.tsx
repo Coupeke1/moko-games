@@ -16,7 +16,10 @@ import { useNavigate, useParams } from "react-router";
 import { useSession } from "@/routes/lobby/hooks/use-session";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import showToast from "@/components/toast";
-import { allPlayersReady, updateSettings } from "@/services/lobby-service";
+import {
+    allPlayersReady,
+    updateSettings,
+} from "@/services/lobby/lobby-service";
 
 export default function LobbySettingsPage() {
     const client = useQueryClient();
