@@ -10,7 +10,7 @@ import org.springframework.web.client.RestClient;
 class ExternalGamesRepositoryConfig {
     @Bean
     @Qualifier("gameService")
-    RestClient gameServiceClient(@Value("${game-service.url}") final String baseUrl) {
+    RestClient gameServiceClient(@Value("${business.game-service.url}") final String baseUrl) {
         return RestClient.builder()
                 .baseUrl(baseUrl + "/api/games")
                 .build();

@@ -35,6 +35,5 @@ public class KeycloakRealmRoleConverter implements Converter<Jwt, Collection<Gra
             return List.of();
         }
         return roles.stream().filter(role -> role != null && !role.trim().isEmpty()).map(role -> "ROLE_" + role).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-
     }
 }
