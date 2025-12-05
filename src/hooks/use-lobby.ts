@@ -1,29 +1,28 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { type Subscription } from "rxjs";
 import type { Lobby } from "@/models/lobby/lobby";
 import { watchLobby } from "@/services/lobby/socket-service";
 import { useSocketStore } from "@/stores/socket-store";
+import { isPlayerInLobby } from "@/services/lobby/lobby-service";
+import { useNavigate } from "react-router";
 
 export function useLobby(lobbyId?: string | null, userId?: string | null) {
     const queryClient = useQueryClient();
+    const navigate = useNavigate();
     const { connect, disconnect, isConnected } = useSocketStore();
+
     const enabled = !!lobbyId && !!userId;
+    const subscription = useRef<Subscription | null>(null);
+    const [isInitialized, setInitialized] = useState(false);
 
-    const subscriptionRef = useRef<Subscription | null>(null);
-    const isInitializedRef = useRef(false);
-
-    // Establish socket connection when hook is used
     useEffect(() => {
         if (!enabled) return;
         connect();
-        return () => {
-            disconnect();
-        };
+        return () => disconnect();
     }, [enabled, connect, disconnect]);
 
-    // Don't use React Query for fetching - just for storing data
-    const query = useQuery<Lobby>({
+    const lobby = useQuery<Lobby>({
         queryKey: ["lobby", lobbyId],
         enabled: false,
         queryFn: async () => {
@@ -32,44 +31,38 @@ export function useLobby(lobbyId?: string | null, userId?: string | null) {
         staleTime: Infinity,
     });
 
-    // Subscribe to lobby updates ONLY after connection is established
     useEffect(() => {
         if (!enabled || !lobbyId || !isConnected) return;
 
-        // Prevent duplicate subscriptions
-        if (subscriptionRef.current) {
-            return;
-        }
-
+        if (subscription.current) return;
         let isFirst = true;
 
-        subscriptionRef.current = watchLobby(lobbyId).subscribe({
-            next: (nextLobby) => {
-                console.log("Received lobby update:", nextLobby);
-                queryClient.setQueryData<Lobby>(["lobby", lobbyId], nextLobby);
+        subscription.current = watchLobby(lobbyId).subscribe({
+            next: (lobby) => {
+                queryClient.setQueryData<Lobby>(["lobby", lobbyId], lobby);
+                if (!isPlayerInLobby(userId, lobby)) navigate("/library");
+
                 if (isFirst) {
                     isFirst = false;
-                    isInitializedRef.current = true;
+                    setInitialized(true);
                 }
             },
-            error: (error) => {
-                console.error("Lobby subscription error:", error);
-                isInitializedRef.current = false;
-            },
+            error: () => setInitialized(false),
         });
 
         return () => {
-            if (subscriptionRef.current) {
-                subscriptionRef.current.unsubscribe();
-                subscriptionRef.current = null;
+            if (subscription.current) {
+                subscription.current.unsubscribe();
+                subscription.current = null;
             }
-            isInitializedRef.current = false;
+
+            setInitialized(false);
         };
-    }, [enabled, lobbyId, isConnected, queryClient]); // Added isConnected dependency
+    }, [enabled, lobbyId, userId, isConnected, queryClient, navigate]);
 
     return {
-        lobby: query.data ?? null,
-        isLoading: !isInitializedRef.current && enabled,
-        isError: query.isError,
+        lobby: lobby.data ?? null,
+        isLoading: !isInitialized && enabled,
+        isError: lobby.isError,
     };
 }
