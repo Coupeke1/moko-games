@@ -21,14 +21,12 @@ public class LobbyPlayerService {
     private final FriendsService friendsService;
     private final PlayerService playerService;
     private final LobbyPublisherService lobbyPublisher;
-    private final InvitePublisherService invitePublisher;
 
-    public LobbyPlayerService(final LobbyRepository lobbyRepository, final FriendsService friendsService, final PlayerService playerService, final LobbyPublisherService lobbyPublisher, final InvitePublisherService invitePublisher) {
+    public LobbyPlayerService(final LobbyRepository lobbyRepository, final FriendsService friendsService, final PlayerService playerService, final LobbyPublisherService lobbyPublisher) {
         this.lobbyRepository = lobbyRepository;
         this.friendsService = friendsService;
         this.playerService = playerService;
         this.lobbyPublisher = lobbyPublisher;
-        this.invitePublisher = invitePublisher;
     }
 
     public void invitePlayer(final PlayerId ownerId, final LobbyId lobbyId, final PlayerId playerId, final Jwt token) {
@@ -36,7 +34,6 @@ public class LobbyPlayerService {
         ensureFriend(ownerId, playerId, token);
 
         lobby.invitePlayer(ownerId, playerId);
-        invitePublisher.publish(playerId, lobby);
         lobbyPublisher.saveAndPublish(lobby);
     }
 

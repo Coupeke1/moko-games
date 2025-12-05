@@ -28,8 +28,8 @@ public class LobbySocketPublisher {
     public void publishToPlayers(final Lobby lobby) {
         LobbyModel model = LobbyModel.from(lobby);
         lobby.players().forEach(player -> {
-            String userId = player.id().value().toString();
-            template.convertAndSendToUser(userId, "/queue/lobby", model);
+            String playerId = player.id().value().toString();
+            template.convertAndSendToUser(playerId, "/queue/lobby", model);
         });
     }
 }
