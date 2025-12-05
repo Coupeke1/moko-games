@@ -4,8 +4,8 @@ import be.kdg.team22.communicationservice.domain.chat.ChatChannel;
 import be.kdg.team22.communicationservice.domain.chat.ChatChannelRepository;
 import be.kdg.team22.communicationservice.domain.chat.ChatChannelType;
 import be.kdg.team22.communicationservice.domain.chat.ChatMessage;
-import be.kdg.team22.communicationservice.domain.chat.ai.AIResponse;
-import be.kdg.team22.communicationservice.domain.chat.ai.BotChatRepository;
+import be.kdg.team22.communicationservice.domain.chat.bot.BotResponse;
+import be.kdg.team22.communicationservice.domain.chat.bot.BotChatRepository;
 import be.kdg.team22.communicationservice.domain.chat.exceptions.CantAutoCreateBotChannel;
 import be.kdg.team22.communicationservice.domain.chat.exceptions.ChatChannelNotFoundException;
 import be.kdg.team22.communicationservice.domain.chat.exceptions.NotInLobbyException;
@@ -38,7 +38,7 @@ public class ChatService {
                                    final String senderId,
                                    final String content,
                                    final Jwt token) {
-        if (type == ChatChannelType.AI) referenceId = senderId;
+        if (type == ChatChannelType.BOT) referenceId = senderId;
 
         if (type == ChatChannelType.LOBBY) {
             boolean allowed = sessionRepository.isPlayerInLobby(senderId, referenceId, token.getTokenValue());
@@ -57,14 +57,14 @@ public class ChatService {
 
         if (type == ChatChannelType.LOBBY) return userMessage;
 
-        AIResponse aiResponse = botChatRepository.askBot(
+        BotResponse botResponse = botChatRepository.askBot(
                 "platform-chatbot-v1",
                 senderId,
                 referenceId,
                 content
         );
 
-        ChatMessage aiMessage = channel.postAIMessage(aiResponse.model(), aiResponse.answer());
+        ChatMessage aiMessage = channel.postAIMessage(botResponse.model(), botResponse.answer());
         channelRepository.save(channel);
 
         return aiMessage;
@@ -76,7 +76,7 @@ public class ChatService {
                                          final String requesterId,
                                          final Jwt token) {
 
-        if (type == ChatChannelType.AI) referenceId = requesterId;
+        if (type == ChatChannelType.BOT) referenceId = requesterId;
 
         if (type == ChatChannelType.LOBBY) {
             if (!sessionRepository.isPlayerInLobby(requesterId, referenceId, token.getTokenValue())) {
@@ -93,15 +93,9 @@ public class ChatService {
         return channel.getMessagesSince(since);
     }
 
-//    public List<ChatMessage> getMessages(ChatChannelType type,
-//                                         String referenceId,
-//                                         String requesterId) {
-//        return getMessages(type, referenceId, null, requesterId);
-//    }
-
     public ChatChannel createChannel(ChatChannelType type, String referenceId) {
-        if (type == ChatChannelType.AI) {
-            throw new CantAutoCreateBotChannel("AI channels cannot be manually created");
+        if (type == ChatChannelType.BOT) {
+            throw new CantAutoCreateBotChannel("BOT channels cannot be manually created");
         }
 
         ChatChannel existing = channelRepository

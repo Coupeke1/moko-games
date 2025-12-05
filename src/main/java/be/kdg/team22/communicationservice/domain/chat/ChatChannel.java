@@ -68,8 +68,8 @@ public class ChatChannel {
     }
 
     public ChatMessage postAIMessage(final String aiModelId, final String content) {
-        if (type != ChatChannelType.AI) {
-            throw new AiMessageInLobbyException("AI messages are only allowed on AI channels");
+        if (type != ChatChannelType.BOT) {
+            throw new AiMessageInLobbyException("BOT messages are only allowed on BOT channels");
         }
         ChatMessage message = ChatMessage.newAIMessage(id, aiModelId, content);
         messages.add(message);

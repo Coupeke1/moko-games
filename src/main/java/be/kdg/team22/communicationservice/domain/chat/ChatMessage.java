@@ -49,7 +49,7 @@ public class ChatMessage {
         return new ChatMessage(
                 ChatMessageId.create(),
                 channelId,
-                "ai:" + aiModelId,
+                "bot:" + aiModelId,
                 content,
                 Instant.now()
         );
