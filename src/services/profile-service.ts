@@ -1,13 +1,13 @@
 import { client } from "@/lib/api-client";
 
-import { config } from "@/config";
+import { environment } from "@/config";
 import { validIdCheck } from "@/lib/id";
 import type { Modules } from "@/models/profile/modules";
 import type { Profile } from "@/models/profile/profile";
 import type { KeycloakTokenParsed } from "keycloak-js";
 import Keycloak from "keycloak-js";
 
-const BASE_URL = config.userService;
+const BASE_URL = environment.userService;
 
 export async function findProfile(id: string): Promise<Profile> {
     try {

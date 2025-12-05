@@ -1,5 +1,4 @@
 import ClockIcon from "@/components/icons/clock-icon";
-import PriceIcon from "@/components/icons/price-icon";
 import { Gap } from "@/components/layout/gap";
 import { Items } from "@/components/layout/items";
 import Row from "@/components/layout/row";
@@ -28,11 +27,6 @@ export default function LibraryCard({ game, onClick }: Props) {
                     <Row gap={Gap.None} items={Items.Center} responsive={false}>
                         <ClockIcon />
                         <p>3h 40m</p>
-                    </Row>
-
-                    <Row gap={Gap.None} items={Items.Center} responsive={false}>
-                        <PriceIcon />
-                        <p>{game.price}</p>
                     </Row>
                 </Row>
             </section>

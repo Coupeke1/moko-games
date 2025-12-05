@@ -4,7 +4,7 @@ import { useProfile } from "@/hooks/use-profile";
 import { useAuthStore } from "@/stores/auth-store";
 import { useEffect } from "react";
 import ErrorState from "@/components/state/error";
-import { config } from "@/config";
+import { environment } from "@/config";
 
 export default function Auth() {
     const initAuth = useAuthStore((state) => state.init);
@@ -13,9 +13,9 @@ export default function Auth() {
 
     useEffect(() => {
         initAuth({
-            url: config.authUrl,
-            realm: config.authRealm,
-            clientId: config.authClientId,
+            url: environment.authUrl,
+            realm: environment.authRealm,
+            clientId: environment.authClientId,
         } as Keycloak.KeycloakConfig);
     }, []);
 

@@ -3,9 +3,9 @@ import { validIdCheck } from "@/lib/id";
 import type { Game } from "@/models/library/game";
 import type { Lobby } from "@/models/lobby/lobby";
 import type { Player } from "@/models/lobby/player";
-import {config} from "@/config.ts";
+import { environment } from "@/config.ts";
 
-const BASE_URL = config.sessionService;
+const BASE_URL = environment.sessionService;
 
 export async function findLobby(id: string): Promise<Lobby> {
     try {

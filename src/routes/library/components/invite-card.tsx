@@ -1,7 +1,7 @@
 import Column from "@/components/layout/column";
 import type { Lobby } from "@/models/lobby/lobby";
 import type { Player } from "@/models/lobby/player";
-import { findOwner } from "@/services/lobby-service";
+import { findOwner } from "@/services/lobby/lobby-service";
 import type { ReactNode } from "react";
 
 interface Props {

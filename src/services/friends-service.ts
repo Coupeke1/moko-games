@@ -1,11 +1,11 @@
-import { config } from "@/config";
+import { environment } from "@/config";
 import { client } from "@/lib/api-client";
 import { validIdCheck } from "@/lib/id";
 import type { Friend } from "@/models/friends/friend";
 import type { Profile } from "@/models/profile/profile";
 
-const PROFILE_URL = config.userService;
-const SOCIAL_URL = config.socialService;
+const PROFILE_URL = environment.userService;
+const SOCIAL_URL = environment.socialService;
 
 export async function findFriends() {
     try {
@@ -14,13 +14,16 @@ export async function findFriends() {
         const details = await Promise.all(
             response.map(async (friend: Friend) => {
                 try {
-                    const { data } = await client.get<Profile>(`${PROFILE_URL}/${friend.id}`);
+                    const { data } = await client.get<Profile>(
+                        `${PROFILE_URL}/${friend.id}`,
+                    );
                     return data;
+                } catch {
+                    throw new Error(
+                        `Friend with id '${friend.id}' could not be fetched`,
+                    );
                 }
-                catch {
-                    throw new Error(`Friend with id '${friend.id}' could not be fetched`);
-                }
-            })
+            }),
         );
 
         return details;
@@ -31,18 +34,23 @@ export async function findFriends() {
 
 export async function findIncomingRequests() {
     try {
-        const { data: response } = await client.get<Friend[]>(`${SOCIAL_URL}/requests/incoming`);
+        const { data: response } = await client.get<Friend[]>(
+            `${SOCIAL_URL}/requests/incoming`,
+        );
 
         const details = await Promise.all(
             response.map(async (friend: Friend) => {
                 try {
-                    const { data } = await client.get<Profile>(`${PROFILE_URL}/${friend.id}`);
+                    const { data } = await client.get<Profile>(
+                        `${PROFILE_URL}/${friend.id}`,
+                    );
                     return data;
+                } catch {
+                    throw new Error(
+                        `Friend with id '${friend.id}' could not be fetched`,
+                    );
                 }
-                catch {
-                    throw new Error(`Friend with id '${friend.id}' could not be fetched`);
-                }
-            })
+            }),
         );
 
         return details;
@@ -53,18 +61,23 @@ export async function findIncomingRequests() {
 
 export async function findOutgoingRequests() {
     try {
-        const { data: response } = await client.get<Friend[]>(`${SOCIAL_URL}/requests/outgoing`);
+        const { data: response } = await client.get<Friend[]>(
+            `${SOCIAL_URL}/requests/outgoing`,
+        );
 
         const details = await Promise.all(
             response.map(async (friend: Friend) => {
                 try {
-                    const { data } = await client.get<Profile>(`${PROFILE_URL}/${friend.id}`);
+                    const { data } = await client.get<Profile>(
+                        `${PROFILE_URL}/${friend.id}`,
+                    );
                     return data;
+                } catch {
+                    throw new Error(
+                        `Friend with id '${friend.id}' could not be fetched`,
+                    );
                 }
-                catch {
-                    throw new Error(`Friend with id '${friend.id}' could not be fetched`);
-                }
-            })
+            }),
         );
 
         return details;
@@ -99,7 +112,9 @@ export async function acceptRequest(id: string) {
         validIdCheck(id);
         await client.post(`${SOCIAL_URL}/accept/${id}`);
     } catch {
-        throw new Error(`Request from user with id '${id}' could not be accepted`);
+        throw new Error(
+            `Request from user with id '${id}' could not be accepted`,
+        );
     }
 }
 
@@ -108,7 +123,9 @@ export async function rejectRequest(id: string) {
         validIdCheck(id);
         await client.post(`${SOCIAL_URL}/reject/${id}`);
     } catch {
-        throw new Error(`Request from user with id '${id}' could not be rejected`);
+        throw new Error(
+            `Request from user with id '${id}' could not be rejected`,
+        );
     }
 }
 
@@ -117,6 +134,8 @@ export async function cancelRequest(id: string) {
         validIdCheck(id);
         await client.post(`${SOCIAL_URL}/cancel/${id}`);
     } catch {
-        throw new Error(`Request from user with id '${id}' could not be cancelled`);
+        throw new Error(
+            `Request from user with id '${id}' could not be cancelled`,
+        );
     }
 }

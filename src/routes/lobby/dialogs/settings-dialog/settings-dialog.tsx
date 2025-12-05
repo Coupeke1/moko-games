@@ -9,7 +9,7 @@ import type { Game } from "@/models/game/game";
 import type { Lobby } from "@/models/lobby/lobby";
 import GameTab from "@/routes/lobby/dialogs/settings-dialog/game-tab";
 import LobbyTab from "@/routes/lobby/dialogs/settings-dialog/lobby-tab";
-import { updateSettings } from "@/services/lobby-service";
+import { updateSettings } from "@/services/lobby/lobby-service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
