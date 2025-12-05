@@ -9,16 +9,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class LobbySocketPublisher {
     private final SimpMessagingTemplate template;
-    private final static String BASE_ROUTE = "/topic/lobbies";
 
     public LobbySocketPublisher(final SimpMessagingTemplate template) {
         this.template = template;
     }
 
     public void publishToLobby(final Lobby lobby) {
-        String route = String.format("%s/%s", BASE_ROUTE, lobby.id().value());
+        String route = String.format("/topic/lobbies/%s", lobby.id().value());
         LobbyModel model = LobbyModel.from(lobby);
-        System.out.println("Sending to all players");
         template.convertAndSend(route, model);
     }
 
@@ -31,7 +29,8 @@ public class LobbySocketPublisher {
         LobbyModel model = LobbyModel.from(lobby);
         lobby.players().forEach(player -> {
             String userId = player.id().value().toString();
-            template.convertAndSendToUser(userId, "/queue/lobby-updates", model);
+            System.out.println("Sending to player " + userId);
+            template.convertAndSendToUser(userId, "/queue/lobby", model);
         });
     }
 }

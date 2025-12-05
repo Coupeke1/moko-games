@@ -19,6 +19,6 @@ public class LobbyPublisherService {
 
     public void saveAndPublish(final Lobby lobby) {
         repository.save(lobby);
-        publisher.publishToLobby(lobby);
+        publisher.publishToPlayers(lobby);
     }
 }
