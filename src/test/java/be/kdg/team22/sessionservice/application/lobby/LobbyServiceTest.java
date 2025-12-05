@@ -21,6 +21,7 @@ import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.domain.player.PlayerName;
 import be.kdg.team22.sessionservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.sessionservice.infrastructure.games.StartGameResponse;
+import be.kdg.team22.sessionservice.infrastructure.lobby.LobbySocketPublisher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -41,7 +42,9 @@ class LobbyServiceTest {
     private final LobbyRepository repo = mock(LobbyRepository.class);
     private final PlayerService playerService = mock(PlayerService.class);
     private final ExternalGamesRepository gameClient = mock(ExternalGamesRepository.class);
-    private final LobbyService service = new LobbyService(repo, playerService, gameClient);
+    private final LobbySocketPublisher socket = mock(LobbySocketPublisher.class);
+    private final LobbyPublisherService publisherService = new LobbyPublisherService(repo, socket);
+    private final LobbyService service = new LobbyService(repo, publisherService, playerService, gameClient);
 
     private Jwt jwtFor(PlayerId owner) {
         return Jwt.withTokenValue("TOKEN-" + owner.value()).header("alg", "none").header("typ", "JWT").claim("sub", owner.value().toString()).claim("preferred_username", "owner").issuedAt(Instant.now()).expiresAt(Instant.now().plusSeconds(3600)).build();

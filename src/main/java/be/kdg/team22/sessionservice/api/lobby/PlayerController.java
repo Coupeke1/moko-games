@@ -1,6 +1,6 @@
 package be.kdg.team22.sessionservice.api.lobby;
 
-import be.kdg.team22.sessionservice.api.lobby.models.LobbyResponseModel;
+import be.kdg.team22.sessionservice.api.lobby.models.LobbyModel;
 import be.kdg.team22.sessionservice.application.lobby.LobbyPlayerService;
 import be.kdg.team22.sessionservice.application.lobby.LobbyService;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
@@ -41,13 +41,13 @@ public class PlayerController {
 
 
     @DeleteMapping("/{id}/bot")
-    public ResponseEntity<LobbyResponseModel> removeBot(@PathVariable UUID id, @AuthenticationPrincipal Jwt token) {
+    public ResponseEntity<LobbyModel> removeBot(@PathVariable UUID id, @AuthenticationPrincipal Jwt token) {
         PlayerId ownerId = PlayerId.get(token);
         LobbyId lobbyId = LobbyId.from(id);
 
         lobbyPlayerService.removeBot(ownerId, lobbyId);
 
         Lobby updatedLobby = lobbyService.findLobby(lobbyId);
-        return ResponseEntity.ok(LobbyResponseModel.from(updatedLobby));
+        return ResponseEntity.ok(LobbyModel.from(updatedLobby));
     }
 }

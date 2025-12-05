@@ -13,6 +13,7 @@ import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.domain.player.PlayerName;
 import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerNotFriendException;
+import be.kdg.team22.sessionservice.infrastructure.lobby.LobbySocketPublisher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -31,17 +32,12 @@ class LobbyPlayerServiceTest {
     private final LobbyRepository repo = mock(LobbyRepository.class);
     private final FriendsService friendsService = mock(FriendsService.class);
     private final PlayerService playerService = mock(PlayerService.class);
-
-    LobbyPlayerService service = new LobbyPlayerService(repo, friendsService, playerService);
+    private final LobbySocketPublisher socket = mock(LobbySocketPublisher.class);
+    private final LobbyPublisherService publisherService = new LobbyPublisherService(repo, socket);
+    LobbyPlayerService service = new LobbyPlayerService(repo, friendsService, playerService, publisherService);
 
     private Jwt jwtFor(PlayerId pid) {
-        return Jwt.withTokenValue("TOKEN-" + pid.value())
-                .header("alg", "none")
-                .claim("sub", pid.value().toString())
-                .claim("preferred_username", "testuser")
-                .issuedAt(Instant.now())
-                .expiresAt(Instant.now().plusSeconds(3600))
-                .build();
+        return Jwt.withTokenValue("TOKEN-" + pid.value()).header("alg", "none").claim("sub", pid.value().toString()).claim("preferred_username", "testuser").issuedAt(Instant.now()).expiresAt(Instant.now().plusSeconds(3600)).build();
     }
 
     private Lobby newLobby(LobbyId id, PlayerId owner) {
@@ -77,9 +73,7 @@ class LobbyPlayerServiceTest {
         when(repo.findById(lobbyId)).thenReturn(Optional.of(lobby));
         when(friendsService.findAllFriends(any())).thenReturn(List.of());
 
-        assertThatThrownBy(() ->
-                service.invitePlayer(owner, lobbyId, target, jwtFor(owner))
-        ).isInstanceOf(PlayerNotFriendException.class);
+        assertThatThrownBy(() -> service.invitePlayer(owner, lobbyId, target, jwtFor(owner))).isInstanceOf(PlayerNotFriendException.class);
     }
 
     @Test
@@ -90,9 +84,7 @@ class LobbyPlayerServiceTest {
 
         when(repo.findById(lobbyId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() ->
-                service.invitePlayer(owner, lobbyId, target, jwtFor(owner))
-        ).isInstanceOf(LobbyNotFoundException.class);
+        assertThatThrownBy(() -> service.invitePlayer(owner, lobbyId, target, jwtFor(owner))).isInstanceOf(LobbyNotFoundException.class);
     }
 
     @Test
@@ -120,9 +112,7 @@ class LobbyPlayerServiceTest {
 
         when(repo.findById(lobbyId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() ->
-                service.acceptInvite(player, lobbyId, jwtFor(player))
-        ).isInstanceOf(LobbyNotFoundException.class);
+        assertThatThrownBy(() -> service.acceptInvite(player, lobbyId, jwtFor(player))).isInstanceOf(LobbyNotFoundException.class);
     }
 
     @Test
@@ -152,9 +142,7 @@ class LobbyPlayerServiceTest {
 
         when(repo.findById(lobbyId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() ->
-                service.removePlayer(owner, lobbyId, target)
-        ).isInstanceOf(LobbyNotFoundException.class);
+        assertThatThrownBy(() -> service.removePlayer(owner, lobbyId, target)).isInstanceOf(LobbyNotFoundException.class);
     }
 
     @Test
@@ -179,8 +167,6 @@ class LobbyPlayerServiceTest {
 
         when(repo.findById(lobbyId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() ->
-                service.setReady(p, lobbyId)
-        ).isInstanceOf(LobbyNotFoundException.class);
+        assertThatThrownBy(() -> service.setReady(p, lobbyId)).isInstanceOf(LobbyNotFoundException.class);
     }
 }

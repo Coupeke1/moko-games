@@ -20,11 +20,13 @@ public class LobbyPlayerService {
     private final LobbyRepository lobbyRepository;
     private final FriendsService friendsService;
     private final PlayerService playerService;
+    private final LobbyPublisherService lobbyPublisher;
 
-    public LobbyPlayerService(final LobbyRepository lobbyRepository, final FriendsService friendsService, final PlayerService playerService) {
+    public LobbyPlayerService(final LobbyRepository lobbyRepository, final FriendsService friendsService, final PlayerService playerService, final LobbyPublisherService lobbyPublisher) {
         this.lobbyRepository = lobbyRepository;
         this.friendsService = friendsService;
         this.playerService = playerService;
+        this.lobbyPublisher = lobbyPublisher;
     }
 
     public void invitePlayer(final PlayerId ownerId, final LobbyId lobbyId, final PlayerId playerId, final Jwt token) {
@@ -32,7 +34,7 @@ public class LobbyPlayerService {
         ensureFriend(ownerId, playerId, token);
 
         lobby.invitePlayer(ownerId, playerId);
-        lobbyRepository.save(lobby);
+        lobbyPublisher.saveAndPublish(lobby);
     }
 
     public void addBot(final PlayerId ownerId, final LobbyId lobbyId) {
@@ -41,15 +43,14 @@ public class LobbyPlayerService {
         Player bot = playerService.createBot();
 
         lobby.addBot(ownerId, bot);
-        lobbyRepository.save(lobby);
+        lobbyPublisher.saveAndPublish(lobby);
     }
 
     public void removeBot(final PlayerId ownerId, final LobbyId lobbyId) {
         Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
 
         lobby.removeBot(ownerId);
-
-        lobbyRepository.save(lobby);
+        lobbyPublisher.saveAndPublish(lobby);
     }
 
     public void acceptInvite(final PlayerId playerId, final LobbyId lobbyId, final Jwt token) {
@@ -57,14 +58,14 @@ public class LobbyPlayerService {
         Player player = playerService.findPlayer(playerId, token);
 
         lobby.acceptInvite(player);
-        lobbyRepository.save(lobby);
+        lobbyPublisher.saveAndPublish(lobby);
     }
 
     public void removePlayer(final PlayerId ownerId, final LobbyId lobbyId, final PlayerId playerId) {
         Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
 
         lobby.removePlayer(ownerId, playerId);
-        lobbyRepository.save(lobby);
+        lobbyPublisher.saveAndPublish(lobby);
     }
 
     private void ensureFriend(final PlayerId ownerId, final PlayerId playerId, final Jwt token) {
@@ -78,13 +79,13 @@ public class LobbyPlayerService {
         Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
 
         lobby.setReady(playerId);
-        lobbyRepository.save(lobby);
+        lobbyPublisher.saveAndPublish(lobby);
     }
 
     public void setUnready(final PlayerId playerId, final LobbyId lobbyId) {
         Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
 
         lobby.setUnready(playerId);
-        lobbyRepository.save(lobby);
+        lobbyPublisher.saveAndPublish(lobby);
     }
 }

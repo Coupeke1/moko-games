@@ -28,11 +28,13 @@ import java.util.UUID;
 @Transactional
 public class LobbyService {
     private final LobbyRepository repository;
+    private final LobbyPublisherService publisher;
     private final PlayerService playerService;
     private final ExternalGamesRepository gamesRepository;
 
-    public LobbyService(final LobbyRepository repository, final PlayerService playerService, final ExternalGamesRepository gamesRepository) {
+    public LobbyService(final LobbyRepository repository, final LobbyPublisherService publisher, final PlayerService playerService, final ExternalGamesRepository gamesRepository) {
         this.repository = repository;
+        this.publisher = publisher;
         this.playerService = playerService;
         this.gamesRepository = gamesRepository;
     }
@@ -42,7 +44,7 @@ public class LobbyService {
         LobbySettings settings = mapToDomainSettings(model.settings(), model.maxPlayers());
         Lobby lobby = new Lobby(gameId, owner, settings);
 
-        repository.save(lobby);
+        publisher.saveAndPublish(lobby);
         return lobby;
     }
 
@@ -57,7 +59,8 @@ public class LobbyService {
     public Lobby closeLobby(final LobbyId lobbyId, final PlayerId ownerId) {
         Lobby lobby = findLobby(lobbyId);
         lobby.close(ownerId);
-        repository.save(lobby);
+
+        publisher.saveAndPublish(lobby);
         return lobby;
     }
 
@@ -65,7 +68,8 @@ public class LobbyService {
         Lobby lobby = findLobby(lobbyId);
         LobbySettings newSettings = mapToDomainSettings(model.settings(), model.maxPlayers());
         lobby.changeSettings(ownerId, newSettings);
-        repository.save(lobby);
+
+        publisher.saveAndPublish(lobby);
         return lobby;
     }
 
@@ -94,7 +98,7 @@ public class LobbyService {
 
         lobby.markStarted(GameId.from(response.gameInstanceId()));
 
-        repository.save(lobby);
+        publisher.saveAndPublish(lobby);
         return lobby;
     }
 
