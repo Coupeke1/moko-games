@@ -30,8 +30,6 @@ export default function PlayerCard({
     profile: Profile;
     isOwner: boolean;
 }) {
-    const client = useQueryClient();
-
     const remove = useMutation({
         mutationFn: async () => await removePlayer(player.id, lobby.id),
         onSuccess: async () => {
