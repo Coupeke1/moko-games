@@ -7,7 +7,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 @AggregateRoot
 public class ChatChannel {
@@ -56,8 +55,7 @@ public class ChatChannel {
         return Collections.unmodifiableList(messages);
     }
 
-    public List<ChatMessage> getMessagesSince(Instant since) {
-        Objects.requireNonNull(since);
+    public List<ChatMessage> getMessagesSince(final Instant since) {
         return messages.stream()
                 .filter(m -> m.getTimestamp().isAfter(since))
                 .toList();

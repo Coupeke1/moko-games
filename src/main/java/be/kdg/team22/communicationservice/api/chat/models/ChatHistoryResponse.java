@@ -14,7 +14,7 @@ public record ChatHistoryResponse(
     public static ChatHistoryResponse fromDomain(ChatChannel channel) {
         List<ChatMessageResponse> msgDtos = channel.getMessages()
                 .stream()
-                .map(ChatMessageResponse::fromDomain)
+                .map(ChatMessageResponse::from)
                 .toList();
 
         return new ChatHistoryResponse(

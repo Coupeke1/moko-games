@@ -11,7 +11,7 @@ public record ChatMessageResponse(
         String content,
         Instant timestamp
 ) {
-    public static ChatMessageResponse fromDomain(ChatMessage message) {
+    public static ChatMessageResponse from(ChatMessage message) {
         return new ChatMessageResponse(
                 message.getId().value(),
                 message.getSenderId(),

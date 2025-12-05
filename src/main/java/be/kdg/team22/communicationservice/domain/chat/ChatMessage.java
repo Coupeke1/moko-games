@@ -4,7 +4,6 @@ import be.kdg.team22.communicationservice.domain.chat.exceptions.MessageEmptyExc
 import org.jmolecules.ddd.annotation.Entity;
 
 import java.time.Instant;
-import java.util.Objects;
 
 @Entity
 public class ChatMessage {
@@ -16,25 +15,25 @@ public class ChatMessage {
     private final String content;
     private final Instant timestamp;
 
-    public ChatMessage(ChatMessageId id,
-                       ChatChannelId channelId,
-                       String senderId,
-                       String content,
-                       Instant timestamp) {
-        this.id = Objects.requireNonNull(id);
-        this.channelId = Objects.requireNonNull(channelId);
-        this.senderId = Objects.requireNonNull(senderId);
-        this.content = Objects.requireNonNull(content);
-        this.timestamp = Objects.requireNonNull(timestamp);
+    public ChatMessage(final ChatMessageId id,
+                       final ChatChannelId channelId,
+                       final String senderId,
+                       final String content,
+                       final Instant timestamp) {
+        this.id = id;
+        this.channelId = channelId;
+        this.senderId = senderId;
+        this.content = content;
+        this.timestamp = timestamp;
 
         if (content.isBlank()) {
             throw MessageEmptyException.BodyEmpty();
         }
     }
 
-    public static ChatMessage newUserMessage(ChatChannelId channelId,
-                                             String senderId,
-                                             String content) {
+    public static ChatMessage newUserMessage(final ChatChannelId channelId,
+                                             final String senderId,
+                                             final String content) {
         return new ChatMessage(
                 ChatMessageId.create(),
                 channelId,
@@ -44,9 +43,9 @@ public class ChatMessage {
         );
     }
 
-    public static ChatMessage newAIMessage(ChatChannelId channelId,
-                                           String aiModelId,
-                                           String content) {
+    public static ChatMessage newAIMessage(final ChatChannelId channelId,
+                                           final String aiModelId,
+                                           final String content) {
         return new ChatMessage(
                 ChatMessageId.create(),
                 channelId,

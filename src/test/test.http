@@ -1,0 +1,73 @@
+### 1) JWT Token (mathias)
+POST http://localhost:8180/realms/moko/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password &
+client_id= communication-service &
+client_secret=cXwsnvyHm2NquygtuDb3QWTLjs9PUOzW &
+username=mathias &
+password=loginmathias &
+scope=openid
+
+> {%
+    client.global.set("chat_token", response.body.access_token);
+%}
+
+### 2) Send message to AI chat channel
+POST http://localhost:8082/api/chat/AI/user123-tictactoe
+Authorization: Bearer {{chat_token}}
+Content-Type: application/json
+
+{
+  "content": "Hoe speel ik tic tac toe?"
+}
+
+> {%
+    client.global.set("ai_reference", "user123-tictactoe");
+%}
+
+### 3) Send second message to AI channel
+POST http://localhost:8082/api/chat/AI/{{ai_reference}}
+Authorization: Bearer {{chat_token}}
+Content-Type: application/json
+
+{
+  "content": "Wat is de beste openingszet?"
+}
+
+### 4) GET AI chat messages
+GET http://localhost:8082/api/chat/AI/{{ai_reference}}
+Authorization: Bearer {{chat_token}}
+
+### 5) GET AI chat messages since timestamp
+GET http://localhost:8082/api/chat/AI/{{ai_reference}}?since=2025-01-01T00:00:00Z
+Authorization: Bearer {{chat_token}}
+
+### 6) Send message to LOBBY chat
+POST http://localhost:8082/api/chat/LOBBY/c7ba4b37-a45d-4e1f-a756-735ef919c84d
+Authorization: Bearer {{chat_token}}
+Content-Type: application/json
+
+{
+  "content": "Hey iedereen!"
+}
+
+> {%
+    client.global.set("lobby_id", "c7ba4b37-a45d-4e1f-a756-735ef919c84d");
+%}
+
+### 7) Send second message to LOBBY
+POST http://localhost:8082/api/chat/LOBBY/{{lobby_id}}
+Authorization: Bearer {{chat_token}}
+Content-Type: application/json
+
+{
+  "content": "Wanneer starten we?"
+}
+
+### 8) GET lobby chat messages
+GET http://localhost:8082/api/chat/LOBBY/{{lobby_id}}
+Authorization: Bearer {{chat_token}}
+
+### Health check
+GET http://localhost:8082/actuator/health

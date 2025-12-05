@@ -1,10 +1,12 @@
 package be.kdg.team22.communicationservice.api.chat;
 
+import be.kdg.team22.communicationservice.api.chat.models.ChatChannelResponse;
 import be.kdg.team22.communicationservice.api.chat.models.ChatMessageRequestModel;
 import be.kdg.team22.communicationservice.api.chat.models.ChatMessageResponse;
+import be.kdg.team22.communicationservice.application.chat.ChatService;
+import be.kdg.team22.communicationservice.domain.chat.ChatChannel;
 import be.kdg.team22.communicationservice.domain.chat.ChatChannelType;
 import be.kdg.team22.communicationservice.domain.chat.ChatMessage;
-import be.kdg.team22.communicationservice.domain.chat.ChatService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,7 +21,6 @@ import static org.springframework.format.annotation.DateTimeFormat.ISO;
 @RestController
 @RequestMapping("/api/chat")
 public class ChatController {
-
     private final ChatService chatService;
 
     public ChatController(ChatService chatService) {
@@ -38,27 +39,35 @@ public class ChatController {
         ChatMessage message = chatService.sendMessage(
                 type,
                 referenceId,
-                "user:" + userId,
-                request.content()
+                userId,
+                request.content(),
+                token
         );
-
-        return ResponseEntity.ok(ChatMessageResponse.fromDomain(message));
+        return ResponseEntity.ok(ChatMessageResponse.from(message));
     }
 
     @GetMapping("/{type}/{referenceId}")
     public ResponseEntity<List<ChatMessageResponse>> getMessages(
             @PathVariable ChatChannelType type,
             @PathVariable String referenceId,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = ISO.DATE_TIME)
-            Instant since
+            @AuthenticationPrincipal Jwt token,
+            @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE_TIME) Instant since
     ) {
-        List<ChatMessage> messages = chatService.getMessages(type, referenceId, since);
+        String userId = token.getSubject();
 
-        List<ChatMessageResponse> dtos = messages.stream()
-                .map(ChatMessageResponse::fromDomain)
-                .toList();
+        List<ChatMessage> messages = chatService.getMessages(type, referenceId, since, userId,token);
 
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(
+                messages.stream().map(ChatMessageResponse::from).toList()
+        );
+    }
+
+    @PostMapping("/channel/{type}/{referenceId}")
+    public ResponseEntity<ChatChannelResponse> createChannel(
+            @PathVariable ChatChannelType type,
+            @PathVariable String referenceId
+    ) {
+        ChatChannel channel = chatService.createChannel(type, referenceId);
+        return ResponseEntity.ok(ChatChannelResponse.from(channel));
     }
 }
