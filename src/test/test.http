@@ -13,6 +13,21 @@ scope=openid
     client.global.set("chat_token", response.body.access_token);
 %}
 
+### 1) JWT Token (kaj)
+POST http://localhost:8180/realms/moko/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password &
+client_id=communication-service &
+client_secret=cXwsnvyHm2NquygtuDb3QWTLjs9PUOzW &
+username=kaj &
+password=loginkaj &
+scope=openid
+
+> {%
+    client.global.set("kaj_Token", response.body.access_token);
+%}
+
 ### 2) Send message to BOT chat channel
 POST http://localhost:8082/api/chat/bot/user123-tictactoe
 Authorization: Bearer {{chat_token}}
@@ -50,7 +65,7 @@ GET http://localhost:8082/api/chat/bot/{{bot_reference}}?since=2025-01-01T00:00:
 Authorization: Bearer {{chat_token}}
 
 ### 6) Send message to LOBBY chat
-POST http://localhost:8082/api/chat/lobby/c7ba4b37-a45d-4e1f-a756-735ef919c84d
+POST http://localhost:8082/api/chat/lobby/e943f180-eaba-4de3-9d12-eee13a25c1b5
 Authorization: Bearer {{chat_token}}
 Content-Type: application/json
 
@@ -59,14 +74,14 @@ Content-Type: application/json
 }
 
 > {%
-    client.global.set("lobby_id", "c7ba4b37-a45d-4e1f-a756-735ef919c84d");
+    client.global.set("lobby_id", "e943f180-eaba-4de3-9d12-eee13a25c1b5");
 %}
 
 
 
 ### 7) Send second message to LOBBY
 POST http://localhost:8082/api/chat/lobby/{{lobby_id}}
-Authorization: Bearer {{chat_token}}
+Authorization: Bearer {{kaj_Token}}
 Content-Type: application/json
 
 {
