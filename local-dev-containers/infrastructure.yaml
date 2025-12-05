@@ -85,11 +85,3 @@ volumes:
   moko_rabbitmq_all:
   moko_redis_all:
   moko_mysql_data:
-
-networks:
-  moko_kc:
-    name: moko-kc-network
-    driver: bridge
-  moko_backend:
-    name: moko-back-network
-    driver: bridge

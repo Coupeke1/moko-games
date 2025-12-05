@@ -1,1 +1,3 @@
 ﻿.idea
+/local-dev-containers/postgresql/
+/local-dev-containers/rabbitmq/

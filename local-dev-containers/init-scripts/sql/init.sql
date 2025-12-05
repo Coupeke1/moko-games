@@ -4,3 +4,4 @@ CREATE SCHEMA social_service;
 CREATE SCHEMA communication_service;
 CREATE SCHEMA session_service;
 CREATE SCHEMA user_service;
+CREATE SCHEMA chess;
