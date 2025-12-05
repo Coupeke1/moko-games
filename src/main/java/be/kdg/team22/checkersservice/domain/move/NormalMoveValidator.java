@@ -43,7 +43,7 @@ public class NormalMoveValidator {
 
     private static void validateSingleStep(final Board board, final Move move) {
         int[] fromCoords = board.convertCellNumberToCoordinates(move.fromCell());
-        int[] toCoords = board.convertCellNumberToCoordinates(move.toCell());
+        int[] toCoords = board.convertCellNumberToCoordinates(move.cells().get(1));
 
         int rowDiff = Math.abs(toCoords[0] - fromCoords[0]);
         if (rowDiff != 1) {

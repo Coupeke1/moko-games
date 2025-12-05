@@ -11,6 +11,8 @@ import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class MoveValidatorTest {
@@ -23,7 +25,7 @@ class MoveValidatorTest {
 
     @Test
     void validateMoveShouldAllowValidForwardMoveForWhite() {
-        Move move = new Move(null, 9, 13);
+        Move move = new Move(null, List.of(9, 13));
 
         assertDoesNotThrow(() ->
                 MoveValidator.validateMove(board, PlayerRole.WHITE, move, KingMovementMode.FLYING)
@@ -32,7 +34,7 @@ class MoveValidatorTest {
 
     @Test
     void validateMoveShouldAllowValidForwardMoveForBlack() {
-        Move move = new Move(null, 24, 20);
+        Move move = new Move(null, List.of(24, 20));
 
         assertDoesNotThrow(() ->
                 MoveValidator.validateMove(board, PlayerRole.BLACK, move, KingMovementMode.FLYING)
@@ -41,7 +43,7 @@ class MoveValidatorTest {
 
     @Test
     void validateMoveShouldThrowWhenMovingEmptyCell() {
-        Move move = new Move(null, 16, 20);
+        Move move = new Move(null, List.of(16, 20));
 
         assertThrows(StartingPieceNotFoundException.class, () ->
                 MoveValidator.validateMove(board, PlayerRole.WHITE, move, KingMovementMode.FLYING)
@@ -50,7 +52,7 @@ class MoveValidatorTest {
 
     @Test
     void validateMoveShouldThrowWhenMovingOpponentPiece() {
-        Move move = new Move(null, 9, 13);
+        Move move = new Move(null, List.of(9, 13));
 
         assertThrows(NotPlayersPieceException.class, () ->
                 MoveValidator.validateMove(board, PlayerRole.BLACK, move, KingMovementMode.FLYING)
@@ -59,7 +61,7 @@ class MoveValidatorTest {
 
     @Test
     void validateMoveShouldThrowWhenMovingBackwardsAsWhite() {
-        Move move = new Move(null, 10, 6);
+        Move move = new Move(null, List.of(10, 6));
 
         assertThrows(BackwardsMoveException.class, () ->
                 MoveValidator.validateMove(createBackwardsMoveBoard(), PlayerRole.WHITE, move, KingMovementMode.FLYING)
@@ -68,7 +70,7 @@ class MoveValidatorTest {
 
     @Test
     void validateMoveShouldThrowWhenMovingBackwardsAsBlack() {
-        Move move = new Move(null, 18, 23);
+        Move move = new Move(null, List.of(18, 23));
 
         assertThrows(BackwardsMoveException.class, () ->
                 MoveValidator.validateMove(createBackwardsMoveBoard(), PlayerRole.BLACK, move, KingMovementMode.FLYING)
@@ -78,7 +80,7 @@ class MoveValidatorTest {
     @Test
     void validateMoveShouldThrowWhenTargetCellOccupied() {
         Board testBoard = createTestBoard();
-        Move move = new Move(null, 9, 13);
+        Move move = new Move(null, List.of(9, 13));
 
         assertThrows(TargetCellNotEmptyException.class, () ->
                 MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move, KingMovementMode.FLYING)
@@ -88,7 +90,7 @@ class MoveValidatorTest {
     @Test
     void validateMoveShouldThrowWhenNotDiagonal() {
         Board testBoard = createTestBoard();
-        Move move = new Move(null, 9, 10);
+        Move move = new Move(null, List.of(9, 10));
 
         assertThrows(MoveNotDiagonalException.class, () ->
                 MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move, KingMovementMode.FLYING)
@@ -97,7 +99,7 @@ class MoveValidatorTest {
 
     @Test
     void validateMoveShouldThrowWhenMovingMoreThanOneStepWithoutCapture() {
-        Move move = new Move(null, 9, 18);
+        Move move = new Move(null, List.of(9, 18));
 
         assertThrows(TooManyTilesException.class, () ->
                 MoveValidator.validateMove(board, PlayerRole.WHITE, move, KingMovementMode.FLYING)
@@ -107,7 +109,7 @@ class MoveValidatorTest {
     @Test
     void validateMoveShouldAllowValidCapture() {
         Board testBoard = createCaptureBoard();
-        Move move = new Move(null, 9, 18);
+        Move move = new Move(null, List.of(9, 18));
 
         assertDoesNotThrow(() ->
                 MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move, KingMovementMode.FLYING)
@@ -117,7 +119,7 @@ class MoveValidatorTest {
     @Test
     void validateMoveShouldThrowWhenCapturingOwnPiece() {
         Board testBoard = createOwnPieceCaptureBoard();
-        Move move = new Move(null, 9, 18);
+        Move move = new Move(null, List.of(9, 18));
 
         assertThrows(OwnPieceInTheWayException.class, () ->
                 MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move, KingMovementMode.FLYING)
@@ -126,7 +128,7 @@ class MoveValidatorTest {
 
     @Test
     void validateMoveShouldThrowWhenCellOutsideBoard() {
-        Move move = new Move(null, 1, 33);
+        Move move = new Move(null, List.of(1, 33));
 
         assertThrows(OutsidePlayingFieldException.class, () ->
                 MoveValidator.validateMove(board, PlayerRole.WHITE, move, KingMovementMode.FLYING)
@@ -135,7 +137,7 @@ class MoveValidatorTest {
 
     @Test
     void isCaptureMoveShouldReturnFalseForOneStepMove() {
-        Move move = new Move(null, 9, 13);
+        Move move = new Move(null, List.of(9, 13));
         Piece testPiece = board.pieceAt(9).get();
 
         assertFalse(MoveValidator.isCaptureMove(board, testPiece.color(), move));
@@ -144,7 +146,7 @@ class MoveValidatorTest {
     @Test
     void validateNormalMoveShouldAllowPromotionMoveForWhite() {
         Board testBoard = createPromotionBoardWhite();
-        Move move = new Move(null, 25, 29);
+        Move move = new Move(null, List.of(25, 29));
 
         assertDoesNotThrow(() ->
                 MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move, KingMovementMode.FLYING)
@@ -154,7 +156,7 @@ class MoveValidatorTest {
     @Test
     void validateNormalMoveShouldAllowPromotionMoveForBlack() {
         Board testBoard = createPromotionBoardBlack();
-        Move move = new Move(null, 5, 1);
+        Move move = new Move(null, List.of(5, 1));
 
         assertDoesNotThrow(() ->
                 MoveValidator.validateMove(testBoard, PlayerRole.BLACK, move, KingMovementMode.FLYING)

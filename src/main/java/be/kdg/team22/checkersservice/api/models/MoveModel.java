@@ -3,16 +3,17 @@ package be.kdg.team22.checkersservice.api.models;
 import be.kdg.team22.checkersservice.domain.move.Move;
 import be.kdg.team22.checkersservice.domain.player.PlayerId;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
 
+import java.util.List;
 import java.util.UUID;
 
-public record MoveModel(@Valid UUID playerId, @Positive int fromCell, @Positive int toCell) {
+public record MoveModel(@Valid UUID playerId, @NotEmpty List<@Positive Integer> cells) {
     public Move to() {
         return new Move(
                 new PlayerId(playerId),
-                fromCell,
-                toCell
+                cells
         );
     }
 }

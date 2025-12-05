@@ -61,7 +61,7 @@ public class KingMoveValidator {
 
     private static void validateSteps(final Board board, final Move move, KingMovementMode movementMode, boolean capture) {
         int[] fromCoords = board.convertCellNumberToCoordinates(move.fromCell());
-        int[] toCoords = board.convertCellNumberToCoordinates(move.toCell());
+        int[] toCoords = board.convertCellNumberToCoordinates(move.cells().get(1));
 
         int rowDiff = Math.abs(toCoords[0] - fromCoords[0]);
         int allowedSteps;

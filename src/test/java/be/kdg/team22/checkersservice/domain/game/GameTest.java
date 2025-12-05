@@ -156,7 +156,7 @@ public class GameTest {
 
     @Test
     void requestMoveShouldChangeCurrentRole() {
-        Move move = new Move(playerBlackId, 24, 20);
+        Move move = new Move(playerBlackId, List.of(24, 20));
 
         game.requestMove(move);
 
@@ -168,7 +168,7 @@ public class GameTest {
         Field boardField = Game.class.getDeclaredField("board");
         boardField.setAccessible(true);
         boardField.set(game, createKingBoard());
-        Move move = new Move(playerBlackId, 23, 12);
+        Move move = new Move(playerBlackId, List.of(23, 12));
 
         game.requestMove(move);
         assertEquals(Optional.empty(), game.board().pieceAt(16));
@@ -179,7 +179,7 @@ public class GameTest {
         Field boardField = Game.class.getDeclaredField("board");
         boardField.setAccessible(true);
         boardField.set(game, createKingBoard());
-        Move move = new Move(playerBlackId, 18, 29);
+        Move move = new Move(playerBlackId, List.of(18, 29));
 
         game.requestMove(move);
         assertEquals(Optional.empty(), game.board().pieceAt(18));
@@ -188,7 +188,7 @@ public class GameTest {
 
     @Test
     void requestMoveShouldThrowWhenNotPlayersTurn() {
-        Move move = new Move(playerWhiteId, 9, 13);
+        Move move = new Move(playerWhiteId, List.of(9, 13));
 
         assertThrows(NotPlayersTurnException.class, () ->
                 game.requestMove(move)
@@ -200,7 +200,7 @@ public class GameTest {
         Field statusField = Game.class.getDeclaredField("status");
         statusField.setAccessible(true);
         statusField.set(game, GameStatus.BLACK_WIN);
-        Move move = new Move(playerBlackId, 24, 20);
+        Move move = new Move(playerBlackId, List.of(24, 20));
 
         assertThrows(GameNotRunningException.class, () ->
                 game.requestMove(move)
@@ -212,7 +212,7 @@ public class GameTest {
         Field boardField = Game.class.getDeclaredField("board");
         boardField.setAccessible(true);
         boardField.set(game, createKingBoard());
-        Move move = new Move(playerBlackId, 18, 27);
+        Move move = new Move(playerBlackId, List.of(18, 27));
 
         assertThrows(OwnPieceInTheWayException.class, () ->
                 game.requestMove(move)
@@ -227,7 +227,7 @@ public class GameTest {
         Field movementModeField = Game.class.getDeclaredField("kingMovementMode");
         movementModeField.setAccessible(true);
         movementModeField.set(game, KingMovementMode.SINGLE);
-        Move move = new Move(playerBlackId, 18, 25);
+        Move move = new Move(playerBlackId, List.of(18, 25));
 
         assertThrows(TooManyTilesException.class, () ->
                 game.requestMove(move)
@@ -242,7 +242,7 @@ public class GameTest {
         Field movementModeField = Game.class.getDeclaredField("kingMovementMode");
         movementModeField.setAccessible(true);
         movementModeField.set(game, KingMovementMode.DOUBLE);
-        Move move = new Move(playerBlackId, 18, 4);
+        Move move = new Move(playerBlackId, List.of(18, 4));
 
         assertThrows(CapturedPieceNotOnLastTileException.class, () ->
                 game.requestMove(move)
@@ -254,7 +254,7 @@ public class GameTest {
         Field boardField = Game.class.getDeclaredField("board");
         boardField.setAccessible(true);
         boardField.set(game, createKingBoard());
-        Move move = new Move(playerBlackId, 18, 4);
+        Move move = new Move(playerBlackId, List.of(18, 4));
 
         assertThrows(CapturedPieceNotOnLastTileException.class, () ->
                 game.requestMove(move)
@@ -266,7 +266,7 @@ public class GameTest {
         Field boardField = Game.class.getDeclaredField("board");
         boardField.setAccessible(true);
         boardField.set(game, createKingBoard());
-        Move move = new Move(playerBlackId, 18, 18);
+        Move move = new Move(playerBlackId, List.of(18, 18));
 
         assertThrows(TargetCellNotEmptyException.class, () ->
                 game.requestMove(move)

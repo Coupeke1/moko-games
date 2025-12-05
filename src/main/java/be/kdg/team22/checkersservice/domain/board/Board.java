@@ -57,7 +57,7 @@ public class Board {
     public void move(final Move move) {
         Piece piece = grid.get(move.fromCell());
 
-        int row = convertCellNumberToCoordinates(move.toCell())[0];
+        int row = convertCellNumberToCoordinates(move.cells().get(1))[0];
         boolean shouldPromote = false;
         if (piece.color() == PlayerRole.WHITE && row == size - 1) {
             shouldPromote = true;
@@ -71,7 +71,7 @@ public class Board {
 
         if (isCaptureMove(this, piece.color(), move)) {
             int[] fromCoords = convertCellNumberToCoordinates(move.fromCell());
-            int[] toCoords = convertCellNumberToCoordinates(move.toCell());
+            int[] toCoords = convertCellNumberToCoordinates(move.cells().get(1));
             int[][] cellsBetween = cellsBetween(fromCoords, toCoords);
             int[] lastCellBeforeDestination = cellsBetween[cellsBetween.length - 1];
             int cellToClear = convertCoordinatesToCellNumber(
@@ -82,7 +82,7 @@ public class Board {
         }
 
         grid.put(move.fromCell(), null);
-        grid.put(move.toCell(), piece);
+        grid.put(move.cells().get(1), piece);
     }
 
     private void placePlayerPieces(final PlayerRole player, final int startRow, final int endRow) {
