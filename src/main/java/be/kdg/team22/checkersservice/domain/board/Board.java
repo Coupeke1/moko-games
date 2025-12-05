@@ -2,6 +2,7 @@ package be.kdg.team22.checkersservice.domain.board;
 
 import be.kdg.team22.checkersservice.domain.game.exceptions.BoardSizeException;
 import be.kdg.team22.checkersservice.domain.game.exceptions.OutsidePlayingFieldException;
+import be.kdg.team22.checkersservice.domain.move.Move;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 import org.jmolecules.ddd.annotation.ValueObject;
 
@@ -9,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static be.kdg.team22.checkersservice.domain.board.MoveValidator.isCaptureMove;
+import static be.kdg.team22.checkersservice.domain.move.MoveValidator.isCaptureMove;
 
 @ValueObject
 public class Board {
@@ -68,17 +69,20 @@ public class Board {
             piece.promoteToKing();
         }
 
-        grid.put(move.fromCell(), null);
-        grid.put(move.toCell(), piece);
-
-        if (isCaptureMove(this, move)) {
+        if (isCaptureMove(this, piece.color(), move)) {
             int[] fromCoords = convertCellNumberToCoordinates(move.fromCell());
             int[] toCoords = convertCellNumberToCoordinates(move.toCell());
-            int middleRow = (fromCoords[0] + toCoords[0]) / 2;
-            int middleCol = (fromCoords[1] + toCoords[1]) / 2;
-            int middleCell = convertCoordinatesToCellNumber(middleRow, middleCol);
-            grid.put(middleCell, null);
+            int[][] cellsBetween = cellsBetween(fromCoords, toCoords);
+            int[] lastCellBeforeDestination = cellsBetween[cellsBetween.length - 1];
+            int cellToClear = convertCoordinatesToCellNumber(
+                    lastCellBeforeDestination[0],
+                    lastCellBeforeDestination[1]
+            );
+            grid.put(cellToClear, null);
         }
+
+        grid.put(move.fromCell(), null);
+        grid.put(move.toCell(), piece);
     }
 
     private void placePlayerPieces(final PlayerRole player, final int startRow, final int endRow) {
@@ -142,6 +146,24 @@ public class Board {
         }
 
         return new int[]{row, col};
+    }
+
+    public int[][] cellsBetween(int[] fromCoords, int[] toCoords) {
+        int rowDiff = toCoords[0] - fromCoords[0];
+        int colDiff = toCoords[1] - fromCoords[1];
+        int distance = Math.abs(rowDiff);
+
+        int[][] cellsBetween = new int[distance - 1][2];
+
+        int rowDirection = rowDiff > 0 ? 1 : -1;
+        int colDirection = colDiff > 0 ? 1 : -1;
+
+        for (int i = 1; i < distance; i++) {
+            cellsBetween[i - 1][0] = fromCoords[0] + (i * rowDirection);
+            cellsBetween[i - 1][1] = fromCoords[1] + (i * colDirection);
+        }
+
+        return cellsBetween;
     }
 
     public Optional<Piece> pieceAt(final int cellNumber) {

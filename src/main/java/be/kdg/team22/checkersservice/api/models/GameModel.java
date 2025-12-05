@@ -2,6 +2,7 @@ package be.kdg.team22.checkersservice.api.models;
 
 import be.kdg.team22.checkersservice.domain.game.Game;
 import be.kdg.team22.checkersservice.domain.game.GameStatus;
+import be.kdg.team22.checkersservice.domain.move.KingMovementMode;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 
 import java.util.List;
@@ -13,6 +14,7 @@ public record GameModel(
         PlayerRole aiPlayer,
         PlayerRole currentRole,
         String[][] board,
+        KingMovementMode kingMovementMode,
         GameStatus status
 ) {
     public static GameModel from(Game game) {
@@ -22,6 +24,7 @@ public record GameModel(
                 game.aiPlayer(),
                 game.currentRole(),
                 game.board().state(),
+                game.kingMovementMode(),
                 game.status()
         );
     }

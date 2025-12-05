@@ -2,7 +2,9 @@ package be.kdg.team22.checkersservice.api;
 
 import be.kdg.team22.checkersservice.api.models.CreateGameModel;
 import be.kdg.team22.checkersservice.api.models.GameModel;
+import be.kdg.team22.checkersservice.api.models.GameSettingsModel;
 import be.kdg.team22.checkersservice.api.models.MoveModel;
+import be.kdg.team22.checkersservice.domain.move.KingMovementMode;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +39,7 @@ public class GameControllerTest {
     @BeforeEach
     void setup() {
         players = List.of(UUID.randomUUID(), UUID.randomUUID());
-        model = new CreateGameModel(players);
+        model = new CreateGameModel(players, new GameSettingsModel(KingMovementMode.FLYING));
         gameId = null;
     }
 
@@ -75,7 +77,7 @@ public class GameControllerTest {
     @Test
     void createShouldReturnBadRequestWithTooManyPlayers() throws Exception {
         List<UUID> threePlayers = List.of(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
-        CreateGameModel threePlayerModel = new CreateGameModel(threePlayers);
+        CreateGameModel threePlayerModel = new CreateGameModel(threePlayers, new GameSettingsModel(KingMovementMode.FLYING));
 
         mock.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -86,7 +88,7 @@ public class GameControllerTest {
 
     @Test
     void createShouldReturnBadRequestWithNotEnoughPlayers() throws Exception {
-        CreateGameModel onePlayerModel = new CreateGameModel(List.of(UUID.randomUUID()));
+        CreateGameModel onePlayerModel = new CreateGameModel(List.of(UUID.randomUUID()), new GameSettingsModel(KingMovementMode.FLYING));
 
         mock.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -99,7 +101,7 @@ public class GameControllerTest {
     void createShouldReturnBadRequestWithDuplicatePlayers() throws Exception {
         UUID duplicateId = UUID.randomUUID();
         List<UUID> duplicatePlayers = List.of(duplicateId, duplicateId);
-        CreateGameModel duplicateModel = new CreateGameModel(duplicatePlayers);
+        CreateGameModel duplicateModel = new CreateGameModel(duplicatePlayers, new GameSettingsModel(KingMovementMode.FLYING));
 
         mock.perform(post("/api/games")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -214,7 +216,7 @@ public class GameControllerTest {
         mock.perform(post("/api/games/{id}/move", gameId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(moveModel))
-        ).andExpect(status().isBadRequest());
+        ).andExpect(status().isNotFound());
     }
 
 

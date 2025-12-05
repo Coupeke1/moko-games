@@ -1,7 +1,7 @@
 package be.kdg.team22.checkersservice.application;
 
 import be.kdg.team22.checkersservice.api.models.CreateGameModel;
-import be.kdg.team22.checkersservice.domain.board.Move;
+import be.kdg.team22.checkersservice.domain.move.Move;
 import be.kdg.team22.checkersservice.domain.game.Game;
 import be.kdg.team22.checkersservice.domain.game.GameId;
 import be.kdg.team22.checkersservice.infrastructure.game.GameRepository;
@@ -20,7 +20,7 @@ public class GameService {
 
     public Game create(final CreateGameModel model, final boolean aiPlayer) {
         List<PlayerId> players = model.players().stream().map(PlayerId::new).toList();
-        Game game = Game.create(players, aiPlayer);
+        Game game = Game.create(players, aiPlayer, model.settings().kingMovementMode());
         repository.save(game);
         return game;
     }

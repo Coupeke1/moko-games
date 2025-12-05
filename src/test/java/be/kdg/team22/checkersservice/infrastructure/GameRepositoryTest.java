@@ -2,6 +2,7 @@ package be.kdg.team22.checkersservice.infrastructure;
 
 import be.kdg.team22.checkersservice.config.TestcontainersConfig;
 import be.kdg.team22.checkersservice.domain.game.Game;
+import be.kdg.team22.checkersservice.domain.move.KingMovementMode;
 import be.kdg.team22.checkersservice.domain.player.PlayerId;
 import be.kdg.team22.checkersservice.infrastructure.game.GameRepository;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
@@ -29,7 +29,8 @@ public class GameRepositoryTest {
         return Game.create(
                 List.of(PlayerId.create("00000000-0000-0000-0000-000000000000"),
                         PlayerId.create("00000000-0000-0000-0000-000000000001")),
-                false
+                false,
+                KingMovementMode.FLYING
         );
     }
 

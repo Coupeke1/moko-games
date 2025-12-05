@@ -1,6 +1,6 @@
 package be.kdg.team22.checkersservice.api.models;
 
-import be.kdg.team22.checkersservice.domain.board.Move;
+import be.kdg.team22.checkersservice.domain.move.Move;
 import be.kdg.team22.checkersservice.domain.player.PlayerId;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;

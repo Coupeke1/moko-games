@@ -1,10 +1,14 @@
 package be.kdg.team22.checkersservice.domain.game;
 
-import be.kdg.team22.checkersservice.domain.board.Move;
+import be.kdg.team22.checkersservice.domain.board.Board;
+import be.kdg.team22.checkersservice.domain.board.Piece;
+import be.kdg.team22.checkersservice.domain.move.KingMovementMode;
+import be.kdg.team22.checkersservice.domain.move.Move;
 import be.kdg.team22.checkersservice.domain.game.exceptions.GameNotRunningException;
 import be.kdg.team22.checkersservice.domain.game.exceptions.NotPlayersTurnException;
 import be.kdg.team22.checkersservice.domain.game.exceptions.PlayerCountException;
 import be.kdg.team22.checkersservice.domain.game.exceptions.UniquePlayersException;
+import be.kdg.team22.checkersservice.domain.move.exceptions.*;
 import be.kdg.team22.checkersservice.domain.player.Player;
 import be.kdg.team22.checkersservice.domain.player.PlayerId;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
@@ -12,10 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,7 +31,7 @@ public class GameTest {
         playerWhiteId = PlayerId.create();
         game = Game.create(
                 List.of(playerBlackId, playerWhiteId),
-                false
+                false, KingMovementMode.FLYING
         );
     }
 
@@ -48,7 +49,7 @@ public class GameTest {
     void createShouldThrowWhenTooFewPlayers() {
         PlayerId playerId = PlayerId.create();
         assertThrows(PlayerCountException.class, () ->
-                Game.create(List.of(playerId), false));
+                Game.create(List.of(playerId), false, KingMovementMode.FLYING));
     }
 
     @Test
@@ -58,7 +59,7 @@ public class GameTest {
             playerIds.add(PlayerId.create());
         }
         assertThrows(PlayerCountException.class, () ->
-                Game.create(playerIds, false));
+                Game.create(playerIds, false, KingMovementMode.FLYING));
     }
 
     @Test
@@ -67,7 +68,7 @@ public class GameTest {
         PlayerId player1 = new PlayerId(uuid);
         PlayerId player2 = new PlayerId(uuid);
         assertThrows(UniquePlayersException.class, () ->
-                Game.create(List.of(player1, player2), false));
+                Game.create(List.of(player1, player2), false, KingMovementMode.FLYING));
     }
 
     @Test
@@ -91,7 +92,7 @@ public class GameTest {
     void createWithAIPlayerShouldSetAiPlayerField() {
         Game gameWithAI = Game.create(
                 List.of(playerBlackId, playerWhiteId),
-                true
+                true, KingMovementMode.FLYING
         );
 
         assertEquals(PlayerRole.WHITE, gameWithAI.aiPlayer());
@@ -138,7 +139,8 @@ public class GameTest {
         PlayerId blackId = new PlayerId(blackUuid);
         PlayerId whiteId = new PlayerId(whiteUuid);
 
-        Game specificGame = Game.create(List.of(blackId, whiteId), false);
+        Game specificGame = Game.create(List.of(blackId, whiteId),
+                false, KingMovementMode.FLYING);
 
         TreeSet<Player> players = specificGame.players();
         assertEquals(2, players.size());
@@ -162,6 +164,29 @@ public class GameTest {
     }
 
     @Test
+    void requestMoveShouldRemovePieceWhenFlyingKingCapturesFromDistance() throws NoSuchFieldException, IllegalAccessException {
+        Field boardField = Game.class.getDeclaredField("board");
+        boardField.setAccessible(true);
+        boardField.set(game, createKingBoard());
+        Move move = new Move(playerBlackId, 23, 12);
+
+        game.requestMove(move);
+        assertEquals(Optional.empty(), game.board().pieceAt(16));
+    }
+
+    @Test
+    void requestMoveShouldMovePieceWhenFlyingKingMoves() throws NoSuchFieldException, IllegalAccessException {
+        Field boardField = Game.class.getDeclaredField("board");
+        boardField.setAccessible(true);
+        boardField.set(game, createKingBoard());
+        Move move = new Move(playerBlackId, 18, 29);
+
+        game.requestMove(move);
+        assertEquals(Optional.empty(), game.board().pieceAt(18));
+        assertNotEquals(Optional.empty(), game.board().pieceAt(29));
+    }
+
+    @Test
     void requestMoveShouldThrowWhenNotPlayersTurn() {
         Move move = new Move(playerWhiteId, 9, 13);
 
@@ -180,5 +205,91 @@ public class GameTest {
         assertThrows(GameNotRunningException.class, () ->
                 game.requestMove(move)
         );
+    }
+
+    @Test
+    void requestMoveShouldThrowWhenOwnPieceInTheWay() throws NoSuchFieldException, IllegalAccessException {
+        Field boardField = Game.class.getDeclaredField("board");
+        boardField.setAccessible(true);
+        boardField.set(game, createKingBoard());
+        Move move = new Move(playerBlackId, 18, 27);
+
+        assertThrows(OwnPieceInTheWayException.class, () ->
+                game.requestMove(move)
+        );
+    }
+
+    @Test
+    void requestMoveShouldThrowWhenKingDoubleMoveWithOnlySingleAllowed() throws NoSuchFieldException, IllegalAccessException {
+        Field boardField = Game.class.getDeclaredField("board");
+        boardField.setAccessible(true);
+        boardField.set(game, createKingBoard());
+        Field movementModeField = Game.class.getDeclaredField("kingMovementMode");
+        movementModeField.setAccessible(true);
+        movementModeField.set(game, KingMovementMode.SINGLE);
+        Move move = new Move(playerBlackId, 18, 25);
+
+        assertThrows(TooManyTilesException.class, () ->
+                game.requestMove(move)
+        );
+    }
+
+    @Test
+    void requestMoveShouldThrowWhenTwoStepKingKeepsMovingAfterCapturingPiece() throws NoSuchFieldException, IllegalAccessException {
+        Field boardField = Game.class.getDeclaredField("board");
+        boardField.setAccessible(true);
+        boardField.set(game, createKingBoard());
+        Field movementModeField = Game.class.getDeclaredField("kingMovementMode");
+        movementModeField.setAccessible(true);
+        movementModeField.set(game, KingMovementMode.DOUBLE);
+        Move move = new Move(playerBlackId, 18, 4);
+
+        assertThrows(CapturedPieceNotOnLastTileException.class, () ->
+                game.requestMove(move)
+        );
+    }
+
+    @Test
+    void requestMoveShouldThrowWhenFlyingKingKeepsMovingAfterCapturingPiece() throws NoSuchFieldException, IllegalAccessException {
+        Field boardField = Game.class.getDeclaredField("board");
+        boardField.setAccessible(true);
+        boardField.set(game, createKingBoard());
+        Move move = new Move(playerBlackId, 18, 4);
+
+        assertThrows(CapturedPieceNotOnLastTileException.class, () ->
+                game.requestMove(move)
+        );
+    }
+
+    @Test
+    void requestMoveShouldThrowWhenFlyingKingMovesToSameSpace() throws NoSuchFieldException, IllegalAccessException {
+        Field boardField = Game.class.getDeclaredField("board");
+        boardField.setAccessible(true);
+        boardField.set(game, createKingBoard());
+        Move move = new Move(playerBlackId, 18, 18);
+
+        assertThrows(TargetCellNotEmptyException.class, () ->
+                game.requestMove(move)
+        );
+    }
+
+    private Board createKingBoard() {
+        Board testBoard = Board.create(8);
+        clearBoard(testBoard);
+
+
+        testBoard.grid().put(18, new Piece(PlayerRole.BLACK, true));
+        testBoard.grid().put(23, new Piece(PlayerRole.BLACK, true));
+        testBoard.grid().put(15, new Piece(PlayerRole.WHITE, true));
+        testBoard.grid().put(16, new Piece(PlayerRole.WHITE, true));
+
+        return testBoard;
+    }
+
+    private void clearBoard(Board board) {
+        int totalCells = (board.size() * board.size()) / 2;
+        for (int i = 1; i <= totalCells; i++) {
+            board.grid().put(i, null);
+        }
     }
 }
