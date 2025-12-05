@@ -17,7 +17,7 @@ import {
     removePlayer,
     unReadyPlayer,
 } from "@/services/lobby/lobby-service";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
 export default function PlayerCard({
     player,
