@@ -29,7 +29,6 @@ public class LobbySocketPublisher {
         LobbyModel model = LobbyModel.from(lobby);
         lobby.players().forEach(player -> {
             String userId = player.id().value().toString();
-            System.out.println("Sending to player " + userId);
             template.convertAndSendToUser(userId, "/queue/lobby", model);
         });
     }
