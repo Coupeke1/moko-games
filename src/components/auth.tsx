@@ -9,7 +9,7 @@ import { environment } from "@/config";
 export default function Auth() {
     const initAuth = useAuthStore((state) => state.init);
     const initialized = useAuthStore((state) => state.initialized);
-    const { isLoading, isError } = useProfile();
+    const { loading: isLoading, error: isError } = useProfile();
 
     useEffect(() => {
         initAuth({

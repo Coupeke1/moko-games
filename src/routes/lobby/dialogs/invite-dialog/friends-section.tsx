@@ -18,7 +18,7 @@ interface Props {
 
 export default function FriendsSection({ lobby, onInvite }: Props) {
     const client = useQueryClient();
-    const { friends, isLoading, isError } = useFriends();
+    const { friends, loading: isLoading, error: isError } = useFriends();
 
     const invite = useMutation({
         mutationFn: async ({ id }: { id: string }) => {

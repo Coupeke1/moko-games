@@ -1,19 +1,17 @@
 import Auth from "@/components/auth";
 import LoadingState from "@/components/state/loading";
-import CartPage from "@/routes/cart/cart";
-import ChatPage from "@/routes/chat/chat";
 import FriendsPage from "@/routes/friends/friends";
 import IncomingRequestsPage from "@/routes/friends/incoming";
 import OutgoingRequestsPage from "@/routes/friends/outgoing";
 import LibraryPage from "@/routes/library/library";
 import LobbyPage from "@/routes/lobby/lobby";
-import NotificationsPage from "@/routes/notifications/notifications";
 import ProfilePage from "@/routes/profile/profile";
 import StorePage from "@/routes/store/store";
 import { useAuthStore } from "@/stores/auth-store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { Toaster } from "sonner";
+import GamePage from "@/routes/library/game";
 
 const client = new QueryClient();
 
@@ -32,7 +30,9 @@ function App() {
                     <Routes>
                         <Route path="/" element={<Navigate to="/store" />} />
                         <Route path="/store" element={<StorePage />} />
+
                         <Route path="/library" element={<LibraryPage />} />
+                        <Route path="/library/:id" element={<GamePage />} />
 
                         <Route path="/lobby/:id" element={<LobbyPage />} />
 
@@ -47,14 +47,6 @@ function App() {
                             path="/friends/requests/outgoing"
                             element={<OutgoingRequestsPage />}
                         />
-
-                        <Route
-                            path="/notifications"
-                            element={<NotificationsPage />}
-                        />
-
-                        <Route path="/chat" element={<ChatPage />} />
-                        <Route path="/cart" element={<CartPage />} />
                     </Routes>
                 )}
 

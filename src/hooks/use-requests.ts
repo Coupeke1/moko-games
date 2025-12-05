@@ -1,20 +1,31 @@
-import { findIncomingRequests, findOutgoingRequests } from "@/services/friends-service";
+import {
+    findIncomingRequests,
+    findOutgoingRequests,
+} from "@/services/friends-service";
 import { useQuery } from "@tanstack/react-query";
 
 export function useIncomingRequests() {
-    const { isLoading, isError, data } = useQuery({
+    const {
+        isLoading: loading,
+        isError: error,
+        data,
+    } = useQuery({
         queryKey: ["friends", "incoming"],
         queryFn: () => findIncomingRequests(),
     });
 
-    return { isLoading, isError, requests: data };
+    return { loading, error, requests: data };
 }
 
 export function useOutgoingRequests() {
-    const { isLoading, isError, data } = useQuery({
+    const {
+        isLoading: loading,
+        isError: error,
+        data,
+    } = useQuery({
         queryKey: ["friends", "outgoing"],
         queryFn: () => findOutgoingRequests(),
     });
 
-    return { isLoading, isError, requests: data };
+    return { loading, error, requests: data };
 }
