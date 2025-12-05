@@ -1,5 +1,19 @@
-## getting a game id
+### getting a game id
 GET http://localhost:8084/api/games/00000000-0000-0000-0000-000000000001
+
+### Regsiter a game
+POST http://localhost:8084/api/games/register
+Content-Type: application/json
+
+{
+  "name": "tic-tac-toe-2",
+  "backendUrl": "http://localhost:8086",
+  "frontendUrl": "http://localhost:5174/tic-tac-toe/game",
+  "startEndpoint": "/api/games",
+  "title": "Tic Tac Toe",
+  "description": "Tic tac toe is played on a 3x3 grid",
+  "image": "test"
+}
 
 ### Health check
 GET http://localhost:8084/actuator/health

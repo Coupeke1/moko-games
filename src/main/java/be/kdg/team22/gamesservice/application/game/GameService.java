@@ -1,10 +1,12 @@
 package be.kdg.team22.gamesservice.application.game;
 
+import be.kdg.team22.gamesservice.api.game.models.RegisterGameRequest;
 import be.kdg.team22.gamesservice.api.game.models.StartGameRequest;
 import be.kdg.team22.gamesservice.api.game.models.StartGameResponseModel;
 import be.kdg.team22.gamesservice.domain.game.Game;
 import be.kdg.team22.gamesservice.domain.game.GameId;
 import be.kdg.team22.gamesservice.domain.game.GameRepository;
+import be.kdg.team22.gamesservice.domain.game.exceptions.DuplicateGameNameException;
 import be.kdg.team22.gamesservice.domain.game.exceptions.GameNotFoundException;
 import be.kdg.team22.gamesservice.domain.game.exceptions.InvalidGameConfigurationException;
 import be.kdg.team22.gamesservice.domain.game.exceptions.PlayersListEmptyException;
@@ -51,5 +53,16 @@ public class GameService {
 
     public List<Game> findAll() {
         return gameRepository.findAll();
+    }
+
+    public Game register(final RegisterGameRequest request) {
+        if (gameRepository.findByName(request.name()).isPresent()) {
+            throw new DuplicateGameNameException(request.name());
+        }
+
+        Game game = Game.register(request);
+        gameRepository.save(game);
+
+        return game;
     }
 }

@@ -1,9 +1,6 @@
 package be.kdg.team22.gamesservice.api.game;
 
-import be.kdg.team22.gamesservice.api.game.models.GameDetailsModel;
-import be.kdg.team22.gamesservice.api.game.models.GameListModel;
-import be.kdg.team22.gamesservice.api.game.models.StartGameRequest;
-import be.kdg.team22.gamesservice.api.game.models.StartGameResponseModel;
+import be.kdg.team22.gamesservice.api.game.models.*;
 import be.kdg.team22.gamesservice.application.game.GameService;
 import be.kdg.team22.gamesservice.domain.game.Game;
 import be.kdg.team22.gamesservice.domain.game.GameId;
@@ -48,6 +45,13 @@ public class GameController {
     @GetMapping("/{id}")
     public ResponseEntity<GameDetailsModel> getGameById(final @PathVariable UUID id) {
         Game game = service.findById(GameId.from(id));
+        return ResponseEntity.ok(GameDetailsModel.from(game));
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<GameDetailsModel> registerGame(final @RequestBody RegisterGameRequest request) {
+        Game game = service.register(request);
+
         return ResponseEntity.ok(GameDetailsModel.from(game));
     }
 }

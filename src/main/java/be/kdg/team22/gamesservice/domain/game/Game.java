@@ -1,5 +1,6 @@
 package be.kdg.team22.gamesservice.domain.game;
 
+import be.kdg.team22.gamesservice.api.game.models.RegisterGameRequest;
 import be.kdg.team22.gamesservice.domain.game.exceptions.*;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
@@ -141,6 +142,19 @@ public class Game {
         if (image == null || image.isBlank()) {
             throw GameMetadataException.invalidImage();
         }
+    }
+
+    public static Game register(RegisterGameRequest request) {
+        return new Game(
+                GameId.create(),
+                request.name(),
+                request.backendUrl(),
+                request.frontendUrl(),
+                request.startEndpoint(),
+                request.title(),
+                request.description(),
+                request.image()
+        );
     }
 
     public GameId id() {
