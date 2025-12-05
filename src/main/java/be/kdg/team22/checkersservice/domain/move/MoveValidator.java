@@ -6,7 +6,6 @@ import be.kdg.team22.checkersservice.domain.game.exceptions.OutsidePlayingFieldE
 import be.kdg.team22.checkersservice.domain.move.exceptions.*;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 
-import java.util.List;
 import java.util.Optional;
 
 import static be.kdg.team22.checkersservice.domain.move.KingMoveValidator.isKingCaptureMove;
@@ -35,16 +34,10 @@ public class MoveValidator {
         }
 
         boolean isKing = movingPiece.get().isKing();
-        for (int[] segment : move.segments()) {
-            int fromCell = segment[0];
-            int toCell = segment[1];
-
-            Move segmentMove = new Move(move.playerId(), List.of(fromCell, toCell));
-            if (isKing) {
-                validateKingMove(board, currentRole, segmentMove, kingMovementMode);
-            } else {
-                validateNormalMove(board, currentRole, segmentMove);
-            }
+        if (isKing) {
+            validateKingMove(board, currentRole, move, kingMovementMode);
+        } else {
+            validateNormalMove(board, currentRole, move);
         }
     }
 

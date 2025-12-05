@@ -273,6 +273,42 @@ public class GameTest {
         );
     }
 
+    @Test
+    void requestMoveShouldAllowMultiCapture() throws NoSuchFieldException, IllegalAccessException {
+        Field boardField = Game.class.getDeclaredField("board");
+        boardField.setAccessible(true);
+        boardField.set(game, createMultiCaptureBoard());
+        Move move = new Move(game.players().first().id(), List.of(22, 13, 6));
+
+        assertDoesNotThrow(() ->
+                game.requestMove(move)
+        );
+        assert (game.board().pieceAt(17).isEmpty());
+        assert (game.board().pieceAt(9).isEmpty());
+    }
+
+    @Test
+    void requestMoveShouldThrowWhenSteppingAfterCapture() throws NoSuchFieldException, IllegalAccessException {
+        Field boardField = Game.class.getDeclaredField("board");
+        boardField.setAccessible(true);
+        boardField.set(game, createMultiCaptureBoard());
+        Move move = new Move(game.players().first().id(), List.of(22, 13, 6, 2));
+
+        assert (game.board().pieceAt(17).isPresent());
+        assert (game.board().pieceAt(9).isPresent());
+    }
+
+    private Board createMultiCaptureBoard() {
+        Board testBoard = Board.create(8);
+        clearBoard(testBoard);
+
+        testBoard.grid().put(22, new Piece(PlayerRole.BLACK, false));
+        testBoard.grid().put(17, new Piece(PlayerRole.WHITE, false));
+        testBoard.grid().put(9, new Piece(PlayerRole.WHITE, false));
+
+        return testBoard;
+    }
+
     private Board createKingBoard() {
         Board testBoard = Board.create(8);
         clearBoard(testBoard);

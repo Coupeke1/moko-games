@@ -6,7 +6,10 @@ Content-Type: application/json
   "players": [
     "642999ad-c546-40b6-876c-1048971c7942",
     "cf36d3e1-a1e0-4c18-89eb-95fa76fc81ee"
-  ]
+  ],
+  "settings": {
+    "kingMovementMode": "SINGLE"
+  }
 }
 
 > {%
@@ -22,9 +25,10 @@ POST localhost:8087/api/games/{{game_id}}/move
 Content-Type: application/json
 
 {
-  "playerId": "642999ad-c546-40b6-876c-1048971c7942",
-  "fromCell": 14,
-  "toCell": 21
+  "playerId": "cf36d3e1-a1e0-4c18-89eb-95fa76fc81ee",
+  "cells": [
+    14, 21, 30
+  ]
 }
 
 ### Health Check

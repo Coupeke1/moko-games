@@ -71,9 +71,12 @@ public class Game {
             throw new NotPlayersTurnException(currentRole);
         }
 
-        MoveValidator.validateMove(board, currentRole, move, kingMovementMode);
+        for (int[] segment : move.segments()) {
+            Move segmentMove = new Move(move.playerId(), List.of(segment[0], segment[1]));
+            MoveValidator.validateMove(board, currentRole, segmentMove, kingMovementMode);
+            board.move(segmentMove);
+        }
 
-        board.move(move);
         nextPlayer();
     }
 
