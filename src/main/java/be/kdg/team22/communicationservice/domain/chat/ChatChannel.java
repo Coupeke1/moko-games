@@ -57,7 +57,7 @@ public class ChatChannel {
 
     public List<ChatMessage> getMessagesSince(final Instant since) {
         return messages.stream()
-                .filter(m -> m.getTimestamp().isAfter(since))
+                .filter(m -> m.timestamp().isAfter(since))
                 .toList();
     }
 

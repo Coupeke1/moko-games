@@ -13,10 +13,10 @@ public record ChatMessageResponse(
 ) {
     public static ChatMessageResponse from(ChatMessage message) {
         return new ChatMessageResponse(
-                message.getId().value(),
-                message.getSenderId(),
-                message.getContent(),
-                message.getTimestamp()
+                message.id().value(),
+                message.senderId(),
+                message.content(),
+                message.timestamp()
         );
     }
 }

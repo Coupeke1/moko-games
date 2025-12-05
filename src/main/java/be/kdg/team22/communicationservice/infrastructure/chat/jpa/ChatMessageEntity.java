@@ -45,11 +45,11 @@ public class ChatMessageEntity {
 
     public static ChatMessageEntity from(ChatMessage msg, ChatChannelEntity parent) {
         return new ChatMessageEntity(
-                msg.getId().value(),
+                msg.id().value(),
                 parent,
-                msg.getSenderId(),
-                msg.getContent(),
-                msg.getTimestamp()
+                msg.senderId(),
+                msg.content(),
+                msg.timestamp()
         );
     }
 

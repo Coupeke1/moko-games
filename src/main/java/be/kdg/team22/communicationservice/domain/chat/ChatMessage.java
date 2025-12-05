@@ -6,14 +6,8 @@ import org.jmolecules.ddd.annotation.Entity;
 import java.time.Instant;
 
 @Entity
-public class ChatMessage {
-
-    private final ChatMessageId id;
-    private final ChatChannelId channelId;
-
-    private final String senderId;
-    private final String content;
-    private final Instant timestamp;
+public record ChatMessage(ChatMessageId id, ChatChannelId channelId, String senderId, String content,
+                          Instant timestamp) {
 
     public ChatMessage(final ChatMessageId id,
                        final ChatChannelId channelId,
@@ -53,25 +47,5 @@ public class ChatMessage {
                 content,
                 Instant.now()
         );
-    }
-
-    public ChatMessageId getId() {
-        return id;
-    }
-
-    public ChatChannelId getChannelId() {
-        return channelId;
-    }
-
-    public String getSenderId() {
-        return senderId;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public Instant getTimestamp() {
-        return timestamp;
     }
 }
