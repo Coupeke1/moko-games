@@ -1,6 +1,6 @@
 import { client } from "@/lib/api-client";
 import { validIdCheck } from "@/lib/id";
-import type { Game } from "@/models/library/game";
+import type { Game } from "@/models/game/game";
 import type { Lobby } from "@/models/lobby/lobby";
 import type { Player } from "@/models/lobby/player";
 import { environment } from "@/config.ts";
