@@ -1,0 +1,46 @@
+server.port: 8082
+
+spring:
+  application:
+    name: communication-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5443/moko?currentSchema=communication_service}
+    username: ${SPRING_DATASOURCE_USERNAME:user}
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create
+    show-sql: false
+
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:user}
+    password: ${SPRING_RABBITMQ_PASSWORD:password}
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI:http://localhost:8180/realms/moko/protocol/openid-connect/certs}
+
+logging:
+  level:
+    sql: ${LOGGING_LEVEL_SQL:debug}
+    web: ${LOGGING_LEVEL_WEB:debug}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always
+      status:
+        http-mapping:
+          WARNING: 200
+          DOWN: 503
+          OUT_OF_SERVICE: 503

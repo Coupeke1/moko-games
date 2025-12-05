@@ -1,6 +1,5 @@
 package be.kdg.team22.communicationservice.domain.chat;
 
-import java.util.Objects;
 import java.util.UUID;
 
 public record ChatMessageId(UUID value) {
@@ -9,6 +8,6 @@ public record ChatMessageId(UUID value) {
     }
 
     public static ChatMessageId from(UUID value) {
-        return new ChatMessageId(Objects.requireNonNull(value));
+        return new ChatMessageId(value);
     }
 }

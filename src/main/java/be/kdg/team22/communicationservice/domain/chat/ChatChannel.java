@@ -18,15 +18,25 @@ public class ChatChannel {
 
     private final List<ChatMessage> messages = new ArrayList<>();
 
-    public ChatChannel(ChatChannelId id,
-                       ChatChannelType type,
-                       String referenceId) {
-        this.id = Objects.requireNonNull(id);
-        this.type = Objects.requireNonNull(type);
-        this.referenceId = Objects.requireNonNull(referenceId);
+    public ChatChannel(final ChatChannelId id,
+                       final ChatChannelType type,
+                       final String referenceId) {
+        this.id = id;
+        this.type = type;
+        this.referenceId = referenceId;
     }
 
-    public static ChatChannel createNew(ChatChannelType type, String referenceId) {
+    public ChatChannel(final ChatChannelId id,
+                       final ChatChannelType type,
+                       final String referenceId,
+                       final List<ChatMessage> messages) {
+        this.id = id;
+        this.type = type;
+        this.referenceId = referenceId;
+        this.messages.addAll(messages);
+    }
+
+    public static ChatChannel createNew(final ChatChannelType type, final String referenceId) {
         return new ChatChannel(ChatChannelId.create(), type, referenceId);
     }
 
@@ -53,13 +63,13 @@ public class ChatChannel {
                 .toList();
     }
 
-    public ChatMessage postUserMessage(String senderId, String content) {
+    public ChatMessage postUserMessage(final String senderId, final String content) {
         ChatMessage message = ChatMessage.newUserMessage(id, senderId, content);
         messages.add(message);
         return message;
     }
 
-    public ChatMessage postAIMessage(String aiModelId, String content) {
+    public ChatMessage postAIMessage(final String aiModelId, final String content) {
         if (type != ChatChannelType.AI) {
             throw new AiMessageInLobbyException("AI messages are only allowed on AI channels");
         }
