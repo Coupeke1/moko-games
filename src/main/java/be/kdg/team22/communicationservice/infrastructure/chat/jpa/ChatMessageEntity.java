@@ -17,7 +17,7 @@ public class ChatMessageEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_id", nullable = false)
-    private ChatChannelEntity channel;
+    private ChannelEntity channel;
 
     @Column(nullable = false)
     private String senderId;
@@ -32,7 +32,7 @@ public class ChatMessageEntity {
     }
 
     public ChatMessageEntity(UUID id,
-                             ChatChannelEntity channel,
+                             ChannelEntity channel,
                              String senderId,
                              String content,
                              Instant timestamp) {
@@ -43,7 +43,7 @@ public class ChatMessageEntity {
         this.timestamp = timestamp;
     }
 
-    public static ChatMessageEntity from(ChatMessage msg, ChatChannelEntity parent) {
+    public static ChatMessageEntity from(ChatMessage msg, ChannelEntity parent) {
         return new ChatMessageEntity(
                 msg.id().value(),
                 parent,
@@ -61,7 +61,7 @@ public class ChatMessageEntity {
         return id;
     }
 
-    public ChatChannelEntity getChannel() {
+    public ChannelEntity getChannel() {
         return channel;
     }
 

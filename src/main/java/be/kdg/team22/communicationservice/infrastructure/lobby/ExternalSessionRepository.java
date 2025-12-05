@@ -8,14 +8,13 @@ import org.springframework.web.client.RestClient;
 
 @Component
 public class ExternalSessionRepository {
-
     private final RestClient client;
 
-    public ExternalSessionRepository(@Qualifier("sessionService") RestClient client) {
+    public ExternalSessionRepository(@Qualifier("sessionService") final RestClient client) {
         this.client = client;
     }
 
-    public boolean isPlayerInLobby(String userId, String lobbyId, String jwtToken) {
+    public boolean isPlayerInLobby(final String userId,final String lobbyId,final String jwtToken) {
         try {
             LobbyResponse response = client.get()
                     .uri("/api/lobbies/{id}", lobbyId)

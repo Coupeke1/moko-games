@@ -1,6 +1,6 @@
 package be.kdg.team22.communicationservice.api.chat.models;
 
-import be.kdg.team22.communicationservice.domain.chat.ChatChannel;
+import be.kdg.team22.communicationservice.domain.chat.Channel;
 
 import java.util.UUID;
 
@@ -10,7 +10,7 @@ public record ChatChannelResponse(
         String referenceId
 ) {
 
-    public static ChatChannelResponse from(ChatChannel channel) {
+    public static ChatChannelResponse from(Channel channel) {
         return new ChatChannelResponse(
                 channel.getId().value(),
                 channel.getType().name(),

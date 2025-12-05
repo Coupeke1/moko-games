@@ -17,10 +17,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/chat/bot")
 public class BotChatController {
-
     private final ChatService chatService;
 
-    public BotChatController(ChatService chatService) {
+    public BotChatController(final ChatService chatService) {
         this.chatService = chatService;
     }
 

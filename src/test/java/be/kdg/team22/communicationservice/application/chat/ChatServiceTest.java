@@ -61,7 +61,7 @@ class ChatServiceTest {
 
     @Test
     void botMessage_existingChannelUsed() {
-        ChatChannel channel = ChatChannel.createNew(ChatChannelType.BOT, "user123");
+        Channel channel = Channel.createNew(ChatChannelType.BOT, "user123");
 
         Mockito.when(channelRepo.findByTypeAndReferenceId(eq(ChatChannelType.BOT), eq("user123")))
                 .thenReturn(Optional.of(channel));
@@ -112,7 +112,7 @@ class ChatServiceTest {
 
     @Test
     void getMessages_bot_overridesReferenceId() {
-        ChatChannel channel = ChatChannel.createNew(ChatChannelType.BOT, "user777");
+        Channel channel = Channel.createNew(ChatChannelType.BOT, "user777");
 
         Mockito.when(channelRepo.findByTypeAndReferenceId(ChatChannelType.BOT, "user777"))
                 .thenReturn(Optional.of(channel));
@@ -144,7 +144,7 @@ class ChatServiceTest {
 
     @Test
     void getMessages_sinceNull_returnsAll() {
-        ChatChannel channel = ChatChannel.createNew(ChatChannelType.LOBBY, "lobby1");
+        Channel channel = Channel.createNew(ChatChannelType.LOBBY, "lobby1");
 
         channel.postUserMessage("u1", "msg1");
         channel.postUserMessage("u1", "msg2");
@@ -161,7 +161,7 @@ class ChatServiceTest {
     @Test
     void getMessages_sinceFiltersCorrectly() throws Exception {
         ChatChannelId channelId = ChatChannelId.create();
-        ChatChannel channel = new ChatChannel(channelId, ChatChannelType.LOBBY, "lobby1");
+        Channel channel = new Channel(channelId, ChatChannelType.LOBBY, "lobby1");
 
         Instant now = Instant.now();
         Instant oldTime = now.minusSeconds(60);
@@ -200,12 +200,12 @@ class ChatServiceTest {
 
     @Test
     void createChannel_existingReturned() {
-        ChatChannel existing = ChatChannel.createNew(ChatChannelType.LOBBY, "l1");
+        Channel existing = Channel.createNew(ChatChannelType.LOBBY, "l1");
 
         Mockito.when(channelRepo.findByTypeAndReferenceId(ChatChannelType.LOBBY, "l1"))
                 .thenReturn(Optional.of(existing));
 
-        ChatChannel result = service.createChannel(ChatChannelType.LOBBY, "l1");
+        Channel result = service.createChannel(ChatChannelType.LOBBY, "l1");
 
         assertSame(existing, result);
     }
@@ -215,15 +215,15 @@ class ChatServiceTest {
         Mockito.when(channelRepo.findByTypeAndReferenceId(ChatChannelType.LOBBY, "l1"))
                 .thenReturn(Optional.empty());
 
-        ChatChannel created = service.createChannel(ChatChannelType.LOBBY, "l1");
+        Channel created = service.createChannel(ChatChannelType.LOBBY, "l1");
 
         assertEquals("l1", created.getReferenceId());
         assertEquals(ChatChannelType.LOBBY, created.getType());
         Mockito.verify(channelRepo).save(any());
     }
 
-    private ChatMessage injectMessage(ChatChannel channel, ChatMessage message) throws Exception {
-        var field = ChatChannel.class.getDeclaredField("messages");
+    private ChatMessage injectMessage(Channel channel, ChatMessage message) throws Exception {
+        var field = Channel.class.getDeclaredField("messages");
         field.setAccessible(true);
         @SuppressWarnings("unchecked")
         List<ChatMessage> list = (List<ChatMessage>) field.get(channel);

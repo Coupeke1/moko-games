@@ -9,34 +9,33 @@ import java.util.Collections;
 import java.util.List;
 
 @AggregateRoot
-public class ChatChannel {
-
+public class Channel {
     private final ChatChannelId id;
     private final ChatChannelType type;
     private final String referenceId;
 
     private final List<ChatMessage> messages = new ArrayList<>();
 
-    public ChatChannel(final ChatChannelId id,
-                       final ChatChannelType type,
-                       final String referenceId) {
+    public Channel(final ChatChannelId id,
+                   final ChatChannelType type,
+                   final String referenceId) {
         this.id = id;
         this.type = type;
         this.referenceId = referenceId;
     }
 
-    public ChatChannel(final ChatChannelId id,
-                       final ChatChannelType type,
-                       final String referenceId,
-                       final List<ChatMessage> messages) {
+    public Channel(final ChatChannelId id,
+                   final ChatChannelType type,
+                   final String referenceId,
+                   final List<ChatMessage> messages) {
         this.id = id;
         this.type = type;
         this.referenceId = referenceId;
         this.messages.addAll(messages);
     }
 
-    public static ChatChannel createNew(final ChatChannelType type, final String referenceId) {
-        return new ChatChannel(ChatChannelId.create(), type, referenceId);
+    public static Channel createNew(final ChatChannelType type, final String referenceId) {
+        return new Channel(ChatChannelId.create(), type, referenceId);
     }
 
     public ChatChannelId getId() {

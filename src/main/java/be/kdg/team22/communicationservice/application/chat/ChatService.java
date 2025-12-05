@@ -1,6 +1,6 @@
 package be.kdg.team22.communicationservice.application.chat;
 
-import be.kdg.team22.communicationservice.domain.chat.ChatChannel;
+import be.kdg.team22.communicationservice.domain.chat.Channel;
 import be.kdg.team22.communicationservice.domain.chat.ChatChannelRepository;
 import be.kdg.team22.communicationservice.domain.chat.ChatChannelType;
 import be.kdg.team22.communicationservice.domain.chat.ChatMessage;
@@ -20,14 +20,13 @@ import java.util.List;
 @Service
 @Transactional
 public class ChatService {
-
     private final ChatChannelRepository channelRepository;
     private final BotChatRepository botChatRepository;
     private final ExternalSessionRepository sessionRepository;
 
-    public ChatService(ChatChannelRepository channelRepository,
-                       BotChatRepository botChatRepository,
-                       ExternalSessionRepository sessionRepository) {
+    public ChatService(final ChatChannelRepository channelRepository,
+                       final BotChatRepository botChatRepository,
+                       final ExternalSessionRepository sessionRepository) {
         this.channelRepository = channelRepository;
         this.botChatRepository = botChatRepository;
         this.sessionRepository = sessionRepository;
@@ -48,9 +47,9 @@ public class ChatService {
         }
 
         String finalReferenceId = referenceId;
-        ChatChannel channel = channelRepository
+        Channel channel = channelRepository
                 .findByTypeAndReferenceId(type, referenceId)
-                .orElseGet(() -> ChatChannel.createNew(type, finalReferenceId));
+                .orElseGet(() -> Channel.createNew(type, finalReferenceId));
 
         ChatMessage userMessage = channel.postUserMessage(senderId, content);
         channelRepository.save(channel);
@@ -85,7 +84,7 @@ public class ChatService {
         }
 
         String finalReferenceId = referenceId;
-        ChatChannel channel = channelRepository
+        Channel channel = channelRepository
                 .findByTypeAndReferenceId(type, referenceId)
                 .orElseThrow(() -> new ChatChannelNotFoundException(type, finalReferenceId));
 
@@ -93,18 +92,18 @@ public class ChatService {
         return channel.getMessagesSince(since);
     }
 
-    public ChatChannel createChannel(ChatChannelType type, String referenceId) {
+    public Channel createChannel(final ChatChannelType type, final String referenceId) {
         if (type == ChatChannelType.BOT) {
             throw new CantAutoCreateBotChannel("BOT channels cannot be manually created");
         }
 
-        ChatChannel existing = channelRepository
+        Channel existing = channelRepository
                 .findByTypeAndReferenceId(type, referenceId)
                 .orElse(null);
 
         if (existing != null) return existing;
 
-        ChatChannel channel = ChatChannel.createNew(type, referenceId);
+        Channel channel = Channel.createNew(type, referenceId);
         channelRepository.save(channel);
         return channel;
     }

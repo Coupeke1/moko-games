@@ -17,10 +17,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/chat/lobby")
 public class LobbyChatController {
-
     private final ChatService chatService;
 
-    public LobbyChatController(ChatService chatService) {
+    public LobbyChatController(final ChatService chatService) {
         this.chatService = chatService;
     }
 

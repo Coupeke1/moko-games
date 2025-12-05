@@ -1,7 +1,7 @@
 package be.kdg.team22.communicationservice.api.chat;
 
 import be.kdg.team22.communicationservice.application.chat.ChatService;
-import be.kdg.team22.communicationservice.domain.chat.ChatChannel;
+import be.kdg.team22.communicationservice.domain.chat.Channel;
 import be.kdg.team22.communicationservice.domain.chat.ChatChannelType;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -14,8 +14,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(ChatChannelController.class)
-class ChatChannelControllerTest {
+@WebMvcTest(ChannelController.class)
+class ChannelControllerTest {
 
     @Autowired
     MockMvc mvc;
@@ -26,7 +26,7 @@ class ChatChannelControllerTest {
     //TODO wanneer AI implementatie er is
     @Test
     void createLobbyChannel_returnsResponse() throws Exception {
-        ChatChannel channel = ChatChannel.createNew(ChatChannelType.LOBBY, "lobby-99");
+        Channel channel = Channel.createNew(ChatChannelType.LOBBY, "lobby-99");
 
         Mockito.when(service.createChannel(
                 eq(ChatChannelType.LOBBY),
@@ -41,7 +41,7 @@ class ChatChannelControllerTest {
 
     @Test
     void createBotChannel_returnsResponse() throws Exception {
-        ChatChannel channel = ChatChannel.createNew(ChatChannelType.BOT, "ai-user-55");
+        Channel channel = Channel.createNew(ChatChannelType.BOT, "ai-user-55");
 
         Mockito.when(service.createChannel(
                 eq(ChatChannelType.BOT),

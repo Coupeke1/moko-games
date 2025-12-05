@@ -5,12 +5,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ChatChannelRepository {
+    Optional<Channel> findById(ChatChannelId id);
 
-    Optional<ChatChannel> findById(ChatChannelId id);
+    Optional<Channel> findByTypeAndReferenceId(ChatChannelType type, String referenceId);
 
-    Optional<ChatChannel> findByTypeAndReferenceId(ChatChannelType type, String referenceId);
-
-    void save(ChatChannel chatChannel);
+    void save(Channel channel);
 
     List<ChatMessage> findMessages(ChatChannelType type, String referenceId);
 

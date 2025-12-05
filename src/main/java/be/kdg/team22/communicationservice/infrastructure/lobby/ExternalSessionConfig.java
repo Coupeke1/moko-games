@@ -8,7 +8,6 @@ import org.springframework.web.client.RestClient;
 
 @Configuration
 public class ExternalSessionConfig {
-
     @Bean
     @Qualifier("sessionService")
     RestClient sessionServiceClient(@Value("${business.session-service.url}") String baseUrl) {

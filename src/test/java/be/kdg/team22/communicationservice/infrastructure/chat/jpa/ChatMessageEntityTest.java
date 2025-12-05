@@ -18,7 +18,7 @@ class ChatMessageEntityTest {
         UUID channelId = UUID.randomUUID();
         UUID msgId = UUID.randomUUID();
 
-        ChatChannelEntity parent = new ChatChannelEntity(channelId, ChatChannelType.LOBBY, "lobby1");
+        ChannelEntity parent = new ChannelEntity(channelId, ChatChannelType.LOBBY, "lobby1");
         ChatMessageEntity entity = new ChatMessageEntity(
                 msgId,
                 parent,
@@ -47,7 +47,7 @@ class ChatMessageEntityTest {
                 Instant.parse("2025-02-02T12:00:00Z")
         );
 
-        ChatChannelEntity parent = new ChatChannelEntity(chId.value(),
+        ChannelEntity parent = new ChannelEntity(chId.value(),
                 ChatChannelType.BOT,
                 "user1");
 
@@ -71,7 +71,7 @@ class ChatMessageEntityTest {
                 Instant.parse("2030-03-03T15:00:00Z")
         );
 
-        ChatChannelEntity parent = new ChatChannelEntity(
+        ChannelEntity parent = new ChannelEntity(
                 chId.value(),
                 ChatChannelType.LOBBY,
                 "ref123"

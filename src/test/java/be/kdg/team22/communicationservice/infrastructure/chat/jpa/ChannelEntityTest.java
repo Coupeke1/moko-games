@@ -1,6 +1,6 @@
 package be.kdg.team22.communicationservice.infrastructure.chat.jpa;
 
-import be.kdg.team22.communicationservice.domain.chat.ChatChannel;
+import be.kdg.team22.communicationservice.domain.chat.Channel;
 import be.kdg.team22.communicationservice.domain.chat.ChatChannelId;
 import be.kdg.team22.communicationservice.domain.chat.ChatChannelType;
 import be.kdg.team22.communicationservice.domain.chat.ChatMessage;
@@ -11,17 +11,17 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class ChatChannelEntityTest {
+class ChannelEntityTest {
 
     @Test
     void fromDomain_convertsChannelAndMessagesCorrectly() {
         ChatChannelId channelId = ChatChannelId.create();
-        ChatChannel channel = ChatChannel.createNew(ChatChannelType.BOT, "user123"); // AI mag alléén bij BOT
+        Channel channel = Channel.createNew(ChatChannelType.BOT, "user123"); // AI mag alléén bij BOT
 
         ChatMessage m1 = channel.postUserMessage("user1", "hello");
         ChatMessage m2 = channel.postBotMessage("model1", "world");
 
-        ChatChannelEntity entity = ChatChannelEntity.from(channel);
+        ChannelEntity entity = ChannelEntity.from(channel);
 
         assertEquals(channel.getId().value(), entity.getId());
         assertEquals(ChatChannelType.BOT, entity.getType());
@@ -35,7 +35,7 @@ class ChatChannelEntityTest {
     @Test
     void toDomain_convertsEntityBackToDomainCorrectly() {
         UUID id = UUID.randomUUID();
-        ChatChannelEntity entity = new ChatChannelEntity(id, ChatChannelType.BOT, "refA");
+        ChannelEntity entity = new ChannelEntity(id, ChatChannelType.BOT, "refA");
 
         ChatMessageEntity m1 = new ChatMessageEntity(
                 UUID.randomUUID(),
@@ -56,7 +56,7 @@ class ChatChannelEntityTest {
         entity.getMessages().add(m1);
         entity.getMessages().add(m2);
 
-        ChatChannel domain = entity.to();
+        Channel domain = entity.to();
 
         assertEquals(id, domain.getId().value());
         assertEquals(ChatChannelType.BOT, domain.getType());
@@ -69,12 +69,12 @@ class ChatChannelEntityTest {
 
     @Test
     void roundTrip_preservesAllFields() {
-        ChatChannel channel = ChatChannel.createNew(ChatChannelType.BOT, "ref55");
+        Channel channel = Channel.createNew(ChatChannelType.BOT, "ref55");
         channel.postUserMessage("u1", "msg1");
         channel.postBotMessage("modelX", "msg2");
 
-        ChatChannelEntity entity = ChatChannelEntity.from(channel);
-        ChatChannel converted = entity.to();
+        ChannelEntity entity = ChannelEntity.from(channel);
+        Channel converted = entity.to();
 
         assertEquals(channel.getId().value(), converted.getId().value());
         assertEquals(channel.getType(), converted.getType());
@@ -87,17 +87,17 @@ class ChatChannelEntityTest {
 
     @Test
     void fromDomain_emptyMessagesProducesEmptyEntityList() {
-        ChatChannel channel = ChatChannel.createNew(ChatChannelType.BOT, "ref-empty");
+        Channel channel = Channel.createNew(ChatChannelType.BOT, "ref-empty");
 
-        ChatChannelEntity entity = ChatChannelEntity.from(channel);
+        ChannelEntity entity = ChannelEntity.from(channel);
 
         assertEquals(0, entity.getMessages().size());
     }
 
     @Test
     void orphanRemovalMapping_removesMessageWhenRemovedFromList() {
-        ChatChannelEntity entity =
-                new ChatChannelEntity(UUID.randomUUID(), ChatChannelType.LOBBY, "l123");
+        ChannelEntity entity =
+                new ChannelEntity(UUID.randomUUID(), ChatChannelType.LOBBY, "l123");
 
         ChatMessageEntity msg = new ChatMessageEntity(
                 UUID.randomUUID(), entity, "u", "x", Instant.now()

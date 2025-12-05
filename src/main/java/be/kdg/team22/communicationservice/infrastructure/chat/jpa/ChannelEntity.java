@@ -1,6 +1,6 @@
 package be.kdg.team22.communicationservice.infrastructure.chat.jpa;
 
-import be.kdg.team22.communicationservice.domain.chat.ChatChannel;
+import be.kdg.team22.communicationservice.domain.chat.Channel;
 import be.kdg.team22.communicationservice.domain.chat.ChatChannelId;
 import be.kdg.team22.communicationservice.domain.chat.ChatChannelType;
 import be.kdg.team22.communicationservice.domain.chat.ChatMessage;
@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "chat_channels")
-public class ChatChannelEntity {
+public class ChannelEntity {
 
     @Id
     private UUID id;
@@ -27,17 +27,17 @@ public class ChatChannelEntity {
     @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatMessageEntity> messages = new ArrayList<>();
 
-    protected ChatChannelEntity() {
+    protected ChannelEntity() {
     }
 
-    public ChatChannelEntity(UUID id, ChatChannelType type, String referenceId) {
+    public ChannelEntity(final UUID id, final ChatChannelType type, final String referenceId) {
         this.id = id;
         this.type = type;
         this.referenceId = referenceId;
     }
 
-    public static ChatChannelEntity from(ChatChannel channel) {
-        ChatChannelEntity entity = new ChatChannelEntity(
+    public static ChannelEntity from(final Channel channel) {
+        ChannelEntity entity = new ChannelEntity(
                 channel.getId().value(),
                 channel.getType(),
                 channel.getReferenceId()
@@ -50,9 +50,8 @@ public class ChatChannelEntity {
         return entity;
     }
 
-    public ChatChannel to() {
-
-        return new ChatChannel(
+    public Channel to() {
+        return new Channel(
                 ChatChannelId.from(this.id),
                 this.type,
                 this.referenceId,
