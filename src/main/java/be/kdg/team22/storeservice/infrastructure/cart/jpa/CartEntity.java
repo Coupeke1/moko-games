@@ -31,9 +31,9 @@ public class CartEntity {
         this.items.forEach(i -> i.setCart(this));
     }
 
-    public static CartEntity fromDomain(final Cart cart) {
+    public static CartEntity from(final Cart cart) {
         var itemEntities = cart.items().stream()
-                .map(CartItemEntity::fromDomain)
+                .map(CartItemEntity::from)
                 .toList();
 
         return new CartEntity(
@@ -43,11 +43,11 @@ public class CartEntity {
         );
     }
 
-    public Cart toDomain() {
+    public Cart to() {
         return new Cart(
                 CartId.from(id),
                 userId,
-                items.stream().map(CartItemEntity::toDomain).collect(Collectors.toSet()));
+                items.stream().map(CartItemEntity::to).collect(Collectors.toSet()));
     }
 
     public UUID id() {

@@ -50,9 +50,9 @@ public class OrderEntity {
         this.items.forEach(i -> i.setOrder(this));
     }
 
-    public static OrderEntity fromDomain(final Order order) {
+    public static OrderEntity from(final Order order) {
         List<OrderItemEntity> mapped = order.items().stream()
-                .map(OrderItemEntity::fromDomain)
+                .map(OrderItemEntity::from)
                 .toList();
 
         return new OrderEntity(
@@ -65,10 +65,10 @@ public class OrderEntity {
         );
     }
 
-    public Order toDomain() {
+    public Order to() {
         return new Order(
                 OrderId.from(id),
-                items.stream().map(OrderItemEntity::toDomain).toList(),
+                items.stream().map(OrderItemEntity::to).toList(),
                 status,
                 UserId.from(userId),
                 paymentId

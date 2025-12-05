@@ -26,11 +26,11 @@ public class CartItemEntity {
         this.gameId = gameId;
     }
 
-    public static CartItemEntity fromDomain(final CartItem item) {
+    public static CartItemEntity from(final CartItem item) {
         return new CartItemEntity(item.gameId());
     }
 
-    public CartItem toDomain() {
+    public CartItem to() {
         return new CartItem(gameId);
     }
 

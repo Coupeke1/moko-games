@@ -19,16 +19,16 @@ public class DbOrderRepository implements OrderRepository {
 
     @Override
     public void save(final Order order) {
-        repository.save(OrderEntity.fromDomain(order));
+        repository.save(OrderEntity.from(order));
     }
 
     @Override
     public Optional<Order> findById(final UUID id) {
-        return repository.findById(id).map(OrderEntity::toDomain);
+        return repository.findById(id).map(OrderEntity::to);
     }
 
     @Override
     public Optional<Order> findByPaymentId(final String paymentId) {
-        return repository.findByPaymentId(paymentId).map(OrderEntity::toDomain);
+        return repository.findByPaymentId(paymentId).map(OrderEntity::to);
     }
 }

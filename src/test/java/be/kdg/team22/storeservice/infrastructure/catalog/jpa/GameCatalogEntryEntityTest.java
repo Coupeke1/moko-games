@@ -22,11 +22,11 @@ class GameCatalogEntryEntityTest {
     }
 
     @Test
-    @DisplayName("fromDomain maps all fields correctly")
-    void fromDomain_mapsAllFields() {
+    @DisplayName("from maps all fields correctly")
+    void from_mapsAllFields() {
         GameCatalogEntry domain = sampleDomain();
 
-        GameCatalogEntryEntity entity = GameCatalogEntryEntity.fromDomain(domain);
+        GameCatalogEntryEntity entity = GameCatalogEntryEntity.from(domain);
 
         assertThat(entity.getId()).isEqualTo(domain.getId());
         assertThat(entity.getPrice()).isEqualTo(domain.getPrice());
@@ -35,8 +35,8 @@ class GameCatalogEntryEntityTest {
     }
 
     @Test
-    @DisplayName("toDomain maps entity fields back to a domain object")
-    void toDomain_mapsBackCorrectly() {
+    @DisplayName("to maps entity fields back to a domain object")
+    void to_mapsBackCorrectly() {
         UUID id = UUID.randomUUID();
         BigDecimal price = BigDecimal.TEN;
         GameCategory category = GameCategory.STRATEGY;
@@ -45,7 +45,7 @@ class GameCatalogEntryEntityTest {
         GameCatalogEntryEntity entity =
                 new GameCatalogEntryEntity(id, price, category, purchaseCount);
 
-        GameCatalogEntry domain = entity.toDomain();
+        GameCatalogEntry domain = entity.to();
 
         assertThat(domain.getId()).isEqualTo(id);
         assertThat(domain.getPrice()).isEqualTo(price);
@@ -58,8 +58,8 @@ class GameCatalogEntryEntityTest {
     void roundTripMapping_preservesAllData() {
         GameCatalogEntry original = sampleDomain();
 
-        GameCatalogEntryEntity entity = GameCatalogEntryEntity.fromDomain(original);
-        GameCatalogEntry result = entity.toDomain();
+        GameCatalogEntryEntity entity = GameCatalogEntryEntity.from(original);
+        GameCatalogEntry result = entity.to();
 
         assertThat(result.getId()).isEqualTo(original.getId());
         assertThat(result.getPrice()).isEqualTo(original.getPrice());

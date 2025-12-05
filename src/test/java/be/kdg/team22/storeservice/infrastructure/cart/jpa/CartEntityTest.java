@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CartEntityTest {
 
     @Test
-    void fromDomain_mapsAllFields_correctly() {
+    void from_mapsAllFields_correctly() {
         UUID userId = UUID.randomUUID();
         CartId cartId = CartId.create();
 
@@ -24,7 +24,7 @@ class CartEntityTest {
                 Set.of(new CartItem(UUID.fromString("11111111-1111-1111-1111-111111111111")))
         );
 
-        CartEntity entity = CartEntity.fromDomain(domain);
+        CartEntity entity = CartEntity.from(domain);
 
         assertThat(entity).isNotNull();
         assertThat(entity.userId()).isEqualTo(userId);
@@ -32,24 +32,24 @@ class CartEntityTest {
         assertThat(entity.items()).hasSize(1);
 
         CartItemEntity item = entity.items().getFirst();
-        assertThat(item.toDomain().gameId())
+        assertThat(item.to().gameId())
                 .isEqualTo(UUID.fromString("11111111-1111-1111-1111-111111111111"));
     }
 
     @Test
-    void fromDomain_setsBackreferences_correctly() {
+    void from_setsBackreferences_correctly() {
         UUID userId = UUID.randomUUID();
         CartId cartId = CartId.create();
 
         Cart domain = new Cart(cartId, userId, Set.of(new CartItem(UUID.randomUUID())));
 
-        CartEntity entity = CartEntity.fromDomain(domain);
+        CartEntity entity = CartEntity.from(domain);
 
         assertThat(entity.items()).allMatch(i -> i.cart() == entity);
     }
 
     @Test
-    void toDomain_mapsBackCorrectly() {
+    void to_mapsBackCorrectly() {
         UUID cartId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
         UUID gameId = UUID.randomUUID();
@@ -57,7 +57,7 @@ class CartEntityTest {
         CartItemEntity item = new CartItemEntity(gameId);
         CartEntity entity = new CartEntity(cartId, userId, List.of(item));
 
-        Cart domain = entity.toDomain();
+        Cart domain = entity.to();
 
         assertThat(domain.id().value()).isEqualTo(cartId);
         assertThat(domain.userId()).isEqualTo(userId);
@@ -68,7 +68,7 @@ class CartEntityTest {
     }
 
     @Test
-    void toDomain_usesSetForItems() {
+    void to_usesSetForItems() {
         UUID cartId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
 
@@ -78,7 +78,7 @@ class CartEntityTest {
 
         CartEntity entity = new CartEntity(cartId, userId, List.of(item1, item2));
 
-        Cart domain = entity.toDomain();
+        Cart domain = entity.to();
 
         assertThat(domain.items()).hasSize(1);
     }

@@ -37,7 +37,7 @@ public class GameCatalogEntryEntity {
         this.purchaseCount = purchaseCount;
     }
 
-    public static GameCatalogEntryEntity fromDomain(final GameCatalogEntry entry) {
+    public static GameCatalogEntryEntity from(final GameCatalogEntry entry) {
         return new GameCatalogEntryEntity(
                 entry.getId(),
                 entry.getPrice(),
@@ -46,7 +46,7 @@ public class GameCatalogEntryEntity {
         );
     }
 
-    public GameCatalogEntry toDomain() {
+    public GameCatalogEntry to() {
         return new GameCatalogEntry(
                 this.id,
                 this.price,

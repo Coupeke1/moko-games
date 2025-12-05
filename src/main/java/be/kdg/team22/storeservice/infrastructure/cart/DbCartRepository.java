@@ -20,12 +20,12 @@ public class DbCartRepository implements CartRepository {
     @Override
     public Optional<Cart> findByUserId(final UUID userId) {
         return repository.findByUserId(userId)
-                .map(CartEntity::toDomain);
+                .map(CartEntity::to);
     }
 
     @Override
     public Cart save(final Cart cart) {
-        repository.save(CartEntity.fromDomain(cart));
+        repository.save(CartEntity.from(cart));
         return cart;
     }
 }

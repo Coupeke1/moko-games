@@ -17,8 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 class OrderEntityTest {
 
     @Test
-    @DisplayName("fromDomain maps Order → OrderEntity correctly")
-    void fromDomain_mapsCorrectly() {
+    @DisplayName("from maps Order → OrderEntity correctly")
+    void from_mapsCorrectly() {
         UUID id = UUID.randomUUID();
         UserId userId = UserId.create();
         Order order = new Order(
@@ -32,16 +32,16 @@ class OrderEntityTest {
                 "payment"
         );
 
-        OrderEntity entity = OrderEntity.fromDomain(order);
+        OrderEntity entity = OrderEntity.from(order);
 
         assertThat(entity).isNotNull();
 
-        assertThat(entity.toDomain().items()).hasSize(2);
+        assertThat(entity.to().items()).hasSize(2);
     }
 
     @Test
-    @DisplayName("toDomain maps OrderEntity → Order correctly")
-    void toDomain_mapsCorrectly() {
+    @DisplayName("to maps OrderEntity → Order correctly")
+    void to_mapsCorrectly() {
         UUID id = UUID.randomUUID();
         UserId userId = UserId.create();
         OrderItemEntity i1 = new OrderItemEntity(UUID.randomUUID(), BigDecimal.valueOf(5));
@@ -56,7 +56,7 @@ class OrderEntityTest {
                 List.of(i1, i2)
         );
 
-        Order domain = entity.toDomain();
+        Order domain = entity.to();
 
         assertThat(domain.id().value()).isEqualTo(id);
         assertThat(domain.items()).hasSize(2);
@@ -79,8 +79,8 @@ class OrderEntityTest {
                 "paymentId"
         );
 
-        OrderEntity entity = OrderEntity.fromDomain(original);
-        Order mapped = entity.toDomain();
+        OrderEntity entity = OrderEntity.from(original);
+        Order mapped = entity.to();
 
         assertThat(mapped.id().value()).isEqualTo(original.id().value());
         assertThat(mapped.totalPrice()).isEqualTo(original.totalPrice());
