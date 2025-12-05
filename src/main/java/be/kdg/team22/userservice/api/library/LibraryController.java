@@ -32,7 +32,7 @@ public class LibraryController {
     }
 
     @GetMapping("/{id}/favourite")
-    public ResponseEntity<Boolean> getFavourite(@AuthenticationPrincipal Jwt token, @PathVariable UUID id) {
+    public ResponseEntity<Boolean> getFavourite(@AuthenticationPrincipal final Jwt token, @PathVariable final UUID id) {
         ProfileId userId = ProfileId.get(token);
         GameId gameId = GameId.from(id);
         boolean favourite = service.isFavourite(userId, gameId);
@@ -40,7 +40,7 @@ public class LibraryController {
     }
 
     @PatchMapping("/{id}/favourite")
-    public ResponseEntity<Void> favouriteGame(@AuthenticationPrincipal Jwt token, @PathVariable UUID id) {
+    public ResponseEntity<Void> favouriteGame(@AuthenticationPrincipal final Jwt token, @PathVariable final UUID id) {
         ProfileId userId = ProfileId.get(token);
         GameId gameId = GameId.from(id);
         service.markFavourite(userId, gameId);
@@ -48,7 +48,7 @@ public class LibraryController {
     }
 
     @PatchMapping("/{id}/unfavourite")
-    public ResponseEntity<Void> unfavouriteGame(@AuthenticationPrincipal Jwt token, @PathVariable UUID id) {
+    public ResponseEntity<Void> unfavouriteGame(@AuthenticationPrincipal final Jwt token, @PathVariable final UUID id) {
         ProfileId userId = ProfileId.get(token);
         GameId gameId = GameId.from(id);
         service.unmarkFavourite(userId, gameId);

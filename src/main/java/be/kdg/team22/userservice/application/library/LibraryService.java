@@ -65,19 +65,19 @@ public class LibraryService {
         return new LibraryGamesModel(games);
     }
 
-    public boolean isFavourite(ProfileId userId, GameId gameId) {
+    public boolean isFavourite(final ProfileId userId, final GameId gameId) {
         LibraryEntry entry = libraryRepository.findByUserIdAndGameId(userId.value(), gameId.value()).orElseThrow(LibraryException::notInLibrary);
         return entry.favourite();
     }
 
-    public void markFavourite(ProfileId userId, GameId gameId) {
+    public void markFavourite(final ProfileId userId, final GameId gameId) {
         LibraryEntry entry = libraryRepository.findByUserIdAndGameId(userId.value(), gameId.value()).orElseThrow(LibraryException::notInLibrary);
 
         LibraryEntry updated = entry.markFavourite();
         libraryRepository.save(updated);
     }
 
-    public void unmarkFavourite(ProfileId userId, GameId gameId) {
+    public void unmarkFavourite(final ProfileId userId, final GameId gameId) {
         LibraryEntry entry = libraryRepository.findByUserIdAndGameId(userId.value(), gameId.value()).orElseThrow(LibraryException::notInLibrary);
 
         LibraryEntry updated = entry.unmarkFavourite();
