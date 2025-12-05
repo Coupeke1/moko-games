@@ -132,3 +132,34 @@ services:
     networks:
       - moko_backend
       - moko_kc
+
+  service-store:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/store-service:main-latest
+    restart: always
+    pull_policy: always
+    profiles: ["store"]
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=store_service
+      SPRING_DATASOURCE_USER: user
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+      SPRING_RABBITMQ_HOST: app-rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: user
+      SPRING_RABBITMQ_PASSWORD: password
+
+      SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ENDPOINT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
+    ports:
+      - "8085:8085"
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8086/actuator/health" ]
+      interval: 1m
+      timeout: 15s
+      retries: 5
+      start_period: 5m
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - moko_backend
+      - moko_kc

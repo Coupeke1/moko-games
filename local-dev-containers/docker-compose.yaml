@@ -4,3 +4,12 @@ include:
   - infrastructure.yaml
   - platform-services.yaml
   - game-services.yaml
+  - black-box-chess-game.yaml
+
+networks:
+  moko_kc:
+    name: moko-kc-network
+    driver: bridge
+  moko_backend:
+    name: moko-back-network
+    driver: bridge

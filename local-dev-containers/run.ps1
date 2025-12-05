@@ -5,7 +5,7 @@ param (
 
 # If --all is provided, override services
 if ($All) {
-    $Services = @("user", "session", "social", "games", "tic-tac-toe", "checkers")
+    $Services = @("user", "session", "social", "games", "store", "tic-tac-toe", "checkers", "chess")
     Write-Host "--all provided. Starting ALL services: $($Services -join ', ')"
 } else {
     if (-not $Services) {
@@ -16,7 +16,7 @@ if ($All) {
 }
 
 # Validate services and build profiles
-$ValidServices = @("user", "session", "social", "games", "tic-tac-toe", "checkers")
+$ValidServices = @("user", "session", "social", "games", "store", "tic-tac-toe", "checkers", "chess")
 $Profiles = @()
 
 foreach ($service in $Services) {

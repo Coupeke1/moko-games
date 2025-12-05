@@ -29,10 +29,14 @@ The scripts can orchestrate the following services:
 - `session` - Session management service
 - `social` - Social features service
 - `games` - Core games service
+- `store` - Store backend service
 
 ### Game Services
 - `tic-tac-toe` - Tic-Tac-Toe game
 - `checkers` - Checkers game
+
+### Black Box (Chess) Services
+- `chess` - Frontend, backend of chess game and related infrastructure (Black Box)
 
 ### Infrastructure
 Infrastructure services (database, messaging, etc.) are **always started** regardless of which services you specify.
