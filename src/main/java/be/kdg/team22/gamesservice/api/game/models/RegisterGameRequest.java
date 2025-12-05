@@ -5,6 +5,7 @@ public record RegisterGameRequest(
         String backendUrl,
         String frontendUrl,
         String startEndpoint,
+        String healthEndpoint,
 
         String title,
         String description,

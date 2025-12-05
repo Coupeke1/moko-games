@@ -11,10 +11,10 @@ import be.kdg.team22.gamesservice.domain.game.exceptions.GameNotFoundException;
 import be.kdg.team22.gamesservice.domain.game.exceptions.InvalidGameConfigurationException;
 import be.kdg.team22.gamesservice.domain.game.exceptions.PlayersListEmptyException;
 import be.kdg.team22.gamesservice.infrastructure.game.engine.ExternalGamesRepository;
+import be.kdg.team22.gamesservice.infrastructure.game.health.GameHealthChecker;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,8 +26,9 @@ import static org.mockito.Mockito.*;
 class GameServiceTest {
 
     private final GameRepository gameRepository = mock(GameRepository.class);
+    private final GameHealthChecker gameHealthChecker = mock(GameHealthChecker.class);
     private final ExternalGamesRepository engine = mock(ExternalGamesRepository.class);
-    private final GameService service = new GameService(gameRepository, engine);
+    private final GameService service = new GameService(gameRepository, gameHealthChecker, engine);
 
     private Game sampleGame(GameId id) {
         return new Game(
@@ -36,6 +37,7 @@ class GameServiceTest {
                 "http://localhost:8087",
                 "/start",
                 "/start",
+                "/health",
                 "Checkers",
                 "A fun board game",
                 "http://img"

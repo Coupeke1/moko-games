@@ -6,10 +6,11 @@ POST http://localhost:8084/api/games/register
 Content-Type: application/json
 
 {
-  "name": "tic-tac-toe-2",
+  "name": "tic-tac-toe",
   "backendUrl": "http://localhost:8086",
   "frontendUrl": "http://localhost:5174/tic-tac-toe/game",
   "startEndpoint": "/api/games",
+  "healthEndpoint": "/actuator/health",
   "title": "Tic Tac Toe",
   "description": "Tic tac toe is played on a 3x3 grid",
   "image": "test"

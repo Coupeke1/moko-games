@@ -28,6 +28,14 @@ public class GameEntity {
 
     @Column(nullable = false, name = "start_endpoint")
     private String startEndpoint;
+    @Column(nullable = false, name = "health_endpoint")
+    private String healthEndpoint;
+
+    @Column(name = "last_health_check")
+    private Instant lastHealthCheck;
+
+    @Column(nullable = false, name = "healthy")
+    private boolean healthy;
 
     @Column(nullable = false)
     private String title;
@@ -53,6 +61,9 @@ public class GameEntity {
             String baseUrl,
             String frontendUrl,
             String startEndpoint,
+            String healthEndpoint,
+            Instant lastHealthCheck,
+            boolean healthy,
             String title,
             String description,
             String image,
@@ -64,6 +75,9 @@ public class GameEntity {
         this.baseUrl = baseUrl;
         this.frontendUrl = frontendUrl;
         this.startEndpoint = startEndpoint;
+        this.healthEndpoint = healthEndpoint;
+        this.lastHealthCheck = lastHealthCheck;
+        this.healthy = healthy;
         this.title = title;
         this.description = description;
         this.image = image;
@@ -78,6 +92,9 @@ public class GameEntity {
                 game.baseUrl(),
                 game.frontendUrl(),
                 game.startEndpoint(),
+                game.healthEndpoint(),
+                game.lastHealthCheck(),
+                game.healthy(),
                 game.title(),
                 game.description(),
                 game.image(),
@@ -93,6 +110,9 @@ public class GameEntity {
                 baseUrl,
                 frontendUrl,
                 startEndpoint,
+                healthEndpoint,
+                lastHealthCheck,
+                healthy,
                 title,
                 description,
                 image,
@@ -115,6 +135,18 @@ public class GameEntity {
 
     public String startEndpoint() {
         return startEndpoint;
+    }
+
+    public String healthEndpoint() {
+        return healthEndpoint;
+    }
+
+    public Instant lastHealthCheck() {
+        return lastHealthCheck;
+    }
+
+    public boolean healthy() {
+        return healthy;
     }
 
     public String title() {

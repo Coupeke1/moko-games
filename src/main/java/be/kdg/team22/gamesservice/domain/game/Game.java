@@ -4,7 +4,6 @@ import be.kdg.team22.gamesservice.api.game.models.RegisterGameRequest;
 import be.kdg.team22.gamesservice.domain.game.exceptions.*;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 
 @AggregateRoot
@@ -19,6 +18,9 @@ public class Game {
     private String baseUrl;
     private String frontendUrl;
     private String startEndpoint;
+    private String healthEndpoint;
+    private Instant lastHealthCheck;
+    private boolean healthy;
 
     // frontend metadata
     private String title;
@@ -31,19 +33,25 @@ public class Game {
             final String baseUrl,
             final String frontendUrl,
             final String startEndpoint,
+            final String healthEndpoint,
+            final Instant lastHealthCheck,
+            final boolean healthy,
             final String title,
             final String description,
             final String image,
             final Instant createdAt,
             final Instant updatedAt
     ) {
-        validate(id, name, baseUrl, frontendUrl, startEndpoint, title, description, image);
+        validate(id, name, baseUrl, frontendUrl, startEndpoint, healthEndpoint, title, description, image);
 
         this.id = id;
         this.name = name;
         this.baseUrl = baseUrl;
         this.frontendUrl = frontendUrl;
         this.startEndpoint = startEndpoint;
+        this.healthEndpoint = healthEndpoint;
+        this.lastHealthCheck = lastHealthCheck;
+        this.healthy = healthy;
 
         this.title = title;
         this.description = description;
@@ -59,17 +67,20 @@ public class Game {
             final String baseUrl,
             final String frontendUrl,
             final String startEndpoint,
+            final String healthEndpoint,
             final String title,
             final String description,
             final String image
     ) {
-        validate(id, name, baseUrl, frontendUrl, startEndpoint, title, description, image);
+        validate(id, name, baseUrl, frontendUrl, startEndpoint, healthEndpoint, title, description, image);
 
         this.id = id;
         this.name = name;
         this.baseUrl = baseUrl;
         this.startEndpoint = startEndpoint;
         this.frontendUrl = frontendUrl;
+        this.healthEndpoint = healthEndpoint;
+        this.healthy = false;
 
         this.title = title;
         this.description = description;
@@ -85,6 +96,7 @@ public class Game {
             final String baseUrl,
             final String frontendUrl,
             final String startEndpoint,
+            final String healthEndpoint,
             final String title,
             final String description,
             final String image
@@ -94,6 +106,7 @@ public class Game {
         if (baseUrl == null || baseUrl.isBlank()) throw new GameBaseUrlInvalidException();
         if (frontendUrl == null || frontendUrl.isBlank()) throw new GameFrontendUrlInvalidException();
         if (startEndpoint == null || startEndpoint.isBlank()) throw new GameStartEndpointInvalidException();
+        if (healthEndpoint == null || healthEndpoint.isBlank()) throw new GameHealthEndpointInvalidException();
         validateMetaData(title, description, image);
     }
 
@@ -151,10 +164,16 @@ public class Game {
                 request.backendUrl(),
                 request.frontendUrl(),
                 request.startEndpoint(),
+                request.healthEndpoint(),
                 request.title(),
                 request.description(),
                 request.image()
         );
+    }
+
+    public void updateHealthStatus(boolean isHealthy) {
+        this.healthy = isHealthy;
+        this.lastHealthCheck = Instant.now();
     }
 
     public GameId id() {
@@ -195,5 +214,17 @@ public class Game {
 
     public Instant updatedAt() {
         return updatedAt;
+    }
+
+    public String healthEndpoint() {
+        return healthEndpoint;
+    }
+
+    public Instant lastHealthCheck() {
+        return lastHealthCheck;
+    }
+
+    public boolean healthy() {
+        return healthy;
     }
 }
