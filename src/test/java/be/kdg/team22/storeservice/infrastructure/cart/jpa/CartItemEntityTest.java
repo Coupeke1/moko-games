@@ -10,23 +10,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CartItemEntityTest {
 
     @Test
-    void fromDomain_mapsFieldsCorrectly() {
+    void from_mapsFieldsCorrectly() {
         UUID gameId = UUID.randomUUID();
         CartItem domain = new CartItem(gameId);
 
-        CartItemEntity entity = CartItemEntity.fromDomain(domain);
+        CartItemEntity entity = CartItemEntity.from(domain);
 
         assertThat(entity).isNotNull();
-        assertThat(entity.toDomain().gameId()).isEqualTo(gameId);
+        assertThat(entity.to().gameId()).isEqualTo(gameId);
     }
 
     @Test
-    void toDomain_mapsBackCorrectly() {
+    void to_mapsBackCorrectly() {
         UUID gameId = UUID.randomUUID();
 
         CartItemEntity entity = new CartItemEntity(gameId);
 
-        CartItem domain = entity.toDomain();
+        CartItem domain = entity.to();
 
         assertThat(domain.gameId()).isEqualTo(gameId);
     }
@@ -41,6 +41,6 @@ class CartItemEntityTest {
         CartEntity cart = new CartEntity(cartId, userId, java.util.List.of(item));
 
         assertThat(item).isNotNull();
-        assertThat(item.toDomain().gameId()).isEqualTo(gameId);
+        assertThat(item.to().gameId()).isEqualTo(gameId);
     }
 }

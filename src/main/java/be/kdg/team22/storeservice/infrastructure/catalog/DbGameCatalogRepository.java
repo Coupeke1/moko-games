@@ -25,14 +25,14 @@ public class DbGameCatalogRepository implements GameCatalogRepository {
     @Override
     public Optional<GameCatalogEntry> findById(UUID id) {
         return jpa.findById(id)
-                .map(GameCatalogEntryEntity::toDomain);
+                .map(GameCatalogEntryEntity::to);
     }
 
     @Override
     public List<GameCatalogEntry> findAll(FilterQuery filter, Pagination pagination) {
         return jpa.findAll()
                 .stream()
-                .map(GameCatalogEntryEntity::toDomain)
+                .map(GameCatalogEntryEntity::to)
                 .filter(e -> filter.category.map(c -> e.getCategory() == c).orElse(true))
                 .filter(e -> filter.minPrice.map(min -> e.getPrice().compareTo(min) >= 0).orElse(true))
                 .filter(e -> filter.maxPrice.map(max -> e.getPrice().compareTo(max) <= 0).orElse(true))
@@ -44,7 +44,7 @@ public class DbGameCatalogRepository implements GameCatalogRepository {
 
     @Override
     public void save(GameCatalogEntry entry) {
-        jpa.save(GameCatalogEntryEntity.fromDomain(entry));
+        jpa.save(GameCatalogEntryEntity.from(entry));
     }
 
     @Override

@@ -28,11 +28,11 @@ public class OrderItemEntity {
         this.price = price;
     }
 
-    static OrderItemEntity fromDomain(final OrderItem item) {
+    static OrderItemEntity from(final OrderItem item) {
         return new OrderItemEntity(item.gameId(), item.price());
     }
 
-    OrderItem toDomain() {
+    OrderItem to() {
         return new OrderItem(gameId, price);
     }
 

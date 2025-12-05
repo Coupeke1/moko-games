@@ -13,29 +13,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 class OrderItemEntityTest {
 
     @Test
-    @DisplayName("fromDomain maps OrderItem → OrderItemEntity correctly")
-    void fromDomain_mapsCorrectly() {
+    @DisplayName("from maps OrderItem → OrderItemEntity correctly")
+    void from_mapsCorrectly() {
         UUID gameId = UUID.randomUUID();
         BigDecimal price = BigDecimal.valueOf(12.50);
 
         OrderItem domain = new OrderItem(gameId, price);
 
-        OrderItemEntity entity = OrderItemEntity.fromDomain(domain);
+        OrderItemEntity entity = OrderItemEntity.from(domain);
 
         assertThat(entity).isNotNull();
-        assertThat(entity.toDomain().gameId()).isEqualTo(gameId);
-        assertThat(entity.toDomain().price()).isEqualByComparingTo(price);
+        assertThat(entity.to().gameId()).isEqualTo(gameId);
+        assertThat(entity.to().price()).isEqualByComparingTo(price);
     }
 
     @Test
-    @DisplayName("toDomain maps OrderItemEntity → OrderItem correctly")
-    void toDomain_mapsCorrectly() {
+    @DisplayName("to maps OrderItemEntity → OrderItem correctly")
+    void to_mapsCorrectly() {
         UUID gameId = UUID.randomUUID();
         BigDecimal price = BigDecimal.valueOf(19.99);
 
         OrderItemEntity entity = new OrderItemEntity(gameId, price);
 
-        OrderItem domain = entity.toDomain();
+        OrderItem domain = entity.to();
 
         assertThat(domain.gameId()).isEqualTo(gameId);
         assertThat(domain.price()).isEqualByComparingTo(price);
@@ -61,10 +61,10 @@ class OrderItemEntityTest {
         );
 
         assertThat(itemEntity).isNotNull();
-        assertThat(itemEntity.toDomain().gameId()).isEqualTo(gameId);
-        assertThat(itemEntity.toDomain().price()).isEqualByComparingTo(price);
+        assertThat(itemEntity.to().gameId()).isEqualTo(gameId);
+        assertThat(itemEntity.to().price()).isEqualByComparingTo(price);
 
-        assertThat(itemEntity.toDomain()).isNotNull();
-        assertThat(itemEntity.toDomain().gameId()).isEqualTo(gameId);
+        assertThat(itemEntity.to()).isNotNull();
+        assertThat(itemEntity.to().gameId()).isEqualTo(gameId);
     }
 }
