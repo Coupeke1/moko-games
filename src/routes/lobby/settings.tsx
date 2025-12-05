@@ -32,7 +32,14 @@ export default function LobbySettingsPage() {
 
     const [size, setSize] = useState<number>(4);
 
-    const { lobby, profile, game, isOwner, isLoading, isError } = useSession();
+    const {
+        lobby,
+        profile,
+        game,
+        isOwner,
+        loading: isLoading,
+        error: isError,
+    } = useSession();
 
     const save = useMutation({
         mutationFn: async ({ lobby, game }: { lobby: string; game: string }) =>

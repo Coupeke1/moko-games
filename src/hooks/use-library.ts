@@ -2,10 +2,14 @@ import { findGames } from "@/services/library-service";
 import { useQuery } from "@tanstack/react-query";
 
 export function useLibrary() {
-    const { isLoading, isError, data } = useQuery({
+    const {
+        isLoading: loading,
+        isError: error,
+        data,
+    } = useQuery({
         queryKey: ["library"],
-        queryFn: () => findGames()
+        queryFn: () => findGames(),
     });
 
-    return { isLoading, isError, games: data };
+    return { loading, error, games: data };
 }

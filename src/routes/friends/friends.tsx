@@ -6,9 +6,8 @@ import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
 import Page from "@/components/layout/page";
-import ErrorState from "@/components/state/error";
-import LoadingState from "@/components/state/loading";
 import Message from "@/components/state/message";
+import State from "@/components/state/state";
 import TabRow from "@/components/tabs/links/row";
 import showToast from "@/components/toast";
 import { useFriends } from "@/hooks/use-friends";
@@ -24,16 +23,15 @@ function Add() {
     const [username, setUsername] = useState("");
 
     const add = useMutation({
-        mutationFn: async ({ username }: { username: string }) => {
-            await sendRequest(username);
-        },
+        mutationFn: async ({ username }: { username: string }) =>
+            await sendRequest(username),
         onSuccess: async () => {
             await client.refetchQueries({ queryKey: ["friends"] });
             showToast(username, "Request sent");
             close();
         },
         onError: (error: Error) => {
-            showToast(username, error.message);
+            showToast("Friends", error.message);
         },
     });
 
@@ -83,21 +81,7 @@ function Friend({ friend }: { friend: Profile }) {
 }
 
 export default function FriendsPage() {
-    const { friends, isLoading, isError } = useFriends();
-
-    if (isLoading || !friends)
-        return (
-            <Page>
-                <LoadingState />
-            </Page>
-        );
-
-    if (isError)
-        return (
-            <Page>
-                <ErrorState />
-            </Page>
-        );
+    const { friends, loading, error } = useFriends();
 
     return (
         <Page>
@@ -105,15 +89,18 @@ export default function FriendsPage() {
                 <TabRow tabs={getTabs()} />
                 <Add />
 
-                {friends.length == 0 ? (
-                    <Message>No friends :(</Message>
-                ) : (
-                    <Grid>
-                        {friends.map((friend: Profile) => (
-                            <Friend friend={friend} />
-                        ))}
-                    </Grid>
-                )}
+                <State data={friends} loading={loading} error={error} />
+
+                {friends &&
+                    (friends.length == 0 ? (
+                        <Message>No friends :(</Message>
+                    ) : (
+                        <Grid>
+                            {friends.map((friend: Profile) => (
+                                <Friend key={friend.id} friend={friend} />
+                            ))}
+                        </Grid>
+                    ))}
             </Column>
         </Page>
     );

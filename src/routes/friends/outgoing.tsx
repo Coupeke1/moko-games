@@ -18,7 +18,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function OutgoingRequestsPage() {
     const client = useQueryClient();
-    const { requests, isLoading, isError } = useOutgoingRequests();
+    const { requests, loading, error } = useOutgoingRequests();
 
     const cancel = useMutation({
         mutationFn: async ({ request }: { request: Profile }) =>
@@ -34,52 +34,33 @@ export default function OutgoingRequestsPage() {
         },
     });
 
-    if (isLoading || requests === undefined)
-        return (
-            <Page>
-                <Column gap={Gap.Large}>
-                    <TabRow tabs={getTabs()} />
-                    <LoadingState />
-                </Column>
-            </Page>
-        );
-
-    if (isError)
-        return (
-            <Page>
-                <Column gap={Gap.Large}>
-                    <TabRow tabs={getTabs()} />
-                    <ErrorState />
-                </Column>
-            </Page>
-        );
-
     return (
         <Page>
             <Column gap={Gap.Large}>
                 <TabRow tabs={getTabs()} />
 
-                {requests.length == 0 ? (
-                    <Message>No outgoing requests :(</Message>
-                ) : (
-                    <Grid>
-                        {requests.map((request: Profile) => (
-                            <UserCard
-                                user={request}
-                                footer={
-                                    <Button
-                                        onClick={() =>
-                                            cancel.mutate({ request })
-                                        }
-                                        fullWidth={true}
-                                    >
-                                        <CancelIcon />
-                                    </Button>
-                                }
-                            />
-                        ))}
-                    </Grid>
-                )}
+                {requests &&
+                    (requests.length == 0 ? (
+                        <Message>No outgoing requests :(</Message>
+                    ) : (
+                        <Grid>
+                            {requests.map((request: Profile) => (
+                                <UserCard
+                                    user={request}
+                                    footer={
+                                        <Button
+                                            onClick={() =>
+                                                cancel.mutate({ request })
+                                            }
+                                            fullWidth={true}
+                                        >
+                                            <CancelIcon />
+                                        </Button>
+                                    }
+                                />
+                            ))}
+                        </Grid>
+                    ))}
             </Column>
         </Page>
     );

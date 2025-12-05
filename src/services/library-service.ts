@@ -13,9 +13,24 @@ export async function findGames(): Promise<Game[]> {
     }
 }
 
+export async function isGameFavourited(id: string) {
+    try {
+        const { data } = await client.get<boolean>(
+            `${BASE_URL}/${id}/favourite`,
+        );
+
+        return data;
+    } catch {
+        throw new Error(
+            `Could not check if game with id '${id}' is favourited`,
+        );
+    }
+}
+
 export async function favouriteGame(id: string) {
     try {
-        // TODO
+        console.log("fav");
+        await client.patch(`${BASE_URL}/${id}/favourite`);
     } catch {
         throw new Error(`Game with id '${id}' could not be favourited`);
     }
@@ -23,7 +38,8 @@ export async function favouriteGame(id: string) {
 
 export async function unFavouriteGame(id: string) {
     try {
-        // TODO
+        console.log("un");
+        await client.patch(`${BASE_URL}/${id}/unfavourite`);
     } catch {
         throw new Error(`Game with id '${id}' could not be unfavourited`);
     }

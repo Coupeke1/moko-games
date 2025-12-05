@@ -10,6 +10,7 @@ import Row from "@/components/layout/row";
 import ErrorState from "@/components/state/error";
 import LoadingState from "@/components/state/loading";
 import Message from "@/components/state/message";
+import State from "@/components/state/state";
 import TabRow from "@/components/tabs/links/row";
 import showToast from "@/components/toast";
 import { useIncomingRequests } from "@/hooks/use-requests";
@@ -20,7 +21,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function IncomingRequestsPage() {
     const client = useQueryClient();
-    const { requests, isLoading, isError } = useIncomingRequests();
+    const { requests, loading, error } = useIncomingRequests();
 
     const accept = useMutation({
         mutationFn: async ({ request }: { request: Profile }) =>
@@ -51,62 +52,45 @@ export default function IncomingRequestsPage() {
         },
     });
 
-    if (isLoading || !requests)
-        return (
-            <Page>
-                <Column gap={Gap.Large}>
-                    <TabRow tabs={getTabs()} />
-                    <LoadingState />
-                </Column>
-            </Page>
-        );
-
-    if (isError)
-        return (
-            <Page>
-                <Column gap={Gap.Large}>
-                    <TabRow tabs={getTabs()} />
-                    <ErrorState />
-                </Column>
-            </Page>
-        );
-
     return (
         <Page>
             <Column gap={Gap.Large}>
                 <TabRow tabs={getTabs()} />
 
-                {requests.length == 0 ? (
-                    <Message>No incoming requests :(</Message>
-                ) : (
-                    <Grid>
-                        {requests.map((request: Profile) => (
-                            <UserCard
-                                user={request}
-                                footer={
-                                    <Row>
-                                        <Button
-                                            onClick={() =>
-                                                accept.mutate({ request })
-                                            }
-                                            fullWidth={true}
-                                        >
-                                            <AcceptIcon />
-                                        </Button>
-                                        <Button
-                                            onClick={() =>
-                                                reject.mutate({ request })
-                                            }
-                                            fullWidth={true}
-                                        >
-                                            <RejectIcon />
-                                        </Button>
-                                    </Row>
-                                }
-                            />
-                        ))}
-                    </Grid>
-                )}
+                <State data={requests} loading={loading} error={error} />
+
+                {requests &&
+                    (requests.length == 0 ? (
+                        <Message>No incoming requests :(</Message>
+                    ) : (
+                        <Grid>
+                            {requests.map((request: Profile) => (
+                                <UserCard
+                                    user={request}
+                                    footer={
+                                        <Row>
+                                            <Button
+                                                onClick={() =>
+                                                    accept.mutate({ request })
+                                                }
+                                                fullWidth={true}
+                                            >
+                                                <AcceptIcon />
+                                            </Button>
+                                            <Button
+                                                onClick={() =>
+                                                    reject.mutate({ request })
+                                                }
+                                                fullWidth={true}
+                                            >
+                                                <RejectIcon />
+                                            </Button>
+                                        </Row>
+                                    }
+                                />
+                            ))}
+                        </Grid>
+                    ))}
             </Column>
         </Page>
     );

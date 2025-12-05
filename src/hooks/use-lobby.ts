@@ -62,7 +62,7 @@ export function useLobby(lobbyId?: string | null, userId?: string | null) {
 
     return {
         lobby: lobby.data ?? null,
-        isLoading: !isInitialized && enabled,
-        isError: lobby.isError,
+        loading: !isInitialized && enabled,
+        error: lobby.isError,
     };
 }
