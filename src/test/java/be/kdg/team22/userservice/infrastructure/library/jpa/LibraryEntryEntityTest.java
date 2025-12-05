@@ -1,6 +1,9 @@
 package be.kdg.team22.userservice.infrastructure.library.jpa;
 
+import be.kdg.team22.userservice.domain.library.GameId;
 import be.kdg.team22.userservice.domain.library.LibraryEntry;
+import be.kdg.team22.userservice.domain.library.LibraryId;
+import be.kdg.team22.userservice.domain.profile.ProfileId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +22,7 @@ class LibraryEntryEntityTest {
     @Test
     @DisplayName("fromDomain → maps ALL fields including favourite")
     void fromDomain_mapsCorrectly() {
-        LibraryEntry domain = new LibraryEntry(id, userId, gameId, purchasedAt, true);
+        LibraryEntry domain = new LibraryEntry(new LibraryId(id), new ProfileId(userId), new GameId(gameId), purchasedAt, true);
 
         LibraryEntryEntity entity = LibraryEntryEntity.fromDomain(domain);
 
@@ -34,8 +37,7 @@ class LibraryEntryEntityTest {
     @Test
     @DisplayName("toDomain → maps entity back to domain correctly (incl favourite)")
     void toDomain_mapsCorrectly() {
-        LibraryEntryEntity entity =
-                new LibraryEntryEntity(id, userId, gameId, purchasedAt, false);
+        LibraryEntryEntity entity = new LibraryEntryEntity(id, userId, gameId, purchasedAt, false);
 
         LibraryEntry domain = entity.toDomain();
 
@@ -49,7 +51,7 @@ class LibraryEntryEntityTest {
     @Test
     @DisplayName("Roundtrip: domain → entity → domain preserves all fields")
     void roundTrip_isConsistent() {
-        LibraryEntry original = new LibraryEntry(id, userId, gameId, purchasedAt, true);
+        LibraryEntry original = new LibraryEntry(new LibraryId(id), new ProfileId(userId), new GameId(gameId), purchasedAt, true);
 
         LibraryEntryEntity entity = LibraryEntryEntity.fromDomain(original);
         LibraryEntry mapped = entity.toDomain();
@@ -61,8 +63,7 @@ class LibraryEntryEntityTest {
     @Test
     @DisplayName("Constructor sets all fields including favourite")
     void constructor_setsFieldsCorrectly() {
-        LibraryEntryEntity entity =
-                new LibraryEntryEntity(id, userId, gameId, purchasedAt, true);
+        LibraryEntryEntity entity = new LibraryEntryEntity(id, userId, gameId, purchasedAt, true);
 
         assertThat(entity.id()).isEqualTo(id);
         assertThat(entity.userId()).isEqualTo(userId);

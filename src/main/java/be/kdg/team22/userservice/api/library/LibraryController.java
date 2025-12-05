@@ -4,6 +4,7 @@ package be.kdg.team22.userservice.api.library;
 import be.kdg.team22.userservice.api.library.models.LibraryGameModel;
 import be.kdg.team22.userservice.api.library.models.LibraryGamesModel;
 import be.kdg.team22.userservice.application.library.LibraryService;
+import be.kdg.team22.userservice.domain.library.GameId;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,23 +31,26 @@ public class LibraryController {
         return ResponseEntity.ok(model.games());
     }
 
-    @PatchMapping("/{gameId}/favourite")
-    public ResponseEntity<Void> favouriteGame(
-            @AuthenticationPrincipal Jwt token,
-            @PathVariable UUID gameId) {
-
+    @GetMapping("/{id}/favourite")
+    public ResponseEntity<Boolean> getFavourite(@AuthenticationPrincipal Jwt token, @PathVariable UUID id) {
         ProfileId userId = ProfileId.get(token);
+        GameId gameId = GameId.from(id);
+        boolean favourite = service.isFavourite(userId, gameId);
+        return ResponseEntity.ok(favourite);
+    }
+
+    @PatchMapping("/{id}/favourite")
+    public ResponseEntity<Void> favouriteGame(@AuthenticationPrincipal Jwt token, @PathVariable UUID id) {
+        ProfileId userId = ProfileId.get(token);
+        GameId gameId = GameId.from(id);
         service.markFavourite(userId, gameId);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{gameId}/unfavourite")
-    public ResponseEntity<Void> unfavouriteGame(
-            @AuthenticationPrincipal Jwt token,
-            @PathVariable UUID gameId) {
-
+    @PatchMapping("/{id}/unfavourite")
+    public ResponseEntity<Void> unfavouriteGame(@AuthenticationPrincipal Jwt token, @PathVariable UUID id) {
         ProfileId userId = ProfileId.get(token);
-
+        GameId gameId = GameId.from(id);
         service.unmarkFavourite(userId, gameId);
         return ResponseEntity.noContent().build();
     }
