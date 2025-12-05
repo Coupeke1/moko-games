@@ -29,7 +29,7 @@ public class ExternalGamesRepository {
 
             throw exception;
         } catch (RestClientException exception) {
-            throw new NotReachableException();
+            throw NotReachableException.GamesService();
         }
     }
 }

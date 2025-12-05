@@ -21,7 +21,7 @@ public class ExternalChatRepository {
     public void createLobbyChat(LobbyId lobbyId) {
         try {
             client.post()
-                    .uri("/api/chat/channel/LOBBY/{id}", lobbyId.value().toString())
+                    .uri("/api/chat/channel/lobby/{id}", lobbyId.value().toString())
                     .retrieve()
                     .toBodilessEntity();
         } catch (HttpClientErrorException e) {
