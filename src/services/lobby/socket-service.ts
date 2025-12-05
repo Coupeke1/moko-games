@@ -13,7 +13,7 @@ export function watchLobby(id: string): Observable<Lobby> {
     );
 
     const updates = client
-        .watch({ destination: `/topic/lobbies/${id}` })
+        .watch({ destination: "/user/queue/lobby" })
         .pipe(map((msg: IMessage) => JSON.parse(msg.body) as Lobby));
 
     return merge(initial, updates);
