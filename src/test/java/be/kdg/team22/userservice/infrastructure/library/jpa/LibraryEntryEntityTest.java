@@ -41,9 +41,9 @@ class LibraryEntryEntityTest {
 
         LibraryEntry domain = entity.toDomain();
 
-        assertThat(domain.id()).isEqualTo(id);
-        assertThat(domain.userId()).isEqualTo(userId);
-        assertThat(domain.gameId()).isEqualTo(gameId);
+        assertThat(domain.id().value()).isEqualTo(id);
+        assertThat(domain.userId().value()).isEqualTo(userId);
+        assertThat(domain.gameId().value()).isEqualTo(gameId);
         assertThat(domain.purchasedAt()).isEqualTo(purchasedAt);
         assertThat(domain.favourite()).isFalse();
     }
