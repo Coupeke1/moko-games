@@ -159,7 +159,7 @@ class ChatServiceTest {
     }
 
     @Test
-    void getMessages_sinceFiltersCorrectly() {
+    void getMessages_sinceFiltersCorrectly() throws Exception {
         ChatChannelId channelId = ChatChannelId.create();
         ChatChannel channel = new ChatChannel(channelId, ChatChannelType.LOBBY, "lobby1");
 
@@ -170,17 +170,19 @@ class ChatServiceTest {
         ChatMessage oldMsg = new ChatMessage(
                 ChatMessageId.create(), channelId, "u1", "old", oldTime
         );
+
         ChatMessage newMsg = new ChatMessage(
                 ChatMessageId.create(), channelId, "u1", "new", newTime
         );
-        channel.getMessages().clear();
 
-        Mockito.when(sessionRepo.isPlayerInLobby("u1", "lobby1", "jwt-token")).thenReturn(true);
+        injectMessage(channel, oldMsg);
+        injectMessage(channel, newMsg);
+
+        Mockito.when(sessionRepo.isPlayerInLobby("u1", "lobby1", "jwt-token"))
+                .thenReturn(true);
+
         Mockito.when(channelRepo.findByTypeAndReferenceId(ChatChannelType.LOBBY, "lobby1"))
                 .thenReturn(Optional.of(channel));
-
-        Mockito.when(channelRepo.findMessagesSince(eq(ChatChannelType.LOBBY), eq("lobby1"), any()))
-                .thenReturn(List.of(newMsg));
 
         List<ChatMessage> result =
                 service.getMessages(ChatChannelType.LOBBY, "lobby1", now.minusSeconds(10), "u1", jwt);
@@ -218,5 +220,14 @@ class ChatServiceTest {
         assertEquals("l1", created.getReferenceId());
         assertEquals(ChatChannelType.LOBBY, created.getType());
         Mockito.verify(channelRepo).save(any());
+    }
+
+    private ChatMessage injectMessage(ChatChannel channel, ChatMessage message) throws Exception {
+        var field = ChatChannel.class.getDeclaredField("messages");
+        field.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        List<ChatMessage> list = (List<ChatMessage>) field.get(channel);
+        list.add(message);
+        return message;
     }
 }

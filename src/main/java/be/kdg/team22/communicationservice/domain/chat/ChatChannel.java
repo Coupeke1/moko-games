@@ -1,6 +1,6 @@
 package be.kdg.team22.communicationservice.domain.chat;
 
-import be.kdg.team22.communicationservice.domain.chat.exceptions.AiMessageInLobbyException;
+import be.kdg.team22.communicationservice.domain.chat.exceptions.BotMessageInLobbyException;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
 import java.time.Instant;
@@ -67,9 +67,9 @@ public class ChatChannel {
         return message;
     }
 
-    public ChatMessage postAIMessage(final String aiModelId, final String content) {
+    public ChatMessage postBotMessage(final String aiModelId, final String content) {
         if (type != ChatChannelType.BOT) {
-            throw new AiMessageInLobbyException("BOT messages are only allowed on BOT channels");
+            throw new BotMessageInLobbyException("BOT messages are only allowed on BOT channels");
         }
         ChatMessage message = ChatMessage.newAIMessage(id, aiModelId, content);
         messages.add(message);

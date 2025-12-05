@@ -64,7 +64,7 @@ public class ChatService {
                 content
         );
 
-        ChatMessage aiMessage = channel.postAIMessage(botResponse.model(), botResponse.answer());
+        ChatMessage aiMessage = channel.postBotMessage(botResponse.model(), botResponse.answer());
         channelRepository.save(channel);
 
         return aiMessage;

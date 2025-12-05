@@ -34,7 +34,6 @@ class BotChatControllerTest {
     @MockitoBean
     ChatService service;
 
-    //TODO wanneer AI implementatie er is
     @Test
     void sendMessage_returnsChatMessageResponse() throws Exception {
         ChatChannelId channelId = ChatChannelId.create();
