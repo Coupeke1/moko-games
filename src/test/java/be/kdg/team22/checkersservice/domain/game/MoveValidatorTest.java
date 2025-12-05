@@ -1,6 +1,7 @@
 package be.kdg.team22.checkersservice.domain.game;
 
 import be.kdg.team22.checkersservice.domain.board.Board;
+import be.kdg.team22.checkersservice.domain.move.KingMovementMode;
 import be.kdg.team22.checkersservice.domain.move.Move;
 import be.kdg.team22.checkersservice.domain.move.MoveValidator;
 import be.kdg.team22.checkersservice.domain.board.Piece;
@@ -24,7 +25,7 @@ class MoveValidatorTest {
         Move move = new Move(null, 9, 13);
 
         assertDoesNotThrow(() ->
-                MoveValidator.validateMove(board, PlayerRole.WHITE, move)
+                MoveValidator.validateMove(board, PlayerRole.WHITE, move, KingMovementMode.FLYING)
         );
     }
 
@@ -33,7 +34,7 @@ class MoveValidatorTest {
         Move move = new Move(null, 24, 20);
 
         assertDoesNotThrow(() ->
-                MoveValidator.validateMove(board, PlayerRole.BLACK, move)
+                MoveValidator.validateMove(board, PlayerRole.BLACK, move, KingMovementMode.FLYING)
         );
     }
 
@@ -42,7 +43,7 @@ class MoveValidatorTest {
         Move move = new Move(null, 16, 20);
 
         assertThrows(InvalidMoveException.class, () ->
-                MoveValidator.validateMove(board, PlayerRole.WHITE, move)
+                MoveValidator.validateMove(board, PlayerRole.WHITE, move, KingMovementMode.FLYING)
         );
     }
 
@@ -51,7 +52,7 @@ class MoveValidatorTest {
         Move move = new Move(null, 9, 13);
 
         assertThrows(InvalidMoveException.class, () ->
-                MoveValidator.validateMove(board, PlayerRole.BLACK, move)
+                MoveValidator.validateMove(board, PlayerRole.BLACK, move, KingMovementMode.FLYING)
         );
     }
 
@@ -60,7 +61,7 @@ class MoveValidatorTest {
         Move move = new Move(null, 13, 9);
 
         assertThrows(InvalidMoveException.class, () ->
-                MoveValidator.validateMove(board, PlayerRole.WHITE, move)
+                MoveValidator.validateMove(board, PlayerRole.WHITE, move, KingMovementMode.FLYING)
         );
     }
 
@@ -69,7 +70,7 @@ class MoveValidatorTest {
         Move move = new Move(null, 20, 24);
 
         assertThrows(InvalidMoveException.class, () ->
-                MoveValidator.validateMove(board, PlayerRole.BLACK, move)
+                MoveValidator.validateMove(board, PlayerRole.BLACK, move, KingMovementMode.FLYING)
         );
     }
 
@@ -79,7 +80,7 @@ class MoveValidatorTest {
         Move move = new Move(null, 9, 13);
 
         assertThrows(InvalidMoveException.class, () ->
-                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move)
+                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move, KingMovementMode.FLYING)
         );
     }
 
@@ -89,7 +90,7 @@ class MoveValidatorTest {
         Move move = new Move(null, 9, 10);
 
         assertThrows(InvalidMoveException.class, () ->
-                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move)
+                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move, KingMovementMode.FLYING)
         );
     }
 
@@ -98,7 +99,7 @@ class MoveValidatorTest {
         Move move = new Move(null, 9, 17);
 
         assertThrows(InvalidMoveException.class, () ->
-                MoveValidator.validateMove(board, PlayerRole.WHITE, move)
+                MoveValidator.validateMove(board, PlayerRole.WHITE, move, KingMovementMode.FLYING)
         );
     }
 
@@ -108,7 +109,7 @@ class MoveValidatorTest {
         Move move = new Move(null, 9, 18);
 
         assertDoesNotThrow(() ->
-                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move)
+                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move, KingMovementMode.FLYING)
         );
     }
 
@@ -118,7 +119,7 @@ class MoveValidatorTest {
         Move move = new Move(null, 9, 18);
 
         assertThrows(InvalidMoveException.class, () ->
-                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move)
+                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move, KingMovementMode.FLYING)
         );
     }
 
@@ -128,7 +129,7 @@ class MoveValidatorTest {
         Move move = new Move(null, 9, 18);
 
         assertThrows(InvalidMoveException.class, () ->
-                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move)
+                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move, KingMovementMode.FLYING)
         );
     }
 
@@ -137,7 +138,7 @@ class MoveValidatorTest {
         Move move = new Move(null, 1, 33);
 
         assertThrows(InvalidMoveException.class, () ->
-                MoveValidator.validateMove(board, PlayerRole.WHITE, move)
+                MoveValidator.validateMove(board, PlayerRole.WHITE, move, KingMovementMode.FLYING)
         );
     }
 
@@ -155,7 +156,7 @@ class MoveValidatorTest {
         Move move = new Move(null, 25, 29);
 
         assertDoesNotThrow(() ->
-                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move)
+                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move, KingMovementMode.FLYING)
         );
     }
 
@@ -165,7 +166,7 @@ class MoveValidatorTest {
         Move move = new Move(null, 5, 1);
 
         assertDoesNotThrow(() ->
-                MoveValidator.validateMove(testBoard, PlayerRole.BLACK, move)
+                MoveValidator.validateMove(testBoard, PlayerRole.BLACK, move, KingMovementMode.FLYING)
         );
     }
 

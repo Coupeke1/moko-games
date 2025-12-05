@@ -5,6 +5,7 @@ import be.kdg.team22.checkersservice.domain.board.Piece;
 import be.kdg.team22.checkersservice.domain.game.Game;
 import be.kdg.team22.checkersservice.domain.game.GameId;
 import be.kdg.team22.checkersservice.domain.game.GameStatus;
+import be.kdg.team22.checkersservice.domain.move.KingMovementMode;
 import be.kdg.team22.checkersservice.domain.player.Player;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 
@@ -17,6 +18,7 @@ public class GameModel {
     public PlayerRole currentRole;
     public int size;
     public Map<Integer, PieceModel> grid;
+    public KingMovementMode kingMovementMode;
     public GameStatus status;
 
     public static GameModel fromDomain(Game game) {
@@ -27,6 +29,7 @@ public class GameModel {
         gameModel.currentRole = game.currentRole();
         gameModel.size = game.board().size();
         gameModel.grid = new HashMap<>();
+        gameModel.kingMovementMode = game.kingMovementMode();
         gameModel.status = game.status();
 
         game.board().grid().forEach((cellNumber, piece) -> {
@@ -60,6 +63,6 @@ public class GameModel {
 
         Board board = new Board(size, reconstructedGrid);
 
-        return new Game(GameId.fromString(id), playerSet, aiPlayer, currentRole, board, status);
+        return new Game(GameId.fromString(id), playerSet, aiPlayer, currentRole, board, kingMovementMode, status);
     }
 }

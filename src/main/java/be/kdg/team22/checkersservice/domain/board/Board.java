@@ -72,10 +72,13 @@ public class Board {
         if (isCaptureMove(this, piece.color(), move)) {
             int[] fromCoords = convertCellNumberToCoordinates(move.fromCell());
             int[] toCoords = convertCellNumberToCoordinates(move.toCell());
-            int middleRow = (fromCoords[0] + toCoords[0]) / 2;
-            int middleCol = (fromCoords[1] + toCoords[1]) / 2;
-            int middleCell = convertCoordinatesToCellNumber(middleRow, middleCol);
-            grid.put(middleCell, null);
+            int[][] cellsBetween = cellsBetween(fromCoords, toCoords);
+            int[] lastCellBeforeDestination = cellsBetween[cellsBetween.length - 1];
+            int cellToClear = convertCoordinatesToCellNumber(
+                    lastCellBeforeDestination[0],
+                    lastCellBeforeDestination[1]
+            );
+            grid.put(cellToClear, null);
         }
 
         grid.put(move.fromCell(), null);

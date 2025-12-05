@@ -7,10 +7,18 @@ import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 
 import java.util.Optional;
 
-public class KingMoveValidator {
-    protected static void validateKingMove(final Board board, final PlayerRole currentRole, final Move move) {
+import static be.kdg.team22.checkersservice.domain.move.MoveValidator.*;
 
+public class KingMoveValidator {
+    protected static void validateKingMove(final Board board, final PlayerRole currentRole, final Move move, KingMovementMode movementMode) {
+        validateCellsWithinBoard(board, move);
+        validateStartingPiece(board, currentRole, move);
+        validateTargetCellEmpty(board, move);
+        validateDiagonalMove(board, move);
+
+        validateSteps(board, move, movementMode, isCaptureMove(board, currentRole, move));
     }
+
 
     protected static boolean isKingCaptureMove(final Board board, final PlayerRole currentRole, final int rowDiff, final int[] fromCoords, final int[] toCoords) {
         if (rowDiff == 1) {
@@ -48,6 +56,28 @@ public class KingMoveValidator {
             }
         } else {
             throw new InvalidMoveException("You cannot move to the same space");
+        }
+    }
+
+    private static void validateSteps(final Board board, final Move move, KingMovementMode movementMode, boolean capture) {
+        int[] fromCoords = board.convertCellNumberToCoordinates(move.fromCell());
+        int[] toCoords = board.convertCellNumberToCoordinates(move.toCell());
+
+        int rowDiff = Math.abs(toCoords[0] - fromCoords[0]);
+        int allowedSteps;
+        switch (movementMode) {
+            case SINGLE -> allowedSteps = 1;
+            case DOUBLE -> allowedSteps = 2;
+            default -> allowedSteps = 100;
+        }
+        if (capture) {
+            if (!KingMovementMode.FLYING.equals(movementMode) && rowDiff > allowedSteps + 1) {
+                throw new InvalidMoveException(String.format("You can only capture over %d tiles with King movement mode %s", allowedSteps, movementMode));
+            }
+        } else  {
+            if (!KingMovementMode.FLYING.equals(movementMode) && rowDiff > allowedSteps) {
+                throw new InvalidMoveException(String.format("You can only move over %d tiles with King movement mode %s", allowedSteps, movementMode));
+            }
         }
     }
 }

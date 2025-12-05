@@ -1,5 +1,6 @@
 package be.kdg.team22.checkersservice.domain.game;
 
+import be.kdg.team22.checkersservice.domain.move.KingMovementMode;
 import be.kdg.team22.checkersservice.domain.move.Move;
 import be.kdg.team22.checkersservice.domain.game.exceptions.GameNotRunningException;
 import be.kdg.team22.checkersservice.domain.game.exceptions.NotPlayersTurnException;
@@ -30,7 +31,7 @@ public class GameTest {
         playerWhiteId = PlayerId.create();
         game = Game.create(
                 List.of(playerBlackId, playerWhiteId),
-                false
+                false, KingMovementMode.FLYING
         );
     }
 
@@ -48,7 +49,7 @@ public class GameTest {
     void createShouldThrowWhenTooFewPlayers() {
         PlayerId playerId = PlayerId.create();
         assertThrows(PlayerCountException.class, () ->
-                Game.create(List.of(playerId), false));
+                Game.create(List.of(playerId), false, KingMovementMode.FLYING));
     }
 
     @Test
@@ -58,7 +59,7 @@ public class GameTest {
             playerIds.add(PlayerId.create());
         }
         assertThrows(PlayerCountException.class, () ->
-                Game.create(playerIds, false));
+                Game.create(playerIds, false, KingMovementMode.FLYING));
     }
 
     @Test
@@ -67,7 +68,7 @@ public class GameTest {
         PlayerId player1 = new PlayerId(uuid);
         PlayerId player2 = new PlayerId(uuid);
         assertThrows(UniquePlayersException.class, () ->
-                Game.create(List.of(player1, player2), false));
+                Game.create(List.of(player1, player2), false, KingMovementMode.FLYING));
     }
 
     @Test
@@ -91,7 +92,7 @@ public class GameTest {
     void createWithAIPlayerShouldSetAiPlayerField() {
         Game gameWithAI = Game.create(
                 List.of(playerBlackId, playerWhiteId),
-                true
+                true, KingMovementMode.FLYING
         );
 
         assertEquals(PlayerRole.WHITE, gameWithAI.aiPlayer());
@@ -138,7 +139,8 @@ public class GameTest {
         PlayerId blackId = new PlayerId(blackUuid);
         PlayerId whiteId = new PlayerId(whiteUuid);
 
-        Game specificGame = Game.create(List.of(blackId, whiteId), false);
+        Game specificGame = Game.create(List.of(blackId, whiteId),
+                false, KingMovementMode.FLYING);
 
         TreeSet<Player> players = specificGame.players();
         assertEquals(2, players.size());

@@ -16,10 +16,10 @@ public class MoveValidator {
     private MoveValidator() {
     }
 
-    public static void validateMove(final Board board, final PlayerRole currentRole, final Move move) {
+    public static void validateMove(final Board board, final PlayerRole currentRole, final Move move, KingMovementMode kingMovementMode) {
         Optional<Piece> movingPiece = board.pieceAt(move.fromCell());
         if (movingPiece.isPresent() && movingPiece.get().isKing()) {
-            validateKingMove(board, currentRole, move);
+            validateKingMove(board, currentRole, move, kingMovementMode);
         } else {
             validateNormalMove(board, currentRole, move);
         }

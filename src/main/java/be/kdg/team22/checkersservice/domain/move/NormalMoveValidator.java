@@ -17,10 +17,8 @@ public class NormalMoveValidator {
         validateDiagonalMove(board, move);
         validateForwardMove(board, currentRole, move);
 
-        if (isCaptureMove(board, currentRole, move)){
-            validateNormalCapture();
-        } else {
-            validateSingleStepMove(board, move);
+        if (!isCaptureMove(board, currentRole, move)) {
+            validateSingleStep(board, move);
         }
     }
 
@@ -42,11 +40,7 @@ public class NormalMoveValidator {
         }
     }
 
-    private static void validateNormalCapture() {
-        //TODO
-    }
-
-    private static void validateSingleStepMove(final Board board, final Move move) {
+    private static void validateSingleStep(final Board board, final Move move) {
         int[] fromCoords = board.convertCellNumberToCoordinates(move.fromCell());
         int[] toCoords = board.convertCellNumberToCoordinates(move.toCell());
 

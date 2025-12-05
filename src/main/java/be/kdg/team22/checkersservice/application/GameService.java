@@ -20,7 +20,7 @@ public class GameService {
 
     public Game create(final CreateGameModel model, final boolean aiPlayer) {
         List<PlayerId> players = model.players().stream().map(PlayerId::new).toList();
-        Game game = Game.create(players, aiPlayer);
+        Game game = Game.create(players, aiPlayer, model.settings().kingMovementMode());
         repository.save(game);
         return game;
     }
