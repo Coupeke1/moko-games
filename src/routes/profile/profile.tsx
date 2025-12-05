@@ -2,8 +2,6 @@ import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import Page from "@/components/layout/page";
 import Section from "@/components/section";
-import ErrorState from "@/components/state/error";
-import LoadingState from "@/components/state/loading";
 import State from "@/components/state/state";
 import { useProfile } from "@/hooks/use-profile";
 import AchievementCard from "@/routes/profile/components/achievement-card";

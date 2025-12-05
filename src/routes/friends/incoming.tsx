@@ -7,8 +7,6 @@ import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
 import Page from "@/components/layout/page";
 import Row from "@/components/layout/row";
-import ErrorState from "@/components/state/error";
-import LoadingState from "@/components/state/loading";
 import Message from "@/components/state/message";
 import State from "@/components/state/state";
 import TabRow from "@/components/tabs/links/row";
@@ -56,7 +54,6 @@ export default function IncomingRequestsPage() {
         <Page>
             <Column gap={Gap.Large}>
                 <TabRow tabs={getTabs()} />
-
                 <State data={requests} loading={loading} error={error} />
 
                 {requests &&

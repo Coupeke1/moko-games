@@ -5,9 +5,8 @@ import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
 import Page from "@/components/layout/page";
-import ErrorState from "@/components/state/error";
-import LoadingState from "@/components/state/loading";
 import Message from "@/components/state/message";
+import State from "@/components/state/state";
 import TabRow from "@/components/tabs/links/row";
 import showToast from "@/components/toast";
 import { useOutgoingRequests } from "@/hooks/use-requests";
@@ -38,6 +37,7 @@ export default function OutgoingRequestsPage() {
         <Page>
             <Column gap={Gap.Large}>
                 <TabRow tabs={getTabs()} />
+                <State data={requests} loading={loading} error={error} />
 
                 {requests &&
                     (requests.length == 0 ? (

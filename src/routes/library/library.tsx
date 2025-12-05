@@ -6,12 +6,9 @@ import { useLibrary } from "@/hooks/use-library";
 import type { Game } from "@/models/library/game";
 import LibraryCard from "@/routes/library/components/library-card";
 import SearchBar from "@/routes/library/components/search-bar";
-import { useState } from "react";
 
 export default function LibraryPage() {
     const { games, loading, error } = useLibrary();
-    const [details, setDetails] = useState(false);
-    const [game, setGame] = useState<Game | null>(null);
 
     return (
         <Page>
