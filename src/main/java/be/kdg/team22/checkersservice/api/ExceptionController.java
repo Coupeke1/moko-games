@@ -1,6 +1,6 @@
 package be.kdg.team22.checkersservice.api;
 
-import be.kdg.team22.checkersservice.domain.move.exceptions.InvalidMoveException;
+import be.kdg.team22.checkersservice.domain.move.exceptions.*;
 import be.kdg.team22.checkersservice.domain.game.exceptions.*;
 import be.kdg.team22.checkersservice.domain.player.exceptions.InvalidPlayerException;
 import org.springframework.http.HttpStatus;
@@ -11,15 +11,22 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class ExceptionController {
     @ExceptionHandler({
+            BackwardsMoveException.class,
             BoardSizeException.class,
+            CapturedPieceNotOnLastTileException.class,
             GameIdException.class,
             GameNotRunningException.class,
-            InvalidMoveException.class,
             InvalidPlayerException.class,
+            MoveNotDiagonalException.class,
+            NotPlayersPieceException.class,
             NotPlayersTurnException.class,
             OutsidePlayingFieldException.class,
+            OwnPieceInTheWayException.class,
             PlayerCountException.class,
             RoleUnfulfilledException.class,
+            TargetCellNotEmptyException.class,
+            TooManyPiecesException.class,
+            TooManyTilesException.class,
             UniquePlayersException.class,
     })
     public ResponseEntity<String> handleDomainErrors(final RuntimeException exception) {
@@ -28,6 +35,7 @@ public class ExceptionController {
 
     @ExceptionHandler({
             NotFoundException.class,
+            StartingPieceNotFoundException.class
     })
     public ResponseEntity<String> handleNotFoundErrors(final RuntimeException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);

@@ -2,7 +2,8 @@ package be.kdg.team22.checkersservice.domain.move;
 
 import be.kdg.team22.checkersservice.domain.board.Board;
 import be.kdg.team22.checkersservice.domain.board.Piece;
-import be.kdg.team22.checkersservice.domain.move.exceptions.InvalidMoveException;
+import be.kdg.team22.checkersservice.domain.move.exceptions.OwnPieceInTheWayException;
+import be.kdg.team22.checkersservice.domain.move.exceptions.TooManyTilesException;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 
 import java.util.Optional;
@@ -29,14 +30,14 @@ public class NormalMoveValidator {
             int[] middleCell = {(fromCoords[0] + toCoords[0]) / 2, (fromCoords[1] + toCoords[1]) / 2};
             Optional<Piece> capturedPiece = board.pieceAt(board.convertCoordinatesToCellNumber(middleCell[0], middleCell[1]));
             if (capturedPiece.isEmpty()) {
-                throw new InvalidMoveException("You can only move 1 tile");
+                throw new TooManyTilesException(1, false);
             } else if (capturedPiece.get().color().equals(currentRole)) {
-                throw new InvalidMoveException("You can not capture your own pieces");
+                throw new OwnPieceInTheWayException();
             } else {
                 return true;
             }
         } else {
-            throw new InvalidMoveException("You can only move 1 tile or capture over 2 tiles");
+            throw new TooManyTilesException(1);
         }
     }
 
@@ -46,7 +47,7 @@ public class NormalMoveValidator {
 
         int rowDiff = Math.abs(toCoords[0] - fromCoords[0]);
         if (rowDiff != 1) {
-            throw new InvalidMoveException("Normal move must be exactly one step");
+            throw new TooManyTilesException(1, false);
         }
     }
 }

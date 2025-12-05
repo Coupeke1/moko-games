@@ -2,7 +2,7 @@ package be.kdg.team22.checkersservice.domain.move;
 
 import be.kdg.team22.checkersservice.domain.board.Board;
 import be.kdg.team22.checkersservice.domain.board.Piece;
-import be.kdg.team22.checkersservice.domain.move.exceptions.InvalidMoveException;
+import be.kdg.team22.checkersservice.domain.move.exceptions.*;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 
 import java.util.Optional;
@@ -35,7 +35,7 @@ public class KingMoveValidator {
 
                 if (cellPiece.isPresent()) {
                     if (cellPiece.get().color().equals(currentRole)) {
-                        throw new InvalidMoveException("There is a piece of your own in the way");
+                        throw new OwnPieceInTheWayException();
                     } else {
                         opponentPieceCount++;
                         lastCellWithPieceIndex = i;
@@ -45,17 +45,17 @@ public class KingMoveValidator {
 
             if (opponentPieceCount == 1) {
                 if (lastCellWithPieceIndex != cellsBetween.length - 1) {
-                    throw new InvalidMoveException("Opponent piece must be in the last occupied cell in the path");
+                    throw new CapturedPieceNotOnLastTileException();
                 } else {
                     return true;
                 }
             } else if (opponentPieceCount == 0) {
                 return false;
             } else {
-                throw new InvalidMoveException("You cannot capture multiple pieces in one row");
+                throw new TooManyPiecesException();
             }
         } else {
-            throw new InvalidMoveException("You cannot move to the same space");
+            throw new NotEnoughTilesException();
         }
     }
 
@@ -72,11 +72,11 @@ public class KingMoveValidator {
         }
         if (capture) {
             if (!KingMovementMode.FLYING.equals(movementMode) && rowDiff > allowedSteps + 1) {
-                throw new InvalidMoveException(String.format("You can only capture over %d tiles with King movement mode %s", allowedSteps, movementMode));
+                throw new TooManyTilesException(allowedSteps + 1, true);
             }
         } else  {
             if (!KingMovementMode.FLYING.equals(movementMode) && rowDiff > allowedSteps) {
-                throw new InvalidMoveException(String.format("You can only move over %d tiles with King movement mode %s", allowedSteps, movementMode));
+                throw new TooManyTilesException(allowedSteps, false);
             }
         }
     }

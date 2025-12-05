@@ -2,7 +2,8 @@ package be.kdg.team22.checkersservice.domain.move;
 
 import be.kdg.team22.checkersservice.domain.board.Board;
 import be.kdg.team22.checkersservice.domain.board.Piece;
-import be.kdg.team22.checkersservice.domain.move.exceptions.InvalidMoveException;
+import be.kdg.team22.checkersservice.domain.game.exceptions.OutsidePlayingFieldException;
+import be.kdg.team22.checkersservice.domain.move.exceptions.*;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 
 import java.util.Optional;
@@ -28,26 +29,26 @@ public class MoveValidator {
     protected static void validateCellsWithinBoard(final Board board, final Move move) {
         int maxCells = (board.size() * board.size()) / 2;
         if (move.fromCell() > maxCells || move.toCell() > maxCells || move.fromCell() <= 0 || move.toCell() <= 0) {
-            throw new InvalidMoveException("Cell numbers must be between 1 and " + maxCells);
+            throw new OutsidePlayingFieldException();
         }
     }
 
     protected static void validateStartingPiece(final Board board, final PlayerRole currentRole, final Move move) {
         Optional<Piece> optionalPiece = board.pieceAt(move.fromCell());
         if (optionalPiece.isEmpty()) {
-            throw new InvalidMoveException("No piece at starting cell " + move.fromCell());
+            throw new StartingPieceNotFoundException(move.fromCell());
         }
 
         Piece piece = optionalPiece.get();
         if (piece.color() != currentRole) {
-            throw new InvalidMoveException("Piece at cell " + move.fromCell() + " does not belong to current player");
+            throw new NotPlayersPieceException(move.fromCell());
         }
     }
 
     protected static void validateTargetCellEmpty(final Board board, final Move move) {
         Optional<Piece> targetPiece = board.pieceAt(move.toCell());
         if (targetPiece.isPresent()) {
-            throw new InvalidMoveException("Target cell " + move.toCell() + " is not empty");
+            throw new TargetCellNotEmptyException(move.toCell());
         }
     }
 
@@ -59,7 +60,7 @@ public class MoveValidator {
         int colDiff = Math.abs(toCoords[1] - fromCoords[1]);
 
         if (rowDiff != colDiff) {
-            throw new InvalidMoveException("Move must be diagonal");
+            throw new MoveNotDiagonalException();
         }
     }
 
@@ -70,18 +71,16 @@ public class MoveValidator {
         int rowDiff = toCoords[0] - fromCoords[0];
 
         if (currentRole == PlayerRole.WHITE && rowDiff <= 0) {
-            throw new InvalidMoveException("White pieces must move forward (down)");
-        }
-
-        if (currentRole == PlayerRole.BLACK && rowDiff >= 0) {
-            throw new InvalidMoveException("Black pieces must move forward (up)");
+            throw new BackwardsMoveException(currentRole);
+        } else if (currentRole == PlayerRole.BLACK && rowDiff >= 0) {
+            throw new BackwardsMoveException(currentRole);
         }
     }
 
     public static boolean isCaptureMove(final Board board, final PlayerRole currentRole, final Move move) {
         Optional<Piece> optionalPiece = board.pieceAt(move.fromCell());
         if (optionalPiece.isEmpty()) {
-            throw new InvalidMoveException("Normal pieces can only move 2 tiles when capturing an opponent's piece");
+            throw new StartingPieceNotFoundException(move.fromCell());
         }
         Piece piece = optionalPiece.get();
 

@@ -216,7 +216,7 @@ public class GameControllerTest {
         mock.perform(post("/api/games/{id}/move", gameId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(moveModel))
-        ).andExpect(status().isBadRequest());
+        ).andExpect(status().isNotFound());
     }
 
 
