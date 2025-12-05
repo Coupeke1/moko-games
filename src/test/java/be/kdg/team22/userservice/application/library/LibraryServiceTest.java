@@ -1,7 +1,9 @@
 package be.kdg.team22.userservice.application.library;
 
 import be.kdg.team22.userservice.api.library.models.LibraryGamesModel;
+import be.kdg.team22.userservice.domain.library.GameId;
 import be.kdg.team22.userservice.domain.library.LibraryEntry;
+import be.kdg.team22.userservice.domain.library.LibraryId;
 import be.kdg.team22.userservice.domain.library.LibraryRepository;
 import be.kdg.team22.userservice.domain.library.exceptions.LibraryException;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
@@ -27,30 +29,15 @@ class LibraryServiceTest {
     private final LibraryService service = new LibraryService(repo, games);
 
     private Jwt token() {
-        return Jwt.withTokenValue("dummy")
-                .header("alg", "none")
-                .subject("11111111-1111-1111-1111-111111111111")
-                .build();
+        return Jwt.withTokenValue("dummy").header("alg", "none").subject("11111111-1111-1111-1111-111111111111").build();
     }
 
     private GameDetailsResponse game(UUID id, String title) {
-        return new GameDetailsResponse(
-                id,
-                "EngineName",
-                title,
-                "Fun game",
-                BigDecimal.TEN,
-                "img.png");
+        return new GameDetailsResponse(id, "EngineName", title, "Fun game", BigDecimal.TEN, "img.png");
     }
 
     private LibraryEntry entry(UUID id, UUID userId, UUID gameId, boolean favourite) {
-        return new LibraryEntry(
-                id,
-                userId,
-                gameId,
-                Instant.parse("2024-01-01T10:00:00Z"),
-                favourite
-        );
+        return new LibraryEntry(new LibraryId(id), new ProfileId(userId), new GameId(gameId), Instant.parse("2024-01-01T10:00:00Z"), favourite);
     }
 
     @Test
@@ -67,8 +54,7 @@ class LibraryServiceTest {
         when(games.getGame(eq(game1), any())).thenReturn(game(game1, "A"));
         when(games.getGame(eq(game2), any())).thenReturn(game(game2, "B"));
 
-        LibraryGamesModel result = service.getLibraryForUser(
-                userId, token(), null, null, "title_asc", 100);
+        LibraryGamesModel result = service.getLibraryForUser(userId, token(), null, null, "title_asc", 100);
 
         assertThat(result.games()).hasSize(2);
         assertThat(result.games().get(0).id()).isEqualTo(game1);
@@ -95,8 +81,7 @@ class LibraryServiceTest {
         when(games.getGame(eq(game1), any())).thenReturn(game(game1, "Chess"));
         when(games.getGame(eq(game2), any())).thenReturn(game(game2, "Monopoly"));
 
-        LibraryGamesModel result = service.getLibraryForUser(
-                userId, token(), "ch", null, "title_asc", 100);
+        LibraryGamesModel result = service.getLibraryForUser(userId, token(), "ch", null, "title_asc", 100);
 
         assertThat(result.games()).hasSize(1);
         assertThat(result.games().getFirst().title()).isEqualTo("Chess");
@@ -117,8 +102,7 @@ class LibraryServiceTest {
         when(games.getGame(eq(g1), any())).thenReturn(game(g1, "A"));
         when(games.getGame(eq(g2), any())).thenReturn(game(g2, "B"));
 
-        LibraryGamesModel result = service.getLibraryForUser(
-                userId, token(), null, true, "title_asc", 100);
+        LibraryGamesModel result = service.getLibraryForUser(userId, token(), null, true, "title_asc", 100);
 
         assertThat(result.games()).hasSize(1);
         assertThat(result.games().getFirst().id()).isEqualTo(g1);
@@ -140,8 +124,7 @@ class LibraryServiceTest {
         when(games.getGame(eq(g1), any())).thenReturn(game(g1, "Alpha"));
         when(games.getGame(eq(g2), any())).thenReturn(game(g2, "Zulu"));
 
-        LibraryGamesModel result = service.getLibraryForUser(
-                userId, token(), null, null, "title_desc", 100);
+        LibraryGamesModel result = service.getLibraryForUser(userId, token(), null, null, "title_desc", 100);
 
         assertThat(result.games()).hasSize(2);
         assertThat(result.games().getFirst().title()).isEqualTo("Zulu");
@@ -163,8 +146,7 @@ class LibraryServiceTest {
         when(games.getGame(eq(g1), any())).thenReturn(game(g1, "Alpha"));
         when(games.getGame(eq(g2), any())).thenReturn(game(g2, "Zulu"));
 
-        LibraryGamesModel result = service.getLibraryForUser(
-                userId, token(), null, null, "title_asc", 1);
+        LibraryGamesModel result = service.getLibraryForUser(userId, token(), null, null, "title_asc", 1);
 
         assertThat(result.games()).hasSize(1);
     }
@@ -176,8 +158,7 @@ class LibraryServiceTest {
 
         when(repo.findByUserId(userId.value())).thenReturn(List.of());
 
-        LibraryGamesModel result = service.getLibraryForUser(
-                userId, token(), null, null, "title_asc", 100);
+        LibraryGamesModel result = service.getLibraryForUser(userId, token(), null, null, "title_asc", 100);
 
         assertThat(result.games()).isEmpty();
         verifyNoInteractions(games);
@@ -193,10 +174,9 @@ class LibraryServiceTest {
         LibraryEntry entry = entry(entryId, userId.value(), gameId, false);
         LibraryEntry updated = entry.markFavourite();
 
-        when(repo.findByUserIdAndGameId(userId.value(), gameId))
-                .thenReturn(java.util.Optional.of(entry));
+        when(repo.findByUserIdAndGameId(userId.value(), gameId)).thenReturn(java.util.Optional.of(entry));
 
-        service.markFavourite(userId, gameId);
+        service.markFavourite(userId, new GameId(gameId));
 
         verify(repo).findByUserIdAndGameId(userId.value(), gameId);
         verify(repo).save(updated); // <-- werkt perfect met void
@@ -208,11 +188,9 @@ class LibraryServiceTest {
         ProfileId userId = new ProfileId(UUID.randomUUID());
         UUID gameId = UUID.randomUUID();
 
-        when(repo.findByUserIdAndGameId(userId.value(), gameId))
-                .thenReturn(java.util.Optional.empty());
+        when(repo.findByUserIdAndGameId(userId.value(), gameId)).thenReturn(java.util.Optional.empty());
 
-        assertThatThrownBy(() -> service.markFavourite(userId, gameId))
-                .isInstanceOf(LibraryException.class);
+        assertThatThrownBy(() -> service.markFavourite(userId, new GameId(gameId))).isInstanceOf(LibraryException.class);
 
         verify(repo, never()).save(any());
     }
@@ -227,10 +205,9 @@ class LibraryServiceTest {
         LibraryEntry entry = entry(entryId, userId.value(), gameId, true);
         LibraryEntry updated = entry.unmarkFavourite();
 
-        when(repo.findByUserIdAndGameId(userId.value(), gameId))
-                .thenReturn(java.util.Optional.of(entry));
+        when(repo.findByUserIdAndGameId(userId.value(), gameId)).thenReturn(java.util.Optional.of(entry));
 
-        service.unmarkFavourite(userId, gameId);
+        service.unmarkFavourite(userId, new GameId(gameId));
 
         verify(repo).findByUserIdAndGameId(userId.value(), gameId);
         verify(repo).save(updated);
@@ -242,11 +219,9 @@ class LibraryServiceTest {
         ProfileId userId = new ProfileId(UUID.randomUUID());
         UUID gameId = UUID.randomUUID();
 
-        when(repo.findByUserIdAndGameId(userId.value(), gameId))
-                .thenReturn(java.util.Optional.empty());
+        when(repo.findByUserIdAndGameId(userId.value(), gameId)).thenReturn(java.util.Optional.empty());
 
-        assertThatThrownBy(() -> service.unmarkFavourite(userId, gameId))
-                .isInstanceOf(LibraryException.class);
+        assertThatThrownBy(() -> service.unmarkFavourite(userId, new GameId(gameId))).isInstanceOf(LibraryException.class);
 
         verify(repo, never()).save(any());
     }
