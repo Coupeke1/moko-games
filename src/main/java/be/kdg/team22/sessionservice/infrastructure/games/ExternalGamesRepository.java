@@ -21,8 +21,7 @@ public class ExternalGamesRepository {
     public StartGameResponse startGame(StartGameRequest request, Jwt token) {
         try {
             return client.post().uri("").header("Authorization", "Bearer " + token.getTokenValue()).body(request).retrieve().body(StartGameResponse.class);
-        } catch (
-                HttpClientErrorException exception) {
+        } catch (HttpClientErrorException exception) {
 
             if (exception.getStatusCode() == HttpStatus.NOT_FOUND) {
                 throw new GameNotFoundException(request.gameId());
@@ -30,7 +29,7 @@ public class ExternalGamesRepository {
 
             throw exception;
         } catch (RestClientException exception) {
-            throw new NotReachableException();
+            throw NotReachableException.GamesService();
         }
     }
 }

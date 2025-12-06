@@ -19,6 +19,7 @@ import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.domain.player.PlayerName;
+import be.kdg.team22.sessionservice.infrastructure.chat.ExternalChatRepository;
 import be.kdg.team22.sessionservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.sessionservice.infrastructure.games.StartGameResponse;
 import be.kdg.team22.sessionservice.infrastructure.lobby.LobbySocketPublisher;
@@ -43,8 +44,9 @@ class LobbyServiceTest {
     private final PlayerService playerService = mock(PlayerService.class);
     private final ExternalGamesRepository gameClient = mock(ExternalGamesRepository.class);
     private final LobbySocketPublisher socket = mock(LobbySocketPublisher.class);
+    private final ExternalChatRepository chat = mock(ExternalChatRepository.class);
     private final LobbyPublisherService publisherService = new LobbyPublisherService(repo, socket);
-    private final LobbyService service = new LobbyService(repo, publisherService, playerService, gameClient);
+    private final LobbyService service = new LobbyService(repo, publisherService, playerService, gameClient, chat);
 
     private Jwt jwtFor(PlayerId owner) {
         return Jwt.withTokenValue("TOKEN-" + owner.value()).header("alg", "none").header("typ", "JWT").claim("sub", owner.value().toString()).claim("preferred_username", "owner").issuedAt(Instant.now()).expiresAt(Instant.now().plusSeconds(3600)).build();

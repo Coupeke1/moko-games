@@ -13,6 +13,7 @@ import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
+import be.kdg.team22.sessionservice.infrastructure.chat.ExternalChatRepository;
 import be.kdg.team22.sessionservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.sessionservice.infrastructure.games.StartGameRequest;
 import be.kdg.team22.sessionservice.infrastructure.games.StartGameResponse;
@@ -31,20 +32,30 @@ public class LobbyService {
     private final LobbyPublisherService publisher;
     private final PlayerService playerService;
     private final ExternalGamesRepository gamesRepository;
+    private final ExternalChatRepository chatRepository;
 
-    public LobbyService(final LobbyRepository repository, final LobbyPublisherService publisher, final PlayerService playerService, final ExternalGamesRepository gamesRepository) {
+    public LobbyService(final LobbyRepository repository,
+                        final LobbyPublisherService publisher,
+                        final PlayerService playerService,
+                        final ExternalGamesRepository gamesRepository,
+                        final ExternalChatRepository chatRepository) {
         this.repository = repository;
         this.publisher = publisher;
         this.playerService = playerService;
         this.gamesRepository = gamesRepository;
+        this.chatRepository = chatRepository;
     }
 
     public Lobby createLobby(final GameId gameId, final PlayerId ownerId, final CreateLobbyModel model, final Jwt token) {
+
         Player owner = playerService.findPlayer(ownerId, token);
         LobbySettings settings = mapToDomainSettings(model.settings(), model.maxPlayers());
         Lobby lobby = new Lobby(gameId, owner, settings);
 
         publisher.saveAndPublish(lobby);
+
+        chatRepository.createLobbyChat(lobby.id());
+
         return lobby;
     }
 

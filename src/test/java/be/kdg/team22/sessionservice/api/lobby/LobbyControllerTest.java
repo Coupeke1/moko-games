@@ -263,7 +263,7 @@ class LobbyControllerTest {
         UUID lobbyId = UUID.randomUUID();
         UUID ownerId = UUID.fromString("40404040-0000-0000-0000-000000000000");
 
-        when(lobbyService.startLobby(eq(LobbyId.from(lobbyId)), eq(PlayerId.from(ownerId)), any(Jwt.class))).thenThrow(new NotReachableException());
+        when(lobbyService.startLobby(eq(LobbyId.from(lobbyId)), eq(PlayerId.from(ownerId)), any(Jwt.class))).thenThrow(NotReachableException.GamesService());
 
         mockMvc.perform(post("/api/lobbies/{lobbyId}/start", lobbyId).with(jwtFor(ownerId.toString(), "owner", "owner@kdg.be")).with(csrf())).andExpect(status().isServiceUnavailable());
     }
