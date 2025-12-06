@@ -17,12 +17,12 @@ public class ExceptionController {
     }
 
     @ExceptionHandler({ChatChannelNotFoundException.class, NotificationNotFoundException.class})
-    public ResponseEntity<String> handleNotFound(final ChatChannelNotFoundException ex) {
+    public ResponseEntity<String> handleNotFound(final Exception ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler({MessageEmptyException.class, CantAutoCreateBotChannel.class, BotMessageInLobbyException.class, ClaimNotFoundException.class})
-    public ResponseEntity<String> handleEmptyMessage(final MessageEmptyException ex) {
+    public ResponseEntity<String> handleEmptyMessage(final Exception ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 

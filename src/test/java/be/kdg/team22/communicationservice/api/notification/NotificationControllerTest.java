@@ -63,7 +63,7 @@ public class NotificationControllerTest {
                 .thenReturn(List.of(notification));
 
         mockMvc.perform(
-                        get("/api/notifications")
+                        get("/api/notifications/me")
                                 .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt))
                 )
                 .andExpect(status().isOk())

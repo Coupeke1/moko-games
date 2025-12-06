@@ -13,7 +13,6 @@ import java.util.Optional;
 
 @Repository
 public class DbNotificationRepository implements NotificationRepository {
-
     private final NotificationJpaRepository jpa;
 
     public DbNotificationRepository(final NotificationJpaRepository jpa) {

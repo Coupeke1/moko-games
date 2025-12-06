@@ -11,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
@@ -25,7 +27,9 @@ class StoreNotificationListenerTest {
 
     @Test
     void handle_shouldCreateOrderNotification() {
-        OrderCompletedEvent event = new OrderCompletedEvent("73355149-b638-494b-a200-04d0eb5b5032", "order-9", null);
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        OrderCompletedEvent event = new OrderCompletedEvent(userId, orderId, null);
 
         listener.handle(event);
 
@@ -39,7 +43,7 @@ class StoreNotificationListenerTest {
                 org.mockito.ArgumentMatchers.anyString()
         );
 
-        assertThat(player.getValue().value().toString()).isEqualTo("73355149-b638-494b-a200-04d0eb5b5032");
+        assertThat(player.getValue().value()).isEqualTo(userId);
         assertThat(title.getValue()).isEqualTo("Order completed");
     }
 }

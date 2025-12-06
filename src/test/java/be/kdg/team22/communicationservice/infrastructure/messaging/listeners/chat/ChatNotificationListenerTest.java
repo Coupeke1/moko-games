@@ -11,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
@@ -25,8 +27,11 @@ class ChatNotificationListenerTest {
 
     @Test
     void handle_shouldCreateDirectMessageNotification() {
+        UUID senderId = UUID.randomUUID();
+        UUID recipientId = UUID.randomUUID();
+        UUID channelID = UUID.randomUUID();
         DirectMessageReceivedEvent event =
-                new DirectMessageReceivedEvent("73355149-b638-494b-a200-04d0eb5b5032", "Alice", "56d28984-a95c-4033-8512-c9ae12febb3f", "Hi!", "channel-123");
+                new DirectMessageReceivedEvent(senderId, "Alice", recipientId, "Hi!", channelID);
 
         listener.handle(event);
 
@@ -41,7 +46,7 @@ class ChatNotificationListenerTest {
                 message.capture()
         );
 
-        assertThat(player.getValue().value().toString()).isEqualTo("56d28984-a95c-4033-8512-c9ae12febb3f");
+        assertThat(player.getValue().value()).isEqualTo(recipientId);
         assertThat(title.getValue()).isEqualTo("New private message from Alice");
         assertThat(message.getValue()).isEqualTo("Hi!");
     }

@@ -1,10 +1,12 @@
 package be.kdg.team22.communicationservice.infrastructure.messaging.events.session;
 
+import java.util.UUID;
+
 public record LobbyInviteEvent(
-        String lobbyId,
-        String inviterId,
+        UUID lobbyId,
+        UUID inviterId,
         String inviterName,
-        String targetUserId,
+        UUID targetUserId,
         String gameName
 ) {
 }

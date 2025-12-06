@@ -11,13 +11,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class AchievementNotificationListener {
     private final NotificationService notifications;
+
     public AchievementNotificationListener(final NotificationService notifications) {
         this.notifications = notifications;
     }
 
     @RabbitListener(queues = RabbitMQTopology.Q_ACHIEVEMENT_UNLOCKED)
     public void handle(final AchievementUnlockedEvent event) {
-        PlayerId recipient = PlayerId.create(event.playerId());
+        PlayerId recipient = PlayerId.from(event.playerId());
 
         notifications.create(
                 recipient,

@@ -15,18 +15,15 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/notifications")
 public class NotificationController {
-
     private final NotificationService service;
 
     public NotificationController(final NotificationService service) {
         this.service = service;
     }
 
-
     @GetMapping("/me")
     public ResponseEntity<List<NotificationModel>> getMyNotifications(
-            @AuthenticationPrincipal final  Jwt jwt) {
-
+            @AuthenticationPrincipal final Jwt jwt) {
         PlayerId playerId = PlayerId.get(jwt);
 
         List<NotificationModel> result = service.getNotifications(playerId)
@@ -40,7 +37,6 @@ public class NotificationController {
     @GetMapping("/unread")
     public ResponseEntity<List<NotificationModel>> getUnread(
             @AuthenticationPrincipal final Jwt jwt) {
-
         PlayerId playerId = PlayerId.get(jwt);
 
         List<NotificationModel> result = service.getUnreadNotifications(playerId)
@@ -53,7 +49,6 @@ public class NotificationController {
 
     @PatchMapping("/{id}/read")
     public ResponseEntity<Void> markAsRead(@PathVariable final UUID id) {
-
         service.markAsRead(NotificationId.from(id));
 
         return ResponseEntity.ok().build();

@@ -11,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
@@ -25,8 +27,10 @@ class AchievementNotificationListenerTest {
 
     @Test
     void handle_shouldCreateAchievementNotification() {
+        UUID playerId = UUID.randomUUID();
+        UUID achievementId = UUID.randomUUID();
         AchievementUnlockedEvent event =
-                new AchievementUnlockedEvent("73355149-b638-494b-a200-04d0eb5b5032", "ach-001", "Winner", "desc");
+                new AchievementUnlockedEvent(playerId, achievementId, "Winner", "desc");
 
         listener.handle(event);
 
@@ -41,7 +45,7 @@ class AchievementNotificationListenerTest {
                 messageCaptor.capture()
         );
 
-        assertThat(playerCaptor.getValue().value().toString()).isEqualTo("73355149-b638-494b-a200-04d0eb5b5032");
+        assertThat(playerCaptor.getValue().value()).isEqualTo(playerId);
         assertThat(titleCaptor.getValue()).isEqualTo("Achievement acquired!");
         assertThat(messageCaptor.getValue()).isEqualTo("You acquired: Winner");
     }

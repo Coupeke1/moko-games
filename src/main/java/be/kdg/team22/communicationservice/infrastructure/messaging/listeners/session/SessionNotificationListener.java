@@ -19,7 +19,7 @@ public class SessionNotificationListener {
 
     @RabbitListener(queues = RabbitMQTopology.Q_LOBBY_INVITE)
     public void handle(final LobbyInviteEvent event) {
-        PlayerId recipient = PlayerId.create(event.targetUserId());
+        PlayerId recipient = PlayerId.from(event.targetUserId());
 
         notifications.create(
                 recipient,
@@ -32,7 +32,7 @@ public class SessionNotificationListener {
 
     @RabbitListener(queues = RabbitMQTopology.Q_PLAYER_JOINED)
     public void handle(final PlayerJoinedLobbyEvent event) {
-        PlayerId host = PlayerId.create(event.hostUserId());
+        PlayerId host = PlayerId.from(event.hostUserId());
 
         notifications.create(
                 host,

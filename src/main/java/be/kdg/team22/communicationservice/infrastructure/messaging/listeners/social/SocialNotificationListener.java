@@ -19,7 +19,7 @@ public class SocialNotificationListener {
 
     @RabbitListener(queues = RabbitMQTopology.Q_FRIEND_REQUEST_RECEIVED)
     public void handle(final FriendRequestReceivedEvent event) {
-        PlayerId recipient = PlayerId.create(event.targetUserId());
+        PlayerId recipient = PlayerId.from(event.targetUserId());
 
         notifications.create(
                 recipient,
@@ -31,7 +31,7 @@ public class SocialNotificationListener {
 
     @RabbitListener(queues = RabbitMQTopology.Q_FRIEND_REQUEST_ACCEPTED)
     public void handle(final FriendRequestAcceptedEvent event) {
-        PlayerId recipient = PlayerId.create(event.targetUserId());
+        PlayerId recipient = PlayerId.from(event.targetUserId());
 
         notifications.create(
                 recipient,

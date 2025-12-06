@@ -1,10 +1,12 @@
 package be.kdg.team22.communicationservice.infrastructure.messaging.events.chat;
 
+import java.util.UUID;
+
 public record DirectMessageReceivedEvent(
-        String senderId,
+        UUID senderId,
         String senderName,
-        String recipientId,
+        UUID recipientId,
         String messagePreview,
-        String channelId
+        UUID channelId
 ) {
 }

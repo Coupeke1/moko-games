@@ -1,8 +1,10 @@
 package be.kdg.team22.communicationservice.infrastructure.messaging.events.social;
 
+import java.util.UUID;
+
 public record FriendRequestAcceptedEvent(
-        String senderId,
+        UUID senderId,
         String senderName,
-        String targetUserId
+        UUID targetUserId
 ) {
 }

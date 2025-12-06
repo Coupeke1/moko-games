@@ -12,6 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
@@ -26,8 +28,10 @@ class SocialNotificationListenerTest {
 
     @Test
     void handleFriendRequestReceived_shouldSendNotification() {
+        UUID senderID = UUID.randomUUID();
+        UUID targetUserId = UUID.randomUUID();
         FriendRequestReceivedEvent event =
-                new FriendRequestReceivedEvent("73355149-b638-494b-a200-04d0eb5b5032", "Bob", "a2797baf-e115-40de-9b2b-83e4b2633039");
+                new FriendRequestReceivedEvent(senderID, "Bob", targetUserId);
 
         listener.handle(event);
 
@@ -40,13 +44,15 @@ class SocialNotificationListenerTest {
                 org.mockito.ArgumentMatchers.anyString()
         );
 
-        assertThat(player.getValue().value().toString()).isEqualTo("a2797baf-e115-40de-9b2b-83e4b2633039");
+        assertThat(player.getValue().value()).isEqualTo(targetUserId);
     }
 
     @Test
     void handleFriendRequestAccepted_shouldSendNotification() {
+        UUID senderId = UUID.randomUUID();
+        UUID targetUserId = UUID.randomUUID();
         FriendRequestAcceptedEvent event =
-                new FriendRequestAcceptedEvent("d986aa70-04be-4f8d-af68-f59ced493efa", "Alice", "308339c6-f216-41e3-bdc1-4b52f3c1015e");
+                new FriendRequestAcceptedEvent(senderId, "Alice", targetUserId);
 
         listener.handle(event);
 
@@ -59,6 +65,6 @@ class SocialNotificationListenerTest {
                 org.mockito.ArgumentMatchers.anyString()
         );
 
-        assertThat(player.getValue().value().toString()).isEqualTo("308339c6-f216-41e3-bdc1-4b52f3c1015e");
+        assertThat(player.getValue().value()).isEqualTo(targetUserId);
     }
 }

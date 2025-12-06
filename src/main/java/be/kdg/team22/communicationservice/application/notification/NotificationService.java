@@ -10,7 +10,6 @@ import java.util.List;
 @Service
 @Transactional
 public class NotificationService {
-
     private final NotificationRepository repository;
 
     public NotificationService(final NotificationRepository repository) {
