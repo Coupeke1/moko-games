@@ -34,11 +34,11 @@ public class LobbyService {
     private final ExternalGamesRepository gamesRepository;
     private final ExternalChatRepository chatRepository;
 
-    public LobbyService(LobbyRepository repository,
-                        LobbyPublisherService publisher,
-                        PlayerService playerService,
-                        ExternalGamesRepository gamesRepository,
-                        ExternalChatRepository chatRepository) {
+    public LobbyService(final LobbyRepository repository,
+                        final LobbyPublisherService publisher,
+                        final PlayerService playerService,
+                        final ExternalGamesRepository gamesRepository,
+                        final ExternalChatRepository chatRepository) {
         this.repository = repository;
         this.publisher = publisher;
         this.playerService = playerService;

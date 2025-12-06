@@ -11,7 +11,6 @@ import org.springframework.web.client.RestClientException;
 
 @Component
 public class ExternalChatRepository {
-
     private final RestClient client;
 
     public ExternalChatRepository(@Qualifier("communicationService") RestClient client) {
