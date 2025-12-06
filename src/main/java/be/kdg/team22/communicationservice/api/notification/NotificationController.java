@@ -18,14 +18,14 @@ public class NotificationController {
 
     private final NotificationService service;
 
-    public NotificationController(NotificationService service) {
+    public NotificationController(final NotificationService service) {
         this.service = service;
     }
 
 
     @GetMapping
     public ResponseEntity<List<NotificationModel>> getAll(
-            @AuthenticationPrincipal Jwt jwt) {
+            @AuthenticationPrincipal final  Jwt jwt) {
 
         PlayerId playerId = PlayerId.get(jwt);
 
@@ -39,7 +39,7 @@ public class NotificationController {
 
     @GetMapping("/unread")
     public ResponseEntity<List<NotificationModel>> getUnread(
-            @AuthenticationPrincipal Jwt jwt) {
+            @AuthenticationPrincipal final Jwt jwt) {
 
         PlayerId playerId = PlayerId.get(jwt);
 
@@ -52,7 +52,7 @@ public class NotificationController {
     }
 
     @PatchMapping("/{id}/read")
-    public ResponseEntity<Void> markAsRead(@PathVariable UUID id) {
+    public ResponseEntity<Void> markAsRead(@PathVariable final UUID id) {
 
         service.markAsRead(NotificationId.from(id));
 
