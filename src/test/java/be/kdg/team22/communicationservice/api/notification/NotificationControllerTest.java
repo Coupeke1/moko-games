@@ -48,7 +48,7 @@ public class NotificationControllerTest {
     }
 
     @Test
-    void getAllNotifications_returnsMappedModels() throws Exception {
+    void getMyNotificationsNotifications_returnsMappedModels() throws Exception {
         Notification notification = new Notification(
                 NotificationId.from(UUID.randomUUID()),
                 PlayerId.from(userId),

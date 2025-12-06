@@ -23,8 +23,8 @@ public class NotificationController {
     }
 
 
-    @GetMapping
-    public ResponseEntity<List<NotificationModel>> getAll(
+    @GetMapping("/me")
+    public ResponseEntity<List<NotificationModel>> getMyNotifications(
             @AuthenticationPrincipal final  Jwt jwt) {
 
         PlayerId playerId = PlayerId.get(jwt);
