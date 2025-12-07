@@ -11,7 +11,7 @@ import { useAuthStore } from "@/stores/auth-store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { Toaster } from "sonner";
-import GamePage from "@/routes/library/game";
+import GamePage from "@/routes/library/entry";
 
 const client = new QueryClient();
 

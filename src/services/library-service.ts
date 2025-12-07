@@ -1,19 +1,26 @@
 import { environment } from "@/config";
 import { client } from "@/lib/api-client";
-import type { Game } from "@/models/library/game";
+import type { Entry } from "@/models/library/entry";
 
 const BASE_URL = environment.libraryService;
 
-export async function findGames(): Promise<Game[]> {
+export async function findEntries(query?: string): Promise<Entry[]> {
     try {
-        const { data } = await client.get<Game[]>(`${BASE_URL}/me`);
+        const params = new URLSearchParams();
+        if (query) params.append("query", query);
+
+        const url = params.toString()
+            ? `${BASE_URL}/me?${params.toString()}`
+            : `${BASE_URL}/me`;
+
+        const { data } = await client.get<Entry[]>(url);
         return data;
     } catch {
         throw new Error("Library could not be fetched");
     }
 }
 
-export async function isGameFavourited(id: string) {
+export async function isEntryFavourited(id: string) {
     try {
         const { data } = await client.get<boolean>(
             `${BASE_URL}/${id}/favourite`,
@@ -22,25 +29,23 @@ export async function isGameFavourited(id: string) {
         return data;
     } catch {
         throw new Error(
-            `Could not check if game with id '${id}' is favourited`,
+            `Could not check if Entry with id '${id}' is favourited`,
         );
     }
 }
 
-export async function favouriteGame(id: string) {
+export async function favouriteEntry(id: string) {
     try {
-        console.log("fav");
         await client.patch(`${BASE_URL}/${id}/favourite`);
     } catch {
-        throw new Error(`Game with id '${id}' could not be favourited`);
+        throw new Error(`Entry with id '${id}' could not be favourited`);
     }
 }
 
-export async function unFavouriteGame(id: string) {
+export async function unFavouriteEntry(id: string) {
     try {
-        console.log("un");
         await client.patch(`${BASE_URL}/${id}/unfavourite`);
     } catch {
-        throw new Error(`Game with id '${id}' could not be unfavourited`);
+        throw new Error(`Entry with id '${id}' could not be unfavourited`);
     }
 }

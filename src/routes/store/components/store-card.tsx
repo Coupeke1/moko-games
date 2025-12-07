@@ -1,22 +1,21 @@
 import Card from "@/components/cards/card";
 import ClockIcon from "@/components/icons/clock-icon";
-import HeartIcon from "@/components/icons/heart-icon";
 import { Gap } from "@/components/layout/gap";
 import { Items } from "@/components/layout/items";
 import Row from "@/components/layout/row";
 import { Size } from "@/components/layout/size";
-import type { Entry } from "@/models/library/entry";
+import type { Entry } from "@/models/store/entry";
 
 interface Props {
     entry: Entry;
 }
 
-export default function LibraryCard({ entry }: Props) {
+export default function StoreCard({ entry }: Props) {
     return (
         <Card
             image={entry.image}
             title={entry.title}
-            href={`/library/${entry.id}`}
+            href={`/store/${entry.id}`}
             height={Size.ExtraLarge}
             information={
                 <Row gap={Gap.None} items={Items.Center} responsive={false}>
@@ -24,7 +23,6 @@ export default function LibraryCard({ entry }: Props) {
                     <p>3h 40m</p>
                 </Row>
             }
-            options={entry.favourite && <HeartIcon />}
         />
     );
 }

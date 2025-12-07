@@ -1,15 +1,24 @@
-import { findGames } from "@/services/library-service";
-import { useQuery } from "@tanstack/react-query";
+import { findEntries } from "@/services/library-service";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useLibrary() {
+    const client = useQueryClient();
+
     const {
         isLoading: loading,
         isError: error,
         data,
     } = useQuery({
         queryKey: ["library"],
-        queryFn: () => findGames(),
+        queryFn: () => {
+            const params = client.getQueryData<{ query?: string }>([
+                "library",
+                "params",
+            ]);
+
+            return findEntries(params?.query);
+        },
     });
 
-    return { loading, error, games: data };
+    return { loading, error, entries: data };
 }

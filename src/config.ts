@@ -34,4 +34,8 @@ export const environment = {
         window.__APP_CONFIG__?.gamesService ??
         import.meta.env.VITE_GAMES_SERVICE ??
         "",
+    storeService:
+        window.__APP_CONFIG__?.storeService ??
+        import.meta.env.VITE_STORE_SERVICE ??
+        "",
 };
