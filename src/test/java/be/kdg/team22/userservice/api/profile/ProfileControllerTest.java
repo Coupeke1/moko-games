@@ -52,7 +52,7 @@ class ProfileControllerTest {
         String description = "Test";
         StatisticsEmbed statistics = new StatisticsEmbed(5, 50);
         ModulesEmbed modules = new ModulesEmbed(true, false);
-        NotificationPreferencesEmbed preferences = new NotificationPreferencesEmbed(true, true, true, true, true, true, true);
+        NotificationPreferencesEmbed preferences = new NotificationPreferencesEmbed(true, true, true, true, true);
 
         repository.save(new ProfileEntity(UUID.fromString(id), username, email, description, "", statistics, modules, Instant.now(), preferences));
         mock.perform(get("/api/profiles/me").with(tokenWithUser(id, "piet", "piet@kdg.be"))).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(id));

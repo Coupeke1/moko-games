@@ -59,10 +59,8 @@ public class ProfileEntity {
 
         NotificationPreferences preferences = profile.preferences();
         NotificationPreferencesEmbed prefs = new NotificationPreferencesEmbed(
-                preferences.receivePlatform(),
                 preferences.receiveEmail(),
                 preferences.social(),
-                preferences.game(),
                 preferences.achievement(),
                 preferences.commerce(),
                 preferences.chat()
@@ -76,10 +74,8 @@ public class ProfileEntity {
         Modules modules = new Modules(this.modules.achievements(), this.modules.favourites());
 
         NotificationPreferences preferences = new NotificationPreferences(
-                this.preferences.receivePlatform,
                 this.preferences.receiveEmail,
                 this.preferences.social,
-                this.preferences.game,
                 this.preferences.achievement,
                 this.preferences.commerce,
                 this.preferences.chat

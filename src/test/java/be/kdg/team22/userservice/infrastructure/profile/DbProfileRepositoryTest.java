@@ -29,7 +29,7 @@ class DbProfileRepositoryTest {
         String description = "Test";
         StatisticsEmbed statistics = new StatisticsEmbed(5, 50);
         ModulesEmbed modules = new ModulesEmbed(true, false);
-        NotificationPreferencesEmbed preferences = new NotificationPreferencesEmbed(true, false, true, false, true, true, true);
+        NotificationPreferencesEmbed preferences = new NotificationPreferencesEmbed(true, false, true, true, true);
 
         ProfileEntity entity = new ProfileEntity(id, username, email, description, "", statistics, modules, Instant.now(), preferences);
         repository.save(entity);
