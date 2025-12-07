@@ -5,7 +5,7 @@ import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
 import Page from "@/components/layout/page";
-import Message from "@/components/state/message";
+import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
 import TabRow from "@/components/tabs/links/row";
 import showToast from "@/components/toast";
@@ -41,7 +41,7 @@ export default function OutgoingRequestsPage() {
 
                 {requests &&
                     (requests.length == 0 ? (
-                        <Message>No outgoing requests :(</Message>
+                        <ErrorState>No outgoing requests</ErrorState>
                     ) : (
                         <Grid>
                             {requests.map((request: Profile) => (

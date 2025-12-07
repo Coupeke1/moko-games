@@ -1,6 +1,6 @@
 import Grid from "@/components/layout/grid/grid";
 import Page from "@/components/layout/page";
-import Message from "@/components/state/message";
+import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
 import { useStore } from "@/hooks/use-store";
 import type { Entry } from "@/models/store/entry";
@@ -29,7 +29,7 @@ export default function StorePage() {
 
             {entries &&
                 (entries.items.length == 0 ? (
-                    <Message>No games :(</Message>
+                    <ErrorState>No games</ErrorState>
                 ) : (
                     <Grid>
                         {entries.items.map((entry: Entry) => (

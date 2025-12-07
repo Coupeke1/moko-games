@@ -7,7 +7,7 @@ import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
 import Page from "@/components/layout/page";
 import Row from "@/components/layout/row";
-import Message from "@/components/state/message";
+import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
 import TabRow from "@/components/tabs/links/row";
 import showToast from "@/components/toast";
@@ -58,7 +58,7 @@ export default function IncomingRequestsPage() {
 
                 {requests &&
                     (requests.length == 0 ? (
-                        <Message>No incoming requests :(</Message>
+                        <ErrorState>No incoming requests</ErrorState>
                     ) : (
                         <Grid>
                             {requests.map((request: Profile) => (
