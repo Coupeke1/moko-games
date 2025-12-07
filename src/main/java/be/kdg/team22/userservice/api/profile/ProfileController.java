@@ -1,6 +1,7 @@
 package be.kdg.team22.userservice.api.profile;
 
 import be.kdg.team22.userservice.api.profile.models.EditModulesModel;
+import be.kdg.team22.userservice.api.profile.models.PreferencesModel;
 import be.kdg.team22.userservice.api.profile.models.ProfileModel;
 import be.kdg.team22.userservice.application.profile.ProfileService;
 import be.kdg.team22.userservice.domain.profile.Modules;
@@ -37,6 +38,23 @@ public class ProfileController {
         Profile profile = service.getOrCreate(token);
         String description = service.changeDescription(profile, model);
         return ResponseEntity.ok(description);
+    }
+
+    @GetMapping("/me/preferences")
+    public ResponseEntity<PreferencesModel> getMyPreferences(
+            @AuthenticationPrincipal final Jwt token
+    ) {
+        Profile profile = service.getOrCreate(token);
+        return ResponseEntity.ok(PreferencesModel.from(profile.preferences()));
+    }
+
+    @PatchMapping("/me/preferences")
+    public ResponseEntity<PreferencesModel> updateMyPreferences(
+            @AuthenticationPrincipal final Jwt token,
+            @RequestBody final PreferencesModel model
+    ) {
+        Profile profile = service.getOrCreate(token);
+        return ResponseEntity.ok(PreferencesModel.from(service.changePreferences(profile, model.to())));
     }
 
     @PatchMapping("/me/image")
