@@ -6,6 +6,8 @@ import be.kdg.team22.checkersservice.domain.game.exceptions.OutsidePlayingFieldE
 import be.kdg.team22.checkersservice.domain.move.exceptions.*;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static be.kdg.team22.checkersservice.domain.move.KingMoveValidator.isKingCaptureMove;
@@ -17,9 +19,45 @@ public class MoveValidator {
     private MoveValidator() {
     }
 
-    public static void validateMove(final Board board, final PlayerRole currentRole, final Move move, KingMovementMode kingMovementMode) {
+    public static void move(final Board board, final PlayerRole currentRole, final Move move, final KingMovementMode kingMovementMode) {
+        Board tempBoard = new Board(board);
+        int captureCount = 0;
+        List<Move> successfulSegments = new ArrayList<>();
+        for (int[] segment : move.segments()) {
+            Move segmentMove = new Move(move.playerId(), List.of(segment[0], segment[1]));
+            validateMove(tempBoard, currentRole, segmentMove, kingMovementMode);
+            if (isCaptureMove(tempBoard, currentRole, segmentMove)) captureCount++;
+            tempBoard.move(segmentMove);
+            successfulSegments.add(segmentMove);
+        }
+
+        if (move.segments().size() > 1 && move.segments().size() != captureCount) {
+            throw new TooManyMovesException();
+        }
+
+        for (Move segmentMove : successfulSegments) {
+            board.move(segmentMove);
+        }
+    }
+
+    public static void validateMove(final Board board, final PlayerRole currentRole, final Move move, final KingMovementMode kingMovementMode) {
+        for (int cell : move.cells()) {
+            if (cell < 1 || cell > (board.size() * board.size()) / 2) {
+                throw new OutsidePlayingFieldException();
+            }
+        }
+
         Optional<Piece> movingPiece = board.pieceAt(move.fromCell());
-        if (movingPiece.isPresent() && movingPiece.get().isKing()) {
+        if (movingPiece.isEmpty()) {
+            throw new StartingPieceNotFoundException(move.fromCell());
+        }
+
+        if (movingPiece.get().color() != currentRole) {
+            throw new NotPlayersPieceException(move.fromCell());
+        }
+
+        boolean isKing = movingPiece.get().isKing();
+        if (isKing) {
             validateKingMove(board, currentRole, move, kingMovementMode);
         } else {
             validateNormalMove(board, currentRole, move);
@@ -28,7 +66,7 @@ public class MoveValidator {
 
     protected static void validateCellsWithinBoard(final Board board, final Move move) {
         int maxCells = (board.size() * board.size()) / 2;
-        if (move.fromCell() > maxCells || move.toCell() > maxCells || move.fromCell() <= 0 || move.toCell() <= 0) {
+        if (move.fromCell() > maxCells || move.cells().get(1) > maxCells || move.fromCell() <= 0 || move.cells().get(1) <= 0) {
             throw new OutsidePlayingFieldException();
         }
     }
@@ -46,15 +84,15 @@ public class MoveValidator {
     }
 
     protected static void validateTargetCellEmpty(final Board board, final Move move) {
-        Optional<Piece> targetPiece = board.pieceAt(move.toCell());
+        Optional<Piece> targetPiece = board.pieceAt(move.cells().get(1));
         if (targetPiece.isPresent()) {
-            throw new TargetCellNotEmptyException(move.toCell());
+            throw new TargetCellNotEmptyException(move.cells().get(1));
         }
     }
 
     protected static void validateDiagonalMove(final Board board, final Move move) {
         int[] fromCoords = board.convertCellNumberToCoordinates(move.fromCell());
-        int[] toCoords = board.convertCellNumberToCoordinates(move.toCell());
+        int[] toCoords = board.convertCellNumberToCoordinates(move.cells().get(1));
 
         int rowDiff = Math.abs(toCoords[0] - fromCoords[0]);
         int colDiff = Math.abs(toCoords[1] - fromCoords[1]);
@@ -66,7 +104,7 @@ public class MoveValidator {
 
     protected static void validateForwardMove(final Board board, final PlayerRole currentRole, final Move move) {
         int[] fromCoords = board.convertCellNumberToCoordinates(move.fromCell());
-        int[] toCoords = board.convertCellNumberToCoordinates(move.toCell());
+        int[] toCoords = board.convertCellNumberToCoordinates(move.cells().get(1));
 
         int rowDiff = toCoords[0] - fromCoords[0];
 
@@ -85,7 +123,7 @@ public class MoveValidator {
         Piece piece = optionalPiece.get();
 
         int[] fromCoords = board.convertCellNumberToCoordinates(move.fromCell());
-        int[] toCoords = board.convertCellNumberToCoordinates(move.toCell());
+        int[] toCoords = board.convertCellNumberToCoordinates(move.cells().get(1));
 
         int rowDiff = Math.abs(toCoords[0] - fromCoords[0]);
         if (!piece.isKing()) {

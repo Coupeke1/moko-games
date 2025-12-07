@@ -158,7 +158,7 @@ public class GameControllerTest {
         int fromCell = 24;
         int toCell = 20;
 
-        MoveModel moveModel = new MoveModel(blackPlayerId, fromCell, toCell);
+        MoveModel moveModel = new MoveModel(blackPlayerId, List.of(fromCell, toCell));
 
         mock.perform(post("/api/games/{id}/move", gameId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -186,7 +186,7 @@ public class GameControllerTest {
                 .orElseThrow()
                 .id();
 
-        MoveModel moveModel = new MoveModel(whitePlayerId, 24, 20);
+        MoveModel moveModel = new MoveModel(whitePlayerId, List.of(24, 20));
 
         mock.perform(post("/api/games/{id}/move", gameId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -211,7 +211,7 @@ public class GameControllerTest {
                 .orElseThrow()
                 .id();
 
-        MoveModel moveModel = new MoveModel(blackPlayerId, 16, 12);
+        MoveModel moveModel = new MoveModel(blackPlayerId, List.of(16, 12));
 
         mock.perform(post("/api/games/{id}/move", gameId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -237,7 +237,7 @@ public class GameControllerTest {
                 .orElseThrow()
                 .id();
 
-        MoveModel moveModel = new MoveModel(blackPlayerId, 24, 28);
+        MoveModel moveModel = new MoveModel(blackPlayerId, List.of(24, 28));
 
         mock.perform(post("/api/games/{id}/move", gameId)
                 .contentType(MediaType.APPLICATION_JSON)

@@ -71,9 +71,8 @@ public class Game {
             throw new NotPlayersTurnException(currentRole);
         }
 
-        MoveValidator.validateMove(board, currentRole, move, kingMovementMode);
+        MoveValidator.move(board, currentRole, move, kingMovementMode);
 
-        board.move(move);
         nextPlayer();
     }
 

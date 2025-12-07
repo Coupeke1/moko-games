@@ -25,6 +25,7 @@ public class ExceptionController {
             PlayerCountException.class,
             RoleUnfulfilledException.class,
             TargetCellNotEmptyException.class,
+            TooManyMovesException.class,
             TooManyPiecesException.class,
             TooManyTilesException.class,
             UniquePlayersException.class,
