@@ -1,6 +1,5 @@
 import Card from "@/components/cards/card";
 import ClockIcon from "@/components/icons/clock-icon";
-import HeartIcon from "@/components/icons/heart-icon";
 import { Gap } from "@/components/layout/gap";
 import { Items } from "@/components/layout/items";
 import Row from "@/components/layout/row";
