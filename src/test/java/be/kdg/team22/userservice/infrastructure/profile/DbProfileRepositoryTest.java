@@ -1,10 +1,7 @@
 package be.kdg.team22.userservice.infrastructure.profile;
 
 import be.kdg.team22.userservice.config.TestcontainersConfig;
-import be.kdg.team22.userservice.infrastructure.profile.jpa.JpaProfileRepository;
-import be.kdg.team22.userservice.infrastructure.profile.jpa.ModulesEmbed;
-import be.kdg.team22.userservice.infrastructure.profile.jpa.ProfileEntity;
-import be.kdg.team22.userservice.infrastructure.profile.jpa.StatisticsEmbed;
+import be.kdg.team22.userservice.infrastructure.profile.jpa.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -32,8 +29,9 @@ class DbProfileRepositoryTest {
         String description = "Test";
         StatisticsEmbed statistics = new StatisticsEmbed(5, 50);
         ModulesEmbed modules = new ModulesEmbed(true, false);
+        NotificationPreferencesEmbed preferences = new NotificationPreferencesEmbed(true, false, true, false, true, true, true);
 
-        ProfileEntity entity = new ProfileEntity(id, username, email, description, "", statistics, modules, Instant.now());
+        ProfileEntity entity = new ProfileEntity(id, username, email, description, "", statistics, modules, Instant.now(), preferences);
         repository.save(entity);
 
         Optional<ProfileEntity> loaded = repository.findById(id);

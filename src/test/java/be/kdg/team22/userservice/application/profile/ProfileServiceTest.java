@@ -217,9 +217,10 @@ class ProfileServiceTest {
     @DisplayName("changeModules → throws when same")
     void changeModules_sameThrows() {
         Modules m = new Modules(true, true);
+        NotificationPreferences preferences = new NotificationPreferences(true, true, false, true, false, true, true);
         Profile p = new Profile(new ProfileId(UUID.randomUUID()),
                 new ProfileName("u"), new ProfileEmail("e@mail"), "d", "i",
-                new Statistics(0, 0), m, null);
+                new Statistics(0, 0), m, null, preferences);
 
         assertThatThrownBy(() -> service.changeModules(p, m))
                 .isInstanceOf(CannotUpdateProfileException.class);
