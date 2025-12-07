@@ -16,6 +16,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,7 +55,7 @@ class LibraryServiceTest {
         when(games.getGame(eq(game1), any())).thenReturn(game(game1, "A"));
         when(games.getGame(eq(game2), any())).thenReturn(game(game2, "B"));
 
-        LibraryGamesModel result = service.getLibraryForUser(userId, token(), null);
+        LibraryGamesModel result = service.getLibraryForUser(userId, token(), new FilterQuery());
 
         assertThat(result.games()).hasSize(2);
         assertThat(result.games().get(0).id()).isEqualTo(game1);
@@ -70,6 +71,9 @@ class LibraryServiceTest {
     @DisplayName("Filter by title or description")
     void getLibraryForUser_filter() {
         ProfileId userId = new ProfileId(UUID.randomUUID());
+        FilterQuery filter = new FilterQuery();
+        filter.query = Optional.of("ch");
+
         UUID game1 = UUID.randomUUID();
         UUID game2 = UUID.randomUUID();
 
@@ -81,7 +85,7 @@ class LibraryServiceTest {
         when(games.getGame(eq(game1), any())).thenReturn(game(game1, "Chess"));
         when(games.getGame(eq(game2), any())).thenReturn(game(game2, "Monopoly"));
 
-        LibraryGamesModel result = service.getLibraryForUser(userId, token(), "ch");
+        LibraryGamesModel result = service.getLibraryForUser(userId, token(), filter);
 
         assertThat(result.games()).hasSize(1);
         assertThat(result.games().getFirst().title()).isEqualTo("Chess");
@@ -95,7 +99,7 @@ class LibraryServiceTest {
 
         when(repo.findByUserId(userId.value())).thenReturn(List.of());
 
-        LibraryGamesModel result = service.getLibraryForUser(userId, token(), null);
+        LibraryGamesModel result = service.getLibraryForUser(userId, token(), new FilterQuery());
 
         assertThat(result.games()).isEmpty();
         verifyNoInteractions(games);

@@ -3,6 +3,7 @@ package be.kdg.team22.userservice.api.library;
 import be.kdg.team22.userservice.api.ExceptionController;
 import be.kdg.team22.userservice.api.library.models.LibraryGameModel;
 import be.kdg.team22.userservice.api.library.models.LibraryGamesModel;
+import be.kdg.team22.userservice.application.library.FilterQuery;
 import be.kdg.team22.userservice.application.library.LibraryService;
 import be.kdg.team22.userservice.domain.library.GameId;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
@@ -24,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -67,11 +69,11 @@ class LibraryControllerTest {
 
         LibraryGamesModel response = new LibraryGamesModel(List.of(gameModel));
 
-        when(libraryService.getLibraryForUser(eq(profileId), eq(jwt), isNull())).thenReturn(response);
+        when(libraryService.getLibraryForUser(eq(profileId), eq(jwt), any())).thenReturn(response);
 
         mockMvc.perform(get("/api/library/me").with(authentication(auth))).andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(1)).andExpect(jsonPath("$[0].title").value("Tic Tac Toe"));
 
-        verify(libraryService).getLibraryForUser(eq(profileId), eq(jwt), isNull());
+        verify(libraryService).getLibraryForUser(eq(profileId), eq(jwt), any());
     }
 
     @Test
@@ -81,13 +83,15 @@ class LibraryControllerTest {
         ProfileId profileId = ProfileId.from(userId);
         UsernamePasswordAuthenticationToken auth = authWithUser(userId);
         Jwt jwt = extractJwt(auth);
+        FilterQuery filter = new FilterQuery();
+        filter.query = Optional.of("ch");
 
         LibraryGamesModel response = new LibraryGamesModel(List.of());
         when(libraryService.getLibraryForUser(any(), any(), any())).thenReturn(response);
 
         mockMvc.perform(get("/api/library/me").param("query", "ch").with(authentication(auth))).andExpect(status().isOk());
 
-        verify(libraryService).getLibraryForUser(eq(profileId), eq(jwt), eq("ch"));
+        verify(libraryService).getLibraryForUser(eq(profileId), eq(jwt), argThat(f -> f.query.isPresent() && f.query.get().equals("ch")));
     }
 
     @Test
