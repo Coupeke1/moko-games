@@ -18,6 +18,7 @@ public class GameModel {
     public PlayerRole currentRole;
     public int size;
     public Map<Integer, PieceModel> grid;
+    public int movesSinceLastCapture;
     public KingMovementMode kingMovementMode;
     public GameStatus status;
 
@@ -29,6 +30,7 @@ public class GameModel {
         gameModel.currentRole = game.currentRole();
         gameModel.size = game.board().size();
         gameModel.grid = new HashMap<>();
+        gameModel.movesSinceLastCapture = game.board().movesSinceLastCapture();
         gameModel.kingMovementMode = game.kingMovementMode();
         gameModel.status = game.status();
 
@@ -61,7 +63,7 @@ public class GameModel {
             }
         }
 
-        Board board = new Board(size, reconstructedGrid);
+        Board board = new Board(size, reconstructedGrid, movesSinceLastCapture);
 
         return new Game(GameId.fromString(id), playerSet, aiPlayer, currentRole, board, kingMovementMode, status);
     }

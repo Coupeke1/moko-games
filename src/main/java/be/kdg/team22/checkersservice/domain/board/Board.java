@@ -17,22 +17,25 @@ import static be.kdg.team22.checkersservice.domain.move.MoveValidator.isCaptureM
 public class Board {
     private final int size;
     private final Map<Integer, Piece> grid;
-    private int movesSinceLastCapture = 0;
+    private int movesSinceLastCapture;
 
     private Board(final int size) {
         this.size = size;
         this.grid = new HashMap<>();
+        this.movesSinceLastCapture = 0;
     }
 
-    public Board(final int size, final Map<Integer, Piece> grid) {
+    public Board(final int size, final Map<Integer, Piece> grid, final int movesSinceLastCapture) {
         this.size = size;
         this.grid = grid;
+        this.movesSinceLastCapture = movesSinceLastCapture;
     }
 
     public Board(final Board other) {
         this.size = other.size;
         this.grid = new HashMap<>();
         this.grid.putAll(other.grid);
+        this.movesSinceLastCapture = other.movesSinceLastCapture;
     }
 
     public static Board create(final int size) {
@@ -207,5 +210,9 @@ public class Board {
 
     public Map<Integer, Piece> grid() {
         return grid;
+    }
+
+    public int movesSinceLastCapture() {
+        return movesSinceLastCapture;
     }
 }
