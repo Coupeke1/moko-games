@@ -7,7 +7,7 @@ const BASE_URL = environment.libraryService;
 export async function findEntries(query?: string): Promise<Entry[]> {
     try {
         const params = new URLSearchParams();
-        if (query) params.append("filter", query);
+        if (query) params.append("query", query);
 
         const url = params.toString()
             ? `${BASE_URL}/me?${params.toString()}`
