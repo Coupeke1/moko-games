@@ -10,7 +10,7 @@ import java.util.Optional;
 import static be.kdg.team22.checkersservice.domain.move.MoveValidator.*;
 
 public class KingMoveValidator {
-    protected static void validateKingMove(final Board board, final PlayerRole currentRole, final Move move, KingMovementMode movementMode) {
+    protected static void validateKingMove(final Board board, final PlayerRole currentRole, final Move move, final KingMovementMode movementMode) {
         validateCellsWithinBoard(board, move);
         validateStartingPiece(board, currentRole, move);
         validateTargetCellEmpty(board, move);
@@ -59,7 +59,7 @@ public class KingMoveValidator {
         }
     }
 
-    private static void validateSteps(final Board board, final Move move, KingMovementMode movementMode, boolean capture) {
+    private static void validateSteps(final Board board, final Move move, final KingMovementMode movementMode, final boolean capture) {
         int[] fromCoords = board.convertCellNumberToCoordinates(move.fromCell());
         int[] toCoords = board.convertCellNumberToCoordinates(move.cells().get(1));
 

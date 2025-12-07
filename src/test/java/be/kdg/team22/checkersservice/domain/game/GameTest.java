@@ -294,8 +294,25 @@ public class GameTest {
         boardField.set(game, createMultiCaptureBoard());
         Move move = new Move(game.players().first().id(), List.of(22, 13, 6, 2));
 
+        assertThrows(TooManyMovesException.class, () ->
+                game.requestMove(move)
+        );
+        assert (game.board().pieceAt(22).isPresent());
         assert (game.board().pieceAt(17).isPresent());
         assert (game.board().pieceAt(9).isPresent());
+    }
+
+    @Test
+    void requestMoveShouldThrowWhenTryingToStepMultipleTimes() throws NoSuchFieldException, IllegalAccessException {
+        Field boardField = Game.class.getDeclaredField("board");
+        boardField.setAccessible(true);
+        boardField.set(game, createMultiCaptureBoard());
+        Move move = new Move(game.players().first().id(), List.of(22, 18, 15));
+
+        assertThrows(TooManyMovesException.class, () ->
+                game.requestMove(move)
+        );
+        assert (game.board().pieceAt(22).isPresent());
     }
 
     private Board createMultiCaptureBoard() {

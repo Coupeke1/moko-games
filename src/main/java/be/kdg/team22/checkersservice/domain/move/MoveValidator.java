@@ -6,6 +6,8 @@ import be.kdg.team22.checkersservice.domain.game.exceptions.OutsidePlayingFieldE
 import be.kdg.team22.checkersservice.domain.move.exceptions.*;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static be.kdg.team22.checkersservice.domain.move.KingMoveValidator.isKingCaptureMove;
@@ -17,7 +19,28 @@ public class MoveValidator {
     private MoveValidator() {
     }
 
-    public static void validateMove(final Board board, final PlayerRole currentRole, final Move move, KingMovementMode kingMovementMode) {
+    public static void move(final Board board, final PlayerRole currentRole, final Move move, final KingMovementMode kingMovementMode) {
+        Board tempBoard = new Board(board);
+        int captureCount = 0;
+        List<Move> successfulSegments = new ArrayList<>();
+        for (int[] segment : move.segments()) {
+            Move segmentMove = new Move(move.playerId(), List.of(segment[0], segment[1]));
+            validateMove(tempBoard, currentRole, segmentMove, kingMovementMode);
+            if (isCaptureMove(tempBoard, currentRole, segmentMove)) captureCount++;
+            tempBoard.move(segmentMove);
+            successfulSegments.add(segmentMove);
+        }
+
+        if (move.segments().size() > 1 && move.segments().size() != captureCount) {
+            throw new TooManyMovesException();
+        }
+
+        for (Move segmentMove : successfulSegments) {
+            board.move(segmentMove);
+        }
+    }
+
+    public static void validateMove(final Board board, final PlayerRole currentRole, final Move move, final KingMovementMode kingMovementMode) {
         for (int cell : move.cells()) {
             if (cell < 1 || cell > (board.size() * board.size()) / 2) {
                 throw new OutsidePlayingFieldException();

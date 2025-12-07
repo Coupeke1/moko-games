@@ -27,6 +27,12 @@ public class Board {
         this.grid = grid;
     }
 
+    public Board(final Board other) {
+        this.size = other.size;
+        this.grid = new HashMap<>();
+        this.grid.putAll(other.grid);
+    }
+
     public static Board create(final int size) {
         if (size != 8 && size != 10) {
             throw new BoardSizeException();

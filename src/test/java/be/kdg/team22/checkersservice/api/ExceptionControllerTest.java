@@ -30,6 +30,7 @@ public class ExceptionControllerTest {
         OwnPieceInTheWayException ownPieceInTheWayEx = new OwnPieceInTheWayException();
         PlayerCountException playerCountEx = new PlayerCountException();
         RoleUnfulfilledException roleUnfulfilledEx = new RoleUnfulfilledException(PlayerRole.BLACK);
+        TooManyMovesException tooManyMovesEx = new TooManyMovesException();
         TooManyPiecesException tooManyPiecesEx = new TooManyPiecesException();
         TooManyTilesException tooManyTilesEx = new TooManyTilesException(2, true);
         UniquePlayersException uniquePlayersEx = new UniquePlayersException();
@@ -46,7 +47,8 @@ public class ExceptionControllerTest {
         ResponseEntity<String> outsidePlayingFieldExResponse = controller.handleDomainErrors(outsidePlayingFieldEx);
         ResponseEntity<String> ownPieceInTheWayExResponse = controller.handleDomainErrors(ownPieceInTheWayEx);
         ResponseEntity<String> playerCountExResponse = controller.handleDomainErrors(playerCountEx);
-        ResponseEntity<String> roleUnfulfilledExceptionResponse = controller.handleDomainErrors(roleUnfulfilledEx);
+        ResponseEntity<String> roleUnfulfilledExResponse = controller.handleDomainErrors(roleUnfulfilledEx);
+        ResponseEntity<String> tooManyMovesExResponse = controller.handleDomainErrors(tooManyMovesEx);
         ResponseEntity<String> tooManyPiecesExResponse = controller.handleDomainErrors(tooManyPiecesEx);
         ResponseEntity<String> tooManyTilesExResponse = controller.handleDomainErrors(tooManyTilesEx);
         ResponseEntity<String> uniquePlayersExResponse = controller.handleDomainErrors(uniquePlayersEx);
@@ -63,7 +65,8 @@ public class ExceptionControllerTest {
         assertThat(outsidePlayingFieldExResponse.getStatusCode().value()).isEqualTo(400);
         assertThat(ownPieceInTheWayExResponse.getStatusCode().value()).isEqualTo(400);
         assertThat(playerCountExResponse.getStatusCode().value()).isEqualTo(400);
-        assertThat(roleUnfulfilledExceptionResponse.getStatusCode().value()).isEqualTo(400);
+        assertThat(roleUnfulfilledExResponse.getStatusCode().value()).isEqualTo(400);
+        assertThat(tooManyMovesExResponse.getStatusCode().value()).isEqualTo(400);
         assertThat(tooManyPiecesExResponse.getStatusCode().value()).isEqualTo(400);
         assertThat(tooManyTilesExResponse.getStatusCode().value()).isEqualTo(400);
         assertThat(uniquePlayersExResponse.getStatusCode().value()).isEqualTo(400);
