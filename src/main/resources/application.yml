@@ -10,10 +10,16 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD:password}
 
   jpa:
-    open-in-view: false
+    open-in-view: ${SPRING_JPA_OPEN_IN_VIEW:false}
     hibernate:
-      ddl-auto: create
-    show-sql: false
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:create}
+    defer-datasource-initialization: ${SPRING_JPA_DEFER_DATASOURCE_INITIALIZATION:true}
+
+  sql:
+    init:
+      mode: ${SPRING_SQL_INIT_MODE:always}
+      data-locations: classpath:data.sql
+      separator: ";"
 
   rabbitmq:
     host: ${SPRING_RABBITMQ_HOST:localhost}
