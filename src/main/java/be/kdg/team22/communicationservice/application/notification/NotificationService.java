@@ -2,6 +2,8 @@ package be.kdg.team22.communicationservice.application.notification;
 
 import be.kdg.team22.communicationservice.domain.notification.*;
 import be.kdg.team22.communicationservice.domain.notification.exceptions.NotificationNotFoundException;
+import be.kdg.team22.communicationservice.infrastructure.user.ExternalUserRepository;
+import be.kdg.team22.communicationservice.infrastructure.user.PreferencesResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,9 +13,17 @@ import java.util.List;
 @Transactional
 public class NotificationService {
     private final NotificationRepository repository;
+    private final ExternalUserRepository userRepository;
 
-    public NotificationService(final NotificationRepository repository) {
+    public NotificationService(final NotificationRepository repository,
+                               final ExternalUserRepository userRepository) {
         this.repository = repository;
+        this.userRepository = userRepository;
+    }
+
+    private NotificationPreferences getPreferences(String jwtToken) {
+        PreferencesResponse response = userRepository.getPreferences(jwtToken);
+        return response.to();
     }
 
     public Notification create(final PlayerId recipient,
@@ -22,21 +32,28 @@ public class NotificationService {
                                final String message) {
 
         Notification notification = Notification.create(
-                recipient,
-                type,
-                title,
-                message
+                recipient, type, title, message
         );
 
         return repository.save(notification);
     }
 
-    public List<Notification> getNotifications(final PlayerId playerId) {
-        return repository.findByRecipientId(playerId);
+    public List<Notification> getNotifications(final PlayerId playerId, final String jwtToken) {
+        NotificationPreferences prefs = getPreferences(jwtToken);
+
+        return repository.findByRecipientId(playerId)
+                .stream()
+                .filter(prefs::allows)
+                .toList();
     }
 
-    public List<Notification> getUnreadNotifications(final PlayerId playerId) {
-        return repository.findUnreadByRecipientId(playerId);
+    public List<Notification> getUnreadNotifications(final PlayerId playerId, final String jwtToken) {
+        NotificationPreferences prefs = getPreferences(jwtToken);
+
+        return repository.findUnreadByRecipientId(playerId)
+                .stream()
+                .filter(prefs::allows)
+                .toList();
     }
 
     public void markAsRead(final NotificationId id) {
