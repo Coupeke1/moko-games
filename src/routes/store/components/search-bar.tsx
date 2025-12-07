@@ -11,7 +11,11 @@ import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 
-export default function SearchBar() {
+interface Props {
+    onSearch: (query: string, sorting: string, category: string) => void;
+}
+
+export default function SearchBar({ onSearch }: Props) {
     const [params, setParams] = useSearchParams();
 
     const [query, setQuery] = useState("");
@@ -37,6 +41,7 @@ export default function SearchBar() {
             if (category) params.category = category;
 
             setParams(params);
+            onSearch(query, sorting, category);
         },
         onSuccess: async () => showToast("Store", "Searching..."),
         onError: (error: Error) => showToast("Store", error.message),
@@ -70,10 +75,13 @@ export default function SearchBar() {
 
                 <Select
                     placeholder="Category"
-                    options={Object.values(Category).map((value: string) => ({
-                        label: `${value.charAt(0)}${value.slice(1).toLowerCase()}`,
-                        value: value.toLowerCase(),
-                    }))}
+                    options={[
+                        { label: "All Categories", value: "all" },
+                        ...Object.values(Category).map((value: string) => ({
+                            label: `${value.charAt(0)}${value.slice(1).toLowerCase()}`,
+                            value: value.toLowerCase(),
+                        })),
+                    ]}
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                 />
