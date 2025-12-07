@@ -67,11 +67,11 @@ class LibraryControllerTest {
 
         LibraryGamesModel response = new LibraryGamesModel(List.of(gameModel));
 
-        when(libraryService.getLibraryForUser(eq(profileId), eq(jwt), isNull(), isNull(), eq("title_asc"), eq(100))).thenReturn(response);
+        when(libraryService.getLibraryForUser(eq(profileId), eq(jwt), isNull())).thenReturn(response);
 
         mockMvc.perform(get("/api/library/me").with(authentication(auth))).andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(1)).andExpect(jsonPath("$[0].title").value("Tic Tac Toe"));
 
-        verify(libraryService).getLibraryForUser(eq(profileId), eq(jwt), isNull(), isNull(), eq("title_asc"), eq(100));
+        verify(libraryService).getLibraryForUser(eq(profileId), eq(jwt), isNull());
     }
 
     @Test
@@ -83,11 +83,11 @@ class LibraryControllerTest {
         Jwt jwt = extractJwt(auth);
 
         LibraryGamesModel response = new LibraryGamesModel(List.of());
-        when(libraryService.getLibraryForUser(any(), any(), any(), any(), any(), any())).thenReturn(response);
+        when(libraryService.getLibraryForUser(any(), any(), any())).thenReturn(response);
 
-        mockMvc.perform(get("/api/library/me").param("filter", "ch").param("favourite", "true").param("order", "purchased_desc").param("limit", "5").with(authentication(auth))).andExpect(status().isOk());
+        mockMvc.perform(get("/api/library/me").param("query", "ch").with(authentication(auth))).andExpect(status().isOk());
 
-        verify(libraryService).getLibraryForUser(eq(profileId), eq(jwt), eq("ch"), eq(true), eq("purchased_desc"), eq(5));
+        verify(libraryService).getLibraryForUser(eq(profileId), eq(jwt), eq("ch"));
     }
 
     @Test
@@ -98,7 +98,7 @@ class LibraryControllerTest {
         UsernamePasswordAuthenticationToken auth = authWithUser(userId);
         Jwt jwt = extractJwt(auth);
 
-        when(libraryService.getLibraryForUser(eq(profileId), eq(jwt), any(), any(), any(), any())).thenReturn(new LibraryGamesModel(List.of()));
+        when(libraryService.getLibraryForUser(eq(profileId), eq(jwt), any())).thenReturn(new LibraryGamesModel(List.of()));
 
         mockMvc.perform(get("/api/library/me").with(authentication(auth))).andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(0));
     }

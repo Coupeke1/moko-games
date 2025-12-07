@@ -24,10 +24,9 @@ public class LibraryController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<List<LibraryGameModel>> getMyLibrary(@AuthenticationPrincipal final Jwt token, @RequestParam(required = false) final String filter, @RequestParam(required = false) final Boolean favourite, @RequestParam(required = false, defaultValue = "title_asc") final String order, @RequestParam(required = false, defaultValue = "100") final Integer limit) {
+    public ResponseEntity<List<LibraryGameModel>> getMyLibrary(@AuthenticationPrincipal final Jwt token, @RequestParam(required = false) final String query) {
         ProfileId userId = ProfileId.get(token);
-        LibraryGamesModel model = service.getLibraryForUser(userId, token, filter, favourite, order, limit);
-
+        LibraryGamesModel model = service.getLibraryForUser(userId, token, query);
         return ResponseEntity.ok(model.games());
     }
 
