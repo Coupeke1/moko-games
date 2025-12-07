@@ -22,6 +22,7 @@ class GameTest {
                 "http://localhost",
                 "/start",
                 "/start",
+                "/health",
                 "Title",
                 "Description",
                 "http://img");
@@ -37,6 +38,7 @@ class GameTest {
                 "http://x",
                 "/start",
                 "/start",
+                "/health",
                 "Title",
                 "Desc",
                 "http://img"
@@ -46,6 +48,7 @@ class GameTest {
         assertThat(game.name()).isEqualTo("engine");
         assertThat(game.baseUrl()).isEqualTo("http://x");
         assertThat(game.startEndpoint()).isEqualTo("/start");
+        assertThat(game.healthEndpoint()).isEqualTo("/health");
         assertThat(game.title()).isEqualTo("Title");
         assertThat(game.description()).isEqualTo("Desc");
         assertThat(game.image()).isEqualTo("http://img");
@@ -59,6 +62,7 @@ class GameTest {
         GameId id = gid();
         Instant created = Instant.parse("2024-01-01T10:00:00Z");
         Instant updated = Instant.parse("2024-01-02T10:00:00Z");
+        Instant lastHealth = Instant.parse("2024-01-03T10:00:00Z");
 
         Game game = new Game(
                 id,
@@ -66,6 +70,9 @@ class GameTest {
                 "http://x",
                 "/start",
                 "/start",
+                "/health",
+                lastHealth,
+                true,
                 "Title",
                 "Desc",
                 "http://img",
@@ -73,6 +80,8 @@ class GameTest {
                 updated
         );
 
+        assertThat(game.healthy()).isEqualTo(true);
+        assertThat(game.lastHealthCheck()).isEqualTo(lastHealth);
         assertThat(game.createdAt()).isEqualTo(created);
         assertThat(game.updatedAt()).isEqualTo(updated);
     }
@@ -86,6 +95,7 @@ class GameTest {
                         "http://x",
                         "/start",
                         "/start",
+                        "/health",
                         "Title",
                         "Desc",
                         "http://img")
@@ -101,6 +111,7 @@ class GameTest {
                         "http://x",
                         "/start",
                         "/start",
+                        "/health",
                         "Title",
                         "Desc",
                         "http://img"
@@ -117,6 +128,7 @@ class GameTest {
                         " ",
                         "/start",
                         "/start",
+                        "/health",
                         "Title",
                         "Desc",
                         "http://img"
@@ -133,11 +145,29 @@ class GameTest {
                         "http://x",
                         "http://x",
                         " ",
+                        "/health",
                         "Title",
                         "Desc",
                         "http://img"
                 )
         ).isInstanceOf(GameStartEndpointInvalidException.class);
+    }
+
+    @Test
+    void constructor_blankHealthEndpointThrows() {
+        assertThatThrownBy(() ->
+                new Game(
+                        gid(),
+                        "engine",
+                        "http://x",
+                        "http://x",
+                        "/start",
+                        " ",
+                        "Title",
+                        "Desc",
+                        "http://img"
+                )
+        ).isInstanceOf(GameHealthEndpointInvalidException.class);
     }
 
     @Test
@@ -149,6 +179,7 @@ class GameTest {
                         "http://x",
                         "/start",
                         "/start",
+                        "/health",
                         "",
                         "Desc",
                         "http://img"

@@ -15,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,6 +44,7 @@ class GameControllerTest {
                 "http://engine",
                 "/play",
                 "/start",
+                "/health",
                 "Tic Tac Toe",
                 "desc",
                 "http://img");
