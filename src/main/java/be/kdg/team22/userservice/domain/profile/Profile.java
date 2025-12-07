@@ -10,13 +10,14 @@ public class Profile {
     private final ProfileId id;
     private final ProfileName username;
     private final ProfileEmail email;
+    private final Statistics statistics;
+    private final Instant createdAt;
+    private NotificationPreferences preferences;
     private String description;
     private String image;
-    private final Statistics statistics;
     private Modules modules;
-    private final Instant createdAt;
 
-    public Profile(final ProfileId id, final ProfileName username, final ProfileEmail email, final String description, final String image, final Statistics statistics, final Modules modules, final Instant createdAt) {
+    public Profile(final ProfileId id, final ProfileName username, final ProfileEmail email, final String description, final String image, final Statistics statistics, final Modules modules, final Instant createdAt, final NotificationPreferences preferences) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -25,10 +26,11 @@ public class Profile {
         this.statistics = statistics;
         this.modules = modules;
         this.createdAt = createdAt;
+        this.preferences = preferences;
     }
 
     public Profile(final ProfileId id, final ProfileName username, final ProfileEmail email, final String description, final String image) {
-        this(id, username, email, description, image, new Statistics(0, 0), new Modules(false, false), Instant.now());
+        this(id, username, email, description, image, new Statistics(0, 0), new Modules(false, false), Instant.now(), null);
     }
 
     public void updateDescription(final String description) {
@@ -50,6 +52,17 @@ public class Profile {
             throw CannotUpdateProfileException.modules(id);
 
         this.modules = modules;
+    }
+
+    public void updatePreferences(final NotificationPreferences prefs) {
+        if (this.preferences.equals(prefs))
+            throw CannotUpdateProfileException.preferences(id);
+
+        this.preferences = prefs;
+    }
+
+    public NotificationPreferences preferences() {
+        return preferences;
     }
 
     public ProfileId id() {

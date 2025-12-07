@@ -18,4 +18,8 @@ public class CannotUpdateProfileException extends RuntimeException {
     public static CannotUpdateProfileException modules(ProfileId id) {
         return new CannotUpdateProfileException(id, "modules");
     }
+
+    public static CannotUpdateProfileException preferences(ProfileId id) {
+        return new CannotUpdateProfileException(id, "preferences");
+    }
 }
