@@ -1,14 +1,12 @@
 package be.kdg.team22.communicationservice.domain.notification;
 
 public record NotificationPreferences(
-        boolean receivePlatform,
         boolean receiveEmail,
         boolean social,
         boolean achievement,
         boolean commerce,
         boolean chat
 ) {
-
     public boolean allows(Notification notification) {
         return switch (notification.type()) {
             case FRIEND_REQUEST_RECEIVED,
@@ -18,6 +16,12 @@ public record NotificationPreferences(
             case ACHIEVEMENT_UNLOCKED -> achievement;
             case ORDER_COMPLETED -> commerce;
             case DIRECT_MESSAGE -> chat;
+            default -> true;
         };
+    }
+
+    public boolean allowsEmail(Notification notification) {
+        if (!receiveEmail) return false;
+        return allows(notification);
     }
 }
