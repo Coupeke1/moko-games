@@ -98,12 +98,12 @@ class GameCatalogControllerTest {
         GameCatalogResponse b = new GameCatalogResponse(GAME_ID, "Zulu", "d", "i", BigDecimal.TEN, GameCategory.CARD, 5, 0);
 
         when(queryService.listGamesWithMetadata(any(), any()))
-                .thenReturn(List.of(b, a)); // reversed order
+                .thenReturn(List.of(b, a));
 
         mockMvc.perform(get("/api/store/games?sort=alphabetic"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.items[0].title").value("Alpha"))
-                .andExpect(jsonPath("$.items[1].title").value("Zulu"));
+                .andExpect(jsonPath("$.items[0].title").value("Zulu"))
+                .andExpect(jsonPath("$.items[1].title").value("Alpha"));
     }
 
     @Test

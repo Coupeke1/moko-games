@@ -15,7 +15,6 @@ import java.util.UUID;
 
 @Service
 public class GameQueryService {
-
     private final GameCatalogRepository repo;
     private final ExternalGamesRepository games;
 
@@ -28,17 +27,19 @@ public class GameQueryService {
 
         List<GameCatalogEntry> entries = repo.findAll(filter, pagination);
 
-        List<GameCatalogResponse> combined = entries.stream()
-                .map(entry -> GameCatalogResponse.from(entry, games.fetchMetadata(entry.getId())))
-                .toList();
+        List<GameCatalogResponse> games = entries.stream().map(entry -> GameCatalogResponse.from(entry, this.games.fetchMetadata(entry.getId()))).toList();
 
-        if (filter.sortBy.isPresent() && filter.sortBy.get().equals("alphabetic")) {
-            combined = combined.stream()
-                    .sorted(Comparator.comparing(GameCatalogResponse::title))
-                    .toList();
+        if (filter.query.isPresent() && !filter.query.get().isBlank()) {
+            String query = filter.query.get();
+
+            games = games.stream().filter(game -> (game.title() != null && game.title().toLowerCase().contains(query.toLowerCase())) || (game.description() != null && game.description().toLowerCase().contains(query))).toList();
         }
 
-        return combined;
+        if (filter.sortBy.isPresent() && filter.sortBy.get().equals("alphabetic")) {
+            games = games.stream().sorted(Comparator.comparing(GameCatalogResponse::title)).toList();
+        }
+
+        return games;
     }
 
     public GameCatalogResponse getGameWithMetadata(final UUID id) {

@@ -16,7 +16,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,7 +24,6 @@ import java.util.UUID;
 @Validated
 @RequestMapping("/api/store/games")
 public class GameCatalogController {
-
     private final StoreService storeService;
     private final GameQueryService queryService;
 
@@ -35,15 +33,9 @@ public class GameCatalogController {
     }
 
     @GetMapping
-    public ResponseEntity<PagedResponse<GameCatalogResponse>> list(
-            @RequestParam(required = false) final GameCategory category,
-            @RequestParam(required = false) final BigDecimal minPrice,
-            @RequestParam(required = false) final BigDecimal maxPrice,
-            @RequestParam(required = false) final String sort,
-            @RequestParam(defaultValue = "0") final int page,
-            @RequestParam(defaultValue = "10") final int size
-    ) {
+    public ResponseEntity<PagedResponse<GameCatalogResponse>> list(@RequestParam(required = false) final String query, @RequestParam(required = false) final GameCategory category, @RequestParam(required = false) final BigDecimal minPrice, @RequestParam(required = false) final BigDecimal maxPrice, @RequestParam(required = false) final String sort, @RequestParam(defaultValue = "0") final int page, @RequestParam(defaultValue = "10") final int size) {
         FilterQuery filter = new FilterQuery();
+        filter.query = Optional.ofNullable(query);
         filter.category = Optional.ofNullable(category);
         filter.minPrice = Optional.ofNullable(minPrice);
         filter.maxPrice = Optional.ofNullable(maxPrice);
@@ -51,12 +43,6 @@ public class GameCatalogController {
 
         Pagination pagination = new Pagination(page, size);
         List<GameCatalogResponse> games = queryService.listGamesWithMetadata(filter, pagination);
-
-        if ("alphabetic".equals(sort)) {
-            games = games.stream()
-                    .sorted(Comparator.comparing(GameCatalogResponse::title))
-                    .toList();
-        }
 
         boolean last = games.size() < size;
         return ResponseEntity.ok(new PagedResponse<>(games, page, size, last));
@@ -69,24 +55,13 @@ public class GameCatalogController {
 
     @PostMapping
     public ResponseEntity<GameCatalogResponse> create(@Valid @RequestBody final GameCatalogRequestModel request) {
-        GameCatalogEntry entry = storeService.create(
-                request.id(),
-                request.price(),
-                request.category()
-        );
+        GameCatalogEntry entry = storeService.create(request.id(), request.price(), request.category());
         return ResponseEntity.ok(queryService.getGameWithMetadata(entry.getId()));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GameCatalogResponse> update(
-            @PathVariable final UUID id,
-            @Valid @RequestBody final UpdateGameCatalogModel request
-    ) {
-        GameCatalogEntry entry = storeService.update(
-                id,
-                request.price(),
-                request.category()
-        );
+    public ResponseEntity<GameCatalogResponse> update(@PathVariable final UUID id, @Valid @RequestBody final UpdateGameCatalogModel request) {
+        GameCatalogEntry entry = storeService.update(id, request.price(), request.category());
         return ResponseEntity.ok(queryService.getGameWithMetadata(entry.getId()));
     }
 
