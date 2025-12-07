@@ -26,7 +26,7 @@ public class LibraryService {
         this.gamesRepository = gamesRepository;
     }
 
-    public LibraryGamesModel getLibraryForUser(final ProfileId userId, final Jwt token, final String query) {
+    public LibraryGamesModel getLibraryForUser(final ProfileId userId, final Jwt token, final FilterQuery filter) {
         List<LibraryEntry> entries = libraryRepository.findByUserId(userId.value());
 
         List<LibraryGameModel> games = entries.stream().map(entry -> {
@@ -35,7 +35,9 @@ public class LibraryService {
             return new LibraryGameModel(game.id(), game.title(), game.description(), game.price(), game.image(), entry.purchasedAt(), entry.favourite());
         }).toList();
 
-        if (query != null && !query.isBlank()) {
+        if (filter.query.isPresent() && !filter.query.get().isBlank()) {
+            String query = filter.query.get();
+
             games = games.stream().filter(game -> (game.title() != null && game.title().toLowerCase().contains(query.toLowerCase())) || (game.description() != null && game.description().toLowerCase().contains(query.toLowerCase()))).toList();
         }
 

@@ -3,6 +3,7 @@ package be.kdg.team22.userservice.api.library;
 
 import be.kdg.team22.userservice.api.library.models.LibraryGameModel;
 import be.kdg.team22.userservice.api.library.models.LibraryGamesModel;
+import be.kdg.team22.userservice.application.library.FilterQuery;
 import be.kdg.team22.userservice.application.library.LibraryService;
 import be.kdg.team22.userservice.domain.library.GameId;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
@@ -12,6 +13,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -26,7 +28,11 @@ public class LibraryController {
     @GetMapping("/me")
     public ResponseEntity<List<LibraryGameModel>> getMyLibrary(@AuthenticationPrincipal final Jwt token, @RequestParam(required = false) final String query) {
         ProfileId userId = ProfileId.get(token);
-        LibraryGamesModel model = service.getLibraryForUser(userId, token, query);
+
+        FilterQuery filter = new FilterQuery();
+        filter.query = Optional.ofNullable(query);
+
+        LibraryGamesModel model = service.getLibraryForUser(userId, token, filter);
         return ResponseEntity.ok(model.games());
     }
 
