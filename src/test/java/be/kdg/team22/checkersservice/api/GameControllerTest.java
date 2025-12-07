@@ -219,7 +219,6 @@ public class GameControllerTest {
         ).andExpect(status().isNotFound());
     }
 
-
     @Test
     void shouldRejectMoveWithInvalidToCell() throws Exception {
         String createResponse = mock.perform(post("/api/games")
