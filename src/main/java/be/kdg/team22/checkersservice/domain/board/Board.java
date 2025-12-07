@@ -1,5 +1,6 @@
 package be.kdg.team22.checkersservice.domain.board;
 
+import be.kdg.team22.checkersservice.domain.game.GameStatus;
 import be.kdg.team22.checkersservice.domain.game.exceptions.BoardSizeException;
 import be.kdg.team22.checkersservice.domain.game.exceptions.OutsidePlayingFieldException;
 import be.kdg.team22.checkersservice.domain.move.Move;
@@ -8,6 +9,7 @@ import org.jmolecules.ddd.annotation.ValueObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import static be.kdg.team22.checkersservice.domain.move.MoveValidator.isCaptureMove;
@@ -16,21 +18,25 @@ import static be.kdg.team22.checkersservice.domain.move.MoveValidator.isCaptureM
 public class Board {
     private final int size;
     private final Map<Integer, Piece> grid;
+    private int movesSinceLastCapture;
 
     private Board(final int size) {
         this.size = size;
         this.grid = new HashMap<>();
+        this.movesSinceLastCapture = 0;
     }
 
-    public Board(final int size, final Map<Integer, Piece> grid) {
+    public Board(final int size, final Map<Integer, Piece> grid, final int movesSinceLastCapture) {
         this.size = size;
         this.grid = grid;
+        this.movesSinceLastCapture = movesSinceLastCapture;
     }
 
     public Board(final Board other) {
         this.size = other.size;
         this.grid = new HashMap<>();
         this.grid.putAll(other.grid);
+        this.movesSinceLastCapture = other.movesSinceLastCapture;
     }
 
     public static Board create(final int size) {
@@ -85,10 +91,31 @@ public class Board {
                     lastCellBeforeDestination[1]
             );
             grid.put(cellToClear, null);
+            movesSinceLastCapture = 0;
+        } else {
+            movesSinceLastCapture++;
         }
 
         grid.put(move.fromCell(), null);
         grid.put(move.cells().get(1), piece);
+    }
+
+    public GameStatus checkWinConditions() {
+        if (movesSinceLastCapture >= 40) return GameStatus.DRAW;
+
+        boolean hasWhite = false;
+        boolean hasBlack = false;
+        for (Piece piece : grid.values().stream().filter(Objects::nonNull).toList()) {
+            if (piece.color() == PlayerRole.WHITE) hasWhite = true;
+            if (piece.color() == PlayerRole.BLACK) hasBlack = true;
+            if (hasWhite && hasBlack) break;
+        }
+
+        if (!hasWhite && !hasBlack) return GameStatus.DRAW;
+        if (!hasWhite) return GameStatus.BLACK_WIN;
+        if (!hasBlack) return GameStatus.WHITE_WIN;
+
+        return GameStatus.RUNNING;
     }
 
     private void placePlayerPieces(final PlayerRole player, final int startRow, final int endRow) {
@@ -185,5 +212,9 @@ public class Board {
 
     public Map<Integer, Piece> grid() {
         return grid;
+    }
+
+    public int movesSinceLastCapture() {
+        return movesSinceLastCapture;
     }
 }

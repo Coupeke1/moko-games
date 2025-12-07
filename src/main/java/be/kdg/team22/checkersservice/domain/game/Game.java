@@ -72,6 +72,7 @@ public class Game {
         }
 
         MoveValidator.move(board, currentRole, move, kingMovementMode);
+        status = board.checkWinConditions();
 
         nextPlayer();
     }

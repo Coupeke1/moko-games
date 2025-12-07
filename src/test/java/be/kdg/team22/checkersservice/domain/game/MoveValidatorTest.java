@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,142 +25,181 @@ class MoveValidatorTest {
     }
 
     @Test
-    void validateMoveShouldAllowValidForwardMoveForWhite() {
+    void moveShouldAllowValidForwardMoveForWhite() {
         Move move = new Move(null, List.of(9, 13));
 
         assertDoesNotThrow(() ->
-                MoveValidator.validateMove(board, PlayerRole.WHITE, move, KingMovementMode.FLYING)
+                MoveValidator.move(board, PlayerRole.WHITE, move, KingMovementMode.FLYING)
         );
     }
 
     @Test
-    void validateMoveShouldAllowValidForwardMoveForBlack() {
+    void moveShouldAllowValidForwardMoveForBlack() {
         Move move = new Move(null, List.of(24, 20));
 
         assertDoesNotThrow(() ->
-                MoveValidator.validateMove(board, PlayerRole.BLACK, move, KingMovementMode.FLYING)
+                MoveValidator.move(board, PlayerRole.BLACK, move, KingMovementMode.FLYING)
         );
     }
 
     @Test
-    void validateMoveShouldThrowWhenMovingEmptyCell() {
+    void moveShouldThrowWhenMovingEmptyCell() {
         Move move = new Move(null, List.of(16, 20));
 
         assertThrows(StartingPieceNotFoundException.class, () ->
-                MoveValidator.validateMove(board, PlayerRole.WHITE, move, KingMovementMode.FLYING)
+                MoveValidator.move(board, PlayerRole.WHITE, move, KingMovementMode.FLYING)
         );
     }
 
     @Test
-    void validateMoveShouldThrowWhenMovingOpponentPiece() {
+    void moveShouldThrowWhenMovingOpponentPiece() {
         Move move = new Move(null, List.of(9, 13));
 
         assertThrows(NotPlayersPieceException.class, () ->
-                MoveValidator.validateMove(board, PlayerRole.BLACK, move, KingMovementMode.FLYING)
+                MoveValidator.move(board, PlayerRole.BLACK, move, KingMovementMode.FLYING)
         );
     }
 
     @Test
-    void validateMoveShouldThrowWhenMovingBackwardsAsWhite() {
+    void moveShouldThrowWhenMovingBackwardsAsWhite() {
+        Board testBoard = Board.create(8);
+        clearBoard(testBoard);
+
+        testBoard.grid().put(10, new Piece(PlayerRole.WHITE, false));
+        testBoard.grid().put(18, new Piece(PlayerRole.BLACK, false));
         Move move = new Move(null, List.of(10, 6));
 
         assertThrows(BackwardsMoveException.class, () ->
-                MoveValidator.validateMove(createBackwardsMoveBoard(), PlayerRole.WHITE, move, KingMovementMode.FLYING)
+                MoveValidator.move(testBoard, PlayerRole.WHITE, move, KingMovementMode.FLYING)
         );
     }
 
     @Test
-    void validateMoveShouldThrowWhenMovingBackwardsAsBlack() {
+    void moveShouldThrowWhenMovingBackwardsAsBlack() {
+        Board testBoard = Board.create(8);
+        clearBoard(testBoard);
+
+        testBoard.grid().put(10, new Piece(PlayerRole.WHITE, false));
+        testBoard.grid().put(18, new Piece(PlayerRole.BLACK, false));
         Move move = new Move(null, List.of(18, 23));
 
         assertThrows(BackwardsMoveException.class, () ->
-                MoveValidator.validateMove(createBackwardsMoveBoard(), PlayerRole.BLACK, move, KingMovementMode.FLYING)
+                MoveValidator.move(testBoard, PlayerRole.BLACK, move, KingMovementMode.FLYING)
         );
     }
 
     @Test
-    void validateMoveShouldThrowWhenTargetCellOccupied() {
+    void moveShouldThrowWhenTargetCellOccupied() {
         Board testBoard = createTestBoard();
         Move move = new Move(null, List.of(9, 13));
 
         assertThrows(TargetCellNotEmptyException.class, () ->
-                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move, KingMovementMode.FLYING)
+                MoveValidator.move(testBoard, PlayerRole.WHITE, move, KingMovementMode.FLYING)
         );
     }
 
     @Test
-    void validateMoveShouldThrowWhenNotDiagonal() {
+    void moveShouldThrowWhenNotDiagonal() {
         Board testBoard = createTestBoard();
         Move move = new Move(null, List.of(9, 10));
 
         assertThrows(MoveNotDiagonalException.class, () ->
-                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move, KingMovementMode.FLYING)
+                MoveValidator.move(testBoard, PlayerRole.WHITE, move, KingMovementMode.FLYING)
         );
     }
 
     @Test
-    void validateMoveShouldThrowWhenMovingMoreThanOneStepWithoutCapture() {
+    void moveShouldThrowWhenMovingMoreThanOneStepWithoutCapture() {
         Move move = new Move(null, List.of(9, 18));
 
         assertThrows(TooManyTilesException.class, () ->
-                MoveValidator.validateMove(board, PlayerRole.WHITE, move, KingMovementMode.FLYING)
+                MoveValidator.move(board, PlayerRole.WHITE, move, KingMovementMode.FLYING)
         );
     }
 
     @Test
-    void validateMoveShouldAllowValidCapture() {
-        Board testBoard = createCaptureBoard();
+    void moveShouldAllowValidCapture() {
+        Board testBoard = Board.create(8);
+        clearBoard(testBoard);
+
+        testBoard.grid().put(9, new Piece(PlayerRole.WHITE, false));
+        testBoard.grid().put(14, new Piece(PlayerRole.BLACK, false));
         Move move = new Move(null, List.of(9, 18));
 
         assertDoesNotThrow(() ->
-                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move, KingMovementMode.FLYING)
+                MoveValidator.move(testBoard, PlayerRole.WHITE, move, KingMovementMode.FLYING)
         );
     }
 
     @Test
-    void validateMoveShouldThrowWhenCapturingOwnPiece() {
-        Board testBoard = createOwnPieceCaptureBoard();
+    void moveShouldThrowWhenCapturingOwnPiece() {
+        Board testBoard = Board.create(8);
+        clearBoard(testBoard);
+
+        testBoard.grid().put(9, new Piece(PlayerRole.WHITE, false));
+        testBoard.grid().put(14, new Piece(PlayerRole.WHITE, false));
         Move move = new Move(null, List.of(9, 18));
 
         assertThrows(OwnPieceInTheWayException.class, () ->
-                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move, KingMovementMode.FLYING)
+                MoveValidator.move(testBoard, PlayerRole.WHITE, move, KingMovementMode.FLYING)
         );
     }
 
     @Test
-    void validateMoveShouldThrowWhenCellOutsideBoard() {
+    void moveShouldThrowWhenCellOutsideBoard() {
         Move move = new Move(null, List.of(1, 33));
 
         assertThrows(OutsidePlayingFieldException.class, () ->
-                MoveValidator.validateMove(board, PlayerRole.WHITE, move, KingMovementMode.FLYING)
+                MoveValidator.move(board, PlayerRole.WHITE, move, KingMovementMode.FLYING)
         );
     }
 
     @Test
     void isCaptureMoveShouldReturnFalseForOneStepMove() {
         Move move = new Move(null, List.of(9, 13));
-        Piece testPiece = board.pieceAt(9).get();
+        Optional<Piece> testPiece = board.pieceAt(9);
 
-        assertFalse(MoveValidator.isCaptureMove(board, testPiece.color(), move));
+        assert testPiece.isPresent();
+        assertFalse(MoveValidator.isCaptureMove(board, testPiece.get().color(), move));
     }
 
     @Test
     void validateNormalMoveShouldAllowPromotionMoveForWhite() {
-        Board testBoard = createPromotionBoardWhite();
+        Board testBoard = Board.create(8);
+        clearBoard(testBoard);
+
+        testBoard.grid().put(25, new Piece(PlayerRole.WHITE, false));
         Move move = new Move(null, List.of(25, 29));
 
         assertDoesNotThrow(() ->
-                MoveValidator.validateMove(testBoard, PlayerRole.WHITE, move, KingMovementMode.FLYING)
+                MoveValidator.move(testBoard, PlayerRole.WHITE, move, KingMovementMode.FLYING)
         );
     }
 
     @Test
     void validateNormalMoveShouldAllowPromotionMoveForBlack() {
-        Board testBoard = createPromotionBoardBlack();
+        Board testBoard = Board.create(8);
+        clearBoard(testBoard);
+
+        testBoard.grid().put(5, new Piece(PlayerRole.BLACK, false));
         Move move = new Move(null, List.of(5, 1));
 
         assertDoesNotThrow(() ->
-                MoveValidator.validateMove(testBoard, PlayerRole.BLACK, move, KingMovementMode.FLYING)
+                MoveValidator.move(testBoard, PlayerRole.BLACK, move, KingMovementMode.FLYING)
+        );
+    }
+
+    @Test
+    void moveShouldAllowTwoStepKingCaptureMove() {
+        Board testBoard = Board.create(8);
+        clearBoard(testBoard);
+
+        testBoard.grid().put(9, new Piece(PlayerRole.WHITE, true));
+        testBoard.grid().put(18, new Piece(PlayerRole.BLACK, false));
+        Move move = new Move(null, List.of(9, 23));
+
+        assertDoesNotThrow(() ->
+                MoveValidator.move(testBoard, PlayerRole.WHITE, move, KingMovementMode.DOUBLE)
         );
     }
 
@@ -169,54 +209,6 @@ class MoveValidatorTest {
 
         testBoard.grid().put(9, new Piece(PlayerRole.WHITE, false));
         testBoard.grid().put(13, new Piece(PlayerRole.WHITE, false));
-
-        return testBoard;
-    }
-
-    private Board createCaptureBoard() {
-        Board testBoard = Board.create(8);
-        clearBoard(testBoard);
-
-        testBoard.grid().put(9, new Piece(PlayerRole.WHITE, false));
-        testBoard.grid().put(14, new Piece(PlayerRole.BLACK, false));
-
-        return testBoard;
-    }
-
-    private Board createOwnPieceCaptureBoard() {
-        Board testBoard = Board.create(8);
-        clearBoard(testBoard);
-
-        testBoard.grid().put(9, new Piece(PlayerRole.WHITE, false));
-        testBoard.grid().put(14, new Piece(PlayerRole.WHITE, false));
-
-        return testBoard;
-    }
-
-    private Board createPromotionBoardWhite() {
-        Board testBoard = Board.create(8);
-        clearBoard(testBoard);
-
-        testBoard.grid().put(25, new Piece(PlayerRole.WHITE, false));
-
-        return testBoard;
-    }
-
-    private Board createPromotionBoardBlack() {
-        Board testBoard = Board.create(8);
-        clearBoard(testBoard);
-
-        testBoard.grid().put(5, new Piece(PlayerRole.BLACK, false));
-
-        return testBoard;
-    }
-
-    private Board createBackwardsMoveBoard() {
-        Board testBoard = Board.create(8);
-        clearBoard(testBoard);
-
-        testBoard.grid().put(10, new Piece(PlayerRole.WHITE, false));
-        testBoard.grid().put(18, new Piece(PlayerRole.BLACK, false));
 
         return testBoard;
     }
