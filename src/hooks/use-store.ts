@@ -1,13 +1,13 @@
-import { findEntries } from "@/services/library-service";
+import { findEntries } from "@/services/store-service";
 import { useQuery } from "@tanstack/react-query";
 
-export function useLibrary() {
+export function useStore() {
     const {
         isLoading: loading,
         isError: error,
         data,
     } = useQuery({
-        queryKey: ["library"],
+        queryKey: ["store"],
         queryFn: () => findEntries(),
     });
 

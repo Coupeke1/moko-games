@@ -10,7 +10,7 @@ import showToast from "@/components/toast";
 import { useFavourite } from "@/hooks/use-favourite";
 import { useGame } from "@/hooks/use-game";
 import type { Game } from "@/models/game/game";
-import { favouriteGame, unFavouriteGame } from "@/services/library-service";
+import { favouriteEntry, unFavouriteEntry } from "@/services/library-service";
 import { createLobby } from "@/services/lobby/lobby-service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -27,6 +27,7 @@ export default function GamePage() {
     }, [id, navigate]);
 
     const { game, loading: gameLoading, error: gameError } = useGame(id!);
+
     const {
         favourited,
         loading: favouritedLoading,
@@ -42,14 +43,13 @@ export default function GamePage() {
             game: Game;
         }) => {
             if (favourited) {
-                await unFavouriteGame(game.id);
+                await unFavouriteEntry(game.id);
                 return;
             }
 
-            await favouriteGame(game.id);
+            await favouriteEntry(game.id);
         },
         onSuccess: async (_data, variables) => {
-            console.log(variables.game.id);
             await client.refetchQueries({
                 queryKey: ["library", "favourite", variables.game.id],
             });
@@ -59,9 +59,7 @@ export default function GamePage() {
                 variables.favourited ? "Unfavourited" : "Favourited",
             );
         },
-        onError: (error: Error) => {
-            showToast("Favourite", error.message);
-        },
+        onError: (error: Error) => showToast("Favourite", error.message),
     });
 
     const start = useMutation({
@@ -74,9 +72,7 @@ export default function GamePage() {
             showToast(variables.game.title, "Lobby was created");
             close();
         },
-        onError: (error: Error) => {
-            showToast("Lobby", error.message);
-        },
+        onError: (error: Error) => showToast("Lobby", error.message),
     });
 
     return (

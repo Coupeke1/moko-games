@@ -1,4 +1,5 @@
 export const GridSize = {
+    ExtraSmall: "xss:grid-cols-2",
     Small: "md:grid-cols-2",
     Medium: "md:grid-cols-2 lg:grid-cols-3",
     Large: "sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",

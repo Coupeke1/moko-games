@@ -1,4 +1,4 @@
-import { isGameFavourited } from "@/services/library-service";
+import { isEntryFavourited } from "@/services/library-service";
 import { useQuery } from "@tanstack/react-query";
 
 export function useFavourite(id: string) {
@@ -8,7 +8,7 @@ export function useFavourite(id: string) {
         data,
     } = useQuery({
         queryKey: ["library", "favourite", id],
-        queryFn: () => isGameFavourited(id),
+        queryFn: () => isEntryFavourited(id),
     });
 
     return { loading, error, favourited: data };

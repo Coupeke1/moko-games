@@ -10,6 +10,7 @@ declare global {
             sessionService?: string;
             sessionSocket?: string;
             gamesService?: string;
+            storeService?: string;
         };
     }
 }
