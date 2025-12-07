@@ -83,6 +83,17 @@ public class BoardTest {
     }
 
     @Test
+    void setupInitialPiecesShouldResetMovesSinceLastCapture() throws NoSuchFieldException, IllegalAccessException {
+        Field movesField = Board.class.getDeclaredField("movesSinceLastCapture");
+        movesField.setAccessible(true);
+        movesField.set(board8x8, 30);
+
+        assertEquals(30, board8x8.movesSinceLastCapture());
+        board8x8.setupInitialPieces();
+        assertEquals(0, board8x8.movesSinceLastCapture());
+    }
+
+    @Test
     void piecesShouldBeInCorrectPositionsFor8x8() {
         String[][] state = board8x8.state();
 

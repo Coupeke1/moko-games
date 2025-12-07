@@ -2,12 +2,9 @@ package be.kdg.team22.checkersservice.domain.game;
 
 import be.kdg.team22.checkersservice.domain.board.Board;
 import be.kdg.team22.checkersservice.domain.board.Piece;
+import be.kdg.team22.checkersservice.domain.game.exceptions.*;
 import be.kdg.team22.checkersservice.domain.move.KingMovementMode;
 import be.kdg.team22.checkersservice.domain.move.Move;
-import be.kdg.team22.checkersservice.domain.game.exceptions.GameNotRunningException;
-import be.kdg.team22.checkersservice.domain.game.exceptions.NotPlayersTurnException;
-import be.kdg.team22.checkersservice.domain.game.exceptions.PlayerCountException;
-import be.kdg.team22.checkersservice.domain.game.exceptions.UniquePlayersException;
 import be.kdg.team22.checkersservice.domain.move.exceptions.*;
 import be.kdg.team22.checkersservice.domain.player.Player;
 import be.kdg.team22.checkersservice.domain.player.PlayerId;
@@ -313,6 +310,41 @@ public class GameTest {
                 game.requestMove(move)
         );
         assert (game.board().pieceAt(22).isPresent());
+    }
+
+    @Test
+    void resetShouldThrowWhenGameStillRunning() {
+        assertEquals(GameStatus.RUNNING, game.status());
+        assertThrows(GameResetException.class, () ->
+                game.reset()
+        );
+    }
+
+    @Test
+    void resetShouldSucceedWhenGameDraw() throws NoSuchFieldException, IllegalAccessException {
+        Field statusField = Game.class.getDeclaredField("status");
+        statusField.setAccessible(true);
+        statusField.set(game, GameStatus.DRAW);
+
+        assertDoesNotThrow(() -> game.reset());
+    }
+
+    @Test
+    void resetShouldSucceedWhenBlackWins() throws NoSuchFieldException, IllegalAccessException {
+        Field statusField = Game.class.getDeclaredField("status");
+        statusField.setAccessible(true);
+        statusField.set(game, GameStatus.BLACK_WIN);
+
+        assertDoesNotThrow(() -> game.reset());
+    }
+
+    @Test
+    void resetShouldSucceedWhenWhiteWins() throws NoSuchFieldException, IllegalAccessException {
+        Field statusField = Game.class.getDeclaredField("status");
+        statusField.setAccessible(true);
+        statusField.set(game, GameStatus.WHITE_WIN);
+
+        assertDoesNotThrow(() -> game.reset());
     }
 
     private Board createMultiCaptureBoard() {

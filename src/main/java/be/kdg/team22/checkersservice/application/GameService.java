@@ -35,4 +35,11 @@ public class GameService {
         repository.save(game);
         return game;
     }
+
+    public Game reset(GameId id) {
+        Game game = getById(id);
+        game.reset();
+        repository.save(game);
+        return game;
+    }
 }

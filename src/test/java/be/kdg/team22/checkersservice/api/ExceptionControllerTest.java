@@ -22,6 +22,7 @@ public class ExceptionControllerTest {
         CapturedPieceNotOnLastTileException capturedPieceNotOnLastTileEx = new CapturedPieceNotOnLastTileException();
         GameIdException gameIdEx = new GameIdException();
         GameNotRunningException gameNotRunningEx = new GameNotRunningException();
+        GameResetException gameResetEx = new GameResetException();
         InvalidPlayerException invalidPlayerEx = new InvalidPlayerException();
         MoveNotDiagonalException moveNotDiagonalEx = new MoveNotDiagonalException();
         NotPlayersPieceException notPlayersPieceEx = new NotPlayersPieceException(1);
@@ -40,6 +41,7 @@ public class ExceptionControllerTest {
         ResponseEntity<String> capturedPieceNotOnLastTileExResponse = controller.handleDomainErrors(capturedPieceNotOnLastTileEx);
         ResponseEntity<String> gameIdExResponse = controller.handleDomainErrors(gameIdEx);
         ResponseEntity<String> gameNotRunningExResponse = controller.handleDomainErrors(gameNotRunningEx);
+        ResponseEntity<String> gameResetExResponse = controller.handleDomainErrors(gameResetEx);
         ResponseEntity<String> invalidPlayerExResponse = controller.handleDomainErrors(invalidPlayerEx);
         ResponseEntity<String> moveNotDiagonalExResponse = controller.handleDomainErrors(moveNotDiagonalEx);
         ResponseEntity<String> notPlayersPieceExResponse = controller.handleDomainErrors(notPlayersPieceEx);
@@ -58,6 +60,7 @@ public class ExceptionControllerTest {
         assertThat(capturedPieceNotOnLastTileExResponse.getStatusCode().value()).isEqualTo(400);
         assertThat(gameIdExResponse.getStatusCode().value()).isEqualTo(400);
         assertThat(gameNotRunningExResponse.getStatusCode().value()).isEqualTo(400);
+        assertThat(gameResetExResponse.getStatusCode().value()).isEqualTo(400);
         assertThat(invalidPlayerExResponse.getStatusCode().value()).isEqualTo(400);
         assertThat(moveNotDiagonalExResponse.getStatusCode().value()).isEqualTo(400);
         assertThat(notPlayersPieceExResponse.getStatusCode().value()).isEqualTo(400);

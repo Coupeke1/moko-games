@@ -16,6 +16,7 @@ public class ExceptionController {
             CapturedPieceNotOnLastTileException.class,
             GameIdException.class,
             GameNotRunningException.class,
+            GameResetException.class,
             InvalidPlayerException.class,
             MoveNotDiagonalException.class,
             NotPlayersPieceException.class,

@@ -51,6 +51,8 @@ public class Board {
     }
 
     public void setupInitialPieces() {
+        movesSinceLastCapture = 0;
+
         int totalCells = (size * size) / 2;
         for (int cell = 1; cell <= totalCells; cell++) {
             grid.put(cell, null);
