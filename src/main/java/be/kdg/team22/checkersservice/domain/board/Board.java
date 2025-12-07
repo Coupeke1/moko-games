@@ -9,6 +9,7 @@ import org.jmolecules.ddd.annotation.ValueObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import static be.kdg.team22.checkersservice.domain.move.MoveValidator.isCaptureMove;
@@ -104,12 +105,13 @@ public class Board {
 
         boolean hasWhite = false;
         boolean hasBlack = false;
-        for (Piece piece : grid.values()) {
+        for (Piece piece : grid.values().stream().filter(Objects::nonNull).toList()) {
             if (piece.color() == PlayerRole.WHITE) hasWhite = true;
             if (piece.color() == PlayerRole.BLACK) hasBlack = true;
             if (hasWhite && hasBlack) break;
         }
 
+        if (!hasWhite && !hasBlack) return GameStatus.DRAW;
         if (!hasWhite) return GameStatus.BLACK_WIN;
         if (!hasBlack) return GameStatus.WHITE_WIN;
 

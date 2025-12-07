@@ -1,13 +1,18 @@
 package be.kdg.team22.checkersservice.domain.game;
 
 import be.kdg.team22.checkersservice.domain.board.Board;
+import be.kdg.team22.checkersservice.domain.board.Piece;
 import be.kdg.team22.checkersservice.domain.game.exceptions.BoardSizeException;
 import be.kdg.team22.checkersservice.domain.game.exceptions.OutsidePlayingFieldException;
+import be.kdg.team22.checkersservice.domain.move.Move;
+import be.kdg.team22.checkersservice.domain.player.PlayerId;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -253,6 +258,80 @@ public class BoardTest {
         }
     }
 
+    @Test
+    void moveShouldIncreaseMovesSinceLastCaptureWhenNotCapturing() {
+        Board board = Board.create(8);
+        int initialMovesSinceLastCapture = board.movesSinceLastCapture();
+        board.move(new Move(PlayerId.create(), List.of(22, 17)));
+
+        assertEquals(initialMovesSinceLastCapture + 1, board.movesSinceLastCapture());
+    }
+
+    @Test
+    void moveShouldResetMovesSinceLastCaptureWhenCapturing() throws NoSuchFieldException, IllegalAccessException {
+        Board board = Board.create(8);
+        Field movesField = Board.class.getDeclaredField("movesSinceLastCapture");
+        movesField.setAccessible(true);
+        movesField.set(board, 39);
+        board.grid().put(18, new Piece(PlayerRole.WHITE, false));
+
+        board.move(new Move(PlayerId.create(), List.of(22, 15)));
+
+        assertEquals(0, board.movesSinceLastCapture());
+    }
+
+    @Test
+    void checkWinConditionsShouldReturnRunningWhenNoConditionsReached() {
+        Board board = Board.create(8);
+
+        assertEquals(GameStatus.RUNNING, board.checkWinConditions());
+    }
+
+    @Test
+    void checkWinConditionsShouldReturnDrawWhenNoCapturesForFortyTurns() throws NoSuchFieldException, IllegalAccessException {
+        Board board = Board.create(8);
+        Field movesField = Board.class.getDeclaredField("movesSinceLastCapture");
+        movesField.setAccessible(true);
+        movesField.set(board, 40);
+
+        assertEquals(GameStatus.DRAW, board.checkWinConditions());
+    }
+
+    @Test
+    void checkWinConditionsShouldReturnDrawWhenNoCapturesForMoreThanFortyTurns() throws NoSuchFieldException, IllegalAccessException {
+        Board board = Board.create(8);
+        Field movesField = Board.class.getDeclaredField("movesSinceLastCapture");
+        movesField.setAccessible(true);
+        movesField.set(board, 41);
+
+        assertEquals(GameStatus.DRAW, board.checkWinConditions());
+    }
+
+    @Test
+    void checkWinConditionsShouldReturnDrawWhenNoPiecesLeft() {
+        Board board = Board.create(8);
+        clearColorFromBoard(board, PlayerRole.WHITE);
+        clearColorFromBoard(board, PlayerRole.BLACK);
+
+        assertEquals(GameStatus.DRAW, board.checkWinConditions());
+    }
+
+    @Test
+    void checkWinConditionsShouldReturnBlackWinWhenNoWhitePiecesLeft() {
+        Board board = Board.create(8);
+        clearColorFromBoard(board, PlayerRole.WHITE);
+
+        assertEquals(GameStatus.BLACK_WIN, board.checkWinConditions());
+    }
+
+    @Test
+    void checkWinConditionsShouldReturnWhiteWinWhenNoBlackPiecesLeft() {
+        Board board = Board.create(8);
+        clearColorFromBoard(board, PlayerRole.BLACK);
+
+        assertEquals(GameStatus.WHITE_WIN, board.checkWinConditions());
+    }
+
     // Helper methods
     private int countPieces(String[][] state) {
         int count = 0;
@@ -287,6 +366,15 @@ public class BoardTest {
             return (int[]) method.invoke(board, row);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void clearColorFromBoard(Board board, PlayerRole color) {
+        int totalCells = (board.size() * board.size()) / 2;
+        for (int i = 1; i <= totalCells; i++) {
+            if (board.grid().get(i) != null && board.grid().get(i).color().equals(color)) {
+                board.grid().put(i, null);
+            }
         }
     }
 }
