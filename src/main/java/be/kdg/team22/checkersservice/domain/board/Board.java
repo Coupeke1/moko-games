@@ -1,5 +1,6 @@
 package be.kdg.team22.checkersservice.domain.board;
 
+import be.kdg.team22.checkersservice.domain.game.GameStatus;
 import be.kdg.team22.checkersservice.domain.game.exceptions.BoardSizeException;
 import be.kdg.team22.checkersservice.domain.game.exceptions.OutsidePlayingFieldException;
 import be.kdg.team22.checkersservice.domain.move.Move;
@@ -16,6 +17,7 @@ import static be.kdg.team22.checkersservice.domain.move.MoveValidator.isCaptureM
 public class Board {
     private final int size;
     private final Map<Integer, Piece> grid;
+    private int movesSinceLastCapture = 0;
 
     private Board(final int size) {
         this.size = size;
@@ -85,10 +87,30 @@ public class Board {
                     lastCellBeforeDestination[1]
             );
             grid.put(cellToClear, null);
+            movesSinceLastCapture = 0;
+        } else {
+            movesSinceLastCapture++;
         }
 
         grid.put(move.fromCell(), null);
         grid.put(move.cells().get(1), piece);
+    }
+
+    public GameStatus checkWinConditions() {
+        if (movesSinceLastCapture >= 40) return GameStatus.DRAW;
+
+        boolean hasWhite = false;
+        boolean hasBlack = false;
+        for (Piece piece : grid.values()) {
+            if (piece.color() == PlayerRole.WHITE) hasWhite = true;
+            if (piece.color() == PlayerRole.BLACK) hasBlack = true;
+            if (hasWhite && hasBlack) break;
+        }
+
+        if (!hasWhite) return GameStatus.BLACK_WIN;
+        if (!hasBlack) return GameStatus.WHITE_WIN;
+
+        return GameStatus.RUNNING;
     }
 
     private void placePlayerPieces(final PlayerRole player, final int startRow, final int endRow) {
