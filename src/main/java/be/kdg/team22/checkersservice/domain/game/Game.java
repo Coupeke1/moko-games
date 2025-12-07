@@ -115,4 +115,12 @@ public class Game {
     public GameStatus status() {
         return status;
     }
+
+    public void reset() {
+        if (status == GameStatus.RUNNING) throw new GameResetException();
+
+        this.status = GameStatus.RUNNING;
+        this.board.setupInitialPieces();
+        this.currentRole = PlayerRole.BLACK;
+    }
 }
