@@ -13,6 +13,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -33,7 +34,7 @@ public class LibraryService {
             GameDetailsResponse game = gamesRepository.getGame(entry.gameId().value(), token);
 
             return new LibraryGameModel(game.id(), game.title(), game.description(), game.price(), game.image(), entry.purchasedAt(), entry.favourite());
-        }).toList();
+        }).sorted(Comparator.comparing(LibraryGameModel::title)).toList();
 
         if (filter.query.isPresent() && !filter.query.get().isBlank()) {
             String query = filter.query.get();
