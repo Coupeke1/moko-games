@@ -4,9 +4,16 @@ import type { Entry } from "@/models/library/entry";
 
 const BASE_URL = environment.libraryService;
 
-export async function findEntries(): Promise<Entry[]> {
+export async function findEntries(query?: string): Promise<Entry[]> {
     try {
-        const { data } = await client.get<Entry[]>(`${BASE_URL}/me`);
+        const params = new URLSearchParams();
+        if (query) params.append("filter", query);
+
+        const url = params.toString()
+            ? `${BASE_URL}/me?${params.toString()}`
+            : `${BASE_URL}/me`;
+
+        const { data } = await client.get<Entry[]>(url);
         return data;
     } catch {
         throw new Error("Library could not be fetched");

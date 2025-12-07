@@ -6,23 +6,30 @@ import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 
-export default function SearchBar() {
+interface Props {
+    onSearch: (query: string) => void;
+}
+
+export default function SearchBar({ onSearch }: Props) {
     const [params, setParams] = useSearchParams();
     const [query, setQuery] = useState("");
 
     useEffect(() => {
         const query: string | null = params.get("query");
         setQuery(query ?? "");
-    }, [params]);
+        onSearch(query ?? "");
+    }, [params, onSearch]);
 
     const search = useMutation({
         mutationFn: async () => {
             const params: Record<string, string> = {};
             if (query) params.query = query;
+
             setParams(params);
+            onSearch(query);
         },
-        onSuccess: async () => showToast("Store", "Searching..."),
-        onError: (error: Error) => showToast("Store", error.message),
+        onSuccess: async () => showToast("Library", "Searching..."),
+        onError: (error: Error) => showToast("Library", error.message),
     });
 
     return (
