@@ -31,6 +31,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     testImplementation("org.springframework.security:spring-security-test")
 
+    // Messaging
+    implementation("org.springframework.boot:spring-boot-starter-amqp")
+    testImplementation("org.springframework.amqp:spring-rabbit-test")
+
     // JMolecules
     implementation("org.jmolecules.integrations:jmolecules-starter-ddd:0.29.0")
     // Testing
