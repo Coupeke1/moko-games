@@ -13,10 +13,25 @@ scope = openid
     client.global.set("access_token", response.body.access_token);
 %}
 
+### 1B) Haal JWT-token op via Keycloak (PASSWORD GRANT)
+POST http://localhost:8180/realms/moko/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = password &
+client_id = user-service &
+client_secret = ZmXSd2mIzB6hsLrybeD3gH0c11vPwrej &
+username = kaj &
+password = loginkaj &
+scope = openid
+
+> {%
+    client.global.set("kaj_token", response.body.access_token);
+%}
+
 
 ### 2) GET /api/profiles/me
 GET http://localhost:8080/api/profiles/me
-Authorization: Bearer {{access_token}}
+Authorization: Bearer {{kaj_token}}
 
 ### 3) PATCH /api/profiles/me (profiel updaten)
 PATCH http://localhost:8080/api/profiles/me
@@ -94,3 +109,20 @@ Authorization: Bearer {{access_token}}
 
 ### Health check
 GET http://localhost:8080/actuator/health
+
+### get preferences of user
+GET http://localhost:8080/api/profiles/me/preferences
+Authorization: Bearer {{access_token}}
+
+### patch preferences
+PATCH http://localhost:8080/api/profiles/me/preferences
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "receiveEmail": false,
+  "social": false,
+  "achievement": true,
+  "commerce": true,
+  "chat": true
+}

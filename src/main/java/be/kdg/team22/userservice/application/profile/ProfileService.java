@@ -90,6 +90,17 @@ public class ProfileService {
         throw ClaimNotFoundException.email();
     }
 
+    public NotificationPreferences changePreferences(final Profile profile,
+                                                     final NotificationPreferences prefs) {
+        if (prefs.equals(profile.preferences()))
+            throw CannotUpdateProfileException.preferences(profile.id());
+
+        profile.updatePreferences(prefs);
+        profileRepository.save(profile);
+
+        return profile.preferences();
+    }
+
     public Profile createBotProfile() {
         ProfileId id = new ProfileId(UUID.randomUUID());
         ProfileName username = BotNameGenerator.randomName();

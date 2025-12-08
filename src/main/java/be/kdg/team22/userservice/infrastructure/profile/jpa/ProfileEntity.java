@@ -31,12 +31,16 @@ public class ProfileEntity {
     @Embedded
     private ModulesEmbed modules;
 
+    @Embedded
+    private NotificationPreferencesEmbed preferences;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
-    protected ProfileEntity() {}
+    protected ProfileEntity() {
+    }
 
-    public ProfileEntity(final UUID id, final String username, final String email, final String description, final String image, final StatisticsEmbed statistics, final ModulesEmbed modules, final Instant createdAt) {
+    public ProfileEntity(final UUID id, final String username, final String email, final String description, final String image, final StatisticsEmbed statistics, final ModulesEmbed modules, final Instant createdAt, final NotificationPreferencesEmbed preferences) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -45,6 +49,7 @@ public class ProfileEntity {
         this.statistics = statistics;
         this.modules = modules;
         this.createdAt = createdAt;
+        this.preferences = preferences;
     }
 
     public static ProfileEntity from(final Profile profile) {
@@ -52,7 +57,15 @@ public class ProfileEntity {
 
         ModulesEmbed modules = new ModulesEmbed(profile.modules().achievements(), profile.modules().favourites());
 
-        return new ProfileEntity(profile.id().value(), profile.username().value(), profile.email().value(), profile.description(), profile.image(), statistics, modules, profile.createdAt());
+        NotificationPreferences preferences = profile.preferences();
+        NotificationPreferencesEmbed prefs = new NotificationPreferencesEmbed(
+                preferences.receiveEmail(),
+                preferences.social(),
+                preferences.achievement(),
+                preferences.commerce(),
+                preferences.chat()
+        );
+        return new ProfileEntity(profile.id().value(), profile.username().value(), profile.email().value(), profile.description(), profile.image(), statistics, modules, profile.createdAt(), prefs);
     }
 
     public Profile to() {
@@ -60,6 +73,13 @@ public class ProfileEntity {
 
         Modules modules = new Modules(this.modules.achievements(), this.modules.favourites());
 
-        return new Profile(new ProfileId(id), new ProfileName(username), new ProfileEmail(email), description, image, statistics, modules, createdAt);
+        NotificationPreferences preferences = new NotificationPreferences(
+                this.preferences.receiveEmail,
+                this.preferences.social,
+                this.preferences.achievement,
+                this.preferences.commerce,
+                this.preferences.chat
+        );
+        return new Profile(new ProfileId(id), new ProfileName(username), new ProfileEmail(email), description, image, statistics, modules, createdAt, preferences);
     }
 }

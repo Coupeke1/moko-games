@@ -1,9 +1,6 @@
 package be.kdg.team22.userservice.api.profile;
 
-import be.kdg.team22.userservice.infrastructure.profile.jpa.JpaProfileRepository;
-import be.kdg.team22.userservice.infrastructure.profile.jpa.ModulesEmbed;
-import be.kdg.team22.userservice.infrastructure.profile.jpa.ProfileEntity;
-import be.kdg.team22.userservice.infrastructure.profile.jpa.StatisticsEmbed;
+import be.kdg.team22.userservice.infrastructure.profile.jpa.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,8 +52,9 @@ class ProfileControllerTest {
         String description = "Test";
         StatisticsEmbed statistics = new StatisticsEmbed(5, 50);
         ModulesEmbed modules = new ModulesEmbed(true, false);
+        NotificationPreferencesEmbed preferences = new NotificationPreferencesEmbed(true, true, true, true, true);
 
-        repository.save(new ProfileEntity(UUID.fromString(id), username, email, description, "", statistics, modules, Instant.now()));
+        repository.save(new ProfileEntity(UUID.fromString(id), username, email, description, "", statistics, modules, Instant.now(), preferences));
         mock.perform(get("/api/profiles/me").with(tokenWithUser(id, "piet", "piet@kdg.be"))).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(id));
     }
 
