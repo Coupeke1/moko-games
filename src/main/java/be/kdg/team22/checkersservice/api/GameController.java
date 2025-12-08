@@ -6,8 +6,11 @@ import be.kdg.team22.checkersservice.api.models.MoveModel;
 import be.kdg.team22.checkersservice.application.GameService;
 import be.kdg.team22.checkersservice.domain.game.Game;
 import be.kdg.team22.checkersservice.domain.game.GameId;
+import be.kdg.team22.checkersservice.domain.player.PlayerId;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,9 +43,10 @@ public class GameController {
     }
 
     @PostMapping("/{id}/move")
-    public ResponseEntity<GameModel> requestMove(@PathVariable final UUID id,
+    public ResponseEntity<GameModel> requestMove(@AuthenticationPrincipal final Jwt token,
+                                                 @PathVariable final UUID id,
                                                  @Valid @RequestBody final MoveModel moveModel) {
-        Game game = service.requestMove(new GameId(id), moveModel.to());
+        Game game = service.requestMove(new GameId(id), PlayerId.get(token), moveModel.to());
         GameModel model = GameModel.from(game);
 
         return ResponseEntity.ok(model);
