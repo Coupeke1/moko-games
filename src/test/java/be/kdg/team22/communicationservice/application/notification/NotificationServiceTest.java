@@ -2,6 +2,10 @@ package be.kdg.team22.communicationservice.application.notification;
 
 import be.kdg.team22.communicationservice.domain.notification.*;
 import be.kdg.team22.communicationservice.domain.notification.exceptions.NotificationNotFoundException;
+import be.kdg.team22.communicationservice.infrastructure.email.EmailService;
+import be.kdg.team22.communicationservice.infrastructure.user.ExternalUserRepository;
+import be.kdg.team22.communicationservice.infrastructure.user.PreferencesResponse;
+import be.kdg.team22.communicationservice.infrastructure.user.ProfileResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -11,13 +15,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 public class NotificationServiceTest {
 
     private NotificationRepository repository;
     private NotificationService service;
+    private ExternalUserRepository userRepo;
+    private EmailService emailService;
 
     private PlayerId recipient;
     private Notification sampleNotification;
@@ -25,7 +32,10 @@ public class NotificationServiceTest {
     @BeforeEach
     void setup() {
         repository = mock(NotificationRepository.class);
-        service = new NotificationService(repository);
+        userRepo = mock(ExternalUserRepository.class);
+        emailService = mock(EmailService.class);
+
+        service = new NotificationService(repository, userRepo, emailService);
 
         recipient = PlayerId.from(UUID.randomUUID());
 
@@ -42,6 +52,11 @@ public class NotificationServiceTest {
 
     @Test
     void create_shouldGenerateNotificationAndSaveToRepository() {
+        PreferencesResponse prefs = new PreferencesResponse(false, true, true, true, true);
+                ProfileResponse profile = new ProfileResponse(recipient.value(), "testuser", "test@example.com", "testImg", "profileDescription");
+
+        when(userRepo.getProfile(recipient.value())).thenReturn(profile);
+        when(userRepo.getPreferencesByUserId(recipient.value())).thenReturn(prefs);
         when(repository.save(any(Notification.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -53,12 +68,59 @@ public class NotificationServiceTest {
         );
 
         verify(repository).save(any(Notification.class));
+        verify(userRepo).getProfile(recipient.value());
+        verify(userRepo).getPreferencesByUserId(recipient.value());
+        verify(emailService, never()).sendNotificationEmail(anyString(), anyString(), any());
 
         assertThat(created.id()).isNotNull();
         assertThat(created.recipientId()).isEqualTo(recipient);
         assertThat(created.type()).isEqualTo(NotificationType.FRIEND_REQUEST_RECEIVED);
         assertThat(created.title()).isEqualTo("Hello");
         assertThat(created.message()).isEqualTo("Message");
+    }
+
+    @Test
+    void create_shouldSendEmailWhenPreferencesAllow() {
+        PreferencesResponse prefs = new PreferencesResponse(true, true, true, true, true);
+        ProfileResponse profile = new ProfileResponse(recipient.value(), "testuser", "test@example.com","testImg","profileDescription");
+
+        when(userRepo.getProfile(recipient.value())).thenReturn(profile);
+        when(userRepo.getPreferencesByUserId(recipient.value())).thenReturn(prefs);
+        when(repository.save(any(Notification.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Notification created = service.create(
+                recipient,
+                NotificationType.FRIEND_REQUEST_RECEIVED,
+                "Hello",
+                "Message"
+        );
+
+        ArgumentCaptor<Notification> notifCaptor = ArgumentCaptor.forClass(Notification.class);
+        verify(emailService).sendNotificationEmail(
+                eq("test@example.com"),
+                eq("testuser"),
+                notifCaptor.capture()
+        );
+
+        assertThat(notifCaptor.getValue().type()).isEqualTo(NotificationType.FRIEND_REQUEST_RECEIVED);
+    }
+
+    @Test
+    void create_shouldNotSendEmailWhenTypeDisabled() {
+        PreferencesResponse prefs = new PreferencesResponse(true, false, true, true, true);
+        ProfileResponse profile = new ProfileResponse(recipient.value(), "testuser", "test@example.com","testImg","profileDescription");
+
+        when(userRepo.getProfile(recipient.value())).thenReturn(profile);
+        when(userRepo.getPreferencesByUserId(recipient.value())).thenReturn(prefs);
+        when(repository.save(any(Notification.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        // When
+        service.create(recipient, NotificationType.FRIEND_REQUEST_RECEIVED, "Hello", "Message");
+
+        // Then - geen email verzonden
+        verify(emailService, never()).sendNotificationEmail(anyString(), anyString(), any());
     }
 
     @Test
@@ -76,7 +138,7 @@ public class NotificationServiceTest {
     void getUnreadNotifications_shouldReturnOnlyUnread() {
         Notification unread = sampleNotification;
         Notification readNotif = new Notification(
-                sampleNotification.id(),
+                NotificationId.from(UUID.randomUUID()),
                 recipient,
                 sampleNotification.type(),
                 sampleNotification.title(),

@@ -64,11 +64,11 @@ public class NotificationService {
         }
     }
 
-    public List<Notification> getNotifications(final PlayerId playerId, final String jwtToken) {
+    public List<Notification> getNotifications(final PlayerId playerId) {
         return repository.findByRecipientId(playerId);
     }
 
-    public List<Notification> getUnreadNotifications(final PlayerId playerId, final String jwtToken) {
+    public List<Notification> getUnreadNotifications(final PlayerId playerId) {
         return repository.findUnreadByRecipientId(playerId);
     }
 

@@ -59,7 +59,7 @@ public class NotificationControllerTest {
                 false
         );
 
-        Mockito.when(service.getNotifications(eq(PlayerId.from(userId)), jwt.getTokenValue()))
+        Mockito.when(service.getNotifications(eq(PlayerId.from(userId))))
                 .thenReturn(List.of(notification));
 
         mockMvc.perform(
@@ -86,7 +86,7 @@ public class NotificationControllerTest {
                 false
         );
 
-        Mockito.when(service.getUnreadNotifications(eq(PlayerId.from(userId)), jwt.getTokenValue()))
+        Mockito.when(service.getUnreadNotifications(eq(PlayerId.from(userId))))
                 .thenReturn(List.of(notification));
 
         mockMvc.perform(

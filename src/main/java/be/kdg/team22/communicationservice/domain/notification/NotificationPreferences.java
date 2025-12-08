@@ -7,7 +7,7 @@ public record NotificationPreferences(
         boolean commerce,
         boolean chat
 ) {
-    public boolean allowsNotification(Notification notification) {
+    public boolean allows(Notification notification) {
         return switch (notification.type()) {
             case FRIEND_REQUEST_RECEIVED,
                  FRIEND_REQUEST_ACCEPTED,
@@ -22,6 +22,6 @@ public record NotificationPreferences(
 
     public boolean allowsEmail(Notification notification) {
         if (!receiveEmail) return false;
-        return allowsNotification(notification);
+        return allows(notification);
     }
 }

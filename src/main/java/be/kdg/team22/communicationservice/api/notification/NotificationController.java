@@ -27,7 +27,7 @@ public class NotificationController {
             @AuthenticationPrincipal final Jwt jwt) {
         PlayerId playerId = PlayerId.get(jwt);
 
-        List<NotificationModel> result = service.getNotifications(playerId, jwt.getTokenValue())
+        List<NotificationModel> result = service.getNotifications(playerId)
                 .stream()
                 .map(NotificationModel::from)
                 .toList();
@@ -40,7 +40,7 @@ public class NotificationController {
             @AuthenticationPrincipal final Jwt jwt) {
         PlayerId playerId = PlayerId.get(jwt);
 
-        List<NotificationModel> result = service.getUnreadNotifications(playerId, jwt.getTokenValue())
+        List<NotificationModel> result = service.getUnreadNotifications(playerId)
                 .stream()
                 .map(NotificationModel::from)
                 .toList();
@@ -55,6 +55,7 @@ public class NotificationController {
         return ResponseEntity.ok().build();
     }
 
+    //TODO remove this endpoint when we truly add working notifications
     @PostMapping("/test")
     public ResponseEntity<Void> createTest(@AuthenticationPrincipal Jwt jwt) {
         PlayerId id = PlayerId.get(jwt);
@@ -68,5 +69,4 @@ public class NotificationController {
 
         return ResponseEntity.ok().build();
     }
-
 }
