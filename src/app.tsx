@@ -11,7 +11,8 @@ import { useAuthStore } from "@/stores/auth-store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { Toaster } from "sonner";
-import GamePage from "@/routes/library/entry";
+import LibraryGamePage from "@/routes/library/game";
+import StoreGamePage from "@/routes/store/game";
 
 const client = new QueryClient();
 
@@ -30,9 +31,13 @@ function App() {
                     <Routes>
                         <Route path="/" element={<Navigate to="/store" />} />
                         <Route path="/store" element={<StorePage />} />
+                        <Route path="/store/:id" element={<StoreGamePage />} />
 
                         <Route path="/library" element={<LibraryPage />} />
-                        <Route path="/library/:id" element={<GamePage />} />
+                        <Route
+                            path="/library/:id"
+                            element={<LibraryGamePage />}
+                        />
 
                         <Route path="/lobby/:id" element={<LobbyPage />} />
 

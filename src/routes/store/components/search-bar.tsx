@@ -6,7 +6,7 @@ import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
 import { GridSize } from "@/components/layout/grid/size";
 import showToast from "@/components/toast";
-import { Category } from "@/models/store/category";
+import { Category, format } from "@/models/store/category";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
@@ -78,7 +78,7 @@ export default function SearchBar({ onSearch }: Props) {
                     options={[
                         { label: "All Categories", value: "all" },
                         ...Object.values(Category).map((value: string) => ({
-                            label: `${value.charAt(0)}${value.slice(1).toLowerCase()}`,
+                            label: format(value),
                             value: value.toLowerCase(),
                         })),
                     ]}

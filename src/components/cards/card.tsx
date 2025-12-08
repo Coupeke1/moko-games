@@ -2,7 +2,7 @@ import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import { Justify } from "@/components/layout/justify";
 import Row from "@/components/layout/row";
-import { Size } from "@/components/layout/size";
+import { Height } from "@/components/layout/size";
 import type { ReactNode } from "react";
 import { Link as RouterLink } from "react-router";
 import Stack from "@/components/layout/stack";
@@ -15,8 +15,9 @@ interface Props {
     options?: ReactNode;
     footer?: ReactNode;
 
-    height?: Size;
+    height?: Height;
     href?: string;
+    onClick?: () => void;
 }
 
 function Content({
@@ -25,13 +26,14 @@ function Content({
     information,
     options,
     footer,
-    height = Size.Medium,
+    height = Height.Medium,
     href,
+    onClick,
 }: Props) {
     return (
         <Column>
             <article
-                className={`flex flex-col ${href && "group"} relative overflow-hidden select-none justify-end bg-cover bg-center px-4 py-2 rounded-lg ${height}`}
+                className={`flex flex-col ${(href || onClick) && "group cursor-pointer"} relative overflow-hidden select-none justify-end bg-cover bg-center px-4 py-2 rounded-lg ${height}`}
                 style={{ backgroundImage: `url("${image}")` }}
             >
                 <section className="absolute inset-0 bg-linear-to-b from-black/10 via-black/20 to-black/80 from-0% via-45% to-100% group-hover:bg-black/20 transition-colors duration-200 rounded-lg" />
@@ -42,16 +44,17 @@ function Content({
                         justify={Justify.Between}
                         responsive={false}
                     >
-                        <Stack>
-                            <h3 className="font-bold text-lg">
-                                {title.substring(0, 15)}
-                                {title.length > 15 ? "..." : ""}
-                            </h3>
+                        <section className="min-w-0">
+                            <Stack>
+                                <h3 className="font-bold text-lg truncate">
+                                    {title}
+                                </h3>
 
-                            <Row gap={Gap.Large} responsive={false}>
-                                {information && information}
-                            </Row>
-                        </Stack>
+                                <Row gap={Gap.Large} responsive={false}>
+                                    {information && information}
+                                </Row>
+                            </Stack>
+                        </section>
 
                         {options && options}
                     </Row>
@@ -64,13 +67,23 @@ function Content({
 }
 
 export default function Card(props: Props) {
-    const { href } = props;
+    const { href, onClick } = props;
 
-    if (!href) return <Content {...props} />;
+    if (!href && !onClick) return <Content {...props} />;
 
-    return (
-        <RouterLink to={href}>
-            <Content {...props} />
-        </RouterLink>
-    );
+    if (onClick && !href)
+        return (
+            <button onClick={onClick}>
+                <Content {...props} />
+            </button>
+        );
+
+    if (href && !onClick)
+        return (
+            <RouterLink to={href}>
+                <Content {...props} />
+            </RouterLink>
+        );
+
+    return null;
 }

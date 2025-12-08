@@ -1,4 +1,4 @@
-export const Size = {
+export const Height = {
     None: "",
     Small: "min-h-24",
     Medium: "min-h-32",
@@ -7,4 +7,4 @@ export const Size = {
     Gigantic: "min-h-64",
 } as const;
 
-export type Size = (typeof Size)[keyof typeof Size];
+export type Height = (typeof Height)[keyof typeof Height];
