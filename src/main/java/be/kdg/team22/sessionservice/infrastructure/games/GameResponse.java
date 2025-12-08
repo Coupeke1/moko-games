@@ -15,4 +15,3 @@ public record GameResponse(
         Instant updatedAt
 ) {
 }
-
