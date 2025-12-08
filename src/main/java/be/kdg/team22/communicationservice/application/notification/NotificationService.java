@@ -2,8 +2,6 @@ package be.kdg.team22.communicationservice.application.notification;
 
 import be.kdg.team22.communicationservice.domain.notification.*;
 import be.kdg.team22.communicationservice.domain.notification.exceptions.NotificationNotFoundException;
-import be.kdg.team22.communicationservice.domain.notification.exceptions.UserPreferencesNotFoundException;
-import be.kdg.team22.communicationservice.domain.notification.exceptions.UserProfileNotFoundException;
 import be.kdg.team22.communicationservice.infrastructure.email.EmailService;
 import be.kdg.team22.communicationservice.infrastructure.user.ExternalUserRepository;
 import be.kdg.team22.communicationservice.infrastructure.user.PreferencesResponse;
@@ -53,20 +51,13 @@ public class NotificationService {
 
     private void sendEmailIfAllowed(UUID recipientId, Notification notification) {
         ProfileResponse profile = userRepository.getProfile(recipientId);
-        if (profile == null || profile.email() == null) {
-            throw new UserProfileNotFoundException(recipientId);
-        }
 
         PreferencesResponse prefsResponse = userRepository.getPreferencesByUserId(recipientId);
-        if (prefsResponse == null) {
-            throw new UserPreferencesNotFoundException(recipientId);
-        }
-
         NotificationPreferences prefs = prefsResponse.to();
 
         if (prefs.allowsEmail(notification)) {
             emailService.sendNotificationEmail(
-                                        profile.email(),
+                    profile.email(),
                     profile.username(),
                     notification
             );

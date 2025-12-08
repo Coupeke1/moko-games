@@ -1,10 +1,14 @@
 package be.kdg.team22.communicationservice.infrastructure.user;
 
+import be.kdg.team22.communicationservice.domain.notification.exceptions.ServiceUnavailableException;
+import be.kdg.team22.communicationservice.domain.notification.exceptions.UserPreferencesNotFoundException;
+import be.kdg.team22.communicationservice.domain.notification.exceptions.UserProfileNotFoundException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
 import java.util.UUID;
 
@@ -34,31 +38,47 @@ public class ExternalUserRepository {
 
     public ProfileResponse getProfile(final UUID userId) {
         try {
-            return client.get()
+            ProfileResponse response = client.get()
                     .uri("/api/profiles/{id}", userId)
                     .retrieve()
                     .body(ProfileResponse.class);
 
+            if (response == null) {
+                throw new UserProfileNotFoundException(userId);
+            }
+
+            return response;
+
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                return null;
+                throw new UserProfileNotFoundException(userId);
             }
             throw e;
+        } catch (RestClientException e) {
+            throw ServiceUnavailableException.userServiceUnavailable();
         }
     }
 
     public PreferencesResponse getPreferencesByUserId(final UUID userId) {
         try {
-            return client.get()
+            PreferencesResponse response = client.get()
                     .uri("/api/profiles/{id}/preferences", userId)
                     .retrieve()
                     .body(PreferencesResponse.class);
 
+            if (response == null) {
+                throw new UserPreferencesNotFoundException(userId);
+            }
+
+            return response;
+
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                return null;
+                throw new UserPreferencesNotFoundException(userId);
             }
             throw e;
+        } catch (RestClientException e) {
+            throw ServiceUnavailableException.userServiceUnavailable();
         }
     }
 }
