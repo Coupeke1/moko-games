@@ -179,7 +179,7 @@ class LibraryServiceTest {
         service.markFavourite(userId, new GameId(gameId));
 
         verify(repo).findByUserIdAndGameId(userId.value(), gameId);
-        verify(repo).save(updated); // <-- werkt perfect met void
+        verify(repo).save(updated);
     }
 
     @Test
