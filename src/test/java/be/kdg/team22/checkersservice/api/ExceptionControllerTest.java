@@ -3,7 +3,9 @@ package be.kdg.team22.checkersservice.api;
 import be.kdg.team22.checkersservice.domain.game.exceptions.*;
 import be.kdg.team22.checkersservice.domain.move.exceptions.*;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
+import be.kdg.team22.checkersservice.domain.player.exceptions.ClaimNotFoundException;
 import be.kdg.team22.checkersservice.domain.player.exceptions.InvalidPlayerException;
+import be.kdg.team22.checkersservice.domain.player.exceptions.PlayerIdentityMismatchException;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 
@@ -77,12 +79,15 @@ public class ExceptionControllerTest {
 
     @Test
     void handleNotFoundExceptions() {
+        ClaimNotFoundException claimNotFoundEx = new ClaimNotFoundException("");
         NotFoundException notFoundEx = new NotFoundException(UUID.randomUUID());
         StartingPieceNotFoundException startingPieceNotFoundEx = new StartingPieceNotFoundException(1);
 
+        ResponseEntity<String> claimNotFoundExResponse = controller.handleNotFoundErrors(claimNotFoundEx);
         ResponseEntity<String> notFoundExResponse = controller.handleNotFoundErrors(notFoundEx);
         ResponseEntity<String> startingPieceNotFoundExResponse = controller.handleNotFoundErrors(startingPieceNotFoundEx);
 
+        assertThat(claimNotFoundExResponse.getStatusCode().value()).isEqualTo(404);
         assertThat(notFoundExResponse.getStatusCode().value()).isEqualTo(404);
         assertThat(startingPieceNotFoundExResponse.getStatusCode().value()).isEqualTo(404);
     }
@@ -99,5 +104,12 @@ public class ExceptionControllerTest {
         IllegalStateException illegalStateEx = new IllegalStateException();
         ResponseEntity<String> response = controller.handleIllegalStateException(illegalStateEx);
         assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @Test
+    void handleForbiddenActions() {
+        PlayerIdentityMismatchException playerIdentityMismatchEx = new PlayerIdentityMismatchException();
+        ResponseEntity<String> response = controller.handleForbiddenActionErrors(playerIdentityMismatchEx);
+        assertThat(response.getStatusCode().value()).isEqualTo(403);
     }
 }
