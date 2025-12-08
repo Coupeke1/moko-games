@@ -7,5 +7,3 @@ public class UserProfileNotFoundException extends RuntimeException {
         super("User profile not found for user ID: " + userId);
     }
 }
-
-
