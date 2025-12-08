@@ -12,11 +12,11 @@ public class OrderEventPublisher {
 
     private final RabbitTemplate rabbitTemplate;
 
-    public OrderEventPublisher(RabbitTemplate rabbitTemplate) {
+    public OrderEventPublisher(final RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void publishOrderCompleted(OrderCompletedEvent event) {
+    public void publishOrderCompleted(final OrderCompletedEvent event) {
         rabbitTemplate.convertAndSend(
                 RabbitMQTopology.EXCHANGE_STORE,
                 ROUTING_KEY_ORDER_COMPLETED,

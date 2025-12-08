@@ -27,11 +27,11 @@ public class PaymentService {
     private final OrderEventPublisher eventPublisher;
 
     public PaymentService(
-            PaymentProvider paymentProvider,
-            OrderRepository orderRepo,
-            CartService cartService,
-            StoreService storeService,
-            OrderEventPublisher eventPublisher) {
+            final PaymentProvider paymentProvider,
+            final OrderRepository orderRepo,
+            final CartService cartService,
+            final StoreService storeService,
+            final OrderEventPublisher eventPublisher) {
         this.paymentProvider = paymentProvider;
         this.orderRepo = orderRepo;
         this.cartService = cartService;
