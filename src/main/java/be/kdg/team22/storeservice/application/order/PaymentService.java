@@ -6,9 +6,11 @@ import be.kdg.team22.storeservice.domain.order.Order;
 import be.kdg.team22.storeservice.domain.order.OrderId;
 import be.kdg.team22.storeservice.domain.order.OrderRepository;
 import be.kdg.team22.storeservice.domain.order.OrderStatus;
+import be.kdg.team22.storeservice.domain.order.events.OrderCompletedEvent;
 import be.kdg.team22.storeservice.domain.order.exceptions.OrderNotFoundException;
 import be.kdg.team22.storeservice.domain.order.exceptions.PaymentIncompleteException;
 import be.kdg.team22.storeservice.domain.payment.PaymentProvider;
+import be.kdg.team22.storeservice.infrastructure.messaging.OrderEventPublisher;
 import com.mollie.mollie.models.components.PaymentStatus;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -22,16 +24,19 @@ public class PaymentService {
     private final OrderRepository orderRepo;
     private final CartService cartService;
     private final StoreService storeService;
+    private final OrderEventPublisher eventPublisher;
 
     public PaymentService(
             PaymentProvider paymentProvider,
             OrderRepository orderRepo,
             CartService cartService,
-            StoreService storeService) {
+            StoreService storeService,
+            OrderEventPublisher eventPublisher) {
         this.paymentProvider = paymentProvider;
         this.orderRepo = orderRepo;
         this.cartService = cartService;
         this.storeService = storeService;
+        this.eventPublisher = eventPublisher;
     }
 
     public void processWebhook(final String paymentId) {
@@ -47,6 +52,12 @@ public class PaymentService {
                 order.updateStatus(OrderStatus.PAID);
                 cartService.clearCart(order.userId());
                 order.items().forEach(item -> storeService.recordPurchase(item.gameId()));
+
+                eventPublisher.publishOrderCompleted(new OrderCompletedEvent(
+                        order.userId().value(),
+                        order.id().value(),
+                        order.totalPrice()
+                ));
             }
             case "canceled" -> order.updateStatus(OrderStatus.CANCELED);
             case "expired" -> order.updateStatus(OrderStatus.EXPIRED);
@@ -67,6 +78,13 @@ public class PaymentService {
             cartService.clearCart(order.userId());
             order.items().forEach(item -> storeService.recordPurchase(item.gameId()));
             orderRepo.save(order);
+
+            eventPublisher.publishOrderCompleted(new OrderCompletedEvent(
+                    order.userId().value(),
+                    order.id().value(),
+                    order.totalPrice()
+            ));
+
             return order;
         }
 
