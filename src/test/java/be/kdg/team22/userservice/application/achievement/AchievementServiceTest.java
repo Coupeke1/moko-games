@@ -5,6 +5,7 @@ import be.kdg.team22.userservice.domain.achievement.AchievementCode;
 import be.kdg.team22.userservice.domain.achievement.AchievementId;
 import be.kdg.team22.userservice.domain.achievement.AchievementRepository;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
+import be.kdg.team22.userservice.infrastructure.messaging.AchievementEventPublisher;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +21,8 @@ import static org.mockito.Mockito.*;
 class AchievementServiceTest {
 
     private final AchievementRepository repo = mock(AchievementRepository.class);
-    private final AchievementService service = new AchievementService(repo);
+    private final AchievementEventPublisher achievementRepository = mock(AchievementEventPublisher.class);
+    private final AchievementService service = new AchievementService(repo, achievementRepository);
 
     @Test
     @DisplayName("award(userId, code) → creëert nieuw achievement wanneer niet bestaat")
