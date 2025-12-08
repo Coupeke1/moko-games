@@ -1,13 +1,13 @@
 package be.kdg.team22.storeservice.api.catalog.models;
 
-import be.kdg.team22.storeservice.domain.catalog.GameCatalogEntry;
+import be.kdg.team22.storeservice.domain.catalog.Entry;
 import be.kdg.team22.storeservice.domain.catalog.GameCategory;
 import be.kdg.team22.storeservice.infrastructure.games.GameMetadataResponse;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public record GameCatalogResponse(
+public record EntryModel(
         UUID id,
         String title,
         String description,
@@ -17,16 +17,16 @@ public record GameCatalogResponse(
         double popularity,
         int purchaseCount
 ) {
-    public static GameCatalogResponse from(GameCatalogEntry entry, GameMetadataResponse meta) {
-        return new GameCatalogResponse(
-                entry.getId(),
+    public static EntryModel from(Entry entry, GameMetadataResponse meta) {
+        return new EntryModel(
+                entry.id().value(),
                 meta.title(),
                 meta.description(),
                 meta.image(),
-                entry.getPrice(),
-                entry.getCategory(),
-                entry.getPopularityScore(),
-                entry.getPurchaseCount()
+                entry.price(),
+                entry.category(),
+                entry.popularity(),
+                entry.purchaseCount()
         );
     }
 }

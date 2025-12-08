@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Positive;
 
 import java.math.BigDecimal;
 
-public record UpdateGameCatalogModel(
+public record UpdateEntryModel(
         @NotNull @Positive BigDecimal price,
         @NotNull GameCategory category
 ) {

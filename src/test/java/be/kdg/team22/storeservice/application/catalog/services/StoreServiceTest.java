@@ -1,8 +1,9 @@
 package be.kdg.team22.storeservice.application.catalog.services;
 
-import be.kdg.team22.storeservice.domain.catalog.GameCatalogEntry;
-import be.kdg.team22.storeservice.domain.catalog.GameCatalogRepository;
+import be.kdg.team22.storeservice.domain.catalog.Entry;
+import be.kdg.team22.storeservice.domain.catalog.EntryRepository;
 import be.kdg.team22.storeservice.domain.catalog.GameCategory;
+import be.kdg.team22.storeservice.domain.catalog.GameId;
 import be.kdg.team22.storeservice.domain.catalog.exceptions.GameNotFoundException;
 import be.kdg.team22.storeservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.storeservice.infrastructure.games.GameMetadataResponse;
@@ -14,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,20 +29,12 @@ class StoreServiceSociableTest {
     private final UUID GAME_ID = UUID.randomUUID();
     StoreService service;
     @Mock
-    GameCatalogRepository repo;
+    EntryRepository repo;
     @Mock
     ExternalGamesRepository games;
 
     private GameMetadataResponse metadata() {
-        return new GameMetadataResponse(
-                GAME_ID,
-                "engine",
-                "Title",
-                "Desc",
-                "img.png",
-                Instant.now(),
-                Instant.now()
-        );
+        return new GameMetadataResponse(GAME_ID, "engine", "Title", "Desc", "img.png", Instant.now(), Instant.now());
     }
 
     @BeforeEach
@@ -50,44 +44,40 @@ class StoreServiceSociableTest {
 
     @Test
     void create_validInput_createsEntryAndStoresIt() {
-        when(games.fetchMetadata(GAME_ID)).thenReturn(metadata());
+        when(games.fetchMetadata(GameId.from(GAME_ID))).thenReturn(metadata());
 
-        GameCatalogEntry created = service.create(GAME_ID, BigDecimal.TEN, GameCategory.CARD);
+        Entry created = service.create(GameId.from(GAME_ID), BigDecimal.TEN, GameCategory.CARD);
 
-        assertThat(created.getId()).isEqualTo(GAME_ID);
-        assertThat(created.getPrice()).isEqualTo(BigDecimal.TEN);
-        assertThat(created.getCategory()).isEqualTo(GameCategory.CARD);
-        assertThat(created.getPurchaseCount()).isZero();
-        assertThat(created.getPopularityScore()).isZero();
+        assertThat(created.id().value()).isEqualTo(GAME_ID);
+        assertThat(created.price()).isEqualTo(BigDecimal.TEN);
+        assertThat(created.category()).isEqualTo(GameCategory.CARD);
+        assertThat(created.purchaseCount()).isZero();
+        assertThat(created.popularity()).isZero();
 
         verify(repo).save(created);
     }
 
     @Test
     void create_failsWhenGameDoesNotExist() {
-        when(games.fetchMetadata(GAME_ID)).thenThrow(new GameNotFoundException(GAME_ID));
+        GameId id = GameId.from(GAME_ID);
+        when(games.fetchMetadata(id)).thenThrow(new GameNotFoundException(id));
 
-        assertThatThrownBy(() ->
-                service.create(GAME_ID, BigDecimal.TEN, GameCategory.STRATEGY)
-        ).isInstanceOf(GameNotFoundException.class);
+        assertThatThrownBy(() -> service.create(GameId.from(GAME_ID), BigDecimal.TEN, GameCategory.STRATEGY)).isInstanceOf(GameNotFoundException.class);
 
         verify(repo, never()).save(any());
     }
 
     @Test
     void update_updatesAndPersists() {
-        GameCatalogEntry entry = new GameCatalogEntry(
-                GAME_ID, BigDecimal.ONE, GameCategory.FAMILY, 3
-        );
+        Entry entry = new Entry(GameId.from(GAME_ID), BigDecimal.ONE, GameCategory.FAMILY, 3, Collections.emptyList());
 
         when(repo.findById(GAME_ID)).thenReturn(Optional.of(entry));
         when(repo.findById(GAME_ID)).thenReturn(Optional.of(entry));
 
-        GameCatalogEntry result =
-                service.update(GAME_ID, BigDecimal.valueOf(20), GameCategory.CARD);
+        Entry result = service.update(GameId.from(GAME_ID), BigDecimal.valueOf(20), GameCategory.CARD);
 
-        assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(20));
-        assertThat(result.getCategory()).isEqualTo(GameCategory.CARD);
+        assertThat(result.price()).isEqualTo(BigDecimal.valueOf(20));
+        assertThat(result.category()).isEqualTo(GameCategory.CARD);
 
         verify(repo).save(entry);
     }
@@ -96,14 +86,12 @@ class StoreServiceSociableTest {
     void update_whenNotFound_throwsException() {
         when(repo.findById(GAME_ID)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() ->
-                service.update(GAME_ID, BigDecimal.ONE, GameCategory.PARTY)
-        ).isInstanceOf(GameNotFoundException.class);
+        assertThatThrownBy(() -> service.update(GameId.from(GAME_ID), BigDecimal.ONE, GameCategory.PARTY)).isInstanceOf(GameNotFoundException.class);
     }
 
     @Test
     void delete_callsRepoDelete() {
-        service.delete(GAME_ID);
+        service.delete(GameId.from(GAME_ID));
         verify(repo).delete(GAME_ID);
     }
 }

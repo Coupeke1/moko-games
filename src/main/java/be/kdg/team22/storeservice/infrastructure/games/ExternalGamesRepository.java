@@ -1,5 +1,6 @@
 package be.kdg.team22.storeservice.infrastructure.games;
 
+import be.kdg.team22.storeservice.domain.catalog.GameId;
 import be.kdg.team22.storeservice.domain.catalog.exceptions.GameNotFoundException;
 import be.kdg.team22.storeservice.domain.exceptions.ServiceUnavailableException;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -8,8 +9,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
-
-import java.util.UUID;
 
 @Component
 public class ExternalGamesRepository {
@@ -20,21 +19,21 @@ public class ExternalGamesRepository {
         this.client = client;
     }
 
-    public GameMetadataResponse fetchMetadata(UUID gameId) {
+    public GameMetadataResponse fetchMetadata(GameId id) {
         try {
             GameMetadataResponse response = client.get()
-                    .uri("/" + gameId)
+                    .uri("/" + id.value())
                     .retrieve()
                     .body(GameMetadataResponse.class);
 
             if (response == null)
-                throw new GameNotFoundException(gameId);
+                throw new GameNotFoundException(id);
 
             return response;
 
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND)
-                throw new GameNotFoundException(gameId);
+                throw new GameNotFoundException(id);
             throw e;
         } catch (RestClientException e) {
             throw ServiceUnavailableException.GameServiceUnavailable();

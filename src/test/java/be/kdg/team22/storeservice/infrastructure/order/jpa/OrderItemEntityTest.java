@@ -1,5 +1,6 @@
 package be.kdg.team22.storeservice.infrastructure.order.jpa;
 
+import be.kdg.team22.storeservice.domain.catalog.GameId;
 import be.kdg.team22.storeservice.domain.order.OrderItem;
 import be.kdg.team22.storeservice.domain.order.OrderStatus;
 import org.junit.jupiter.api.DisplayName;
@@ -18,12 +19,12 @@ class OrderItemEntityTest {
         UUID gameId = UUID.randomUUID();
         BigDecimal price = BigDecimal.valueOf(12.50);
 
-        OrderItem domain = new OrderItem(gameId, price);
+        OrderItem domain = new OrderItem(GameId.from(gameId), price);
 
         OrderItemEntity entity = OrderItemEntity.from(domain);
 
         assertThat(entity).isNotNull();
-        assertThat(entity.to().gameId()).isEqualTo(gameId);
+        assertThat(entity.to().gameId().value()).isEqualTo(gameId);
         assertThat(entity.to().price()).isEqualByComparingTo(price);
     }
 
@@ -37,7 +38,7 @@ class OrderItemEntityTest {
 
         OrderItem domain = entity.to();
 
-        assertThat(domain.gameId()).isEqualTo(gameId);
+        assertThat(domain.gameId().value()).isEqualTo(gameId);
         assertThat(domain.price()).isEqualByComparingTo(price);
     }
 
@@ -61,10 +62,10 @@ class OrderItemEntityTest {
         );
 
         assertThat(itemEntity).isNotNull();
-        assertThat(itemEntity.to().gameId()).isEqualTo(gameId);
+        assertThat(itemEntity.to().gameId().value()).isEqualTo(gameId);
         assertThat(itemEntity.to().price()).isEqualByComparingTo(price);
 
         assertThat(itemEntity.to()).isNotNull();
-        assertThat(itemEntity.to().gameId()).isEqualTo(gameId);
+        assertThat(itemEntity.to().gameId().value()).isEqualTo(gameId);
     }
 }

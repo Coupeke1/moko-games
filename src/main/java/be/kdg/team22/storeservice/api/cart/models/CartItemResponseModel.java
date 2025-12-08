@@ -8,6 +8,6 @@ public record CartItemResponseModel(
         UUID gameId
 ) {
     public static CartItemResponseModel from(CartItem item) {
-        return new CartItemResponseModel(item.gameId());
+        return new CartItemResponseModel(item.gameId().value());
     }
 }

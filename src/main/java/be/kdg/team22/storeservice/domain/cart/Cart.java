@@ -2,6 +2,7 @@ package be.kdg.team22.storeservice.domain.cart;
 
 import be.kdg.team22.storeservice.domain.cart.exceptions.CartItemNotFoundException;
 import be.kdg.team22.storeservice.domain.cart.exceptions.GameAlreadyInCartException;
+import be.kdg.team22.storeservice.domain.catalog.GameId;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
 import java.util.HashSet;
@@ -38,18 +39,18 @@ public class Cart {
         return Set.copyOf(items);
     }
 
-    public void addItem(final UUID gameId) {
+    public void addItem(final GameId gameId) {
         CartItem item = new CartItem(gameId);
 
-        if (items.contains(item)) throw new GameAlreadyInCartException(gameId, userId);
+        if (items.contains(item)) throw new GameAlreadyInCartException(gameId.value(), userId);
 
         items.add(item);
     }
 
-    public void removeItem(final UUID gameId) {
+    public void removeItem(final GameId gameId) {
         boolean removed = items.removeIf(i -> i.gameId().equals(gameId));
 
-        if (!removed) throw new CartItemNotFoundException(gameId, userId);
+        if (!removed) throw new CartItemNotFoundException(gameId.value(), userId);
     }
 
     public void clear() {
