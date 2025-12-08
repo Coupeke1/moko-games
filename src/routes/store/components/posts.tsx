@@ -1,6 +1,5 @@
 import Card from "@/components/cards/card";
 import NewsIcon from "@/components/icons/news-icon";
-import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
 import { GridSize } from "@/components/layout/grid/size";
@@ -11,7 +10,7 @@ import { usePosts } from "@/hooks/use-posts";
 import type { Entry } from "@/models/store/entry";
 import type { Post } from "@/models/store/post/post";
 import { format } from "@/models/store/post/type";
-import PostDialog from "../dialogs/post-dialog/post-dialog";
+import PostDialog from "@/routes/store/dialogs/post-dialog";
 import { useState } from "react";
 
 interface Props {
