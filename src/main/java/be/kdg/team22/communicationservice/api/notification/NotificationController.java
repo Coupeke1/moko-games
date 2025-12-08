@@ -3,6 +3,7 @@ package be.kdg.team22.communicationservice.api.notification;
 import be.kdg.team22.communicationservice.api.notification.models.NotificationModel;
 import be.kdg.team22.communicationservice.application.notification.NotificationService;
 import be.kdg.team22.communicationservice.domain.notification.NotificationId;
+import be.kdg.team22.communicationservice.domain.notification.NotificationType;
 import be.kdg.team22.communicationservice.domain.notification.PlayerId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -50,6 +51,21 @@ public class NotificationController {
     @PatchMapping("/{id}/read")
     public ResponseEntity<Void> markAsRead(@PathVariable final UUID id) {
         service.markAsRead(NotificationId.from(id));
+
+        return ResponseEntity.ok().build();
+    }
+
+    //TODO remove this endpoint when we truly add working notifications
+    @PostMapping("/test")
+    public ResponseEntity<Void> createTest(@AuthenticationPrincipal Jwt jwt) {
+        PlayerId id = PlayerId.get(jwt);
+
+        service.create(
+                id,
+                NotificationType.FRIEND_REQUEST_RECEIVED,
+                "Test Social Notification",
+                "Dit is een test"
+        );
 
         return ResponseEntity.ok().build();
     }

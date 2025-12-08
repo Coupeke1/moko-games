@@ -1,8 +1,7 @@
 package be.kdg.team22.communicationservice.api;
 
 import be.kdg.team22.communicationservice.domain.chat.exceptions.*;
-import be.kdg.team22.communicationservice.domain.notification.exceptions.ClaimNotFoundException;
-import be.kdg.team22.communicationservice.domain.notification.exceptions.NotificationNotFoundException;
+import be.kdg.team22.communicationservice.domain.notification.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -16,7 +15,7 @@ public class ExceptionController {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
     }
 
-    @ExceptionHandler({ChatChannelNotFoundException.class, NotificationNotFoundException.class})
+    @ExceptionHandler({ChatChannelNotFoundException.class, NotificationNotFoundException.class, UserProfileNotFoundException.class, UserPreferencesNotFoundException.class})
     public ResponseEntity<String> handleNotFound(final Exception ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
@@ -24,6 +23,16 @@ public class ExceptionController {
     @ExceptionHandler({MessageEmptyException.class, CantAutoCreateBotChannel.class, BotMessageInLobbyException.class, ClaimNotFoundException.class})
     public ResponseEntity<String> handleEmptyMessage(final Exception ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({EmailSendingException.class, EmailTemplateException.class})
+    public ResponseEntity<String> handleEmailErrors(final Exception ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(ServiceUnavailableException.class)
+    public ResponseEntity<String> handleServiceUnavailable(final ServiceUnavailableException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
     }
 
     @ExceptionHandler(RuntimeException.class)
