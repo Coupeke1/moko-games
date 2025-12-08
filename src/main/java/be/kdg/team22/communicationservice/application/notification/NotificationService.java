@@ -67,7 +67,6 @@ public class NotificationService {
 
         NotificationPreferences prefs = prefsResponse.to();
 
-        // Check if email is allowed for this notification and send it
         if (prefs.allowsEmail(notification)) {
             emailService.sendNotificationEmail(
                     profile.email(),

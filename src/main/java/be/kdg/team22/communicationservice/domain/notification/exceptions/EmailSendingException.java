@@ -1,4 +1,4 @@
-﻿package be.kdg.team22.communicationservice.domain.notification.exceptions;
+package be.kdg.team22.communicationservice.domain.notification.exceptions;
 import be.kdg.team22.communicationservice.domain.notification.NotificationId;
 public class EmailSendingException extends RuntimeException {
     public EmailSendingException(String recipientEmail, NotificationId notificationId, Throwable cause) {
