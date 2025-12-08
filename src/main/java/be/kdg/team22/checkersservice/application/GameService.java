@@ -4,6 +4,7 @@ import be.kdg.team22.checkersservice.api.models.CreateGameModel;
 import be.kdg.team22.checkersservice.domain.move.Move;
 import be.kdg.team22.checkersservice.domain.game.Game;
 import be.kdg.team22.checkersservice.domain.game.GameId;
+import be.kdg.team22.checkersservice.domain.player.exceptions.PlayerIdentityMismatchException;
 import be.kdg.team22.checkersservice.infrastructure.game.GameRepository;
 import be.kdg.team22.checkersservice.domain.player.PlayerId;
 import org.springframework.stereotype.Service;
@@ -29,14 +30,17 @@ public class GameService {
         return repository.findById(id).orElseThrow(id::notFound);
     }
 
-    public Game requestMove(GameId gameId, Move move) {
+    public Game requestMove(final GameId gameId, final PlayerId playerId, final Move move) {
+        if (!playerId.equals(move.playerId())) throw new PlayerIdentityMismatchException();
+
         Game game = getById(gameId);
         game.requestMove(move);
         repository.save(game);
+
         return game;
     }
 
-    public Game reset(GameId id) {
+    public Game reset(final GameId id) {
         Game game = getById(id);
         game.reset();
         repository.save(game);

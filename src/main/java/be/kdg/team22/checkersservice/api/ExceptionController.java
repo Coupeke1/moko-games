@@ -2,7 +2,9 @@ package be.kdg.team22.checkersservice.api;
 
 import be.kdg.team22.checkersservice.domain.move.exceptions.*;
 import be.kdg.team22.checkersservice.domain.game.exceptions.*;
+import be.kdg.team22.checkersservice.domain.player.exceptions.ClaimNotFoundException;
 import be.kdg.team22.checkersservice.domain.player.exceptions.InvalidPlayerException;
+import be.kdg.team22.checkersservice.domain.player.exceptions.PlayerIdentityMismatchException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -36,6 +38,7 @@ public class ExceptionController {
     }
 
     @ExceptionHandler({
+            ClaimNotFoundException.class,
             NotFoundException.class,
             StartingPieceNotFoundException.class
     })
@@ -51,5 +54,10 @@ public class ExceptionController {
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<String> handleIllegalStateException(final IllegalStateException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(PlayerIdentityMismatchException.class)
+    public ResponseEntity<String> handleForbiddenActionErrors(final RuntimeException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.FORBIDDEN);
     }
 }
