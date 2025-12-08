@@ -9,6 +9,9 @@ import be.kdg.team22.socialservice.domain.friendship.exceptions.CannotAddExcepti
 import be.kdg.team22.socialservice.domain.friendship.exceptions.FriendshipNotFoundException;
 import be.kdg.team22.socialservice.domain.user.UserId;
 import be.kdg.team22.socialservice.domain.user.Username;
+import be.kdg.team22.socialservice.infrastructure.messaging.SocialEventPublisher;
+import be.kdg.team22.socialservice.infrastructure.messaging.events.FriendRequestAcceptedEvent;
+import be.kdg.team22.socialservice.infrastructure.messaging.events.FriendRequestReceivedEvent;
 import be.kdg.team22.socialservice.infrastructure.user.ExternalUserRepository;
 import be.kdg.team22.socialservice.infrastructure.user.UserResponse;
 import org.springframework.stereotype.Service;
@@ -21,10 +24,12 @@ import java.util.List;
 public class FriendService {
     private final FriendshipRepository friendshipRepository;
     private final ExternalUserRepository userRepository;
+    private final SocialEventPublisher eventPublisher;
 
-    public FriendService(final FriendshipRepository friendshipRepository, final ExternalUserRepository userRepository) {
+    public FriendService(final FriendshipRepository friendshipRepository, final ExternalUserRepository userRepository, final SocialEventPublisher eventPublisher) {
         this.friendshipRepository = friendshipRepository;
         this.userRepository = userRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     public void sendRequest(final UserId userId, final Username username) {
@@ -43,6 +48,18 @@ public class FriendService {
                 .orElseGet(() -> new Friendship(userId, targetId));
 
         friendshipRepository.save(friendship);
+
+        // Get sender's username to include in the event
+        UserResponse senderInfo = userRepository.getById(userId.value());
+
+        // Publish event to notify the target user
+        eventPublisher.publishFriendRequestReceived(
+                new FriendRequestReceivedEvent(
+                        userId.value(),
+                        senderInfo.username(),
+                        targetId.value()
+                )
+        );
     }
 
     public void acceptRequest(final UserId userId, final UserId targetId) {
@@ -50,6 +67,18 @@ public class FriendService {
 
         friendship.accept(userId);
         friendshipRepository.save(friendship);
+
+        // Get accepter's username to include in the event
+        UserResponse accepterInfo = userRepository.getById(userId.value());
+
+        // Publish event to notify the original requester
+        eventPublisher.publishFriendRequestAccepted(
+                new FriendRequestAcceptedEvent(
+                        userId.value(),
+                        accepterInfo.username(),
+                        targetId.value()
+                )
+        );
     }
 
     public void rejectRequest(final UserId userId, final UserId targetId) {

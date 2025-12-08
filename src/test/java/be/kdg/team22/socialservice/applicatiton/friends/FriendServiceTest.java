@@ -3,15 +3,16 @@ package be.kdg.team22.socialservice.applicatiton.friends;
 import be.kdg.team22.socialservice.api.friends.models.FriendModel;
 import be.kdg.team22.socialservice.api.friends.models.FriendsOverviewModel;
 import be.kdg.team22.socialservice.application.friends.FriendService;
-import be.kdg.team22.socialservice.domain.friendship.exceptions.CannotAddException;
-import be.kdg.team22.socialservice.domain.friendship.exceptions.CannotRemoveException;
 import be.kdg.team22.socialservice.domain.friendship.Friendship;
 import be.kdg.team22.socialservice.domain.friendship.FriendshipId;
 import be.kdg.team22.socialservice.domain.friendship.FriendshipRepository;
 import be.kdg.team22.socialservice.domain.friendship.FriendshipStatus;
+import be.kdg.team22.socialservice.domain.friendship.exceptions.CannotAddException;
+import be.kdg.team22.socialservice.domain.friendship.exceptions.CannotRemoveException;
 import be.kdg.team22.socialservice.domain.friendship.exceptions.FriendshipNotFoundException;
 import be.kdg.team22.socialservice.domain.user.UserId;
 import be.kdg.team22.socialservice.domain.user.Username;
+import be.kdg.team22.socialservice.infrastructure.messaging.SocialEventPublisher;
 import be.kdg.team22.socialservice.infrastructure.user.ExternalUserRepository;
 import be.kdg.team22.socialservice.infrastructure.user.UserResponse;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,8 @@ import static org.mockito.Mockito.*;
 class FriendServiceTest {
     private final FriendshipRepository friendshipRepository = mock(FriendshipRepository.class);
     private final ExternalUserRepository userRepository = mock(ExternalUserRepository.class);
-    private final FriendService service = new FriendService(friendshipRepository, userRepository);
+    private final SocialEventPublisher eventPublisher = mock(SocialEventPublisher.class);
+    private final FriendService service = new FriendService(friendshipRepository, userRepository, eventPublisher);
 
     private UserResponse userResponse(UUID id, String username) {
         return new UserResponse(id, username);
