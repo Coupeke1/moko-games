@@ -19,7 +19,7 @@ done
 
 # If --all is provided, override services
 if [ "$ALL" = true ]; then
-    SERVICES=("user" "session" "social" "games" "store" "tic-tac-toe" "checkers" "chess")
+    SERVICES=("user" "session" "social" "games" "store" "communication" "tic-tac-toe" "checkers" "chess")
     echo "--all provided. Starting ALL services: ${SERVICES[*]}"
 else
     if [ "${#SERVICES[@]}" -eq 0 ]; then
@@ -30,7 +30,7 @@ else
 fi
 
 # Validate services and build profiles
-VALID_SERVICES=("user" "session" "social" "games" "store" "tic-tac-toe" "checkers" "chess")
+VALID_SERVICES=("user" "session" "social" "games" "store" "communication" "tic-tac-toe" "checkers" "chess")
 PROFILES=()
 
 for service in "${SERVICES[@]}"; do
