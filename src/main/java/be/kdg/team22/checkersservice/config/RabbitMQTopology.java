@@ -8,10 +8,14 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQTopology {
     public static final String EXCHANGE_GAMEPLAY = "exchange.gameplay";
 
-    public static final String ROUTING_TICTACTOE_WON = "tictactoe.won";
-    public static final String ROUTING_TICTACTOE_DRAW = "tictactoe.draw";
+    public static final String ROUTING_CHECKERS_DRAW = "checkers.draw";
+    public static final String ROUTING_CHECKERS_LOST = "checkers.lost";
+    public static final String ROUTING_CHECKERS_WON = "checkers.won";
+    public static final String ROUTING_CHECKERS_PROMOTION = "checkers.promotion";
+    public static final String ROUTING_CHECKERS_MULTICAPTURE = "checkers.multicapture";
+    public static final String ROUTING_CHECKERS_THREEKINGS = "checkers.threekings";
 
-    public static final String QUEUE_TICTACTOE_EVENTS = "queue.tictactoe.events";
+    public static final String QUEUE_CHECKERS_EVENTS = "queue.checkers.events";
 
     @Bean
     TopicExchange gameplayExchange() {
@@ -19,21 +23,49 @@ public class RabbitMQTopology {
     }
 
     @Bean
-    Queue tictactoeQueue() {
-        return QueueBuilder.durable(QUEUE_TICTACTOE_EVENTS).build();
+    Queue checkersQueue() {
+        return QueueBuilder.durable(QUEUE_CHECKERS_EVENTS).build();
     }
 
     @Bean
-    Binding tictactoeWonBinding() {
-        return BindingBuilder.bind(tictactoeQueue())
+    Binding checkersDrawBinding() {
+        return BindingBuilder.bind(checkersQueue())
                 .to(gameplayExchange())
-                .with(ROUTING_TICTACTOE_WON);
+                .with(ROUTING_CHECKERS_DRAW);
     }
 
     @Bean
-    Binding tictactoeDrawBinding() {
-        return BindingBuilder.bind(tictactoeQueue())
+    Binding checkersLostBinding() {
+        return BindingBuilder.bind(checkersQueue())
                 .to(gameplayExchange())
-                .with(ROUTING_TICTACTOE_DRAW);
+                .with(ROUTING_CHECKERS_LOST);
+    }
+
+    @Bean
+    Binding checkersWonBinding() {
+        return BindingBuilder.bind(checkersQueue())
+                .to(gameplayExchange())
+                .with(ROUTING_CHECKERS_WON);
+    }
+
+    @Bean
+    Binding checkersPromotionBinding() {
+        return BindingBuilder.bind(checkersQueue())
+                .to(gameplayExchange())
+                .with(ROUTING_CHECKERS_PROMOTION);
+    }
+
+    @Bean
+    Binding checkersMulticaptureBinding() {
+        return BindingBuilder.bind(checkersQueue())
+                .to(gameplayExchange())
+                .with(ROUTING_CHECKERS_MULTICAPTURE);
+    }
+
+    @Bean
+    Binding checkersThreeKingsBinding() {
+        return BindingBuilder.bind(checkersQueue())
+                .to(gameplayExchange())
+                .with(ROUTING_CHECKERS_THREEKINGS);
     }
 }

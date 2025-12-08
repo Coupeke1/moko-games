@@ -4,6 +4,7 @@ import be.kdg.team22.checkersservice.domain.game.GameStatus;
 import be.kdg.team22.checkersservice.domain.game.exceptions.BoardSizeException;
 import be.kdg.team22.checkersservice.domain.game.exceptions.OutsidePlayingFieldException;
 import be.kdg.team22.checkersservice.domain.move.Move;
+import be.kdg.team22.checkersservice.domain.move.MoveResult;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 import org.jmolecules.ddd.annotation.ValueObject;
 
@@ -68,10 +69,11 @@ public class Board {
         placePlayerPieces(PlayerRole.BLACK, size + 1 - rowsPerPlayer, size);
     }
 
-    public void move(final Move move) {
+    public MoveResult move(final Move move) {
         Piece piece = grid.get(move.fromCell());
 
         int row = convertCellNumberToCoordinates(move.cells().get(1))[0];
+        boolean promotion = false;
         boolean shouldPromote = false;
         if (piece.color() == PlayerRole.WHITE && row == size - 1) {
             shouldPromote = true;
@@ -81,8 +83,10 @@ public class Board {
 
         if (shouldPromote && !piece.isKing()) {
             piece.promoteToKing();
+            promotion = true;
         }
 
+        boolean capture = false;
         if (isCaptureMove(this, piece.color(), move)) {
             int[] fromCoords = convertCellNumberToCoordinates(move.fromCell());
             int[] toCoords = convertCellNumberToCoordinates(move.cells().get(1));
@@ -94,12 +98,20 @@ public class Board {
             );
             grid.put(cellToClear, null);
             movesSinceLastCapture = 0;
+            capture = true;
+
         } else {
             movesSinceLastCapture++;
         }
 
         grid.put(move.fromCell(), null);
         grid.put(move.cells().get(1), piece);
+
+        return new MoveResult(capture, false, promotion, kingCount(piece.color()));
+    }
+
+    private int kingCount(PlayerRole playerRole) {
+        return grid.values().stream().filter(p -> p != null && p.color() == playerRole && p.isKing()).toList().size();
     }
 
     public GameStatus checkWinConditions() {

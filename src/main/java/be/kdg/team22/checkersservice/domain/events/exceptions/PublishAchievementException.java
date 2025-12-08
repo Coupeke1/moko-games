@@ -1,4 +1,4 @@
-package be.kdg.team22.checkersservice.domain.events;
+package be.kdg.team22.checkersservice.domain.events.exceptions;
 
 import org.springframework.amqp.AmqpException;
 
