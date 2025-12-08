@@ -4,7 +4,7 @@ import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
 import Section from "@/components/section";
-import Message from "@/components/state/message";
+import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
 import showToast from "@/components/toast";
 import type { Player } from "@/models/lobby/player";
@@ -90,7 +90,7 @@ export default function LobbyPage() {
 
                         <Section title="Players">
                             {lobby.players.length == 0 ? (
-                                <Message>No players :(</Message>
+                                <ErrorState>No players</ErrorState>
                             ) : (
                                 <Grid>
                                     {lobby.players.map((player: Player) => (

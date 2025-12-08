@@ -1,6 +1,6 @@
 import Grid from "@/components/layout/grid/grid";
 import Page from "@/components/layout/page";
-import Message from "@/components/state/message";
+import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
 import { useLibrary } from "@/hooks/use-library";
 import type { Entry } from "@/models/library/entry";
@@ -25,7 +25,7 @@ export default function LibraryPage() {
 
             {entries &&
                 (entries.length == 0 ? (
-                    <Message>No games :(</Message>
+                    <ErrorState>No games</ErrorState>
                 ) : (
                     <Grid>
                         {entries.map((entry: Entry) => (
