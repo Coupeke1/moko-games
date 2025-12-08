@@ -24,7 +24,9 @@ public class StoreNotificationListener {
                 recipient,
                 NotificationType.ORDER_COMPLETED,
                 "Order completed",
-                "Your order (" + event.orderId() + ") has successfully been completed."
+                String.format("Your order (%s) has successfully been completed for a total of €%.2f",
+                        event.orderId(),
+                        event.totalAmount())
         );
     }
 }
