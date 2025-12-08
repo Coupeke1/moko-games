@@ -14,7 +14,7 @@ public class SocialEventPublisher {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void publishFriendRequestReceived(FriendRequestReceivedEvent event) {
+    public void publishFriendRequestReceived(final FriendRequestReceivedEvent event) {
         rabbitTemplate.convertAndSend(
                 RabbitMQTopology.EXCHANGE_SOCIAL,
                 RabbitMQTopology.ROUTING_KEY_FRIEND_REQUEST_RECEIVED,
@@ -22,7 +22,7 @@ public class SocialEventPublisher {
         );
     }
 
-    public void publishFriendRequestAccepted(FriendRequestAcceptedEvent event) {
+    public void publishFriendRequestAccepted(final FriendRequestAcceptedEvent event) {
         rabbitTemplate.convertAndSend(
                 RabbitMQTopology.EXCHANGE_SOCIAL,
                 RabbitMQTopology.ROUTING_KEY_FRIEND_REQUEST_ACCEPTED,
