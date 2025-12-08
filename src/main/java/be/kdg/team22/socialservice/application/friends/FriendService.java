@@ -49,10 +49,8 @@ public class FriendService {
 
         friendshipRepository.save(friendship);
 
-        // Get sender's username to include in the event
         UserResponse senderInfo = userRepository.getById(userId.value());
 
-        // Publish event to notify the target user
         eventPublisher.publishFriendRequestReceived(
                 new FriendRequestReceivedEvent(
                         userId.value(),
@@ -68,10 +66,8 @@ public class FriendService {
         friendship.accept(userId);
         friendshipRepository.save(friendship);
 
-        // Get accepter's username to include in the event
         UserResponse accepterInfo = userRepository.getById(userId.value());
 
-        // Publish event to notify the original requester
         eventPublisher.publishFriendRequestAccepted(
                 new FriendRequestAcceptedEvent(
                         userId.value(),

@@ -44,6 +44,7 @@ class FriendServiceTest {
         UUID targetId = UUID.randomUUID();
 
         when(userRepository.getByUsername(new Username("piet"))).thenReturn(Optional.of(userResponse(targetId, "piet")));
+        when(userRepository.getById(currentUser.value())).thenReturn(userResponse(currentUser.value(), "currentUser"));
 
         when(friendshipRepository.findBetween(eq(currentUser), eq(UserId.from(targetId)))).thenReturn(Optional.empty());
 
@@ -51,6 +52,7 @@ class FriendServiceTest {
 
         verify(friendshipRepository).findBetween(eq(currentUser), eq(UserId.from(targetId)));
         verify(friendshipRepository).save(any(Friendship.class));
+        verify(eventPublisher).publishFriendRequestReceived(any());
     }
 
     @Test
@@ -96,12 +98,14 @@ class FriendServiceTest {
         when(existing.status()).thenReturn(FriendshipStatus.REJECTED);
 
         when(userRepository.getByUsername(new Username("piet"))).thenReturn(Optional.of(userResponse(targetId, "piet")));
+        when(userRepository.getById(currentUser.value())).thenReturn(userResponse(currentUser.value(), "currentUser"));
         when(friendshipRepository.findBetween(currentUser, targetUser)).thenReturn(Optional.of(existing));
 
         service.sendRequest(currentUser, new Username("piet"));
 
         verify(existing).restartRequest(currentUser, targetUser);
         verify(friendshipRepository).save(existing);
+        verify(eventPublisher).publishFriendRequestReceived(any());
     }
 
     @Test
@@ -114,12 +118,14 @@ class FriendServiceTest {
         when(existing.status()).thenReturn(FriendshipStatus.CANCELLED);
 
         when(userRepository.getByUsername(new Username("piet"))).thenReturn(Optional.of(userResponse(targetId, "piet")));
+        when(userRepository.getById(currentUser.value())).thenReturn(userResponse(currentUser.value(), "currentUser"));
         when(friendshipRepository.findBetween(currentUser, targetUser)).thenReturn(Optional.of(existing));
 
         service.sendRequest(currentUser, new Username("piet"));
 
         verify(existing).restartRequest(currentUser, targetUser);
         verify(friendshipRepository).save(existing);
+        verify(eventPublisher).publishFriendRequestReceived(any());
     }
 
     @Test
@@ -131,11 +137,13 @@ class FriendServiceTest {
         Friendship friendship = mock(Friendship.class);
 
         when(friendshipRepository.findBetween(currentUser, otherUser)).thenReturn(Optional.of(friendship));
+        when(userRepository.getById(currentUser.value())).thenReturn(userResponse(currentUser.value(), "currentUser"));
 
         service.acceptRequest(currentUser, otherUser);
 
         verify(friendship).accept(currentUser);
         verify(friendshipRepository).save(friendship);
+        verify(eventPublisher).publishFriendRequestAccepted(any());
     }
 
     @Test
