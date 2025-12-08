@@ -7,6 +7,7 @@ import be.kdg.team22.storeservice.domain.order.*;
 import be.kdg.team22.storeservice.domain.order.exceptions.OrderNotFoundException;
 import be.kdg.team22.storeservice.domain.order.exceptions.PaymentIncompleteException;
 import be.kdg.team22.storeservice.domain.payment.PaymentProvider;
+import be.kdg.team22.storeservice.infrastructure.messaging.OrderEventPublisher;
 import com.mollie.mollie.models.components.PaymentStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +28,7 @@ class PaymentServiceTest {
     private OrderRepository orderRepo;
     private CartService cartService;
     private StoreService storeService;
+    private OrderEventPublisher eventPublisher;
 
     private PaymentService service;
 
@@ -41,8 +43,9 @@ class PaymentServiceTest {
         orderRepo = mock(OrderRepository.class);
         cartService = mock(CartService.class);
         storeService = mock(StoreService.class);
+        eventPublisher = mock(OrderEventPublisher.class);
 
-        service = new PaymentService(paymentProvider, orderRepo, cartService, storeService);
+        service = new PaymentService(paymentProvider, orderRepo, cartService, storeService, eventPublisher);
 
         orderId = UUID.randomUUID();
         gameId = UUID.randomUUID();
