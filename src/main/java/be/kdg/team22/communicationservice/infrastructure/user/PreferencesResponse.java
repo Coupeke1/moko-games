@@ -11,7 +11,7 @@ public record PreferencesResponse(
 ) {
     public static PreferencesResponse defaultPreferences() {
         return new PreferencesResponse(
-                false,
+                true,
                 true,
                 true,
                 true,

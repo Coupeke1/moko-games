@@ -3,6 +3,7 @@ package be.kdg.team22.communicationservice.api.notification;
 import be.kdg.team22.communicationservice.api.notification.models.NotificationModel;
 import be.kdg.team22.communicationservice.application.notification.NotificationService;
 import be.kdg.team22.communicationservice.domain.notification.NotificationId;
+import be.kdg.team22.communicationservice.domain.notification.NotificationType;
 import be.kdg.team22.communicationservice.domain.notification.PlayerId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,7 +27,7 @@ public class NotificationController {
             @AuthenticationPrincipal final Jwt jwt) {
         PlayerId playerId = PlayerId.get(jwt);
 
-        List<NotificationModel> result = service.getNotifications(playerId)
+        List<NotificationModel> result = service.getNotifications(playerId, jwt.getTokenValue())
                 .stream()
                 .map(NotificationModel::from)
                 .toList();
@@ -39,7 +40,7 @@ public class NotificationController {
             @AuthenticationPrincipal final Jwt jwt) {
         PlayerId playerId = PlayerId.get(jwt);
 
-        List<NotificationModel> result = service.getUnreadNotifications(playerId)
+        List<NotificationModel> result = service.getUnreadNotifications(playerId, jwt.getTokenValue())
                 .stream()
                 .map(NotificationModel::from)
                 .toList();
@@ -53,4 +54,19 @@ public class NotificationController {
 
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/test")
+    public ResponseEntity<Void> createTest(@AuthenticationPrincipal Jwt jwt) {
+        PlayerId id = PlayerId.get(jwt);
+
+        service.create(
+                id,
+                NotificationType.FRIEND_REQUEST_RECEIVED,
+                "Test Social Notification",
+                "Dit is een test"
+        );
+
+        return ResponseEntity.ok().build();
+    }
+
 }
