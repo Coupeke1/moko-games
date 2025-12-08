@@ -2,12 +2,12 @@ package be.kdg.team22.communicationservice.application.notification;
 
 import be.kdg.team22.communicationservice.domain.notification.*;
 import be.kdg.team22.communicationservice.domain.notification.exceptions.NotificationNotFoundException;
+import be.kdg.team22.communicationservice.domain.notification.exceptions.UserPreferencesNotFoundException;
+import be.kdg.team22.communicationservice.domain.notification.exceptions.UserProfileNotFoundException;
 import be.kdg.team22.communicationservice.infrastructure.email.EmailService;
 import be.kdg.team22.communicationservice.infrastructure.user.ExternalUserRepository;
 import be.kdg.team22.communicationservice.infrastructure.user.PreferencesResponse;
 import be.kdg.team22.communicationservice.infrastructure.user.ProfileResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +17,6 @@ import java.util.UUID;
 @Service
 @Transactional
 public class NotificationService {
-    private static final Logger log = LoggerFactory.getLogger(NotificationService.class);
 
     private final NotificationRepository repository;
     private final ExternalUserRepository userRepository;
@@ -54,35 +53,27 @@ public class NotificationService {
     }
 
     private void sendEmailIfAllowed(UUID recipientId, Notification notification) {
-        try {
-            // Fetch user profile to get email and preferences
-            ProfileResponse profile = userRepository.getProfile(recipientId);
-            if (profile == null || profile.email() == null) {
-                log.debug("No profile or email found for user {}", recipientId);
-                return;
-            }
+        // Fetch user profile to get email and preferences
+        ProfileResponse profile = userRepository.getProfile(recipientId);
+        if (profile == null || profile.email() == null) {
+            throw new UserProfileNotFoundException(recipientId);
+        }
 
-            // Fetch preferences (using a service account or default preferences)
-            // Since we don't have JWT here, we'll need to modify this approach
-            // For now, we'll create a method that fetches preferences by userId
-            PreferencesResponse prefsResponse = userRepository.getPreferencesByUserId(recipientId);
-            NotificationPreferences prefs = prefsResponse.to();
+        // Fetch preferences by userId
+        PreferencesResponse prefsResponse = userRepository.getPreferencesByUserId(recipientId);
+        if (prefsResponse == null) {
+            throw new UserPreferencesNotFoundException(recipientId);
+        }
 
-            // Check if email is allowed for this notification
-            if (prefs.allowsEmail(notification)) {
-                emailService.sendNotificationEmail(
-                        profile.email(),
-                        profile.username(),
-                        notification
-                );
-                log.info("Email notification queued for user {} ({})", profile.username(), profile.email());
-            } else {
-                log.debug("Email notification not sent to user {} - disabled in preferences", recipientId);
-            }
+        NotificationPreferences prefs = prefsResponse.to();
 
-        } catch (Exception e) {
-            // Don't fail notification creation if email fails
-            log.error("Failed to send email notification for user {}: {}", recipientId, e.getMessage());
+        // Check if email is allowed for this notification and send it
+        if (prefs.allowsEmail(notification)) {
+            emailService.sendNotificationEmail(
+                    profile.email(),
+                    profile.username(),
+                    notification
+            );
         }
     }
 
