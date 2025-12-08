@@ -14,6 +14,7 @@ import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.domain.player.PlayerName;
 import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerNotFriendException;
 import be.kdg.team22.sessionservice.infrastructure.lobby.LobbySocketPublisher;
+import be.kdg.team22.sessionservice.infrastructure.messaging.LobbyEventPublisher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -33,8 +34,9 @@ class LobbyPlayerServiceTest {
     private final FriendsService friendsService = mock(FriendsService.class);
     private final PlayerService playerService = mock(PlayerService.class);
     private final LobbySocketPublisher socket = mock(LobbySocketPublisher.class);
+    private final LobbyEventPublisher eventPublisher = mock(LobbyEventPublisher.class);
     private final LobbyPublisherService publisherService = new LobbyPublisherService(repo, socket);
-    LobbyPlayerService service = new LobbyPlayerService(repo, friendsService, playerService, publisherService);
+    LobbyPlayerService service = new LobbyPlayerService(repo, friendsService, playerService, publisherService, eventPublisher);
 
     private Jwt jwtFor(PlayerId pid) {
         return Jwt.withTokenValue("TOKEN-" + pid.value()).header("alg", "none").claim("sub", pid.value().toString()).claim("preferred_username", "testuser").issuedAt(Instant.now()).expiresAt(Instant.now().plusSeconds(3600)).build();
@@ -53,9 +55,11 @@ class LobbyPlayerServiceTest {
         LobbyId lobbyId = LobbyId.create();
 
         Lobby lobby = newLobby(lobbyId, owner);
+        Player ownerPlayer = new Player(owner, new PlayerName("owner"), "");
 
         when(repo.findById(lobbyId)).thenReturn(Optional.of(lobby));
         when(friendsService.findAllFriends(any())).thenReturn(List.of(target));
+        when(playerService.findPlayer(eq(owner), any())).thenReturn(ownerPlayer);
 
         service.invitePlayer(owner, lobbyId, target, jwtFor(owner));
 
