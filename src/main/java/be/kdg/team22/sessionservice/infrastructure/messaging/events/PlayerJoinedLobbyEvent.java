@@ -9,4 +9,3 @@ public record PlayerJoinedLobbyEvent(
         UUID hostUserId
 ) {
 }
-

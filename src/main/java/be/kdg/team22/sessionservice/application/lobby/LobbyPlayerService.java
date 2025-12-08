@@ -36,13 +36,11 @@ public class LobbyPlayerService {
         Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
         ensureFriend(ownerId, playerId, token);
 
-        // Get inviter information
         Player inviter = playerService.findPlayer(ownerId, token);
 
         lobby.invitePlayer(ownerId, playerId);
         lobbyPublisher.saveAndPublish(lobby);
 
-        // Publish RabbitMQ event for notification
         eventPublisher.publishLobbyInvite(lobby, ownerId, inviter.username().value(), playerId);
     }
 
@@ -69,7 +67,6 @@ public class LobbyPlayerService {
         lobby.acceptInvite(player);
         lobbyPublisher.saveAndPublish(lobby);
 
-        // Publish RabbitMQ event for notification
         eventPublisher.publishPlayerJoinedLobby(lobby, playerId, player.username().value());
     }
 

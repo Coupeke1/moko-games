@@ -1,5 +1,6 @@
 package be.kdg.team22.sessionservice.api.lobby;
 
+import be.kdg.team22.sessionservice.domain.game.GameServiceNotReachableException;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.*;
 import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerAlreadyInLobbyException;
 import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerNotFoundException;
@@ -23,8 +24,8 @@ public class ExceptionController {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(NotReachableException.class)
-    public ResponseEntity<String> handleServiceUnreachable(final NotReachableException exception) {
+    @ExceptionHandler({NotReachableException.class, GameServiceNotReachableException.class})
+    public ResponseEntity<String> handleServiceUnreachable(final RuntimeException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
     }
 
