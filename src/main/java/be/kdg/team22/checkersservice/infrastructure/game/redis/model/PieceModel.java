@@ -10,7 +10,7 @@ public class PieceModel {
     public static PieceModel fromDomain(Piece piece) {
         PieceModel pieceModel = new PieceModel();
         pieceModel.color = piece.color();
-        pieceModel.isKing = false;
+        pieceModel.isKing = piece.isKing();
 
         return pieceModel;
     }
