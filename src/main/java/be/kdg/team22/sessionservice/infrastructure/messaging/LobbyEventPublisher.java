@@ -14,12 +14,12 @@ public class LobbyEventPublisher {
     private final RabbitTemplate rabbitTemplate;
     private final GameRepository gameRepository;
 
-    public LobbyEventPublisher(RabbitTemplate rabbitTemplate, GameRepository gameRepository) {
+    public LobbyEventPublisher(final RabbitTemplate rabbitTemplate, final GameRepository gameRepository) {
         this.rabbitTemplate = rabbitTemplate;
         this.gameRepository = gameRepository;
     }
 
-    public void publishLobbyInvite(Lobby lobby, PlayerId inviterId, String inviterName, PlayerId targetUserId) {
+    public void publishLobbyInvite(final Lobby lobby, final PlayerId inviterId, final String inviterName, final PlayerId targetUserId) {
         String gameName = gameRepository.findGameNameById(lobby.gameId());
 
         LobbyInviteEvent event = new LobbyInviteEvent(
@@ -38,7 +38,7 @@ public class LobbyEventPublisher {
         );
     }
 
-    public void publishPlayerJoinedLobby(Lobby lobby, PlayerId playerId, String playerName) {
+    public void publishPlayerJoinedLobby(final Lobby lobby, final PlayerId playerId, final String playerName) {
         PlayerJoinedLobbyEvent event = new PlayerJoinedLobbyEvent(
                 lobby.id().value(),
                 playerId.value(),

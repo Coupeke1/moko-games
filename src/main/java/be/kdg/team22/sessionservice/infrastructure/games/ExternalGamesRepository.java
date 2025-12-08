@@ -36,7 +36,7 @@ public class ExternalGamesRepository implements GameRepository {
         }
     }
 
-    public String findGameNameById(GameId gameId) {
+    public String findGameNameById(final GameId gameId) {
         try {
             GameResponse response = client.get()
                     .uri("/" + gameId.value())
