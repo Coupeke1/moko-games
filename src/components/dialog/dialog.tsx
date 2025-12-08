@@ -41,7 +41,7 @@ export default function Dialog({
         <RadixDialog.Root open={open} onOpenChange={handleOpenChange}>
             <RadixDialog.Portal>
                 <RadixDialog.Overlay className="fixed inset-0 bg-black/50 z-100" />
-                <RadixDialog.Content className="flex flex-col fixed z-100 left-1/2 top-1/2 xs:w-[75%] w-[90%] max-w-2xl h-[65%] sm:h-[90%] -translate-x-1/2 -translate-y-1/2 rounded-lg bg-bg text-fg overflow-hidden">
+                <RadixDialog.Content className="flex flex-col fixed z-100 left-1/2 top-1/2 xs:w-[75%] w-[90%] max-w-2xl h-[90%] -translate-x-1/2 -translate-y-1/2 rounded-lg bg-bg text-fg overflow-hidden">
                     <section className="sticky top-0 bg-bg py-3 px-4 border-b-2 border-bg-2 z-10">
                         <Column>
                             <Row
@@ -49,7 +49,7 @@ export default function Dialog({
                                 items={Items.Center}
                                 responsive={false}
                             >
-                                <RadixDialog.Title className="text-xl font-semibold">
+                                <RadixDialog.Title className="text-xl font-semibold truncate">
                                     {title}
                                 </RadixDialog.Title>
                                 <RadixDialog.Close

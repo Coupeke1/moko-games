@@ -16,7 +16,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 
-export default function GamePage() {
+export default function LibraryGamePage() {
     const client = useQueryClient();
     const navigate = useNavigate();
     const params = useParams();
@@ -122,7 +122,9 @@ export default function GamePage() {
                         </section>
                     </article>
 
-                    <p>{game.description}</p>
+                    <p className="text-fg-2">{game.description}</p>
+
+                    <p>TODO: Show achievements for {game.title} here</p>
                 </Column>
             )}
         </Page>

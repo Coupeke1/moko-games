@@ -5,6 +5,7 @@ import { Items } from "@/components/layout/items";
 import { Justify } from "@/components/layout/justify";
 import { Padding } from "@/components/layout/padding";
 import Row from "@/components/layout/row";
+import Statistic from "@/components/statistic";
 import Image from "@/routes/profile/components/image";
 
 interface Props {
@@ -15,15 +16,6 @@ interface Props {
     level: number;
     playTime: string;
     onEdit: () => void;
-}
-
-function Statistic({ title, value }: { title: string; value: string }) {
-    return (
-        <Column gap={Gap.None}>
-            <h4 className="text-sm md:text-xs text-fg-2">{title}</h4>
-            <p className="text-lg text-right md:text-md">{value}</p>
-        </Column>
-    );
 }
 
 export default function ProfileInformation({
@@ -45,7 +37,10 @@ export default function ProfileInformation({
                         <Row items={Items.Center} responsive={false}>
                             <h2 className="text-3xl font-bold">{username}</h2>
 
-                            <button onClick={onEdit}>
+                            <button
+                                onClick={onEdit}
+                                className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75"
+                            >
                                 <EditIcon small={true} />
                             </button>
                         </Row>

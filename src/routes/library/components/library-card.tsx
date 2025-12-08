@@ -4,7 +4,7 @@ import HeartIcon from "@/components/icons/heart-icon";
 import { Gap } from "@/components/layout/gap";
 import { Items } from "@/components/layout/items";
 import Row from "@/components/layout/row";
-import { Size } from "@/components/layout/size";
+import { Height } from "@/components/layout/size";
 import type { Entry } from "@/models/library/entry";
 
 interface Props {
@@ -17,7 +17,7 @@ export default function LibraryCard({ entry }: Props) {
             image={entry.image}
             title={entry.title}
             href={`/library/${entry.id}`}
-            height={Size.ExtraLarge}
+            height={Height.ExtraLarge}
             information={
                 <Row gap={Gap.None} items={Items.Center} responsive={false}>
                     <ClockIcon />
