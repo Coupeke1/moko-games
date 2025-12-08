@@ -5,6 +5,7 @@ import be.kdg.team22.storeservice.application.order.OrderService;
 import be.kdg.team22.storeservice.application.order.PaymentService;
 import be.kdg.team22.storeservice.config.TestSecurityConfig;
 import be.kdg.team22.storeservice.domain.cart.UserId;
+import be.kdg.team22.storeservice.domain.catalog.GameId;
 import be.kdg.team22.storeservice.domain.order.Order;
 import be.kdg.team22.storeservice.domain.order.OrderId;
 import be.kdg.team22.storeservice.domain.order.OrderItem;
@@ -64,7 +65,7 @@ class OrderControllerTest {
 
         Order order = new Order(
                 new OrderId(orderId),
-                List.of(new OrderItem(UUID.randomUUID(), BigDecimal.valueOf(9.99))),
+                List.of(new OrderItem(GameId.create(), BigDecimal.valueOf(9.99))),
                 OrderStatus.PENDING_PAYMENT,
                 userId,
                 "paymentId"
@@ -94,8 +95,8 @@ class OrderControllerTest {
         Order order = new Order(
                 new OrderId(id),
                 List.of(
-                        new OrderItem(UUID.randomUUID(), BigDecimal.valueOf(5)),
-                        new OrderItem(UUID.randomUUID(), BigDecimal.valueOf(10))
+                        new OrderItem(GameId.create(), BigDecimal.valueOf(5)),
+                        new OrderItem(GameId.create(), BigDecimal.valueOf(10))
                 ),
                 OrderStatus.PENDING_PAYMENT,
                 userId,
@@ -140,7 +141,7 @@ class OrderControllerTest {
 
         Order order = new Order(
                 new OrderId(orderId),
-                List.of(new OrderItem(UUID.randomUUID(), BigDecimal.valueOf(20))),
+                List.of(new OrderItem(GameId.create(), BigDecimal.valueOf(20))),
                 OrderStatus.PAID,
                 userId,
                 "paymentId"

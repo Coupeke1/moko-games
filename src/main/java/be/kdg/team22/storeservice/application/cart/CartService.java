@@ -8,6 +8,7 @@ import be.kdg.team22.storeservice.domain.cart.exceptions.CartEmptyException;
 import be.kdg.team22.storeservice.domain.cart.exceptions.CartNotFoundException;
 import be.kdg.team22.storeservice.domain.cart.exceptions.GameAlreadyOwnedException;
 import be.kdg.team22.storeservice.domain.cart.exceptions.InvalidMetadataException;
+import be.kdg.team22.storeservice.domain.catalog.GameId;
 import be.kdg.team22.storeservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.storeservice.infrastructure.games.GameMetadataResponse;
 import be.kdg.team22.storeservice.infrastructure.user.ExternalUserRepository;
@@ -24,47 +25,42 @@ public class CartService {
     private final ExternalGamesRepository gamesRepository;
     private final ExternalUserRepository userRepository;
 
-    public CartService(CartRepository repo,
-                       ExternalGamesRepository gamesRepository,
-                       ExternalUserRepository userRepository) {
+    public CartService(CartRepository repo, ExternalGamesRepository gamesRepository, ExternalUserRepository userRepository) {
         this.repo = repo;
         this.gamesRepository = gamesRepository;
         this.userRepository = userRepository;
     }
 
     public Cart getOrCreate(final UserId userId) {
-        return repo.findByUserId(userId.value())
-                .orElseGet(() -> {
-                    Cart c = new Cart(CartId.create(), userId.value());
-                    repo.save(c);
-                    return c;
-                });
+        return repo.findByUserId(userId.value()).orElseGet(() -> {
+            Cart c = new Cart(CartId.create(), userId.value());
+            repo.save(c);
+            return c;
+        });
     }
 
     public Cart get(final UserId userId) {
-        return repo.findByUserId(userId.value())
-                .orElseThrow(() -> new CartNotFoundException(userId.value()));
+        return repo.findByUserId(userId.value()).orElseThrow(() -> new CartNotFoundException(userId.value()));
     }
 
-    public void addItem(final UserId userId, final UUID gameId, final String jwt) {
+    public void addItem(final UserId userId, final GameId gameId, final String jwt) {
         GameMetadataResponse meta = gamesRepository.fetchMetadata(gameId);
         validateMetadata(meta, gameId);
 
-        if (userRepository.userOwnsGame(gameId, jwt))
-            throw new GameAlreadyOwnedException(gameId, userId.value());
+        if (userRepository.userOwnsGame(gameId.value(), jwt))
+            throw new GameAlreadyOwnedException(gameId.value(), userId.value());
 
-        Cart cart = repo.findByUserId(userId.value())
-                .orElseGet(() -> {
-                    Cart newCart = new Cart(new CartId(UUID.randomUUID()), userId.value());
-                    repo.save(newCart);
-                    return newCart;
-                });
+        Cart cart = repo.findByUserId(userId.value()).orElseGet(() -> {
+            Cart newCart = new Cart(new CartId(UUID.randomUUID()), userId.value());
+            repo.save(newCart);
+            return newCart;
+        });
 
         cart.addItem(gameId);
         repo.save(cart);
     }
 
-    public void removeItem(final UserId userId, final UUID gameId) {
+    public void removeItem(final UserId userId, final GameId gameId) {
         Cart cart = get(userId);
         cart.removeItem(gameId);
         repo.save(cart);
@@ -73,20 +69,21 @@ public class CartService {
     public void clearCart(final UserId userId) {
         Cart cart = get(userId);
 
-        if (cart.isEmpty()) throw new CartEmptyException(userId.value());
+        if (cart.isEmpty())
+            throw new CartEmptyException(userId.value());
 
         cart.clear();
         repo.save(cart);
     }
 
-    private void validateMetadata(GameMetadataResponse meta, UUID gameId) {
+    private void validateMetadata(GameMetadataResponse meta, GameId gameId) {
         if (meta == null)
-            throw new InvalidMetadataException(gameId, "Game metadata is null");
+            throw new InvalidMetadataException(gameId.value(), "Game metadata is null");
 
         if (meta.title() == null || meta.title().isBlank())
-            throw new InvalidMetadataException(gameId, "Title missing");
+            throw new InvalidMetadataException(gameId.value(), "Title missing");
 
         if (meta.image() == null || meta.image().isBlank())
-            throw new InvalidMetadataException(gameId, "Image missing");
+            throw new InvalidMetadataException(gameId.value(), "Image missing");
     }
 }

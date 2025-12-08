@@ -6,6 +6,7 @@ import be.kdg.team22.storeservice.domain.cart.Cart;
 import be.kdg.team22.storeservice.domain.cart.CartId;
 import be.kdg.team22.storeservice.domain.cart.CartItem;
 import be.kdg.team22.storeservice.domain.cart.UserId;
+import be.kdg.team22.storeservice.domain.catalog.GameId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,11 +42,7 @@ class CartControllerTest {
     JwtDecoder jwtDecoder;
 
     private Cart sampleCart() {
-        return new Cart(
-                CartId.from(USER_ID),
-                USER_ID,
-                Set.of(new CartItem(GAME_ID))
-        );
+        return new Cart(CartId.from(USER_ID), USER_ID, Set.of(new CartItem(GameId.from(GAME_ID))));
     }
 
     private String jwtUserId() {
@@ -59,10 +56,7 @@ class CartControllerTest {
 
         when(cartService.getOrCreate(UserId.from(USER_ID))).thenReturn(cart);
 
-        mockMvc.perform(get("/api/cart")
-                        .with(jwt().jwt(builder -> builder.subject(jwtUserId()))))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.items[0].gameId").value(GAME_ID.toString()));
+        mockMvc.perform(get("/api/cart").with(jwt().jwt(builder -> builder.subject(jwtUserId())))).andExpect(status().isOk()).andExpect(jsonPath("$.items[0].gameId").value(GAME_ID.toString()));
 
         verify(cartService).getOrCreate(UserId.from(USER_ID));
     }
@@ -70,8 +64,7 @@ class CartControllerTest {
     @Test
     @DisplayName("GET /api/cart → missing JWT returns 401")
     void getCart_missingJwt_401() throws Exception {
-        mockMvc.perform(get("/api/cart"))
-                .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/cart")).andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -83,14 +76,9 @@ class CartControllerTest {
                 }
                 """;
 
-        mockMvc.perform(post("/api/cart/items")
-                        .with(jwt().jwt(builder -> builder.subject(jwtUserId())))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(body))
-                .andExpect(status().isOk());
+        mockMvc.perform(post("/api/cart/items").with(jwt().jwt(builder -> builder.subject(jwtUserId()))).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isOk());
 
-        verify(cartService).addItem(UserId.from(USER_ID), GAME_ID, "token");
+        verify(cartService).addItem(UserId.from(USER_ID), GameId.from(GAME_ID), "token");
     }
 
     @Test
@@ -102,39 +90,27 @@ class CartControllerTest {
                 }
                 """;
 
-        mockMvc.perform(post("/api/cart/items")
-                        .with(jwt().jwt(builder -> builder.subject(jwtUserId())))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(body))
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/api/cart/items").with(jwt().jwt(builder -> builder.subject(jwtUserId()))).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isBadRequest());
     }
 
     @Test
     @DisplayName("DELETE /api/cart/items/{gameId} → removes item")
     void deleteItem_succeeds() throws Exception {
-        mockMvc.perform(delete("/api/cart/items/{gameId}", GAME_ID)
-                        .with(jwt().jwt(builder -> builder.subject(jwtUserId())))
-                        .with(csrf()))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(delete("/api/cart/items/{gameId}", GAME_ID).with(jwt().jwt(builder -> builder.subject(jwtUserId()))).with(csrf())).andExpect(status().isNoContent());
 
-        verify(cartService).removeItem(UserId.from(USER_ID), GAME_ID);
+        verify(cartService).removeItem(UserId.from(USER_ID), GameId.from(GAME_ID));
     }
 
     @Test
     @DisplayName("DELETE /api/cart/items/{gameId} → missing JWT returns 401")
     void deleteItem_missingJwt_401() throws Exception {
-        mockMvc.perform(delete("/api/cart/items/{gameId}", GAME_ID))
-                .andExpect(status().isUnauthorized());
+        mockMvc.perform(delete("/api/cart/items/{gameId}", GAME_ID)).andExpect(status().isUnauthorized());
     }
 
     @Test
     @DisplayName("DELETE /api/cart → clears cart")
     void clearCart_succeeds() throws Exception {
-        mockMvc.perform(delete("/api/cart")
-                        .with(jwt().jwt(builder -> builder.subject(jwtUserId())))
-                        .with(csrf()))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(delete("/api/cart").with(jwt().jwt(builder -> builder.subject(jwtUserId()))).with(csrf())).andExpect(status().isNoContent());
 
         verify(cartService).clearCart(UserId.from(USER_ID));
     }

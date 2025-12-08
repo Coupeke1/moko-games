@@ -6,6 +6,7 @@ import be.kdg.team22.storeservice.api.cart.models.CartResponseModel;
 import be.kdg.team22.storeservice.application.cart.CartService;
 import be.kdg.team22.storeservice.domain.cart.Cart;
 import be.kdg.team22.storeservice.domain.cart.UserId;
+import be.kdg.team22.storeservice.domain.catalog.GameId;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -39,7 +40,7 @@ public class CartController {
             @Valid @RequestBody final AddCartItemRequestModel request
     ) {
         UserId userId = UserId.get(jwt);
-        service.addItem(userId, request.gameId(), jwt.getTokenValue());
+        service.addItem(userId, GameId.from(request.gameId()), jwt.getTokenValue());
         return ResponseEntity.ok().build();
     }
 
@@ -49,7 +50,7 @@ public class CartController {
             @PathVariable final UUID gameId
     ) {
         UserId userId = UserId.get(jwt);
-        service.removeItem(userId, gameId);
+        service.removeItem(userId, GameId.from(gameId));
         return ResponseEntity.noContent().build();
     }
 

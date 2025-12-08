@@ -4,8 +4,8 @@ import be.kdg.team22.storeservice.api.order.models.PaymentResponse;
 import be.kdg.team22.storeservice.application.cart.CartService;
 import be.kdg.team22.storeservice.domain.cart.Cart;
 import be.kdg.team22.storeservice.domain.cart.UserId;
-import be.kdg.team22.storeservice.domain.catalog.GameCatalogEntry;
-import be.kdg.team22.storeservice.domain.catalog.GameCatalogRepository;
+import be.kdg.team22.storeservice.domain.catalog.Entry;
+import be.kdg.team22.storeservice.domain.catalog.EntryRepository;
 import be.kdg.team22.storeservice.domain.catalog.exceptions.GameNotFoundException;
 import be.kdg.team22.storeservice.domain.order.*;
 import be.kdg.team22.storeservice.domain.order.exceptions.OrderEmptyException;
@@ -23,13 +23,10 @@ import java.util.List;
 public class OrderService {
     private final OrderRepository repository;
     private final CartService cartService;
-    private final GameCatalogRepository catalog;
+    private final EntryRepository catalog;
     private final PaymentProvider paymentProvider;
 
-    public OrderService(OrderRepository repository,
-                        CartService cartService,
-                        GameCatalogRepository catalog,
-                        PaymentProvider paymentProvider) {
+    public OrderService(OrderRepository repository, CartService cartService, EntryRepository catalog, PaymentProvider paymentProvider) {
         this.repository = repository;
         this.cartService = cartService;
         this.catalog = catalog;
@@ -42,36 +39,26 @@ public class OrderService {
         if (cart.isEmpty())
             throw new OrderEmptyException();
 
-        List<OrderItem> items = cart.items().stream()
-                .map(i -> {
-                    GameCatalogEntry entry = catalog.findById(i.gameId())
-                            .orElseThrow(() -> new GameNotFoundException(i.gameId()));
-                    return new OrderItem(i.gameId(), entry.getPrice());
-                })
-                .toList();
+        List<OrderItem> items = cart.items().stream().map(item -> {
+            Entry entry = catalog.findById(item.gameId().value()).orElseThrow(() -> new GameNotFoundException(item.gameId()));
+            return new OrderItem(item.gameId(), entry.price());
+        }).toList();
 
-        Order order = new Order(
-                OrderId.create(),
-                items,
-                OrderStatus.PENDING_PAYMENT,
-                userId
-        );
+        Order order = new Order(OrderId.create(), items, OrderStatus.PENDING_PAYMENT, userId);
 
         repository.save(order);
-
         return order;
     }
 
     public Order getOrder(final OrderId id) {
-        return repository.findById(id.value())
-                .orElseThrow(OrderNotFoundException::new);
+        return repository.findById(id.value()).orElseThrow(OrderNotFoundException::new);
     }
 
     public PaymentResponse createPaymentForOrder(final OrderId id, final UserId userId) {
-        Order order = repository.findById(id.value())
-                .orElseThrow(OrderNotFoundException::new);
+        Order order = repository.findById(id.value()).orElseThrow(OrderNotFoundException::new);
 
-        if (!order.userId().equals(userId)) throw new OrderNotOwnedException("User does not own this order");
+        if (!order.userId().equals(userId))
+            throw new OrderNotOwnedException("User does not own this order");
 
         Payment payment = paymentProvider.createPayment(order);
 

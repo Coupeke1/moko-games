@@ -9,13 +9,15 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface GameCatalogRepository {
+public interface EntryRepository {
 
-    Optional<GameCatalogEntry> findById(UUID id);
+    Optional<Entry> findById(UUID id);
 
-    List<GameCatalogEntry> findAll(FilterQuery filter, Pagination pagination);
+    Optional<Entry> findByIdWithPosts(UUID id);
 
-    void save(GameCatalogEntry entry);
+    List<Entry> findAll(FilterQuery filter, Pagination pagination);
+
+    void save(Entry entry);
 
     void delete(UUID id);
 }

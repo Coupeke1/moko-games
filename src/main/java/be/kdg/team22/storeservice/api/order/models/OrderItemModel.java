@@ -11,7 +11,7 @@ public record OrderItemModel(
 ) {
     public static OrderItemModel from(final OrderItem item) {
         return new OrderItemModel(
-                item.gameId(),
+                item.gameId().value(),
                 item.price()
         );
     }

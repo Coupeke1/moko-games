@@ -3,6 +3,7 @@ package be.kdg.team22.storeservice.infrastructure.cart.jpa;
 import be.kdg.team22.storeservice.domain.cart.Cart;
 import be.kdg.team22.storeservice.domain.cart.CartId;
 import be.kdg.team22.storeservice.domain.cart.CartItem;
+import be.kdg.team22.storeservice.domain.catalog.GameId;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -18,11 +19,7 @@ class CartEntityTest {
         UUID userId = UUID.randomUUID();
         CartId cartId = CartId.create();
 
-        Cart domain = new Cart(
-                cartId,
-                userId,
-                Set.of(new CartItem(UUID.fromString("11111111-1111-1111-1111-111111111111")))
-        );
+        Cart domain = new Cart(cartId, userId, Set.of(new CartItem(GameId.from(UUID.fromString("11111111-1111-1111-1111-111111111111")))));
 
         CartEntity entity = CartEntity.from(domain);
 
@@ -32,8 +29,7 @@ class CartEntityTest {
         assertThat(entity.items()).hasSize(1);
 
         CartItemEntity item = entity.items().getFirst();
-        assertThat(item.to().gameId())
-                .isEqualTo(UUID.fromString("11111111-1111-1111-1111-111111111111"));
+        assertThat(item.to().gameId().value()).isEqualTo(UUID.fromString("11111111-1111-1111-1111-111111111111"));
     }
 
     @Test
@@ -41,7 +37,7 @@ class CartEntityTest {
         UUID userId = UUID.randomUUID();
         CartId cartId = CartId.create();
 
-        Cart domain = new Cart(cartId, userId, Set.of(new CartItem(UUID.randomUUID())));
+        Cart domain = new Cart(cartId, userId, Set.of(new CartItem(GameId.create())));
 
         CartEntity entity = CartEntity.from(domain);
 
@@ -64,7 +60,7 @@ class CartEntityTest {
         assertThat(domain.items()).hasSize(1);
 
         CartItem mapped = domain.items().iterator().next();
-        assertThat(mapped.gameId()).isEqualTo(gameId);
+        assertThat(mapped.gameId().value()).isEqualTo(gameId);
     }
 
     @Test

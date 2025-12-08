@@ -11,8 +11,8 @@ class UpdateGameCatalogModelTest {
 
     @Test
     void validModel_shouldHoldValues() {
-        UpdateGameCatalogModel model =
-                new UpdateGameCatalogModel(BigDecimal.valueOf(12), GameCategory.CARD);
+        UpdateEntryModel model =
+                new UpdateEntryModel(BigDecimal.valueOf(12), GameCategory.CARD);
 
         assertThat(model.price()).isEqualTo(BigDecimal.valueOf(12));
         assertThat(model.category()).isEqualTo(GameCategory.CARD);

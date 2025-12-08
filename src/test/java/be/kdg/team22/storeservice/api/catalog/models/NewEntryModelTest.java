@@ -8,12 +8,12 @@ import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-class GameCatalogRequestModelTest {
+class NewEntryModelTest {
 
     @Test
     void validModel_shouldHoldValues() {
         UUID id = UUID.randomUUID();
-        GameCatalogRequestModel model = new GameCatalogRequestModel(id, BigDecimal.TEN, GameCategory.CARD);
+        NewEntryModel model = new NewEntryModel(id, BigDecimal.TEN, GameCategory.CARD);
 
         assertThat(model.id()).isEqualTo(id);
         assertThat(model.price()).isEqualTo(BigDecimal.TEN);

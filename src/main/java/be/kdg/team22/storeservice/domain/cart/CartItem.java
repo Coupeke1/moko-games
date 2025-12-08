@@ -1,11 +1,10 @@
 package be.kdg.team22.storeservice.domain.cart;
 
+import be.kdg.team22.storeservice.domain.catalog.GameId;
 import org.jmolecules.ddd.annotation.ValueObject;
-
-import java.util.UUID;
 
 @ValueObject
 public record CartItem(
-        UUID gameId
+        GameId gameId
 ) {
 }

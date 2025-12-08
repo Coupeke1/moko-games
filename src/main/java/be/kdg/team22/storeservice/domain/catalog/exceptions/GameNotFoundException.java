@@ -1,12 +1,11 @@
 package be.kdg.team22.storeservice.domain.catalog.exceptions;
 
+import be.kdg.team22.storeservice.domain.catalog.GameId;
 import org.jmolecules.ddd.annotation.ValueObject;
-
-import java.util.UUID;
 
 @ValueObject
 public class GameNotFoundException extends RuntimeException {
-    public GameNotFoundException(UUID id) {
-        super("Game with ID %s not found".formatted(id));
+    public GameNotFoundException(final GameId id) {
+        super("Game with id '%s' not found".formatted(id));
     }
 }

@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public record GameCatalogRequestModel(
+public record NewEntryModel(
         @NotNull UUID id,
         @NotNull @Positive BigDecimal price,
         @NotNull GameCategory category
