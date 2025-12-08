@@ -1,5 +1,8 @@
 package be.kdg.team22.sessionservice.infrastructure.games;
 
+import be.kdg.team22.sessionservice.domain.game.GameRepository;
+import be.kdg.team22.sessionservice.domain.game.GameServiceNotReachableException;
+import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.GameNotFoundException;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.NotReachableException;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,7 +14,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
 @Component
-public class ExternalGamesRepository {
+public class ExternalGamesRepository implements GameRepository {
     private final RestClient client;
 
     public ExternalGamesRepository(@Qualifier("gameService") final RestClient client) {
@@ -30,6 +33,26 @@ public class ExternalGamesRepository {
             throw exception;
         } catch (RestClientException exception) {
             throw NotReachableException.GamesService();
+        }
+    }
+
+    public String findGameNameById(final GameId gameId) {
+        try {
+            GameResponse response = client.get()
+                    .uri("/" + gameId.value())
+                    .retrieve()
+                    .body(GameResponse.class);
+
+            if (response == null)
+                throw new GameNotFoundException(gameId.value());
+
+            return response.name();
+        } catch (HttpClientErrorException exception) {
+            if (exception.getStatusCode() == HttpStatus.NOT_FOUND)
+                throw new GameNotFoundException(gameId.value());
+            throw exception;
+        } catch (RestClientException exception) {
+            throw new GameServiceNotReachableException();
         }
     }
 }

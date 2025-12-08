@@ -8,6 +8,7 @@ import be.kdg.team22.sessionservice.domain.lobby.LobbyRepository;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerNotFriendException;
+import be.kdg.team22.sessionservice.infrastructure.messaging.LobbyEventPublisher;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,20 +22,26 @@ public class LobbyPlayerService {
     private final FriendsService friendsService;
     private final PlayerService playerService;
     private final LobbyPublisherService lobbyPublisher;
+    private final LobbyEventPublisher eventPublisher;
 
-    public LobbyPlayerService(final LobbyRepository lobbyRepository, final FriendsService friendsService, final PlayerService playerService, final LobbyPublisherService lobbyPublisher) {
+    public LobbyPlayerService(final LobbyRepository lobbyRepository, final FriendsService friendsService, final PlayerService playerService, final LobbyPublisherService lobbyPublisher, final LobbyEventPublisher eventPublisher) {
         this.lobbyRepository = lobbyRepository;
         this.friendsService = friendsService;
         this.playerService = playerService;
         this.lobbyPublisher = lobbyPublisher;
+        this.eventPublisher = eventPublisher;
     }
 
     public void invitePlayer(final PlayerId ownerId, final LobbyId lobbyId, final PlayerId playerId, final Jwt token) {
         Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
         ensureFriend(ownerId, playerId, token);
 
+        Player inviter = playerService.findPlayer(ownerId, token);
+
         lobby.invitePlayer(ownerId, playerId);
         lobbyPublisher.saveAndPublish(lobby);
+
+        eventPublisher.publishLobbyInvite(lobby, ownerId, inviter.username().value(), playerId);
     }
 
     public void addBot(final PlayerId ownerId, final LobbyId lobbyId) {
@@ -59,6 +66,8 @@ public class LobbyPlayerService {
 
         lobby.acceptInvite(player);
         lobbyPublisher.saveAndPublish(lobby);
+
+        eventPublisher.publishPlayerJoinedLobby(lobby, playerId, player.username().value());
     }
 
     public void removePlayer(final PlayerId ownerId, final LobbyId lobbyId, final PlayerId playerId) {
