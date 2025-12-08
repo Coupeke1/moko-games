@@ -1,11 +1,12 @@
 package be.kdg.team22.storeservice.application.catalog.services;
 
-import be.kdg.team22.storeservice.api.catalog.models.GameCatalogResponse;
+import be.kdg.team22.storeservice.api.catalog.models.EntryModel;
 import be.kdg.team22.storeservice.application.catalog.queries.FilterQuery;
 import be.kdg.team22.storeservice.application.catalog.queries.Pagination;
-import be.kdg.team22.storeservice.domain.catalog.GameCatalogEntry;
-import be.kdg.team22.storeservice.domain.catalog.GameCatalogRepository;
+import be.kdg.team22.storeservice.domain.catalog.Entry;
+import be.kdg.team22.storeservice.domain.catalog.EntryRepository;
 import be.kdg.team22.storeservice.domain.catalog.GameCategory;
+import be.kdg.team22.storeservice.domain.catalog.GameId;
 import be.kdg.team22.storeservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.storeservice.infrastructure.games.GameMetadataResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,22 +34,20 @@ class GameQueryServiceSociableTest {
     private final UUID ID2 = UUID.randomUUID();
     GameQueryService queryService;
     @Mock
-    GameCatalogRepository repo;
+    EntryRepository repo;
     @Mock
     ExternalGamesRepository games;
 
-    private GameCatalogEntry entry1() {
-        return new GameCatalogEntry(ID1, BigDecimal.valueOf(10), GameCategory.CARD, 5);
+    private Entry entry1() {
+        return new Entry(GameId.from(ID1), BigDecimal.valueOf(10), GameCategory.CARD, 5, Collections.emptyList());
     }
 
-    private GameCatalogEntry entry2() {
-        return new GameCatalogEntry(ID2, BigDecimal.valueOf(20), GameCategory.STRATEGY, 3);
+    private Entry entry2() {
+        return new Entry(GameId.from(ID2), BigDecimal.valueOf(20), GameCategory.STRATEGY, 3, Collections.emptyList());
     }
 
     private GameMetadataResponse meta(UUID id, String title) {
-        return new GameMetadataResponse(
-                id, "engine", title, "desc", "img.png", Instant.now(), Instant.now()
-        );
+        return new GameMetadataResponse(id, "engine", title, "desc", "img.png", Instant.now(), Instant.now());
     }
 
     @BeforeEach
@@ -57,33 +57,27 @@ class GameQueryServiceSociableTest {
 
     @Test
     void list_returnsMappedResponses() {
-        when(repo.findAll(any(), any()))
-                .thenReturn(List.of(entry1(), entry2()));
+        when(repo.findAll(any(), any())).thenReturn(List.of(entry1(), entry2()));
 
-        when(games.fetchMetadata(ID1)).thenReturn(meta(ID1, "A-Title"));
-        when(games.fetchMetadata(ID2)).thenReturn(meta(ID2, "B-Title"));
+        when(games.fetchMetadata(GameId.from(ID1))).thenReturn(meta(ID1, "A-Title"));
+        when(games.fetchMetadata(GameId.from(ID2))).thenReturn(meta(ID2, "B-Title"));
 
-        List<GameCatalogResponse> responses =
-                queryService.listGamesWithMetadata(new FilterQuery(), new Pagination(0, 10));
+        List<EntryModel> responses = queryService.listGamesWithMetadata(new FilterQuery(), new Pagination(0, 10));
 
-        assertThat(responses)
-                .extracting(GameCatalogResponse::title)
-                .containsExactly("A-Title", "B-Title");
+        assertThat(responses).extracting(EntryModel::title).containsExactly("A-Title", "B-Title");
     }
 
     @Test
     void list_alphabeticSorting_appliesCorrectly() {
-        when(repo.findAll(any(), any()))
-                .thenReturn(List.of(entry1(), entry2()));
+        when(repo.findAll(any(), any())).thenReturn(List.of(entry1(), entry2()));
 
-        when(games.fetchMetadata(ID1)).thenReturn(meta(ID1, "Zulu"));
-        when(games.fetchMetadata(ID2)).thenReturn(meta(ID2, "Alpha"));
+        when(games.fetchMetadata(GameId.from(ID1))).thenReturn(meta(ID1, "Zulu"));
+        when(games.fetchMetadata(GameId.from(ID2))).thenReturn(meta(ID2, "Alpha"));
 
         FilterQuery filter = new FilterQuery();
         filter.sortBy = Optional.of("alphabetic");
 
-        List<GameCatalogResponse> responses =
-                queryService.listGamesWithMetadata(filter, new Pagination(0, 10));
+        List<EntryModel> responses = queryService.listGamesWithMetadata(filter, new Pagination(0, 10));
 
         assertThat(responses.get(0).title()).isEqualTo("Alpha");
         assertThat(responses.get(1).title()).isEqualTo("Zulu");
@@ -92,9 +86,9 @@ class GameQueryServiceSociableTest {
     @Test
     void get_returnsMappedResponse() {
         when(repo.findById(ID1)).thenReturn(Optional.of(entry1()));
-        when(games.fetchMetadata(ID1)).thenReturn(meta(ID1, "Chess"));
+        when(games.fetchMetadata(GameId.from(ID1))).thenReturn(meta(ID1, "Chess"));
 
-        GameCatalogResponse response = queryService.getGameWithMetadata(ID1);
+        EntryModel response = queryService.getGameWithMetadata(GameId.from(ID1));
 
         assertThat(response.title()).isEqualTo("Chess");
         assertThat(response.id()).isEqualTo(ID1);
@@ -104,7 +98,6 @@ class GameQueryServiceSociableTest {
     void get_whenNotFound_throwsException() {
         when(repo.findById(ID1)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> queryService.getGameWithMetadata(ID1))
-                .isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> queryService.getGameWithMetadata(GameId.from(ID1))).isInstanceOf(RuntimeException.class);
     }
 }

@@ -1,5 +1,6 @@
 package be.kdg.team22.storeservice.infrastructure.games;
 
+import be.kdg.team22.storeservice.domain.catalog.GameId;
 import be.kdg.team22.storeservice.domain.catalog.exceptions.GameNotFoundException;
 import be.kdg.team22.storeservice.domain.exceptions.ServiceUnavailableException;
 import org.junit.jupiter.api.DisplayName;
@@ -38,7 +39,7 @@ class ExternalGamesRepositoryTest {
 
         ExternalGamesRepository repo = new ExternalGamesRepository(client);
 
-        GameMetadataResponse result = repo.fetchMetadata(gameId);
+        GameMetadataResponse result = repo.fetchMetadata(GameId.from(gameId));
 
         assertThat(result.id()).isEqualTo(gameId);
     }
@@ -58,7 +59,7 @@ class ExternalGamesRepositoryTest {
 
         ExternalGamesRepository repo = new ExternalGamesRepository(client);
 
-        assertThatThrownBy(() -> repo.fetchMetadata(gameId))
+        assertThatThrownBy(() -> repo.fetchMetadata(GameId.from(gameId)))
                 .isInstanceOf(GameNotFoundException.class);
     }
 
@@ -77,7 +78,7 @@ class ExternalGamesRepositoryTest {
 
         ExternalGamesRepository repo = new ExternalGamesRepository(client);
 
-        assertThatThrownBy(() -> repo.fetchMetadata(gameId))
+        assertThatThrownBy(() -> repo.fetchMetadata(GameId.from(gameId)))
                 .isInstanceOf(GameNotFoundException.class);
     }
 
@@ -97,7 +98,7 @@ class ExternalGamesRepositoryTest {
 
         ExternalGamesRepository repo = new ExternalGamesRepository(client);
 
-        assertThatThrownBy(() -> repo.fetchMetadata(gameId))
+        assertThatThrownBy(() -> repo.fetchMetadata(GameId.from(gameId)))
                 .isInstanceOf(HttpClientErrorException.class)
                 .hasMessageContaining("400");
     }
@@ -117,7 +118,7 @@ class ExternalGamesRepositoryTest {
 
         ExternalGamesRepository repo = new ExternalGamesRepository(client);
 
-        assertThatThrownBy(() -> repo.fetchMetadata(gameId))
+        assertThatThrownBy(() -> repo.fetchMetadata(GameId.from(gameId)))
                 .isInstanceOf(ServiceUnavailableException.class);
     }
 }

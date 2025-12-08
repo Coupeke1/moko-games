@@ -2,65 +2,68 @@ package be.kdg.team22.storeservice.application.catalog.services;
 
 import be.kdg.team22.storeservice.application.catalog.queries.FilterQuery;
 import be.kdg.team22.storeservice.application.catalog.queries.Pagination;
-import be.kdg.team22.storeservice.domain.catalog.GameCatalogEntry;
-import be.kdg.team22.storeservice.domain.catalog.GameCatalogRepository;
-import be.kdg.team22.storeservice.domain.catalog.GameCategory;
+import be.kdg.team22.storeservice.domain.catalog.*;
 import be.kdg.team22.storeservice.domain.catalog.exceptions.GameNotFoundException;
 import be.kdg.team22.storeservice.infrastructure.games.ExternalGamesRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.UUID;
+import java.util.Collection;
+import java.util.Collections;
 
 @Service
 @Transactional
 public class StoreService {
-    private final GameCatalogRepository repo;
+    private final EntryRepository repository;
     private final ExternalGamesRepository games;
 
-    public StoreService(final GameCatalogRepository repo, final ExternalGamesRepository games) {
-        this.repo = repo;
+    public StoreService(final EntryRepository repository, final ExternalGamesRepository games) {
+        this.repository = repository;
         this.games = games;
     }
 
-    public GameCatalogEntry get(final UUID id) {
-        return repo.findById(id)
-                .orElseThrow(() -> new GameNotFoundException(id));
+    public Entry get(final GameId id) {
+        return repository.findById(id.value()).orElseThrow(id::notFound);
     }
 
-    public List<GameCatalogEntry> list(final FilterQuery filter, final Pagination pagination) {
-        return repo.findAll(filter, pagination);
+    public Collection<Post> getPosts(final GameId id) {
+        final Entry entry = repository.findByIdWithPosts(id.value()).orElseThrow(id::notFound);
+        return entry.posts();
     }
 
-    public GameCatalogEntry create(final UUID id, final BigDecimal price, final GameCategory category) {
+    public Post getPost(final GameId entryId, final PostId postId) {
+        final Entry entry = repository.findByIdWithPosts(entryId.value()).orElseThrow(entryId::notFound);
+        return entry.findPost(postId).orElseThrow(postId::notFound);
+    }
+
+    public Collection<Entry> list(final FilterQuery filter, final Pagination pagination) {
+        return repository.findAll(filter, pagination);
+    }
+
+    public Entry create(final GameId id, final BigDecimal price, final GameCategory category) {
         games.fetchMetadata(id);
+        final Entry entry = new Entry(id, price, category, Collections.emptyList());
 
-        GameCatalogEntry entry = new GameCatalogEntry(id, price, category);
-
-        repo.save(entry);
+        repository.save(entry);
         return entry;
     }
 
-    public GameCatalogEntry update(final UUID id, final BigDecimal price, final GameCategory category) {
-        GameCatalogEntry existing = repo.findById(id)
-                .orElseThrow(() -> new GameNotFoundException(id));
-
+    public Entry update(final GameId id, final BigDecimal price, final GameCategory category) {
+        final Entry existing = repository.findById(id.value()).orElseThrow(id::notFound);
         existing.updatePriceAndCategory(price, category);
 
-        repo.save(existing);
+        repository.save(existing);
         return existing;
     }
 
-    public void recordPurchase(final UUID gameId) {
-        GameCatalogEntry entry = repo.findById(gameId)
-                .orElseThrow(() -> new GameNotFoundException(gameId));
+    public void recordPurchase(final GameId gameId) {
+        final Entry entry = repository.findById(gameId.value()).orElseThrow(() -> new GameNotFoundException(gameId));
         entry.recordPurchase();
-        repo.save(entry);
+        repository.save(entry);
     }
 
-    public void delete(final UUID id) {
-        repo.delete(id);
+    public void delete(final GameId id) {
+        repository.delete(id.value());
     }
 }

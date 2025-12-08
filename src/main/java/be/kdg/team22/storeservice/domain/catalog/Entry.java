@@ -4,34 +4,33 @@ import be.kdg.team22.storeservice.domain.catalog.exceptions.GameCatalogException
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
 import java.math.BigDecimal;
-import java.util.UUID;
+import java.util.Collection;
+import java.util.Optional;
 
 @AggregateRoot
-public class GameCatalogEntry {
-    private final UUID id;
+public class Entry {
+    private final GameId id;
     private BigDecimal price;
     private GameCategory category;
     private int purchaseCount;
     private double popularityScore;
+    private final Collection<Post> posts;
 
-    public GameCatalogEntry(final UUID id,
-                            final BigDecimal price,
-                            final GameCategory category) {
+    public Entry(final GameId id, final BigDecimal price, final GameCategory category, Collection<Post> posts) {
         this.id = id;
         this.price = price;
         this.category = category;
+        this.posts = posts;
         this.purchaseCount = 0;
         this.popularityScore = calculatePopularityScore();
     }
 
-    public GameCatalogEntry(final UUID id,
-                            final BigDecimal price,
-                            final GameCategory category,
-                            final int purchaseCount) {
+    public Entry(final GameId id, final BigDecimal price, final GameCategory category, final int purchaseCount, Collection<Post> posts) {
         this.id = id;
         this.price = price;
         this.category = category;
         this.purchaseCount = purchaseCount;
+        this.posts = posts;
         this.popularityScore = calculatePopularityScore();
     }
 
@@ -52,24 +51,31 @@ public class GameCatalogEntry {
         return Math.log10(purchaseCount + 1) * 10;
     }
 
-    public UUID getId() {
+    public GameId id() {
         return id;
     }
 
-    public BigDecimal getPrice() {
+    public BigDecimal price() {
         return price;
     }
 
-    public GameCategory getCategory() {
+    public GameCategory category() {
         return category;
     }
 
-    public double getPopularityScore() {
+    public double popularity() {
         return popularityScore;
     }
 
-    public int getPurchaseCount() {
+    public int purchaseCount() {
         return purchaseCount;
     }
 
+    public Collection<Post> posts() {
+        return posts;
+    }
+
+    public Optional<Post> findPost(final PostId id) {
+        return posts.stream().filter(post -> post.id().equals(id)).findFirst();
+    }
 }

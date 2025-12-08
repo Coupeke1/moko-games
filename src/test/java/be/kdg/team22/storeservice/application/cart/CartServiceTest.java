@@ -5,6 +5,7 @@ import be.kdg.team22.storeservice.domain.cart.CartId;
 import be.kdg.team22.storeservice.domain.cart.CartRepository;
 import be.kdg.team22.storeservice.domain.cart.UserId;
 import be.kdg.team22.storeservice.domain.cart.exceptions.*;
+import be.kdg.team22.storeservice.domain.catalog.GameId;
 import be.kdg.team22.storeservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.storeservice.infrastructure.games.GameMetadataResponse;
 import be.kdg.team22.storeservice.infrastructure.user.ExternalUserRepository;
@@ -40,15 +41,7 @@ class CartServiceTest {
 
         service = new CartService(repo, games, users);
 
-        validMetadata = new GameMetadataResponse(
-                GAME,
-                "name",
-                "title",
-                "desc",
-                "image.png",
-                Instant.now(),
-                Instant.now()
-        );
+        validMetadata = new GameMetadataResponse(GAME, "name", "title", "desc", "image.png", Instant.now(), Instant.now());
     }
 
     @Test
@@ -93,93 +86,84 @@ class CartServiceTest {
     void get_notFound() {
         when(repo.findByUserId(USER)).thenReturn(Optional.empty());
 
-        assertThrows(CartNotFoundException.class,
-                () -> service.get(userId));
+        assertThrows(CartNotFoundException.class, () -> service.get(userId));
     }
 
     @Test
     @DisplayName("addItem → throws metadata null")
     void addItem_metadataNull() {
-        when(games.fetchMetadata(GAME)).thenReturn(null);
+        when(games.fetchMetadata(GameId.from(GAME))).thenReturn(null);
 
-        assertThrows(InvalidMetadataException.class,
-                () -> service.addItem(userId, GAME, JWT));
+        assertThrows(InvalidMetadataException.class, () -> service.addItem(userId, GameId.from(GAME), JWT));
     }
 
     @Test
     @DisplayName("addItem → missing title")
     void addItem_missingTitle() {
-        GameMetadataResponse meta = new GameMetadataResponse(
-                GAME, "name", "", "desc", "image", Instant.now(), Instant.now()
-        );
-        when(games.fetchMetadata(GAME)).thenReturn(meta);
+        GameMetadataResponse meta = new GameMetadataResponse(GAME, "name", "", "desc", "image", Instant.now(), Instant.now());
+        when(games.fetchMetadata(GameId.from(GAME))).thenReturn(meta);
 
-        assertThrows(InvalidMetadataException.class,
-                () -> service.addItem(userId, GAME, JWT));
+        assertThrows(InvalidMetadataException.class, () -> service.addItem(userId, GameId.from(GAME), JWT));
     }
 
     @Test
     @DisplayName("addItem → missing image")
     void addItem_missingImage() {
-        GameMetadataResponse meta = new GameMetadataResponse(
-                GAME, "name", "title", "desc", "", Instant.now(), Instant.now()
-        );
-        when(games.fetchMetadata(GAME)).thenReturn(meta);
+        GameMetadataResponse meta = new GameMetadataResponse(GAME, "name", "title", "desc", "", Instant.now(), Instant.now());
+        when(games.fetchMetadata(GameId.from(GAME))).thenReturn(meta);
 
-        assertThrows(InvalidMetadataException.class,
-                () -> service.addItem(userId, GAME, JWT));
+        assertThrows(InvalidMetadataException.class, () -> service.addItem(userId, GameId.from(GAME), JWT));
     }
 
     @Test
     @DisplayName("addItem → user already owns game")
     void addItem_userOwnsGame() {
-        when(games.fetchMetadata(GAME)).thenReturn(validMetadata);
+        when(games.fetchMetadata(GameId.from(GAME))).thenReturn(validMetadata);
         when(users.userOwnsGame(GAME, JWT)).thenReturn(true);
 
-        assertThrows(GameAlreadyOwnedException.class,
-                () -> service.addItem(userId, GAME, JWT));
+        assertThrows(GameAlreadyOwnedException.class, () -> service.addItem(userId, GameId.from(GAME), JWT));
     }
 
     @Test
     @DisplayName("addItem → adds to existing cart")
     void addItem_existingCart() {
         Cart cart = new Cart(CartId.create(), USER);
-        when(games.fetchMetadata(GAME)).thenReturn(validMetadata);
+        when(games.fetchMetadata(GameId.from(GAME))).thenReturn(validMetadata);
         when(users.userOwnsGame(GAME, JWT)).thenReturn(false);
         when(repo.findByUserId(USER)).thenReturn(Optional.of(cart));
 
-        service.addItem(userId, GAME, JWT);
+        service.addItem(userId, GameId.from(GAME), JWT);
 
-        assertTrue(cart.items().stream().anyMatch(i -> i.gameId().equals(GAME)));
+        assertTrue(cart.items().stream().anyMatch(i -> i.gameId().value().equals(GAME)));
         verify(repo).save(cart);
     }
 
     @Test
     @DisplayName("addItem → creates new cart when none exists")
     void addItem_newCart() {
-        when(games.fetchMetadata(GAME)).thenReturn(validMetadata);
+        when(games.fetchMetadata(GameId.from(GAME))).thenReturn(validMetadata);
         when(users.userOwnsGame(GAME, JWT)).thenReturn(false);
         when(repo.findByUserId(USER)).thenReturn(Optional.empty());
 
-        service.addItem(userId, GAME, JWT);
+        service.addItem(userId, GameId.from(GAME), JWT);
 
         ArgumentCaptor<Cart> captor = ArgumentCaptor.forClass(Cart.class);
         verify(repo, atLeastOnce()).save(captor.capture());
 
         Cart saved = captor.getValue();
         assertEquals(USER, saved.userId());
-        assertTrue(saved.items().stream().anyMatch(i -> i.gameId().equals(GAME)));
+        assertTrue(saved.items().stream().anyMatch(i -> i.gameId().value().equals(GAME)));
     }
 
     @Test
     @DisplayName("removeItem → happy path")
     void removeItem() {
         Cart cart = new Cart(CartId.create(), USER);
-        cart.addItem(GAME);
+        cart.addItem(GameId.from(GAME));
 
         when(repo.findByUserId(USER)).thenReturn(Optional.of(cart));
 
-        service.removeItem(userId, GAME);
+        service.removeItem(userId, GameId.from(GAME));
 
         assertTrue(cart.items().isEmpty());
         verify(repo).save(cart);
@@ -191,15 +175,14 @@ class CartServiceTest {
         Cart cart = new Cart(CartId.create(), USER);
         when(repo.findByUserId(USER)).thenReturn(Optional.of(cart));
 
-        assertThrows(CartItemNotFoundException.class,
-                () -> service.removeItem(userId, GAME));
+        assertThrows(CartItemNotFoundException.class, () -> service.removeItem(userId, GameId.from(GAME)));
     }
 
     @Test
     @DisplayName("clearCart → happy path")
     void clearCart() {
         Cart cart = new Cart(CartId.create(), USER);
-        cart.addItem(GAME);
+        cart.addItem(GameId.from(GAME));
         when(repo.findByUserId(USER)).thenReturn(Optional.of(cart));
 
         service.clearCart(userId);
@@ -214,7 +197,6 @@ class CartServiceTest {
         Cart cart = new Cart(CartId.create(), USER);
         when(repo.findByUserId(USER)).thenReturn(Optional.of(cart));
 
-        assertThrows(CartEmptyException.class,
-                () -> service.clearCart(userId));
+        assertThrows(CartEmptyException.class, () -> service.clearCart(userId));
     }
 }

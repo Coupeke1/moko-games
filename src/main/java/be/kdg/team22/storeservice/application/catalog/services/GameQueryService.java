@@ -1,51 +1,52 @@
 package be.kdg.team22.storeservice.application.catalog.services;
 
-import be.kdg.team22.storeservice.api.catalog.models.GameCatalogResponse;
+import be.kdg.team22.storeservice.api.catalog.models.EntryModel;
 import be.kdg.team22.storeservice.application.catalog.queries.FilterQuery;
 import be.kdg.team22.storeservice.application.catalog.queries.Pagination;
-import be.kdg.team22.storeservice.domain.catalog.GameCatalogEntry;
-import be.kdg.team22.storeservice.domain.catalog.GameCatalogRepository;
+import be.kdg.team22.storeservice.domain.catalog.GameId;
+import be.kdg.team22.storeservice.domain.catalog.Entry;
+import be.kdg.team22.storeservice.domain.catalog.EntryRepository;
 import be.kdg.team22.storeservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.storeservice.infrastructure.games.GameMetadataResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class GameQueryService {
-
-    private final GameCatalogRepository repo;
+    private final EntryRepository repo;
     private final ExternalGamesRepository games;
 
-    public GameQueryService(final GameCatalogRepository repo, final ExternalGamesRepository games) {
+    public GameQueryService(final EntryRepository repo, final ExternalGamesRepository games) {
         this.repo = repo;
         this.games = games;
     }
 
-    public List<GameCatalogResponse> listGamesWithMetadata(final FilterQuery filter, final Pagination pagination) {
+    public List<EntryModel> listGamesWithMetadata(final FilterQuery filter, final Pagination pagination) {
 
-        List<GameCatalogEntry> entries = repo.findAll(filter, pagination);
+        List<Entry> entries = repo.findAll(filter, pagination);
 
-        List<GameCatalogResponse> combined = entries.stream()
-                .map(entry -> GameCatalogResponse.from(entry, games.fetchMetadata(entry.getId())))
-                .toList();
+        List<EntryModel> games = entries.stream().map(entry -> EntryModel.from(entry, this.games.fetchMetadata(entry.id()))).toList();
 
-        if (filter.sortBy.isPresent() && filter.sortBy.get().equals("alphabetic")) {
-            combined = combined.stream()
-                    .sorted(Comparator.comparing(GameCatalogResponse::title))
-                    .toList();
+        if (filter.query.isPresent() && !filter.query.get().isBlank()) {
+            String query = filter.query.get();
+
+            games = games.stream().filter(game -> (game.title() != null && game.title().toLowerCase().contains(query.toLowerCase())) || (game.description() != null && game.description().toLowerCase().contains(query))).toList();
         }
 
-        return combined;
+        if (filter.sortBy.isPresent() && filter.sortBy.get().equals("alphabetic")) {
+            games = games.stream().sorted(Comparator.comparing(EntryModel::title)).toList();
+        }
+
+        return games;
     }
 
-    public GameCatalogResponse getGameWithMetadata(final UUID id) {
+    public EntryModel getGameWithMetadata(final GameId id) {
 
-        GameCatalogEntry entry = repo.findById(id).orElseThrow();
+        Entry entry = repo.findById(id.value()).orElseThrow();
         GameMetadataResponse meta = games.fetchMetadata(id);
 
-        return GameCatalogResponse.from(entry, meta);
+        return EntryModel.from(entry, meta);
     }
 }

@@ -2,6 +2,7 @@ package be.kdg.team22.storeservice.application.order;
 
 import be.kdg.team22.storeservice.application.cart.CartService;
 import be.kdg.team22.storeservice.application.catalog.services.StoreService;
+import be.kdg.team22.storeservice.domain.catalog.GameId;
 import be.kdg.team22.storeservice.domain.order.*;
 import be.kdg.team22.storeservice.domain.order.exceptions.OrderNotFoundException;
 import be.kdg.team22.storeservice.domain.order.exceptions.PaymentIncompleteException;
@@ -49,7 +50,7 @@ class PaymentServiceTest {
 
         order = new Order(
                 new OrderId(orderId),
-                List.of(new OrderItem(gameId, BigDecimal.TEN)),
+                List.of(new OrderItem(GameId.from(gameId), BigDecimal.TEN)),
                 OrderStatus.PENDING_PAYMENT,
                 new be.kdg.team22.storeservice.domain.cart.UserId(user),
                 "PAY123"
@@ -76,7 +77,7 @@ class PaymentServiceTest {
         assertThat(order.status()).isEqualTo(OrderStatus.PAID);
 
         verify(cartService).clearCart(order.userId());
-        verify(storeService).recordPurchase(gameId);
+        verify(storeService).recordPurchase(GameId.from(gameId));
 
         verify(orderRepo).save(order);
     }
@@ -153,7 +154,7 @@ class PaymentServiceTest {
         assertThat(result.status()).isEqualTo(OrderStatus.PAID);
 
         verify(cartService).clearCart(order.userId());
-        verify(storeService).recordPurchase(gameId);
+        verify(storeService).recordPurchase(GameId.from(gameId));
 
         verify(orderRepo).save(order);
     }

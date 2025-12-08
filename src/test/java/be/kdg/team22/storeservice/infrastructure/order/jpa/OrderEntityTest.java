@@ -1,6 +1,7 @@
 package be.kdg.team22.storeservice.infrastructure.order.jpa;
 
 import be.kdg.team22.storeservice.domain.cart.UserId;
+import be.kdg.team22.storeservice.domain.catalog.GameId;
 import be.kdg.team22.storeservice.domain.order.Order;
 import be.kdg.team22.storeservice.domain.order.OrderId;
 import be.kdg.team22.storeservice.domain.order.OrderItem;
@@ -24,8 +25,8 @@ class OrderEntityTest {
         Order order = new Order(
                 new OrderId(id),
                 List.of(
-                        new OrderItem(UUID.randomUUID(), BigDecimal.valueOf(5)),
-                        new OrderItem(UUID.randomUUID(), BigDecimal.valueOf(10))
+                        new OrderItem(GameId.create(), BigDecimal.valueOf(5)),
+                        new OrderItem(GameId.create(), BigDecimal.valueOf(10))
                 ),
                 OrderStatus.PENDING_PAYMENT,
                 userId,
@@ -71,8 +72,8 @@ class OrderEntityTest {
         Order original = new Order(
                 new OrderId(id),
                 List.of(
-                        new OrderItem(UUID.randomUUID(), BigDecimal.valueOf(7)),
-                        new OrderItem(UUID.randomUUID(), BigDecimal.valueOf(3))
+                        new OrderItem(GameId.create(), BigDecimal.valueOf(7)),
+                        new OrderItem(GameId.create(), BigDecimal.valueOf(3))
                 ),
                 OrderStatus.PENDING_PAYMENT,
                 UserId.create(),

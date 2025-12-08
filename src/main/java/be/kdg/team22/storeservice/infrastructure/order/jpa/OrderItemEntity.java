@@ -1,5 +1,6 @@
 package be.kdg.team22.storeservice.infrastructure.order.jpa;
 
+import be.kdg.team22.storeservice.domain.catalog.GameId;
 import be.kdg.team22.storeservice.domain.order.OrderItem;
 import jakarta.persistence.*;
 
@@ -29,11 +30,11 @@ public class OrderItemEntity {
     }
 
     static OrderItemEntity from(final OrderItem item) {
-        return new OrderItemEntity(item.gameId(), item.price());
+        return new OrderItemEntity(item.gameId().value(), item.price());
     }
 
     OrderItem to() {
-        return new OrderItem(gameId, price);
+        return new OrderItem(GameId.from(gameId), price);
     }
 
     public void setOrder(final OrderEntity order) {

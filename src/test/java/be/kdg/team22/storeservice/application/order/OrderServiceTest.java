@@ -6,8 +6,9 @@ import be.kdg.team22.storeservice.domain.cart.Cart;
 import be.kdg.team22.storeservice.domain.cart.CartId;
 import be.kdg.team22.storeservice.domain.cart.CartItem;
 import be.kdg.team22.storeservice.domain.cart.UserId;
-import be.kdg.team22.storeservice.domain.catalog.GameCatalogEntry;
-import be.kdg.team22.storeservice.domain.catalog.GameCatalogRepository;
+import be.kdg.team22.storeservice.domain.catalog.Entry;
+import be.kdg.team22.storeservice.domain.catalog.EntryRepository;
+import be.kdg.team22.storeservice.domain.catalog.GameId;
 import be.kdg.team22.storeservice.domain.catalog.exceptions.GameNotFoundException;
 import be.kdg.team22.storeservice.domain.order.*;
 import be.kdg.team22.storeservice.domain.order.exceptions.OrderEmptyException;
@@ -20,10 +21,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -37,7 +35,7 @@ class OrderServiceTest {
 
     private OrderRepository repo;
     private CartService cartService;
-    private GameCatalogRepository catalog;
+    private EntryRepository catalog;
     private PaymentProvider paymentProvider;
     private OrderService service;
 
@@ -45,7 +43,7 @@ class OrderServiceTest {
     void setup() {
         repo = mock(OrderRepository.class);
         cartService = mock(CartService.class);
-        catalog = mock(GameCatalogRepository.class);
+        catalog = mock(EntryRepository.class);
         paymentProvider = mock(PaymentProvider.class);
 
         service = new OrderService(repo, cartService, catalog, paymentProvider);
@@ -58,30 +56,28 @@ class OrderServiceTest {
 
         when(cartService.get(userId)).thenReturn(empty);
 
-        assertThatThrownBy(() -> service.createOrder(userId))
-                .isInstanceOf(OrderEmptyException.class);
+        assertThatThrownBy(() -> service.createOrder(userId)).isInstanceOf(OrderEmptyException.class);
     }
 
     @Test
     @DisplayName("createOrder → throws GameNotFoundException when catalog has no entry")
     void createOrder_gameNotFound() {
-        Cart cart = new Cart(CartId.create(), USER, Set.of(new CartItem(GAME1)));
+        Cart cart = new Cart(CartId.create(), USER, Set.of(new CartItem(GameId.from(GAME1))));
 
         when(cartService.get(userId)).thenReturn(cart);
         when(catalog.findById(GAME1)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.createOrder(userId))
-                .isInstanceOf(GameNotFoundException.class);
+        assertThatThrownBy(() -> service.createOrder(userId)).isInstanceOf(GameNotFoundException.class);
     }
 
     @Test
     @DisplayName("createOrder → creates valid order with catalog prices and saves to repo")
     void createOrder_success() {
-        Cart cart = new Cart(CartId.create(), USER, Set.of(new CartItem(GAME1)));
+        Cart cart = new Cart(CartId.create(), USER, Set.of(new CartItem(GameId.from(GAME1))));
 
         when(cartService.get(userId)).thenReturn(cart);
 
-        GameCatalogEntry entry = new GameCatalogEntry(GAME1, BigDecimal.valueOf(19.99), null);
+        Entry entry = new Entry(GameId.from(GAME1), BigDecimal.valueOf(19.99), null, Collections.emptyList());
         when(catalog.findById(GAME1)).thenReturn(Optional.of(entry));
 
         final Order[] savedOrder = new Order[1];
@@ -103,12 +99,7 @@ class OrderServiceTest {
     @Test
     @DisplayName("getOrder → returns order when found")
     void getOrder_success() {
-        Order order = new Order(
-                new OrderId(UUID.randomUUID()),
-                List.of(new OrderItem(GAME1, BigDecimal.TEN)),
-                OrderStatus.PENDING_PAYMENT,
-                userId
-        );
+        Order order = new Order(new OrderId(UUID.randomUUID()), List.of(new OrderItem(GameId.from(GAME1), BigDecimal.TEN)), OrderStatus.PENDING_PAYMENT, userId);
 
         when(repo.findById(order.id().value())).thenReturn(Optional.of(order));
 
@@ -124,8 +115,7 @@ class OrderServiceTest {
 
         when(repo.findById(id)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.getOrder(new OrderId(id)))
-                .isInstanceOf(OrderNotFoundException.class);
+        assertThatThrownBy(() -> service.getOrder(new OrderId(id))).isInstanceOf(OrderNotFoundException.class);
     }
 
     @Test
@@ -134,8 +124,7 @@ class OrderServiceTest {
         UUID orderId = UUID.randomUUID();
         when(repo.findById(orderId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.createPaymentForOrder(new OrderId(orderId), userId))
-                .isInstanceOf(OrderNotFoundException.class);
+        assertThatThrownBy(() -> service.createPaymentForOrder(new OrderId(orderId), userId)).isInstanceOf(OrderNotFoundException.class);
     }
 
     @Test
@@ -143,18 +132,11 @@ class OrderServiceTest {
     void createPaymentForOrder_wrongUser() {
         UUID orderId = UUID.randomUUID();
 
-        Order order = new Order(
-                new OrderId(orderId),
-                List.of(new OrderItem(GAME1, BigDecimal.TEN)),
-                OrderStatus.PENDING_PAYMENT,
-                new UserId(UUID.randomUUID())
-        );
+        Order order = new Order(new OrderId(orderId), List.of(new OrderItem(GameId.from(GAME1), BigDecimal.TEN)), OrderStatus.PENDING_PAYMENT, new UserId(UUID.randomUUID()));
 
         when(repo.findById(orderId)).thenReturn(Optional.of(order));
 
-        assertThatThrownBy(() -> service.createPaymentForOrder(new OrderId(orderId), userId))
-                .isInstanceOf(OrderNotOwnedException.class)
-                .hasMessageContaining("User does not own this order");
+        assertThatThrownBy(() -> service.createPaymentForOrder(new OrderId(orderId), userId)).isInstanceOf(OrderNotOwnedException.class).hasMessageContaining("User does not own this order");
     }
 
     @Test
@@ -162,12 +144,7 @@ class OrderServiceTest {
     void createPaymentForOrder_success() {
         UUID orderId = UUID.randomUUID();
 
-        Order order = new Order(
-                new OrderId(orderId),
-                List.of(new OrderItem(GAME1, BigDecimal.TEN)),
-                OrderStatus.PENDING_PAYMENT,
-                userId
-        );
+        Order order = new Order(new OrderId(orderId), List.of(new OrderItem(GameId.from(GAME1), BigDecimal.TEN)), OrderStatus.PENDING_PAYMENT, userId);
 
         when(repo.findById(orderId)).thenReturn(Optional.of(order));
 

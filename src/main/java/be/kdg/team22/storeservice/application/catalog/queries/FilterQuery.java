@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 public class FilterQuery {
+    public Optional<String> query = Optional.empty();
     public Optional<GameCategory> category = Optional.empty();
     public Optional<BigDecimal> minPrice = Optional.empty();
     public Optional<BigDecimal> maxPrice = Optional.empty();

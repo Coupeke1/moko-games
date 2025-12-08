@@ -1,12 +1,13 @@
 package be.kdg.team22.storeservice.api.catalog;
 
-import be.kdg.team22.storeservice.api.catalog.models.GameCatalogResponse;
+import be.kdg.team22.storeservice.api.catalog.models.EntryModel;
 import be.kdg.team22.storeservice.application.catalog.queries.FilterQuery;
 import be.kdg.team22.storeservice.application.catalog.queries.Pagination;
 import be.kdg.team22.storeservice.application.catalog.services.GameQueryService;
 import be.kdg.team22.storeservice.application.catalog.services.StoreService;
 import be.kdg.team22.storeservice.config.TestSecurityConfig;
-import be.kdg.team22.storeservice.domain.catalog.GameCatalogEntry;
+import be.kdg.team22.storeservice.domain.catalog.GameId;
+import be.kdg.team22.storeservice.domain.catalog.Entry;
 import be.kdg.team22.storeservice.domain.catalog.GameCategory;
 import be.kdg.team22.storeservice.infrastructure.games.GameMetadataResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +22,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,9 +35,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(GameCatalogController.class)
+@WebMvcTest(CatalogController.class)
 @Import(TestSecurityConfig.class)
-class GameCatalogControllerTest {
+class CatalogControllerTest {
 
     private final UUID GAME_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
     @Autowired
@@ -44,12 +47,13 @@ class GameCatalogControllerTest {
     @MockitoBean
     private GameQueryService queryService;
 
-    private GameCatalogEntry sampleEntry() {
-        return new GameCatalogEntry(
-                GAME_ID,
+    private Entry sampleEntry() {
+        return new Entry(
+                GameId.from(GAME_ID),
                 BigDecimal.valueOf(10),
                 GameCategory.STRATEGY,
-                5
+                5,
+                Collections.emptyList()
         );
     }
 
@@ -65,8 +69,8 @@ class GameCatalogControllerTest {
         );
     }
 
-    private GameCatalogResponse sampleResponse() {
-        return GameCatalogResponse.from(sampleEntry(), sampleMetadata());
+    private EntryModel sampleResponse() {
+        return EntryModel.from(sampleEntry(), sampleMetadata());
     }
 
     @Test
@@ -94,22 +98,22 @@ class GameCatalogControllerTest {
     @Test
     @DisplayName("GET /api/store/games?sort=alphabetic sorts alphabetically")
     void list_sortsAlphabetically() throws Exception {
-        GameCatalogResponse a = new GameCatalogResponse(GAME_ID, "Alpha", "d", "i", BigDecimal.TEN, GameCategory.CARD, 5, 0);
-        GameCatalogResponse b = new GameCatalogResponse(GAME_ID, "Zulu", "d", "i", BigDecimal.TEN, GameCategory.CARD, 5, 0);
+        EntryModel a = new EntryModel(GAME_ID, "Alpha", "d", "i", BigDecimal.TEN, GameCategory.CARD, 5, 0);
+        EntryModel b = new EntryModel(GAME_ID, "Zulu", "d", "i", BigDecimal.TEN, GameCategory.CARD, 5, 0);
 
         when(queryService.listGamesWithMetadata(any(), any()))
-                .thenReturn(List.of(b, a)); // reversed order
+                .thenReturn(List.of(b, a));
 
         mockMvc.perform(get("/api/store/games?sort=alphabetic"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.items[0].title").value("Alpha"))
-                .andExpect(jsonPath("$.items[1].title").value("Zulu"));
+                .andExpect(jsonPath("$.items[0].title").value("Zulu"))
+                .andExpect(jsonPath("$.items[1].title").value("Alpha"));
     }
 
     @Test
     @DisplayName("GET /api/store/games/{id} returns single catalog entry")
     void get_returnsGame() throws Exception {
-        when(queryService.getGameWithMetadata(GAME_ID))
+        when(queryService.getGameWithMetadata(GameId.from(GAME_ID)))
                 .thenReturn(sampleResponse());
 
         mockMvc.perform(get("/api/store/games/{id}", GAME_ID))
@@ -122,12 +126,12 @@ class GameCatalogControllerTest {
     @Test
     @DisplayName("POST /api/store/games creates entry and returns metadata response")
     void create_createsEntry() throws Exception {
-        GameCatalogEntry entry = sampleEntry();
+        Entry entry = sampleEntry();
 
         when(storeService.create(any(), any(), any()))
                 .thenReturn(entry);
 
-        when(queryService.getGameWithMetadata(entry.getId()))
+        when(queryService.getGameWithMetadata(entry.id()))
                 .thenReturn(sampleResponse());
 
         mockMvc.perform(post("/api/store/games")
@@ -143,13 +147,13 @@ class GameCatalogControllerTest {
                 .andExpect(jsonPath("$.id").value(GAME_ID.toString()))
                 .andExpect(jsonPath("$.title").value("Chess"));
 
-        verify(storeService).create(eq(GAME_ID), eq(BigDecimal.valueOf(10)), eq(GameCategory.STRATEGY));
+        verify(storeService).create(eq(GameId.from(GAME_ID)), eq(BigDecimal.valueOf(10)), eq(GameCategory.STRATEGY));
     }
 
     @Test
     @DisplayName("POST /api/store/games returns 400 when validation fails")
     void create_validationFails_returns400() throws Exception {
-        GameCatalogEntry entry = sampleEntry();
+        Entry entry = sampleEntry();
 
         when(storeService.create(any(), any(), any()))
                 .thenReturn(entry);
@@ -167,10 +171,10 @@ class GameCatalogControllerTest {
     @Test
     @DisplayName("PUT /api/store/games/{id} updates entry")
     void update_updatesEntry() throws Exception {
-        GameCatalogEntry entry = sampleEntry();
-        when(storeService.update(eq(GAME_ID), any(), any()))
+        Entry entry = sampleEntry();
+        when(storeService.update(eq(GameId.from(GAME_ID)), any(), any()))
                 .thenReturn(entry);
-        when(queryService.getGameWithMetadata(GAME_ID))
+        when(queryService.getGameWithMetadata(GameId.from(GAME_ID)))
                 .thenReturn(sampleResponse());
 
         mockMvc.perform(put("/api/store/games/{id}", GAME_ID)
@@ -203,11 +207,11 @@ class GameCatalogControllerTest {
     @Test
     @DisplayName("DELETE /api/store/games/{id} removes entry")
     void delete_removesEntry() throws Exception {
-        doNothing().when(storeService).delete(GAME_ID);
+        doNothing().when(storeService).delete(GameId.from(GAME_ID));
 
         mockMvc.perform(delete("/api/store/games/{id}", GAME_ID))
                 .andExpect(status().isNoContent());
 
-        verify(storeService).delete(GAME_ID);
+        verify(storeService).delete(GameId.from(GAME_ID));
     }
 }
