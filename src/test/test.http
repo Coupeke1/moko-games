@@ -96,3 +96,7 @@ Authorization: Bearer {{chat_token}}
 
 ### health check
 GET http://localhost:8082/actuator/health
+
+### testing notifications
+POST http://localhost:8082/api/notifications/test
+Authorization: Bearer {{chat_token}}

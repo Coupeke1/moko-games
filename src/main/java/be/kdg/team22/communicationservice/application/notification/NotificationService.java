@@ -46,20 +46,17 @@ public class NotificationService {
 
         Notification saved = repository.save(notification);
 
-        // Try to send email notification
         sendEmailIfAllowed(recipient.value(), saved);
 
         return saved;
     }
 
     private void sendEmailIfAllowed(UUID recipientId, Notification notification) {
-        // Fetch user profile to get email and preferences
         ProfileResponse profile = userRepository.getProfile(recipientId);
         if (profile == null || profile.email() == null) {
             throw new UserProfileNotFoundException(recipientId);
         }
 
-        // Fetch preferences by userId
         PreferencesResponse prefsResponse = userRepository.getPreferencesByUserId(recipientId);
         if (prefsResponse == null) {
             throw new UserPreferencesNotFoundException(recipientId);
@@ -69,7 +66,7 @@ public class NotificationService {
 
         if (prefs.allowsEmail(notification)) {
             emailService.sendNotificationEmail(
-                    profile.email(),
+                                        profile.email(),
                     profile.username(),
                     notification
             );
