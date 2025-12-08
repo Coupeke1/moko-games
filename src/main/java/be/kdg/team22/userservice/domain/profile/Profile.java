@@ -30,7 +30,7 @@ public class Profile {
     }
 
     public Profile(final ProfileId id, final ProfileName username, final ProfileEmail email, final String description, final String image) {
-        this(id, username, email, description, image, new Statistics(0, 0), new Modules(false, false), Instant.now(), null);
+        this(id, username, email, description, image, new Statistics(0, 0), new Modules(false, false), Instant.now(), new NotificationPreferences(true, true, true, true, true));
     }
 
     public void updateDescription(final String description) {

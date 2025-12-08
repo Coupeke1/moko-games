@@ -77,6 +77,13 @@ public class ProfileController {
         return ResponseEntity.ok(ProfileModel.from(profile));
     }
 
+    @GetMapping("{id}/preferences")
+    public ResponseEntity<PreferencesModel> getPreferencesById(
+            @PathVariable final UUID id) {
+        Profile profile = service.getById(new ProfileId(id));
+        return ResponseEntity.ok(PreferencesModel.from(profile.preferences()));
+    }
+
     @GetMapping("/find/{username}")
     public ResponseEntity<ProfileModel> getByUsername(@PathVariable final String username) {
         Profile profile = service.getByUsername(new ProfileName(username));
