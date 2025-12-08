@@ -27,7 +27,8 @@ public class GameController {
     }
 
     @PostMapping({"/", ""})
-    public ResponseEntity<GameModel> create(@RequestParam(defaultValue = "false") final boolean aiPlayer, @Valid @RequestBody final CreateGameModel model) {
+    public ResponseEntity<GameModel> create(@RequestParam(defaultValue = "false") final boolean aiPlayer,
+                                            @Valid @RequestBody final CreateGameModel model) {
         Game game = service.create(model, aiPlayer);
         GameModel gameModel = GameModel.from(game);
 
