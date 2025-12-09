@@ -8,8 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQTopology {
     public static final String EXCHANGE_GAMEPLAY = "exchange.gameplay";
 
-    public static final String ROUTING_TICTACTOE_WON = "tictactoe.won";
-    public static final String ROUTING_TICTACTOE_DRAW = "tictactoe.draw";
+    public static final String ROUTING_TICTACTOE_GAMEPLAY = "game.tictactoe.achievement";
     public static final String ROUTING_GAME_ENDED = "game.ended";
 
     public static final String QUEUE_TICTACTOE_EVENTS = "queue.tictactoe.events";
@@ -25,16 +24,9 @@ public class RabbitMQTopology {
     }
 
     @Bean
-    Binding tictactoeWonBinding() {
+    Binding tictactoeAchievementBinding() {
         return BindingBuilder.bind(tictactoeQueue())
                 .to(gameplayExchange())
-                .with(ROUTING_TICTACTOE_WON);
-    }
-
-    @Bean
-    Binding tictactoeDrawBinding() {
-        return BindingBuilder.bind(tictactoeQueue())
-                .to(gameplayExchange())
-                .with(ROUTING_TICTACTOE_DRAW);
+                .with(ROUTING_TICTACTOE_GAMEPLAY);
     }
 }

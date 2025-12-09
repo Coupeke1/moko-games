@@ -4,9 +4,9 @@ import be.kdg.team22.tictactoeservice.api.models.CreateGameModel;
 import be.kdg.team22.tictactoeservice.api.models.GameSettingsModel;
 import be.kdg.team22.tictactoeservice.application.events.GameEventPublisher;
 import be.kdg.team22.tictactoeservice.config.BoardSizeProperties;
-import be.kdg.team22.tictactoeservice.domain.events.GameDrawEvent;
+import be.kdg.team22.tictactoeservice.domain.events.AchievementCode;
+import be.kdg.team22.tictactoeservice.domain.events.GameAchievementEvent;
 import be.kdg.team22.tictactoeservice.domain.events.GameEndedEvent;
-import be.kdg.team22.tictactoeservice.domain.events.GameWonEvent;
 import be.kdg.team22.tictactoeservice.domain.game.Game;
 import be.kdg.team22.tictactoeservice.domain.game.GameId;
 import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
@@ -124,8 +124,7 @@ public class GameServiceTest {
         service.requestMove(id, playerId, move);
 
         verify(repository).save(game);
-        verify(publisher, never()).publishGameWon(any());
-        verify(publisher, never()).publishGameDraw(any());
+        verify(publisher, never()).publishAchievement(any());
         verify(publisher, never()).publishGameEnded(any());
     }
 
@@ -146,8 +145,13 @@ public class GameServiceTest {
 
         verify(repository).save(game);
 
-        ArgumentCaptor<GameWonEvent> captor = ArgumentCaptor.forClass(GameWonEvent.class);
-        verify(publisher).publishGameWon(captor.capture());
+        ArgumentCaptor<GameAchievementEvent> captor = ArgumentCaptor.forClass(GameAchievementEvent.class);
+        verify(publisher).publishAchievement(captor.capture());
+
+        GameAchievementEvent event = captor.getValue();
+        assertEquals(id.value(), event.gameId());
+        assertEquals(playerId.value(), event.playerId());
+        assertEquals(AchievementCode.TICTACTOE_WIN.name(), event.achievementCode());
     }
 
     @Test
@@ -169,15 +173,26 @@ public class GameServiceTest {
 
         verify(repository).save(game);
 
-        ArgumentCaptor<GameDrawEvent> captor = ArgumentCaptor.forClass(GameDrawEvent.class);
-        verify(publisher).publishGameDraw(captor.capture());
+        ArgumentCaptor<GameAchievementEvent> captor = ArgumentCaptor.forClass(GameAchievementEvent.class);
+        verify(publisher, times(2)).publishAchievement(captor.capture());
 
-        GameDrawEvent event = captor.getValue();
-        assertEquals(id.value(), event.gameId());
-        assertEquals(
-                List.of(playerX.id().value(), playerO.id().value()),
-                event.players()
-        );
+        List<GameAchievementEvent> allValues = captor.getAllValues();
+
+        GameAchievementEvent playerXDrawEvent = allValues.stream()
+                .filter(event -> event.playerId().equals(playerX.id().value()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Draw event not found"));
+        assertEquals(id.value(), playerXDrawEvent.gameId());
+        assertEquals(playerX.id().value(), playerXDrawEvent.playerId());
+        assertEquals(AchievementCode.TICTACTOE_DRAW.name(), playerXDrawEvent.achievementCode());
+
+        GameAchievementEvent playerODrawEvent = allValues.stream()
+                .filter(event -> event.playerId().equals(playerO.id().value()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Draw event not found"));
+        assertEquals(id.value(), playerODrawEvent.gameId());
+        assertEquals(playerO.id().value(), playerODrawEvent.playerId());
+        assertEquals(AchievementCode.TICTACTOE_DRAW.name(), playerODrawEvent.achievementCode());
 
         ArgumentCaptor<GameEndedEvent> endedCaptor = ArgumentCaptor.forClass(GameEndedEvent.class);
         verify(publisher).publishGameEnded(endedCaptor.capture());
@@ -201,7 +216,7 @@ public class GameServiceTest {
 
         service.requestMove(id, playerId, move);
 
-        verify(publisher, times(1)).publishGameWon(any(GameWonEvent.class));
+        verify(publisher, times(1)).publishAchievement(any(GameAchievementEvent.class));
         verify(publisher, times(1)).publishGameEnded(any(GameEndedEvent.class));
     }
 }
