@@ -5,8 +5,8 @@ import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyRepository;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
+import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.JpaLobbyRepository;
 import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.LobbyEntity;
-import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.LobbyJpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,9 +14,9 @@ import java.util.Optional;
 
 @Repository
 public class DbLobbyRepository implements LobbyRepository {
-    private final LobbyJpaRepository repository;
+    private final JpaLobbyRepository repository;
 
-    public DbLobbyRepository(final LobbyJpaRepository repository) {
+    public DbLobbyRepository(final JpaLobbyRepository repository) {
         this.repository = repository;
     }
 
@@ -26,12 +26,17 @@ public class DbLobbyRepository implements LobbyRepository {
     }
 
     @Override
+    public Optional<Lobby> findByStartedGameId(final GameId gameInstanceId) {
+        return repository.findByStartedGameId(gameInstanceId.value()).map(LobbyEntity::to);
+    }
+
+    @Override
     public List<Lobby> findAll() {
         return repository.findAll().stream().map(LobbyEntity::to).toList();
     }
 
     @Override
-    public List<Lobby> findInvitesFromPlayerId(PlayerId id, GameId gameId) {
+    public List<Lobby> findInvitesFromPlayerId(final PlayerId id, final GameId gameId) {
         return repository.findInvitesFromPlayerId(id.value(), gameId.value()).stream().map(LobbyEntity::to).toList();
     }
 

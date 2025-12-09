@@ -5,8 +5,8 @@ import be.kdg.team22.sessionservice.domain.lobby.LobbyStatus;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.BotEmbed;
+import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.JpaLobbyRepository;
 import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.LobbyEntity;
-import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.LobbyJpaRepository;
 import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.PlayerEmbed;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DbLobbyRepositoryTest {
 
     @Autowired
-    private LobbyJpaRepository repo;
+    private JpaLobbyRepository repo;
 
     @Test
     void saveAndLoadLobby_withBot() {

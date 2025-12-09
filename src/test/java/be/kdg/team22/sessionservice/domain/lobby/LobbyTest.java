@@ -319,6 +319,43 @@ class LobbyTest {
     }
 
     @Test
+    void finish_setsStatusToFinished() {
+        PlayerId owner = pid();
+        Lobby lobby = new Lobby(game(), lp(owner, new PlayerName("owner")), settings(4));
+
+        lobby.markStarted(GameId.from(UUID.randomUUID()));
+        lobby.finish();
+
+        assertThat(lobby.status()).isEqualTo(LobbyStatus.FINISHED);
+    }
+
+    @Test
+    void finish_throwsWhenLobbyIsOpen() {
+        Lobby lobby = new Lobby(game(), lp(pid(), new PlayerName("owner")), settings(4));
+
+        assertThatThrownBy(lobby::finish).isInstanceOf(LobbyNotStartedException.class);
+    }
+
+    @Test
+    void finish_throwsWhenLobbyIsClosed() {
+        PlayerId owner = pid();
+        Lobby lobby = new Lobby(game(), lp(owner, new PlayerName("owner")), settings(4));
+        lobby.close(owner);
+
+        assertThatThrownBy(lobby::finish).isInstanceOf(LobbyNotStartedException.class);
+    }
+
+    @Test
+    void finish_throwsWhenLobbyIsAlreadyFinished() {
+        PlayerId owner = pid();
+        Lobby lobby = new Lobby(game(), lp(owner, new PlayerName("owner")), settings(4));
+        lobby.markStarted(GameId.from(UUID.randomUUID()));
+        lobby.finish();
+
+        assertThatThrownBy(lobby::finish).isInstanceOf(LobbyNotStartedException.class);
+    }
+
+    @Test
     void ensureModifiable_throwsWhenClosedOrStarted() {
         PlayerId owner = pid();
         Lobby lobby = new Lobby(game(), lp(owner, new PlayerName("owner")), settings(4));

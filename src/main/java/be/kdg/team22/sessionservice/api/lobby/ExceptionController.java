@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class ExceptionController {
 
-    @ExceptionHandler({ClaimNotFoundException.class, LobbyNotFoundException.class, PlayerNotFoundException.class, OwnerNotFoundException.class, InviteNotFoundException.class, GameNotFoundException.class})
+    @ExceptionHandler({ClaimNotFoundException.class, LobbyNotFoundException.class, PlayerNotFoundException.class, OwnerNotFoundException.class, InviteNotFoundException.class, GameNotFoundException.class, LobbyNotFoundByGameInstanceException.class})
     public ResponseEntity<String> handleNotFound(final RuntimeException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({GameNotValidException.class, OwnerNotValidException.class, LobbyCreationException.class, IllegalArgumentException.class, CannotJoinClosedLobbyException.class, PlayerAlreadyInLobbyException.class, OwnerCannotLeaveLobbyException.class, PlayerNotInLobbyException.class, LobbyAlreadyStartedException.class, NotLobbyOwnerException.class, LobbyManagementNotAllowedException.class, MaxPlayersTooSmallException.class, LobbySettingsInvalidException.class, PlayersNotReadyException.class, TooManyBotsException.class, PlayersException.class, UnsupportedOperationException.class})
+    @ExceptionHandler({GameNotValidException.class, OwnerNotValidException.class, LobbyCreationException.class, IllegalArgumentException.class, CannotJoinClosedLobbyException.class, PlayerAlreadyInLobbyException.class, OwnerCannotLeaveLobbyException.class, PlayerNotInLobbyException.class, LobbyAlreadyStartedException.class, NotLobbyOwnerException.class, LobbyManagementNotAllowedException.class, MaxPlayersTooSmallException.class, LobbySettingsInvalidException.class, PlayersNotReadyException.class, TooManyBotsException.class, PlayersException.class, UnsupportedOperationException.class, LobbyNotStartedException.class, LobbyClosedException.class})
     public ResponseEntity<String> handleBadRequest(final RuntimeException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
