@@ -36,6 +36,14 @@ public class LibraryController {
         return ResponseEntity.ok(model.games());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Boolean> ownsGame(@AuthenticationPrincipal final Jwt token, @PathVariable final UUID id) {
+        ProfileId userId = ProfileId.get(token);
+        GameId gameId = GameId.from(id);
+        boolean ownsGame = service.ownsGame(userId, gameId);
+        return ResponseEntity.ok(ownsGame);
+    }
+
     @GetMapping("/{id}/favourite")
     public ResponseEntity<Boolean> getFavourite(@AuthenticationPrincipal final Jwt token, @PathVariable final UUID id) {
         ProfileId userId = ProfileId.get(token);
