@@ -2,9 +2,8 @@ import { Gap } from "@/components/layout/gap";
 import NavigationBar from "@/components/navigation/bar";
 import Footer from "@/components/navigation/footer";
 import { getButtons, getLinks } from "@/components/navigation/models";
-import { useState, type ReactNode } from "react";
-import Stack from "@/components/layout/stack";
 import CartDialog from "@/features/cart/cart-dialog";
+import { useState, type ReactNode } from "react";
 
 interface Props {
     children: ReactNode;
