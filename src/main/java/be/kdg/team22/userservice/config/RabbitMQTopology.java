@@ -10,6 +10,8 @@ public class RabbitMQTopology {
     public static final String EXCHANGE_GAMEPLAY = "exchange.gameplay";
     public static final String QUEUE_USER_GAMEPLAY = "queue.user.gameplay";
 
+    public static final String QUEUE_GAMES_PURCHASED = "queue.user-service.games-purchased";
+
     public static final String EXCHANGE_ACHIEVEMENTS = "exchange.achievements";
 
     @Bean
