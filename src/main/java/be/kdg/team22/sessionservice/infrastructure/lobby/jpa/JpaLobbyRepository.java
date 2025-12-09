@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface LobbyJpaRepository extends JpaRepository<LobbyEntity, UUID> {
+public interface JpaLobbyRepository extends JpaRepository<LobbyEntity, UUID> {
 
-    Optional<LobbyEntity> findByStartedGameId(UUID startedGameId);
+    Optional<LobbyEntity> findByStartedGameId(final UUID startedGameId);
 
     @Query("""
             SELECT l
