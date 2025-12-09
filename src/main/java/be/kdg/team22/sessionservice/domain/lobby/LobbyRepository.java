@@ -10,6 +10,8 @@ import java.util.Optional;
 public interface LobbyRepository {
     Optional<Lobby> findById(LobbyId id);
 
+    Optional<Lobby> findByStartedGameId(GameId gameInstanceId);
+
     List<Lobby> findAll();
 
     void save(Lobby lobby);

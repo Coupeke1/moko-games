@@ -26,6 +26,11 @@ public class DbLobbyRepository implements LobbyRepository {
     }
 
     @Override
+    public Optional<Lobby> findByStartedGameId(final GameId gameInstanceId) {
+        return repository.findByStartedGameId(gameInstanceId.value()).map(LobbyEntity::to);
+    }
+
+    @Override
     public List<Lobby> findAll() {
         return repository.findAll().stream().map(LobbyEntity::to).toList();
     }

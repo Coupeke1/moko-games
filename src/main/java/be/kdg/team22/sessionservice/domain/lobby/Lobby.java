@@ -213,6 +213,14 @@ public class Lobby {
         this.updatedAt = Instant.now();
     }
 
+    public void finish() {
+        if (status != LobbyStatus.STARTED)
+            throw new LobbyNotStartedException(id);
+
+        this.status = LobbyStatus.FINISHED;
+        this.updatedAt = Instant.now();
+    }
+
     public void ensureOwner(final PlayerId ownerId) {
         if (!owner.equals(ownerId))
             throw new NotLobbyOwnerException(ownerId);

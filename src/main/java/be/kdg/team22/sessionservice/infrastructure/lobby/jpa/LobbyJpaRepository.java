@@ -5,9 +5,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface LobbyJpaRepository extends JpaRepository<LobbyEntity, UUID> {
+
+    Optional<LobbyEntity> findByStartedGameId(UUID startedGameId);
 
     @Query("""
             SELECT l
