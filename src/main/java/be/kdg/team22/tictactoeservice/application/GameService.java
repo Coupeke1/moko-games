@@ -4,6 +4,7 @@ import be.kdg.team22.tictactoeservice.api.models.CreateGameModel;
 import be.kdg.team22.tictactoeservice.application.events.GameEventPublisher;
 import be.kdg.team22.tictactoeservice.config.BoardSizeProperties;
 import be.kdg.team22.tictactoeservice.domain.events.GameDrawEvent;
+import be.kdg.team22.tictactoeservice.domain.events.GameEndedEvent;
 import be.kdg.team22.tictactoeservice.domain.events.GameWonEvent;
 import be.kdg.team22.tictactoeservice.domain.events.exceptions.PublishAchievementException;
 import be.kdg.team22.tictactoeservice.domain.events.exceptions.RabbitNotReachableException;
@@ -85,6 +86,15 @@ public class GameService {
                                 game.players().stream()
                                         .map(p -> p.id().value())
                                         .toList(),
+                                Instant.now()
+                        )
+                );
+            }
+
+            if (game.status() == GameStatus.WON || game.status() == GameStatus.TIE) {
+                publisher.publishGameEnded(
+                        new GameEndedEvent(
+                                game.id().value(),
                                 Instant.now()
                         )
                 );
