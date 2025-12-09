@@ -83,7 +83,7 @@ public class ChatService {
                                            final String content,
                                            final Channel channel) {
         ProfileResponse senderProfile = userRepository.getProfile(UUID.fromString(senderId));
-                String messagePreview = content.length() > 50 ? content.substring(0, Math.min(47, content.length())) + "..." : content;
+                String messagePreview = content.length() > 50 ? content.substring(0, 47) + "..." : content;
 
         chatEventPublisher.publishDirectMessage(
                 UUID.fromString(senderId),
