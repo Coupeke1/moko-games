@@ -51,7 +51,7 @@ public class PaymentService {
         switch (s) {
             case "paid" -> {
                 order.updateStatus(OrderStatus.PAID);
-                cartService.clearCart(order.userId());
+                cartService.clear(order.userId());
                 order.items().forEach(item -> storeService.recordPurchase(item.gameId()));
 
                 eventPublisher.publishOrderCompleted(new OrderCompletedEvent(
@@ -81,7 +81,7 @@ public class PaymentService {
 
         if (status == PaymentStatus.PAID) {
             order.updateStatus(OrderStatus.PAID);
-            cartService.clearCart(order.userId());
+            cartService.clear(order.userId());
             order.items().forEach(item -> storeService.recordPurchase(item.gameId()));
             orderRepo.save(order);
 

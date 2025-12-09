@@ -1,39 +1,27 @@
 package be.kdg.team22.storeservice.infrastructure.user;
 
+import be.kdg.team22.storeservice.domain.catalog.GameId;
 import be.kdg.team22.storeservice.domain.exceptions.ServiceUnavailableException;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
-import java.util.List;
-import java.util.UUID;
-
 @Component
 public class ExternalUserRepository {
-
     private final RestClient client;
 
     public ExternalUserRepository(@Qualifier("libraryService") final RestClient client) {
         this.client = client;
     }
 
-    public boolean userOwnsGame(UUID gameId, String jwtToken) {
+    public boolean userOwnsGame(final GameId gameId, final String jwtToken) {
         try {
-            List<LibraryGameResponse> library = client.get()
-                    .uri("/me")
-                    .header("Authorization", "Bearer " + jwtToken)
-                    .retrieve()
-                    .body(new ParameterizedTypeReference<>() {
-                    });
-
-            if (library == null) return false;
-
-            return library.stream().anyMatch(game -> game.id().equals(gameId));
-
+            Boolean ownsGame = client.get().uri("/" + gameId.value()).header("Authorization", "Bearer " + jwtToken).retrieve().body(Boolean.class);
+            return ownsGame != null && ownsGame;
         } catch (RestClientException e) {
             throw ServiceUnavailableException.UserServiceUnavailable();
         }
     }
+
 }

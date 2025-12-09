@@ -7,22 +7,20 @@ import org.jmolecules.ddd.annotation.AggregateRoot;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 @AggregateRoot
 public class Cart {
-
     private final CartId id;
-    private final UUID userId;
-    private final Set<CartItem> items = new HashSet<>();
+    private final UserId userId;
+    private final Set<CartItem> entries = new HashSet<>();
 
-    public Cart(final CartId id, final UUID userId, final Set<CartItem> items) {
+    public Cart(final CartId id, final UserId userId, final Set<CartItem> entries) {
         this.id = id;
         this.userId = userId;
-        this.items.addAll(items);
+        this.entries.addAll(entries);
     }
 
-    public Cart(final CartId id, final UUID userId) {
+    public Cart(final CartId id, final UserId userId) {
         this.id = id;
         this.userId = userId;
     }
@@ -31,33 +29,35 @@ public class Cart {
         return id;
     }
 
-    public UUID userId() {
+    public UserId userId() {
         return userId;
     }
 
-    public Set<CartItem> items() {
-        return Set.copyOf(items);
+    public Set<CartItem> entries() {
+        return Set.copyOf(entries);
     }
 
-    public void addItem(final GameId gameId) {
+    public void add(final GameId gameId) {
         CartItem item = new CartItem(gameId);
 
-        if (items.contains(item)) throw new GameAlreadyInCartException(gameId.value(), userId);
+        if (entries.contains(item))
+            throw new GameAlreadyInCartException(gameId.value(), userId.value());
 
-        items.add(item);
+        entries.add(item);
     }
 
-    public void removeItem(final GameId gameId) {
-        boolean removed = items.removeIf(i -> i.gameId().equals(gameId));
+    public void remove(final GameId gameId) {
+        boolean removed = entries.removeIf(i -> i.gameId().equals(gameId));
 
-        if (!removed) throw new CartItemNotFoundException(gameId.value(), userId);
+        if (!removed)
+            throw new CartItemNotFoundException(gameId.value(), userId.value());
     }
 
     public void clear() {
-        items.clear();
+        entries.clear();
     }
 
     public boolean isEmpty() {
-        return items.isEmpty();
+        return entries.isEmpty();
     }
 }

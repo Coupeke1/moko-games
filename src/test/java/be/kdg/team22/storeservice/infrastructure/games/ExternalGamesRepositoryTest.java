@@ -19,23 +19,15 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 class ExternalGamesRepositoryTest {
-
     @Test
     @DisplayName("fetchMetadata → returns metadata")
     void fetch_ok() {
         UUID gameId = UUID.randomUUID();
-        GameMetadataResponse resp = new GameMetadataResponse(
-                gameId, "name", "title", "desc", "img",
-                Instant.now(), Instant.now()
-        );
+        GameMetadataResponse resp = new GameMetadataResponse(gameId, "name", "title", "desc", "img", Instant.now(), Instant.now());
 
         RestClient client = mock(RestClient.class, RETURNS_DEEP_STUBS);
 
-        when(client.get()
-                .uri("/" + gameId)
-                .retrieve()
-                .body(eq(GameMetadataResponse.class))
-        ).thenReturn(resp);
+        when(client.get().uri("/" + gameId).retrieve().body(eq(GameMetadataResponse.class))).thenReturn(resp);
 
         ExternalGamesRepository repo = new ExternalGamesRepository(client);
 
@@ -51,16 +43,11 @@ class ExternalGamesRepositoryTest {
 
         RestClient client = mock(RestClient.class, RETURNS_DEEP_STUBS);
 
-        when(client.get()
-                .uri("/" + gameId)
-                .retrieve()
-                .body(eq(GameMetadataResponse.class))
-        ).thenReturn(null);
+        when(client.get().uri("/" + gameId).retrieve().body(eq(GameMetadataResponse.class))).thenReturn(null);
 
         ExternalGamesRepository repo = new ExternalGamesRepository(client);
 
-        assertThatThrownBy(() -> repo.fetchMetadata(GameId.from(gameId)))
-                .isInstanceOf(GameNotFoundException.class);
+        assertThatThrownBy(() -> repo.fetchMetadata(GameId.from(gameId))).isInstanceOf(GameNotFoundException.class);
     }
 
     @Test
@@ -70,16 +57,11 @@ class ExternalGamesRepositoryTest {
 
         RestClient client = mock(RestClient.class, RETURNS_DEEP_STUBS);
 
-        when(client.get()
-                .uri("/" + gameId)
-                .retrieve()
-                .body(eq(GameMetadataResponse.class))
-        ).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        when(client.get().uri("/" + gameId).retrieve().body(eq(GameMetadataResponse.class))).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
         ExternalGamesRepository repo = new ExternalGamesRepository(client);
 
-        assertThatThrownBy(() -> repo.fetchMetadata(GameId.from(gameId)))
-                .isInstanceOf(GameNotFoundException.class);
+        assertThatThrownBy(() -> repo.fetchMetadata(GameId.from(gameId))).isInstanceOf(GameNotFoundException.class);
     }
 
     @Test
@@ -90,17 +72,11 @@ class ExternalGamesRepositoryTest {
 
         RestClient client = mock(RestClient.class, RETURNS_DEEP_STUBS);
 
-        when(client.get()
-                .uri("/" + gameId)
-                .retrieve()
-                .body(eq(GameMetadataResponse.class))
-        ).thenThrow(ex);
+        when(client.get().uri("/" + gameId).retrieve().body(eq(GameMetadataResponse.class))).thenThrow(ex);
 
         ExternalGamesRepository repo = new ExternalGamesRepository(client);
 
-        assertThatThrownBy(() -> repo.fetchMetadata(GameId.from(gameId)))
-                .isInstanceOf(HttpClientErrorException.class)
-                .hasMessageContaining("400");
+        assertThatThrownBy(() -> repo.fetchMetadata(GameId.from(gameId))).isInstanceOf(HttpClientErrorException.class).hasMessageContaining("400");
     }
 
     @Test
@@ -110,15 +86,10 @@ class ExternalGamesRepositoryTest {
 
         RestClient client = mock(RestClient.class, RETURNS_DEEP_STUBS);
 
-        when(client.get()
-                .uri("/" + gameId)
-                .retrieve()
-                .body(eq(GameMetadataResponse.class))
-        ).thenThrow(new RestClientException("boom"));
+        when(client.get().uri("/" + gameId).retrieve().body(eq(GameMetadataResponse.class))).thenThrow(new RestClientException("boom"));
 
         ExternalGamesRepository repo = new ExternalGamesRepository(client);
 
-        assertThatThrownBy(() -> repo.fetchMetadata(GameId.from(gameId)))
-                .isInstanceOf(ServiceUnavailableException.class);
+        assertThatThrownBy(() -> repo.fetchMetadata(GameId.from(gameId))).isInstanceOf(ServiceUnavailableException.class);
     }
 }

@@ -39,7 +39,7 @@ public class OrderService {
         if (cart.isEmpty())
             throw new OrderEmptyException();
 
-        List<OrderItem> items = cart.items().stream().map(item -> {
+        List<OrderItem> items = cart.entries().stream().map(item -> {
             Entry entry = catalog.findById(item.gameId().value()).orElseThrow(() -> new GameNotFoundException(item.gameId()));
             return new OrderItem(item.gameId(), entry.price());
         }).toList();

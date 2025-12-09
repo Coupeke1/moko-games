@@ -2,6 +2,7 @@ package be.kdg.team22.storeservice.infrastructure.cart.jpa;
 
 import be.kdg.team22.storeservice.domain.cart.Cart;
 import be.kdg.team22.storeservice.domain.cart.CartId;
+import be.kdg.team22.storeservice.domain.cart.UserId;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -32,22 +33,13 @@ public class CartEntity {
     }
 
     public static CartEntity from(final Cart cart) {
-        var itemEntities = cart.items().stream()
-                .map(CartItemEntity::from)
-                .toList();
+        var itemEntities = cart.entries().stream().map(CartItemEntity::from).toList();
 
-        return new CartEntity(
-                cart.id().value(),
-                cart.userId(),
-                itemEntities
-        );
+        return new CartEntity(cart.id().value(), cart.userId().value(), itemEntities);
     }
 
     public Cart to() {
-        return new Cart(
-                CartId.from(id),
-                userId,
-                items.stream().map(CartItemEntity::to).collect(Collectors.toSet()));
+        return new Cart(CartId.from(id), UserId.from(userId), items.stream().map(CartItemEntity::to).collect(Collectors.toSet()));
     }
 
     public UUID id() {

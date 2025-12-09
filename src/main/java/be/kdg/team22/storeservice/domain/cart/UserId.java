@@ -38,7 +38,7 @@ public record UserId(UUID value) {
         return create(sub);
     }
 
-    public CartNotFoundException notFound() {
+    public CartNotFoundException cartNotFound() {
         return new CartNotFoundException(value);
     }
 }
