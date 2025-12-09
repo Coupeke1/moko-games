@@ -135,7 +135,7 @@ public class Board {
     private void placePlayerPieces(final PlayerRole player, final int startRow, final int endRow) {
         for (int row = startRow; row <= endRow; row++) {
             for (int cell : getCellsInRow(row)) {
-                grid.put(cell, new Piece(player, false));
+                grid.put(cell, new Piece(player, true));
             }
         }
     }

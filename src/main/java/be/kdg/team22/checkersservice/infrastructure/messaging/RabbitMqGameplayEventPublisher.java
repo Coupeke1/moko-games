@@ -26,7 +26,7 @@ public class RabbitMqGameplayEventPublisher implements GameEventPublisher {
         try {
             rabbitTemplate.convertAndSend(
                     RabbitMQTopology.EXCHANGE_GAMEPLAY,
-                    RabbitMQTopology.ROUTING_CHECKERS_DRAW,
+                    RabbitMQTopology.ROUTING_CHECKERS_GAMEPLAY,
                     event,
                     msg -> {
                         msg.getMessageProperties().setMessageId(UUID.randomUUID().toString());
