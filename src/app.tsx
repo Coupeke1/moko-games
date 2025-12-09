@@ -1,18 +1,18 @@
 import Auth from "@/components/auth";
 import LoadingState from "@/components/state/loading";
-import FriendsPage from "@/routes/friends/friends";
-import IncomingRequestsPage from "@/routes/friends/incoming";
-import OutgoingRequestsPage from "@/routes/friends/outgoing";
-import LibraryPage from "@/routes/library/library";
-import LobbyPage from "@/routes/lobby/lobby";
-import ProfilePage from "@/routes/profile/profile";
-import StorePage from "@/routes/store/store";
+import FriendsPage from "@/features/friends/friends";
+import IncomingRequestsPage from "@/features/friends/incoming";
+import OutgoingRequestsPage from "@/features/friends/outgoing";
+import LibraryGamePage from "@/features/library/game";
+import LibraryPage from "@/features/library/library";
+import LobbyPage from "@/features/lobby/lobby";
+import ProfilePage from "@/features/profile/profile";
+import StoreGamePage from "@/features/store/game";
+import StorePage from "@/features/store/store";
 import { useAuthStore } from "@/stores/auth-store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { Toaster } from "sonner";
-import LibraryGamePage from "@/routes/library/game";
-import StoreGamePage from "@/routes/store/game";
 
 const client = new QueryClient();
 

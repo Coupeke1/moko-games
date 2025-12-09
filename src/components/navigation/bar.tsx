@@ -49,7 +49,10 @@ export default function NavigationBar({ links, buttons }: Props) {
                 <section className="hidden md:flex">
                     <Row gap={Gap.Medium} wrap={true}>
                         {buttons.map((button: Button) => (
-                            <NavigationButton key={button.title} path="/todo">
+                            <NavigationButton
+                                key={button.title}
+                                onClick={button.onClick}
+                            >
                                 {button.icon}
                             </NavigationButton>
                         ))}

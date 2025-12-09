@@ -3,7 +3,7 @@ import BotIcon from "@/components/icons/bot-icon";
 import { Gap } from "@/components/layout/gap";
 import { Items } from "@/components/layout/items";
 import Row from "@/components/layout/row";
-import type { Bot } from "@/models/profile/bot";
+import type { Bot } from "@/features/profile/models/bot.ts";
 import type { ReactNode } from "react";
 
 interface Props {

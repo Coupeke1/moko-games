@@ -40,4 +40,8 @@ export const environment = {
         window.__APP_CONFIG__?.storeService ??
         import.meta.env.VITE_STORE_SERVICE ??
         "",
+    cartService:
+        window.__APP_CONFIG__?.cartService ??
+        import.meta.env.VITE_CART_SERVICE ??
+        "",
 };
