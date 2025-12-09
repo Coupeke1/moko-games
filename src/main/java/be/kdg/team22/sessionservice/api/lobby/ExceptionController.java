@@ -19,7 +19,7 @@ public class ExceptionController {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({GameNotValidException.class, OwnerNotValidException.class, LobbyCreationException.class, IllegalArgumentException.class, CannotJoinClosedLobbyException.class, PlayerAlreadyInLobbyException.class, OwnerCannotLeaveLobbyException.class, PlayerNotInLobbyException.class, LobbyAlreadyStartedException.class, NotLobbyOwnerException.class, LobbyManagementNotAllowedException.class, MaxPlayersTooSmallException.class, LobbySettingsInvalidException.class, PlayersNotReadyException.class, TooManyBotsException.class, PlayersException.class, UnsupportedOperationException.class, LobbyNotStartedException.class})
+    @ExceptionHandler({GameNotValidException.class, OwnerNotValidException.class, LobbyCreationException.class, IllegalArgumentException.class, CannotJoinClosedLobbyException.class, PlayerAlreadyInLobbyException.class, OwnerCannotLeaveLobbyException.class, PlayerNotInLobbyException.class, LobbyAlreadyStartedException.class, NotLobbyOwnerException.class, LobbyManagementNotAllowedException.class, MaxPlayersTooSmallException.class, LobbySettingsInvalidException.class, PlayersNotReadyException.class, TooManyBotsException.class, PlayersException.class, UnsupportedOperationException.class, LobbyNotStartedException.class, LobbyClosedException.class})
     public ResponseEntity<String> handleBadRequest(final RuntimeException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }

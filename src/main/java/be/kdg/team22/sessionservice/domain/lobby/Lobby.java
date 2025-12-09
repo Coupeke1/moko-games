@@ -290,4 +290,8 @@ public class Lobby {
     public Player bot() {
         return bot;
     }
+
+    public boolean isClosedOrFinished() {
+        return status == LobbyStatus.CLOSED || status == LobbyStatus.FINISHED;
+    }
 }

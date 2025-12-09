@@ -8,6 +8,7 @@ import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.GameNotStartedException;
+import be.kdg.team22.sessionservice.domain.lobby.exceptions.LobbyClosedException;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +39,11 @@ public class LobbyController {
     @GetMapping("/{id}")
     public ResponseEntity<LobbyModel> getById(@PathVariable final UUID id) {
         Lobby lobby = service.findLobby(LobbyId.from(id));
+
+        if (lobby.isClosedOrFinished()) {
+            throw new LobbyClosedException(lobby.id(), lobby.status().toString());
+        }
+
         return ResponseEntity.ok(LobbyModel.from(lobby));
     }
 
