@@ -5,7 +5,6 @@ import be.kdg.team22.storeservice.domain.exceptions.ServiceUnavailableException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
@@ -13,62 +12,90 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class ExternalUserRepositoryTest {
-    final UUID GAME = UUID.randomUUID();
-    final String JWT = "token";
-    RestClient client;
-    RestClient.RequestHeadersSpec<?> headerSpec;
-    ExternalUserRepository repository;
+    private static final UUID GAME_ID = UUID.randomUUID();
+    private static final String JWT = "token";
+
+    private RestClient client;
+    private RestClient.RequestHeadersUriSpec requestHeadersUriSpec;
+    private RestClient.RequestHeadersSpec headerSpec;
+    private RestClient.ResponseSpec responseSpec;
+    private ExternalUserRepository repository;
 
     @BeforeEach
     void setup() {
-        client = mock(RestClient.class, RETURNS_DEEP_STUBS);
-        headerSpec = mock(RestClient.RequestHeadersSpec.class, RETURNS_DEEP_STUBS);
+        client = mock(RestClient.class);
+        requestHeadersUriSpec = mock(RestClient.RequestHeadersUriSpec.class);
+        headerSpec = mock(RestClient.RequestHeadersSpec.class);
+        responseSpec = mock(RestClient.ResponseSpec.class);
 
-        Mockito.<RestClient.RequestHeadersSpec<?>>when(client.get().uri("/me").header(eq("Authorization"), any(String[].class))).thenReturn(headerSpec);
+        when(client.get()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri("/" + GAME_ID)).thenReturn(headerSpec);
+        when(headerSpec.header("Authorization", "Bearer " + JWT)).thenReturn(headerSpec);
+        when(headerSpec.retrieve()).thenReturn(responseSpec);
 
         repository = new ExternalUserRepository(client);
     }
 
     @Test
-    @DisplayName("userOwnsGame → true when backend returns true")
-    void owns_true() {
-        when(headerSpec.retrieve().body(Boolean.class)).thenReturn(true);
-        assertThat(repository.userOwnsGame(GameId.from(GAME), JWT)).isTrue();
-    }
+    @DisplayName("userOwnsGame returns true when backend returns true")
+    void userOwnsGame_backendReturnsTrue_returnsTrue() {
+        when(responseSpec.body(Boolean.class)).thenReturn(true);
 
+        boolean result = repository.userOwnsGame(GameId.from(GAME_ID), JWT);
 
-    @Test
-    @DisplayName("userOwnsGame → false when backend returns false")
-    void owns_false() {
-        when(headerSpec.retrieve().body(Boolean.class)).thenReturn(false);
-        assertThat(repository.userOwnsGame(GameId.from(GAME), JWT)).isFalse();
-    }
-
-
-    @Test
-    @DisplayName("userOwnsGame → RestClientException → UserServiceUnavailable")
-    void owns_restError() {
-        when(headerSpec.retrieve().body(Boolean.class)).thenThrow(new RestClientException("boom"));
-
-        assertThatThrownBy(() -> repository.userOwnsGame(GameId.from(GAME), JWT)).isInstanceOf(ServiceUnavailableException.class);
-    }
-
-
-    @Test
-    @DisplayName("userOwnsGame → false when backend returns false")
-    void owns_empty() {
-        when(headerSpec.retrieve().body(Boolean.class)).thenReturn(false);
-        assertThat(repository.userOwnsGame(GameId.from(GAME), JWT)).isFalse();
+        assertThat(result).isTrue();
+        verify(client.get()).uri("/" + GAME_ID);
+        verify(headerSpec).header("Authorization", "Bearer " + JWT);
     }
 
     @Test
-    @DisplayName("userOwnsGame → false when backend returns null")
-    void owns_null() {
-        when(headerSpec.retrieve().body(Boolean.class)).thenReturn(null);
-        assertThat(repository.userOwnsGame(GameId.from(GAME), JWT)).isFalse();
+    @DisplayName("userOwnsGame returns false when backend returns false")
+    void userOwnsGame_backendReturnsFalse_returnsFalse() {
+        when(responseSpec.body(Boolean.class)).thenReturn(false);
+
+        boolean result = repository.userOwnsGame(GameId.from(GAME_ID), JWT);
+
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    @DisplayName("userOwnsGame returns false when backend returns null")
+    void userOwnsGame_backendReturnsNull_returnsFalse() {
+        when(responseSpec.body(Boolean.class)).thenReturn(null);
+
+        boolean result = repository.userOwnsGame(GameId.from(GAME_ID), JWT);
+
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    @DisplayName("userOwnsGame throws ServiceUnavailableException when RestClient throws exception")
+    void userOwnsGame_restClientThrowsException_throwsServiceUnavailable() {
+        when(responseSpec.body(Boolean.class)).thenThrow(new RestClientException("Service unavailable"));
+
+        assertThatThrownBy(() -> repository.userOwnsGame(GameId.from(GAME_ID), JWT)).isInstanceOf(ServiceUnavailableException.class).hasMessageContaining("User-Service is currently unavailable");
+    }
+
+    @Test
+    @DisplayName("userOwnsGame constructs correct URI with game ID")
+    void userOwnsGame_constructsCorrectUri() {
+        when(responseSpec.body(Boolean.class)).thenReturn(true);
+
+        repository.userOwnsGame(GameId.from(GAME_ID), JWT);
+
+        verify(requestHeadersUriSpec).uri("/" + GAME_ID);
+    }
+
+    @Test
+    @DisplayName("userOwnsGame includes Bearer token in Authorization header")
+    void userOwnsGame_includesBearerToken() {
+        when(responseSpec.body(Boolean.class)).thenReturn(true);
+
+        repository.userOwnsGame(GameId.from(GAME_ID), JWT);
+
+        verify(headerSpec).header("Authorization", "Bearer " + JWT);
     }
 }

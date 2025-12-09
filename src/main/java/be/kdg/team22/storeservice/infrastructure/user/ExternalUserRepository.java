@@ -9,7 +9,6 @@ import org.springframework.web.client.RestClientException;
 
 @Component
 public class ExternalUserRepository {
-
     private final RestClient client;
 
     public ExternalUserRepository(@Qualifier("libraryService") final RestClient client) {
