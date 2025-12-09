@@ -40,7 +40,8 @@ public class LibraryEntryEntity {
     }
 
     public static LibraryEntryEntity fromDomain(final LibraryEntry entry) {
-        return new LibraryEntryEntity(entry.id().value(), entry.userId().value(), entry.gameId().value(), entry.purchasedAt(), entry.favourite());
+        UUID id = (entry.id() != null && entry.id().value() != null) ? entry.id().value() : null;
+        return new LibraryEntryEntity(id, entry.userId().value(), entry.gameId().value(), entry.purchasedAt(), entry.favourite());
     }
 
     public LibraryEntry toDomain() {
