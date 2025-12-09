@@ -65,12 +65,7 @@ public class GameServiceTest {
         service.requestMove(id, playerId, move);
 
         verify(repository).save(game);
-        verify(publisher, never()).publishGameDraw(any());
-        verify(publisher, never()).publishGameLost(any());
-        verify(publisher, never()).publishGameWon(any());
-        verify(publisher, never()).publishKingPromotionEvent(any());
-        verify(publisher, never()).publishMultiCaptureEvent(any());
-        verify(publisher, never()).publishThreeKingsEvent(any());
+        verify(publisher, never()).publishAchievement(any());
     }
 
     @Test
@@ -87,15 +82,26 @@ public class GameServiceTest {
 
         verify(repository).save(game);
 
-        ArgumentCaptor<GameDrawEvent> captor = ArgumentCaptor.forClass(GameDrawEvent.class);
-        verify(publisher).publishGameDraw(captor.capture());
+        ArgumentCaptor<GameAchievementEvent> captor = ArgumentCaptor.forClass(GameAchievementEvent.class);
+        verify(publisher, times(2)).publishAchievement(captor.capture());
 
-        GameDrawEvent event = captor.getValue();
-        assertEquals(id.value(), event.gameId());
-        assertEquals(
-                List.of(playerBlack.id().value(), playerWhite.id().value()),
-                event.players()
-        );
+        List<GameAchievementEvent> allValues = captor.getAllValues();
+
+        GameAchievementEvent playerBlackDrawEvent = allValues.stream()
+                .filter(event -> event.playerId().equals(playerBlack.id().value()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Draw event not found"));
+        assertEquals(id.value(), playerBlackDrawEvent.gameId());
+        assertEquals(playerBlack.id().value(), playerBlackDrawEvent.playerId());
+        assertEquals(AchievementCode.CHECKERS_DRAW, playerBlackDrawEvent.achievementCode());
+
+        GameAchievementEvent playerWhiteDrawEvent = allValues.stream()
+                .filter(event -> event.playerId().equals(playerWhite.id().value()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Draw event not found"));
+        assertEquals(id.value(), playerWhiteDrawEvent.gameId());
+        assertEquals(playerWhite.id().value(), playerWhiteDrawEvent.playerId());
+        assertEquals(AchievementCode.CHECKERS_DRAW, playerWhiteDrawEvent.achievementCode());
     }
 
     @Test
@@ -106,31 +112,72 @@ public class GameServiceTest {
         Move move = new Move(playerId, List.of(21, 17));
 
         when(repository.findById(id)).thenReturn(Optional.of(game));
+        doReturn(PlayerRole.BLACK).when(game).currentRole();
+        doReturn(playerBlack).when(game).currentPlayer();
         doReturn(GameStatus.BLACK_WIN).when(game).status();
 
         service.requestMove(id, playerId, move);
 
         verify(repository).save(game);
 
-        ArgumentCaptor<GameWonEvent> winCaptor = ArgumentCaptor.forClass(GameWonEvent.class);
-        verify(publisher).publishGameWon(winCaptor.capture());
+        ArgumentCaptor<GameAchievementEvent> captor = ArgumentCaptor.forClass(GameAchievementEvent.class);
+        verify(publisher, times(2)).publishAchievement(captor.capture());
 
-        GameWonEvent winEvent = winCaptor.getValue();
+        List<GameAchievementEvent> allValues = captor.getAllValues();
+
+        GameAchievementEvent winEvent = allValues.stream()
+                .filter(event -> event.playerId().equals(playerBlack.id().value()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Win event not found"));
         assertEquals(id.value(), winEvent.gameId());
-        assertEquals(
-                playerBlack.id().value(),
-                winEvent.winnerId()
-        );
+        assertEquals(playerBlack.id().value(), winEvent.playerId());
+        assertEquals(AchievementCode.CHECKERS_WIN, winEvent.achievementCode());
 
-        ArgumentCaptor<GameLostEvent> loseCaptor = ArgumentCaptor.forClass(GameLostEvent.class);
-        verify(publisher).publishGameLost(loseCaptor.capture());
+        GameAchievementEvent lossEvent = allValues.stream()
+                .filter(event -> event.playerId().equals(playerWhite.id().value()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Loss event not found"));
+        assertEquals(id.value(), lossEvent.gameId());
+        assertEquals(playerWhite.id().value(), lossEvent.playerId());
+        assertEquals(AchievementCode.CHECKERS_LOSS, lossEvent.achievementCode());
+    }
 
-        GameLostEvent event = loseCaptor.getValue();
-        assertEquals(id.value(), event.gameId());
-        assertEquals(
-                playerWhite.id().value(),
-                event.loserId()
-        );
+    @Test
+    void requestMoveShouldPublishAchievementsWhenWhiteWon() {
+        Game game = spy(Game.create(players.stream().map(Player::id).toList(), false, KingMovementMode.SINGLE));
+        GameId id = game.id();
+        PlayerId playerId = playerWhite.id();
+        Move move = new Move(playerId, List.of(21, 17));
+
+        when(repository.findById(id)).thenReturn(Optional.of(game));
+        doReturn(PlayerRole.WHITE).when(game).currentRole();
+        doReturn(playerWhite).when(game).currentPlayer();
+        doReturn(GameStatus.WHITE_WIN).when(game).status();
+
+        service.requestMove(id, playerId, move);
+
+        verify(repository).save(game);
+
+        ArgumentCaptor<GameAchievementEvent> captor = ArgumentCaptor.forClass(GameAchievementEvent.class);
+        verify(publisher, times(2)).publishAchievement(captor.capture());
+
+        List<GameAchievementEvent> allValues = captor.getAllValues();
+
+        GameAchievementEvent winEvent = allValues.stream()
+                .filter(event -> event.playerId().equals(playerWhite.id().value()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Win event not found"));
+        assertEquals(id.value(), winEvent.gameId());
+        assertEquals(playerWhite.id().value(), winEvent.playerId());
+        assertEquals(AchievementCode.CHECKERS_WIN, winEvent.achievementCode());
+
+        GameAchievementEvent lossEvent = allValues.stream()
+                .filter(event -> event.playerId().equals(playerBlack.id().value()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Loss event not found"));
+        assertEquals(id.value(), lossEvent.gameId());
+        assertEquals(playerBlack.id().value(), lossEvent.playerId());
+        assertEquals(AchievementCode.CHECKERS_LOSS, lossEvent.achievementCode());
     }
 
     @Test
@@ -149,15 +196,16 @@ public class GameServiceTest {
 
         verify(repository).save(game);
 
-        ArgumentCaptor<KingPromotionEvent> captor = ArgumentCaptor.forClass(KingPromotionEvent.class);
-        verify(publisher).publishKingPromotionEvent(captor.capture());
+        ArgumentCaptor<GameAchievementEvent> captor = ArgumentCaptor.forClass(GameAchievementEvent.class);
+        verify(publisher).publishAchievement(captor.capture());
 
-        KingPromotionEvent event = captor.getValue();
+        GameAchievementEvent event = captor.getValue();
         assertEquals(id.value(), event.gameId());
         assertEquals(
                 playerBlack.id().value(),
                 event.playerId()
         );
+        assertEquals(AchievementCode.CHECKERS_PROMOTION, event.achievementCode());
     }
 
     @Test
@@ -176,15 +224,16 @@ public class GameServiceTest {
 
         verify(repository).save(game);
 
-        ArgumentCaptor<MultiCaptureEvent> captor = ArgumentCaptor.forClass(MultiCaptureEvent.class);
-        verify(publisher).publishMultiCaptureEvent(captor.capture());
+        ArgumentCaptor<GameAchievementEvent> captor = ArgumentCaptor.forClass(GameAchievementEvent.class);
+        verify(publisher).publishAchievement(captor.capture());
 
-        MultiCaptureEvent event = captor.getValue();
+        GameAchievementEvent event = captor.getValue();
         assertEquals(id.value(), event.gameId());
         assertEquals(
                 playerBlack.id().value(),
                 event.playerId()
         );
+        assertEquals(AchievementCode.CHECKERS_MULTICAPTURE, event.achievementCode());
     }
 
     @Test
@@ -194,7 +243,7 @@ public class GameServiceTest {
         PlayerId playerId = playerBlack.id();
         Move move = new Move(playerId, List.of(21, 17));
 
-        MoveResult promotionResult = new MoveResult(false, true, false, 3);
+        MoveResult promotionResult = new MoveResult(false, false, false, 3);
 
         when(repository.findById(id)).thenReturn(Optional.of(game));
         when(game.requestMove(move)).thenReturn(promotionResult);
@@ -203,14 +252,15 @@ public class GameServiceTest {
 
         verify(repository).save(game);
 
-        ArgumentCaptor<ThreeKingsEvent> captor = ArgumentCaptor.forClass(ThreeKingsEvent.class);
-        verify(publisher).publishThreeKingsEvent(captor.capture());
+        ArgumentCaptor<GameAchievementEvent> captor = ArgumentCaptor.forClass(GameAchievementEvent.class);
+        verify(publisher).publishAchievement(captor.capture());
 
-        ThreeKingsEvent event = captor.getValue();
+        GameAchievementEvent event = captor.getValue();
         assertEquals(id.value(), event.gameId());
         assertEquals(
                 playerBlack.id().value(),
                 event.playerId()
         );
+        assertEquals(AchievementCode.CHECKERS_THREE_KINGS, event.achievementCode());
     }
 }

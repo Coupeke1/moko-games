@@ -22,111 +22,11 @@ public class RabbitMqGameplayEventPublisher implements GameEventPublisher {
     }
 
     @Override
-    public void publishGameDraw(final GameDrawEvent event) {
+    public void publishAchievement(final GameAchievementEvent event) {
         try {
             rabbitTemplate.convertAndSend(
                     RabbitMQTopology.EXCHANGE_GAMEPLAY,
-                    RabbitMQTopology.ROUTING_CHECKERS_DRAW,
-                    event,
-                    msg -> {
-                        msg.getMessageProperties().setMessageId(UUID.randomUUID().toString());
-                        msg.getMessageProperties().setCorrelationId(event.gameId().toString());
-                        return msg;
-                    }
-            );
-        } catch (AmqpConnectException exception) {
-            throw new RabbitNotReachableException();
-        } catch (AmqpException exception) {
-            throw new PublishAchievementException();
-        }
-    }
-
-    @Override
-    public void publishGameLost(final GameLostEvent event) {
-        try {
-            rabbitTemplate.convertAndSend(
-                    RabbitMQTopology.EXCHANGE_GAMEPLAY,
-                    RabbitMQTopology.ROUTING_CHECKERS_LOST,
-                    event,
-                    msg -> {
-                        msg.getMessageProperties().setMessageId(UUID.randomUUID().toString());
-                        msg.getMessageProperties().setCorrelationId(event.gameId().toString());
-                        return msg;
-                    }
-            );
-        } catch (AmqpConnectException exception) {
-            throw new RabbitNotReachableException();
-        } catch (AmqpException exception) {
-            throw new PublishAchievementException();
-        }
-    }
-
-    @Override
-    public void publishGameWon(final GameWonEvent event) {
-        try {
-            rabbitTemplate.convertAndSend(
-                    RabbitMQTopology.EXCHANGE_GAMEPLAY,
-                    RabbitMQTopology.ROUTING_CHECKERS_WON,
-                    event,
-                    msg -> {
-                        msg.getMessageProperties().setMessageId(UUID.randomUUID().toString());
-                        msg.getMessageProperties().setCorrelationId(event.gameId().toString());
-                        return msg;
-                    }
-            );
-        } catch (AmqpConnectException exception) {
-            throw new RabbitNotReachableException();
-        } catch (AmqpException exception) {
-            throw new PublishAchievementException();
-        }
-    }
-
-    @Override
-    public void publishKingPromotionEvent(final KingPromotionEvent event) {
-        try {
-            rabbitTemplate.convertAndSend(
-                    RabbitMQTopology.EXCHANGE_GAMEPLAY,
-                    RabbitMQTopology.ROUTING_CHECKERS_PROMOTION,
-                    event,
-                    msg -> {
-                        msg.getMessageProperties().setMessageId(UUID.randomUUID().toString());
-                        msg.getMessageProperties().setCorrelationId(event.gameId().toString());
-                        return msg;
-                    }
-            );
-        } catch (AmqpConnectException exception) {
-            throw new RabbitNotReachableException();
-        } catch (AmqpException exception) {
-            throw new PublishAchievementException();
-        }
-    }
-
-    @Override
-    public void publishMultiCaptureEvent(final MultiCaptureEvent event) {
-        try {
-            rabbitTemplate.convertAndSend(
-                    RabbitMQTopology.EXCHANGE_GAMEPLAY,
-                    RabbitMQTopology.ROUTING_CHECKERS_MULTICAPTURE,
-                    event,
-                    msg -> {
-                        msg.getMessageProperties().setMessageId(UUID.randomUUID().toString());
-                        msg.getMessageProperties().setCorrelationId(event.gameId().toString());
-                        return msg;
-                    }
-            );
-        } catch (AmqpConnectException exception) {
-            throw new RabbitNotReachableException();
-        } catch (AmqpException exception) {
-            throw new PublishAchievementException();
-        }
-    }
-
-    @Override
-    public void publishThreeKingsEvent(final ThreeKingsEvent event) {
-        try {
-            rabbitTemplate.convertAndSend(
-                    RabbitMQTopology.EXCHANGE_GAMEPLAY,
-                    RabbitMQTopology.ROUTING_CHECKERS_THREEKINGS,
+                    RabbitMQTopology.ROUTING_CHECKERS_GAMEPLAY,
                     event,
                     msg -> {
                         msg.getMessageProperties().setMessageId(UUID.randomUUID().toString());
