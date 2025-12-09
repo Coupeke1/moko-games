@@ -74,4 +74,3 @@ class ChatEventPublisherTest {
         assertThat(eventCaptor.getValue().messagePreview()).isEqualTo(longMessage);
     }
 }
-
