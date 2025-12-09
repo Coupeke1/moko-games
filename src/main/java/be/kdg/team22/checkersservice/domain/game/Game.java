@@ -3,6 +3,7 @@ package be.kdg.team22.checkersservice.domain.game;
 import be.kdg.team22.checkersservice.domain.board.Board;
 import be.kdg.team22.checkersservice.domain.move.KingMovementMode;
 import be.kdg.team22.checkersservice.domain.move.Move;
+import be.kdg.team22.checkersservice.domain.move.MoveResult;
 import be.kdg.team22.checkersservice.domain.move.MoveValidator;
 import be.kdg.team22.checkersservice.domain.game.exceptions.*;
 import be.kdg.team22.checkersservice.domain.player.Player;
@@ -62,7 +63,7 @@ public class Game {
         return new Game(players, aiPlayer ? PlayerRole.WHITE : null, kingMovementMode);
     }
 
-    public void requestMove(final Move move) {
+    public MoveResult requestMove(final Move move) {
         if (status != GameStatus.RUNNING) {
             throw new GameNotRunningException();
         }
@@ -71,10 +72,11 @@ public class Game {
             throw new NotPlayersTurnException(currentRole);
         }
 
-        MoveValidator.move(board, currentRole, move, kingMovementMode);
+        MoveResult result = MoveValidator.move(board, currentRole, move, kingMovementMode);
         status = board.checkWinConditions();
 
         nextPlayer();
+        return result;
     }
 
     public Player currentPlayer() {
@@ -122,5 +124,12 @@ public class Game {
         this.status = GameStatus.RUNNING;
         this.board.setupInitialPieces();
         this.currentRole = PlayerRole.BLACK;
+    }
+
+    public Player playerWithRole(final PlayerRole role) {
+        return players.stream()
+                .filter(p -> p.role() == role)
+                .findFirst()
+                .orElseThrow(() -> new RoleUnfulfilledException(role));
     }
 }

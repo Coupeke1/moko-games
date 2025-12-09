@@ -19,7 +19,7 @@ public class MoveValidator {
     private MoveValidator() {
     }
 
-    public static void move(final Board board, final PlayerRole currentRole, final Move move, final KingMovementMode kingMovementMode) {
+    public static MoveResult move(final Board board, final PlayerRole currentRole, final Move move, final KingMovementMode kingMovementMode) {
         Board tempBoard = new Board(board);
         int captureCount = 0;
         List<Move> successfulSegments = new ArrayList<>();
@@ -35,9 +35,21 @@ public class MoveValidator {
             throw new TooManyMovesException();
         }
 
+        boolean overallPromotion = false;
+        int captures = 0;
+        int kingCount = 0;
         for (Move segmentMove : successfulSegments) {
-            board.move(segmentMove);
+            MoveResult result = board.move(segmentMove);
+            if (result.capture()) {
+                captures++;
+            }
+            if (result.promotion()) {
+                overallPromotion = true;
+            }
+            kingCount = result.kingCount();
         }
+
+        return new MoveResult(captures > 0, captures > 1, overallPromotion, kingCount);
     }
 
     public static void validateMove(final Board board, final PlayerRole currentRole, final Move move, final KingMovementMode kingMovementMode) {
