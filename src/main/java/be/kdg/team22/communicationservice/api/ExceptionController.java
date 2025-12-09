@@ -10,16 +10,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class ExceptionController {
 
-    @ExceptionHandler(NotInLobbyException.class)
-    public ResponseEntity<String> handleNotInLobby(final NotInLobbyException ex) {
+    @ExceptionHandler({NotInLobbyException.class, NotBotChannelOwnerException.class, NotFriendsException.class})
+    public ResponseEntity<String> handleAccessDenied(final RuntimeException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
     }
-
-    @ExceptionHandler(NotFriendsException.class)
-    public ResponseEntity<String> handleNotFriends(final NotFriendsException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
-    }
-
     @ExceptionHandler({ChatChannelNotFoundException.class, NotificationNotFoundException.class, UserProfileNotFoundException.class, UserPreferencesNotFoundException.class})
     public ResponseEntity<String> handleNotFound(final Exception ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
@@ -38,6 +32,11 @@ public class ExceptionController {
     @ExceptionHandler(ServiceUnavailableException.class)
     public ResponseEntity<String> handleServiceUnavailable(final ServiceUnavailableException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    @ExceptionHandler(BotServiceException.class)
+    public ResponseEntity<String> handleBotServiceError(final BotServiceException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_GATEWAY);
     }
 
     @ExceptionHandler(RuntimeException.class)
