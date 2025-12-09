@@ -63,20 +63,34 @@ public class GameService {
                                 Instant.now()
                         )
                 );
-                case GameStatus.BLACK_WIN -> publisher.publishGameWon(
-                        new GameWonEvent(
-                                game.id().value(),
-                                game.playerWithRole(PlayerRole.BLACK).id().value(),
-                                Instant.now()
-                        )
-                );
-                case GameStatus.WHITE_WIN -> publisher.publishGameWon(
-                        new GameWonEvent(
-                                game.id().value(),
-                                game.playerWithRole(PlayerRole.WHITE).id().value(),
-                                Instant.now()
-                        )
-                );
+                case GameStatus.BLACK_WIN -> {
+                    publisher.publishGameWon(
+                            new GameWonEvent(
+                                    game.id().value(),
+                                    game.playerWithRole(PlayerRole.BLACK).id().value(),
+                                    Instant.now()
+                            )
+                    );
+                    publisher.publishGameLost(
+                            new GameLostEvent(game.id().value(),
+                                    game.playerWithRole(PlayerRole.WHITE).id().value(),
+                                    Instant.now())
+                    );
+                }
+                case GameStatus.WHITE_WIN -> {
+                    publisher.publishGameWon(
+                            new GameWonEvent(
+                                    game.id().value(),
+                                    game.playerWithRole(PlayerRole.WHITE).id().value(),
+                                    Instant.now()
+                            )
+                    );
+                    publisher.publishGameLost(
+                            new GameLostEvent(game.id().value(),
+                                    game.playerWithRole(PlayerRole.BLACK).id().value(),
+                                    Instant.now())
+                    );
+                }
             }
 
             if (result.promotion()) {

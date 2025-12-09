@@ -5,6 +5,7 @@ import be.kdg.team22.checkersservice.domain.board.Piece;
 import be.kdg.team22.checkersservice.domain.game.exceptions.*;
 import be.kdg.team22.checkersservice.domain.move.KingMovementMode;
 import be.kdg.team22.checkersservice.domain.move.Move;
+import be.kdg.team22.checkersservice.domain.move.MoveResult;
 import be.kdg.team22.checkersservice.domain.move.exceptions.*;
 import be.kdg.team22.checkersservice.domain.player.Player;
 import be.kdg.team22.checkersservice.domain.player.PlayerId;
@@ -277,9 +278,9 @@ public class GameTest {
         boardField.set(game, createMultiCaptureBoard());
         Move move = new Move(game.players().first().id(), List.of(22, 13, 6));
 
-        assertDoesNotThrow(() ->
-                game.requestMove(move)
-        );
+        MoveResult result = game.requestMove(move);
+        assert (result.multiCapture());
+        assert (result.capture());
         assert (game.board().pieceAt(17).isEmpty());
         assert (game.board().pieceAt(9).isEmpty());
     }
