@@ -54,39 +54,45 @@ public class GameService {
 
         try {
             switch (game.status()) {
-                case GameStatus.DRAW -> publisher.publishGameDraw(
-                        new GameDrawEvent(
-                                game.id().value(),
-                                game.players().stream()
-                                        .map(p -> p.id().value())
-                                        .toList(),
-                                Instant.now()
-                        )
-                );
+                case GameStatus.DRAW -> game.players().forEach(player ->
+                        publisher.publishAchievement(
+                                new GameAchievementEvent(
+                                        "CHECKERS_DRAW",
+                                        game.id().value(),
+                                        player.id().value(),
+                                        Instant.now()
+                                )
+                        ));
                 case GameStatus.BLACK_WIN -> {
-                    publisher.publishGameWon(
-                            new GameWonEvent(
+                    publisher.publishAchievement(
+                            new GameAchievementEvent(
+                                    "CHECKERS_WIN",
                                     game.id().value(),
                                     game.playerWithRole(PlayerRole.BLACK).id().value(),
                                     Instant.now()
                             )
                     );
-                    publisher.publishGameLost(
-                            new GameLostEvent(game.id().value(),
+                    publisher.publishAchievement(
+                            new GameAchievementEvent(
+                                    "CHECKERS_LOSS",
+                                    game.id().value(),
                                     game.playerWithRole(PlayerRole.WHITE).id().value(),
                                     Instant.now())
                     );
                 }
                 case GameStatus.WHITE_WIN -> {
-                    publisher.publishGameWon(
-                            new GameWonEvent(
+                    publisher.publishAchievement(
+                            new GameAchievementEvent(
+                                    "CHECKERS_WIN",
                                     game.id().value(),
                                     game.playerWithRole(PlayerRole.WHITE).id().value(),
                                     Instant.now()
                             )
                     );
-                    publisher.publishGameLost(
-                            new GameLostEvent(game.id().value(),
+                    publisher.publishAchievement(
+                            new GameAchievementEvent(
+                                    "CHECKERS_LOSS",
+                                    game.id().value(),
                                     game.playerWithRole(PlayerRole.BLACK).id().value(),
                                     Instant.now())
                     );
@@ -94,8 +100,9 @@ public class GameService {
             }
 
             if (result.promotion()) {
-                publisher.publishKingPromotionEvent(
-                        new KingPromotionEvent(
+                publisher.publishAchievement(
+                        new GameAchievementEvent(
+                                "CHECKERS_PROMOTION",
                                 game.id().value(),
                                 move.playerId().value(),
                                 Instant.now()
@@ -104,8 +111,9 @@ public class GameService {
             }
 
             if (result.multiCapture()) {
-                publisher.publishMultiCaptureEvent(
-                        new MultiCaptureEvent(
+                publisher.publishAchievement(
+                        new GameAchievementEvent(
+                                "CHECKERS_MULTICAPTURE",
                                 game.id().value(),
                                 move.playerId().value(),
                                 Instant.now()
@@ -114,8 +122,9 @@ public class GameService {
             }
 
             if (result.kingCount() >= 3) {
-                publisher.publishThreeKingsEvent(
-                        new ThreeKingsEvent(
+                publisher.publishAchievement(
+                        new GameAchievementEvent(
+                                "CHECKERS_THREE_KINGS",
                                 game.id().value(),
                                 move.playerId().value(),
                                 Instant.now()
