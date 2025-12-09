@@ -19,6 +19,11 @@ spring:
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:create}
     defer-datasource-initialization: ${SPRING_JPA_DEFER_DATASOURCE_INITIALIZATION:true}
 
+  sql:
+    init:
+      mode: ${SPRING_SQL_INIT_MODE:always}
+      data-locations: classpath:${SPRING_SQL_DATA_FILE:local.sql}
+
   rabbitmq:
     host: ${SPRING_RABBITMQ_HOST:localhost}
     port: ${SPRING_RABBITMQ_PORT:5672}
