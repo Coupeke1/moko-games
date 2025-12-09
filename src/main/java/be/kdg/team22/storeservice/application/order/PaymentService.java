@@ -1,11 +1,12 @@
 package be.kdg.team22.storeservice.application.order;
 
 import be.kdg.team22.storeservice.application.cart.CartService;
-import be.kdg.team22.storeservice.application.catalog.services.StoreService;
+import be.kdg.team22.storeservice.application.catalog.StoreService;
 import be.kdg.team22.storeservice.domain.order.Order;
 import be.kdg.team22.storeservice.domain.order.OrderId;
 import be.kdg.team22.storeservice.domain.order.OrderRepository;
 import be.kdg.team22.storeservice.domain.order.OrderStatus;
+import be.kdg.team22.storeservice.domain.order.events.GamesPurchasedEvent;
 import be.kdg.team22.storeservice.domain.order.events.OrderCompletedEvent;
 import be.kdg.team22.storeservice.domain.order.exceptions.OrderNotFoundException;
 import be.kdg.team22.storeservice.domain.order.exceptions.PaymentIncompleteException;
@@ -58,6 +59,11 @@ public class PaymentService {
                         order.id().value(),
                         order.totalPrice()
                 ));
+
+                eventPublisher.publishGamesPurchased(new GamesPurchasedEvent(
+                        order.userId().value(),
+                        order.items().stream().map(item -> item.gameId().value()).toList()
+                ));
             }
             case "canceled" -> order.updateStatus(OrderStatus.CANCELED);
             case "expired" -> order.updateStatus(OrderStatus.EXPIRED);
@@ -83,6 +89,11 @@ public class PaymentService {
                     order.userId().value(),
                     order.id().value(),
                     order.totalPrice()
+            ));
+
+            eventPublisher.publishGamesPurchased(new GamesPurchasedEvent(
+                    order.userId().value(),
+                    order.items().stream().map(item -> item.gameId().value()).toList()
             ));
 
             return order;

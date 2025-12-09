@@ -1,4 +1,4 @@
-package be.kdg.team22.storeservice.application.catalog.services;
+package be.kdg.team22.storeservice.application.catalog;
 
 import be.kdg.team22.storeservice.application.catalog.queries.FilterQuery;
 import be.kdg.team22.storeservice.application.catalog.queries.Pagination;

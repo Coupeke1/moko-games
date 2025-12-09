@@ -1,6 +1,7 @@
 package be.kdg.team22.storeservice.application.catalog.services;
 
 import be.kdg.team22.storeservice.api.catalog.models.EntryModel;
+import be.kdg.team22.storeservice.application.catalog.GameService;
 import be.kdg.team22.storeservice.application.catalog.queries.FilterQuery;
 import be.kdg.team22.storeservice.application.catalog.queries.Pagination;
 import be.kdg.team22.storeservice.domain.catalog.Entry;
@@ -28,11 +29,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class GameQueryServiceSociableTest {
+class GameServiceSociableTest {
 
     private final UUID ID1 = UUID.randomUUID();
     private final UUID ID2 = UUID.randomUUID();
-    GameQueryService queryService;
+    GameService queryService;
     @Mock
     EntryRepository repo;
     @Mock
@@ -52,7 +53,7 @@ class GameQueryServiceSociableTest {
 
     @BeforeEach
     void setup() {
-        queryService = new GameQueryService(repo, games);
+        queryService = new GameService(repo, games);
     }
 
     @Test

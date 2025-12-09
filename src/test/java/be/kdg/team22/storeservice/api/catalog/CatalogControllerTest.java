@@ -3,8 +3,8 @@ package be.kdg.team22.storeservice.api.catalog;
 import be.kdg.team22.storeservice.api.catalog.models.EntryModel;
 import be.kdg.team22.storeservice.application.catalog.queries.FilterQuery;
 import be.kdg.team22.storeservice.application.catalog.queries.Pagination;
-import be.kdg.team22.storeservice.application.catalog.services.GameQueryService;
-import be.kdg.team22.storeservice.application.catalog.services.StoreService;
+import be.kdg.team22.storeservice.application.catalog.GameService;
+import be.kdg.team22.storeservice.application.catalog.StoreService;
 import be.kdg.team22.storeservice.config.TestSecurityConfig;
 import be.kdg.team22.storeservice.domain.catalog.GameId;
 import be.kdg.team22.storeservice.domain.catalog.Entry;
@@ -22,7 +22,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -45,7 +44,7 @@ class CatalogControllerTest {
     @MockitoBean
     private StoreService storeService;
     @MockitoBean
-    private GameQueryService queryService;
+    private GameService queryService;
 
     private Entry sampleEntry() {
         return new Entry(

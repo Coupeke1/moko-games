@@ -1,11 +1,11 @@
-package be.kdg.team22.storeservice.application.catalog.services;
+package be.kdg.team22.storeservice.application.catalog;
 
 import be.kdg.team22.storeservice.api.catalog.models.EntryModel;
 import be.kdg.team22.storeservice.application.catalog.queries.FilterQuery;
 import be.kdg.team22.storeservice.application.catalog.queries.Pagination;
-import be.kdg.team22.storeservice.domain.catalog.GameId;
 import be.kdg.team22.storeservice.domain.catalog.Entry;
 import be.kdg.team22.storeservice.domain.catalog.EntryRepository;
+import be.kdg.team22.storeservice.domain.catalog.GameId;
 import be.kdg.team22.storeservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.storeservice.infrastructure.games.GameMetadataResponse;
 import org.springframework.stereotype.Service;
@@ -14,17 +14,16 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
-public class GameQueryService {
+public class GameService {
     private final EntryRepository repo;
     private final ExternalGamesRepository games;
 
-    public GameQueryService(final EntryRepository repo, final ExternalGamesRepository games) {
+    public GameService(final EntryRepository repo, final ExternalGamesRepository games) {
         this.repo = repo;
         this.games = games;
     }
 
     public List<EntryModel> listGamesWithMetadata(final FilterQuery filter, final Pagination pagination) {
-
         List<Entry> entries = repo.findAll(filter, pagination);
 
         List<EntryModel> games = entries.stream().map(entry -> EntryModel.from(entry, this.games.fetchMetadata(entry.id()))).toList();
@@ -43,10 +42,8 @@ public class GameQueryService {
     }
 
     public EntryModel getGameWithMetadata(final GameId id) {
-
         Entry entry = repo.findById(id.value()).orElseThrow();
         GameMetadataResponse meta = games.fetchMetadata(id);
-
         return EntryModel.from(entry, meta);
     }
 }

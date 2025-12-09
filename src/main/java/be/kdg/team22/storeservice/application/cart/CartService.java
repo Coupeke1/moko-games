@@ -20,27 +20,26 @@ import java.util.UUID;
 @Service
 @Transactional
 public class CartService {
-
-    private final CartRepository repo;
+    private final CartRepository cartRepository;
     private final ExternalGamesRepository gamesRepository;
     private final ExternalUserRepository userRepository;
 
-    public CartService(CartRepository repo, ExternalGamesRepository gamesRepository, ExternalUserRepository userRepository) {
-        this.repo = repo;
+    public CartService(final CartRepository cartRepository, final ExternalGamesRepository gamesRepository, final ExternalUserRepository userRepository) {
+        this.cartRepository = cartRepository;
         this.gamesRepository = gamesRepository;
         this.userRepository = userRepository;
     }
 
-    public Cart getOrCreate(final UserId userId) {
-        return repo.findByUserId(userId.value()).orElseGet(() -> {
-            Cart c = new Cart(CartId.create(), userId.value());
-            repo.save(c);
-            return c;
+    public Cart getOrCreate(final UserId id) {
+        return cartRepository.findByUserId(id.value()).orElseGet(() -> {
+            Cart cart = new Cart(CartId.create(), id.value());
+            cartRepository.save(cart);
+            return cart;
         });
     }
 
     public Cart get(final UserId userId) {
-        return repo.findByUserId(userId.value()).orElseThrow(() -> new CartNotFoundException(userId.value()));
+        return cartRepository.findByUserId(userId.value()).orElseThrow(() -> new CartNotFoundException(userId.value()));
     }
 
     public void addItem(final UserId userId, final GameId gameId, final String jwt) {
@@ -50,20 +49,20 @@ public class CartService {
         if (userRepository.userOwnsGame(gameId.value(), jwt))
             throw new GameAlreadyOwnedException(gameId.value(), userId.value());
 
-        Cart cart = repo.findByUserId(userId.value()).orElseGet(() -> {
+        Cart cart = cartRepository.findByUserId(userId.value()).orElseGet(() -> {
             Cart newCart = new Cart(new CartId(UUID.randomUUID()), userId.value());
-            repo.save(newCart);
+            cartRepository.save(newCart);
             return newCart;
         });
 
         cart.addItem(gameId);
-        repo.save(cart);
+        cartRepository.save(cart);
     }
 
     public void removeItem(final UserId userId, final GameId gameId) {
         Cart cart = get(userId);
         cart.removeItem(gameId);
-        repo.save(cart);
+        cartRepository.save(cart);
     }
 
     public void clearCart(final UserId userId) {
@@ -73,7 +72,7 @@ public class CartService {
             throw new CartEmptyException(userId.value());
 
         cart.clear();
-        repo.save(cart);
+        cartRepository.save(cart);
     }
 
     private void validateMetadata(GameMetadataResponse meta, GameId gameId) {
