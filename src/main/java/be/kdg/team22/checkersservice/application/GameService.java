@@ -57,7 +57,7 @@ public class GameService {
                 case GameStatus.DRAW -> game.players().forEach(player ->
                         publisher.publishAchievement(
                                 new GameAchievementEvent(
-                                        AchievementCode.CHECKERS_DRAW,
+                                        AchievementCode.CHECKERS_DRAW.name(),
                                         game.id().value(),
                                         player.id().value(),
                                         Instant.now()
@@ -66,7 +66,7 @@ public class GameService {
                 case GameStatus.BLACK_WIN -> {
                     publisher.publishAchievement(
                             new GameAchievementEvent(
-                                    AchievementCode.CHECKERS_WIN,
+                                    AchievementCode.CHECKERS_WIN.name(),
                                     game.id().value(),
                                     game.playerWithRole(PlayerRole.BLACK).id().value(),
                                     Instant.now()
@@ -74,7 +74,7 @@ public class GameService {
                     );
                     publisher.publishAchievement(
                             new GameAchievementEvent(
-                                    AchievementCode.CHECKERS_LOSS,
+                                    AchievementCode.CHECKERS_LOSS.name(),
                                     game.id().value(),
                                     game.playerWithRole(PlayerRole.WHITE).id().value(),
                                     Instant.now())
@@ -83,7 +83,7 @@ public class GameService {
                 case GameStatus.WHITE_WIN -> {
                     publisher.publishAchievement(
                             new GameAchievementEvent(
-                                    AchievementCode.CHECKERS_WIN,
+                                    AchievementCode.CHECKERS_WIN.name(),
                                     game.id().value(),
                                     game.playerWithRole(PlayerRole.WHITE).id().value(),
                                     Instant.now()
@@ -91,7 +91,7 @@ public class GameService {
                     );
                     publisher.publishAchievement(
                             new GameAchievementEvent(
-                                    AchievementCode.CHECKERS_LOSS,
+                                    AchievementCode.CHECKERS_LOSS.name(),
                                     game.id().value(),
                                     game.playerWithRole(PlayerRole.BLACK).id().value(),
                                     Instant.now())
@@ -102,7 +102,7 @@ public class GameService {
             if (result.promotion()) {
                 publisher.publishAchievement(
                         new GameAchievementEvent(
-                                AchievementCode.CHECKERS_PROMOTION,
+                                AchievementCode.CHECKERS_PROMOTION.name(),
                                 game.id().value(),
                                 move.playerId().value(),
                                 Instant.now()
@@ -113,7 +113,7 @@ public class GameService {
             if (result.multiCapture()) {
                 publisher.publishAchievement(
                         new GameAchievementEvent(
-                                AchievementCode.CHECKERS_MULTICAPTURE,
+                                AchievementCode.CHECKERS_MULTICAPTURE.name(),
                                 game.id().value(),
                                 move.playerId().value(),
                                 Instant.now()
@@ -124,7 +124,7 @@ public class GameService {
             if (result.kingCount() >= 3) {
                 publisher.publishAchievement(
                         new GameAchievementEvent(
-                                AchievementCode.CHECKERS_THREE_KINGS,
+                                AchievementCode.CHECKERS_THREE_KINGS.name(),
                                 game.id().value(),
                                 move.playerId().value(),
                                 Instant.now()

@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQTopology {
     public static final String EXCHANGE_GAMEPLAY = "exchange.gameplay";
 
-    public static final String ROUTING_CHECKERS_GAMEPLAY = "game.checkers";
+    public static final String ROUTING_CHECKERS_GAMEPLAY = "game.checkers.achievement";
 
     public static final String QUEUE_CHECKERS_EVENTS = "queue.checkers.events";
 
