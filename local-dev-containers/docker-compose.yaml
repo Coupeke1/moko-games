@@ -4,7 +4,6 @@ include:
   - infrastructure.yaml
   - platform-services.yaml
   - game-services.yaml
-  - frontend.yaml
   - black-box-chess-game.yaml
 
 networks:

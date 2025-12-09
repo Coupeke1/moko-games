@@ -55,6 +55,9 @@ Infrastructure services (database, messaging, etc.) are **always started** regar
 
 # All services
 .\run.ps1 -All
+
+# All services except some
+.\run.ps1 -All -Exclude checkers,tic-tac-toe
 ```
 
 ### Bash
@@ -67,6 +70,9 @@ Infrastructure services (database, messaging, etc.) are **always started** regar
 
 # All services
 ./run.sh --all
+
+# All services except some
+./run.sh --all --exclude checkers --exclude tic-tac-toe
 ```
 
 ---
@@ -94,13 +100,23 @@ Starts only the infrastructure (no platform or game services).
 ```powershell
 .\run.ps1 -All
 ```
-Starts all available services: user, session, social, games, tic-tac-toe, checkers.
+Starts all available services: user, session, social, games, store, tic-tac-toe, checkers, chess, frontend-platform, frontend-tic-tac-toe.
+
+#### Starting All Services Except Some
+```powershell
+# Exclude one service
+.\run.ps1 -All -Exclude checkers
+
+# Exclude multiple services (comma-separated)
+.\run.ps1 -All -Exclude checkers,tic-tac-toe
+```
 
 #### Parameter Details
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `-Services` | String array | Comma-separated list of services to start |
 | `-All` | Switch | Start all available services (overrides `-Services`) |
+| `-Exclude` | String array | Comma-separated list of services to exclude (works with `-All` or when starting with all services) |
 
 ---
 
@@ -125,18 +141,60 @@ Starts only the infrastructure (no platform or game services).
 ```bash
 ./run.sh --all
 ```
-Starts all available services: user, session, social, games, tic-tac-toe, checkers.
+Starts all available services: user, session, social, games, store, tic-tac-toe, checkers, chess, frontend-platform, frontend-tic-tac-toe.
+
+#### Starting All Services Except Some
+```bash
+# Exclude one service
+./run.sh --all --exclude checkers
+
+# Exclude multiple services
+./run.sh --all --exclude checkers --exclude tic-tac-toe
+```
 
 #### Argument Details
-| Argument | Description |
-|----------|-------------|
-| `--all` | Start all available services |
-| `<service-name>` | Individual service names (space-separated) |
-| None | Start infrastructure only |
+| Argument                   | Description                                    |
+|----------------------------|------------------------------------------------|
+| `--all`                    | Start all available services                   |
+| `--exclude <service-name>` | Exclude a service (can be used multiple times) |
+| `<service-name>`           | Individual service names (space-separated)     |
+| None                       | Start infrastructure only                      |
 
 ---
 
-## Script Behavior
+## Common Use Cases
+
+### Run everything except a specific game
+```powershell
+# PowerShell
+.\run.ps1 -All -Exclude checkers
+```
+```bash
+# Bash
+./run.sh --all --exclude checkers
+```
+
+### Run all services except multiple games
+```powershell
+# PowerShell
+.\run.ps1 -All -Exclude checkers,tic-tac-toe
+```
+```bash
+# Bash
+./run.sh --all --exclude checkers --exclude tic-tac-toe
+```
+
+### Run only platform services (exclude games and chess)
+```powershell
+# PowerShell
+.\run.ps1 -All -Exclude tic-tac-toe,checkers,chess,frontend-tic-tac-toe
+```
+```bash
+# Bash
+./run.sh --all --exclude tic-tac-toe --exclude checkers --exclude chess --exclude frontend-tic-tac-toe
+```
+
+---
 
 ### Startup Flow
 1. Script validates all requested services
