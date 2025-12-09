@@ -1,6 +1,8 @@
 export const environment = {
     authUrl:
-        window.__APP_CONFIG__?.authUrl ?? import.meta.env.VITE_AUTH_URL ?? "",
+        window.__APP_CONFIG__?.authUrl
+        ?? import.meta.env.VITE_AUTH_URL
+        ?? "",
     authRealm:
         window.__APP_CONFIG__?.authRealm ??
         import.meta.env.VITE_AUTH_REALM ??
