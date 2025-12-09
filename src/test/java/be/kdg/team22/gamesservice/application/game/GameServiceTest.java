@@ -2,12 +2,15 @@ package be.kdg.team22.gamesservice.application.game;
 
 import be.kdg.team22.gamesservice.api.game.models.CheckersSettingsModel;
 import be.kdg.team22.gamesservice.api.game.models.GameSettingsModel;
+import be.kdg.team22.gamesservice.api.game.models.RegisterGameRequest;
 import be.kdg.team22.gamesservice.api.game.models.StartGameRequest;
 import be.kdg.team22.gamesservice.api.game.models.StartGameResponseModel;
 import be.kdg.team22.gamesservice.domain.game.Game;
 import be.kdg.team22.gamesservice.domain.game.GameId;
 import be.kdg.team22.gamesservice.domain.game.GameRepository;
+import be.kdg.team22.gamesservice.domain.game.exceptions.DuplicateGameNameException;
 import be.kdg.team22.gamesservice.domain.game.exceptions.GameNotFoundException;
+import be.kdg.team22.gamesservice.domain.game.exceptions.GameUnhealthyException;
 import be.kdg.team22.gamesservice.domain.game.exceptions.InvalidGameConfigurationException;
 import be.kdg.team22.gamesservice.domain.game.exceptions.PlayersListEmptyException;
 import be.kdg.team22.gamesservice.infrastructure.game.engine.ExternalGamesRepository;
@@ -21,6 +24,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class GameServiceTest {
@@ -168,5 +172,158 @@ class GameServiceTest {
 
         assertThat(result).containsExactly(game1, game2);
         verify(gameRepository).findAll();
+    }
+
+    @Test
+    @DisplayName("register → happy path → creates and saves game")
+    void register_happyPath() {
+        RegisterGameRequest request = new RegisterGameRequest(
+                "Checkers",
+                "http://localhost:8087",
+                "http://localhost:3000",
+                "/start",
+                "/health",
+                "Checkers",
+                "A fun board game",
+                "http://img"
+        );
+
+        when(gameRepository.findByName("Checkers")).thenReturn(Optional.empty());
+        when(gameHealthChecker.isHealthy(request)).thenReturn(true);
+
+        Game result = service.register(request);
+
+        assertThat(result).isNotNull();
+        assertThat(result.name()).isEqualTo("Checkers");
+        assertThat(result.baseUrl()).isEqualTo("http://localhost:8087");
+        assertThat(result.frontendUrl()).isEqualTo("http://localhost:3000");
+        assertThat(result.startEndpoint()).isEqualTo("/start");
+        assertThat(result.healthEndpoint()).isEqualTo("/health");
+        assertThat(result.title()).isEqualTo("Checkers");
+        assertThat(result.description()).isEqualTo("A fun board game");
+        assertThat(result.image()).isEqualTo("http://img");
+        assertThat(result.healthy()).isTrue();
+
+        verify(gameRepository).findByName("Checkers");
+        verify(gameHealthChecker).isHealthy(request);
+        verify(gameRepository).save(any(Game.class));
+    }
+
+    @Test
+    @DisplayName("register → duplicate game name → throws DuplicateGameNameException")
+    void register_duplicateGameName() {
+        RegisterGameRequest request = new RegisterGameRequest(
+                "Checkers",
+                "http://localhost:8087",
+                "http://localhost:3000",
+                "/start",
+                "/health",
+                "Checkers",
+                "A fun board game",
+                "http://img"
+        );
+
+        GameId existingId = GameId.from(UUID.randomUUID());
+        Game existingGame = sampleGame(existingId);
+
+        when(gameRepository.findByName("Checkers")).thenReturn(Optional.of(existingGame));
+
+        assertThatThrownBy(() -> service.register(request))
+                .isInstanceOf(DuplicateGameNameException.class);
+
+        verify(gameRepository).findByName("Checkers");
+        verifyNoInteractions(gameHealthChecker);
+        verify(gameRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("register → unhealthy game → throws GameUnhealthyException")
+    void register_unhealthyGame() {
+        RegisterGameRequest request = new RegisterGameRequest(
+                "Checkers",
+                "http://localhost:8087",
+                "http://localhost:3000",
+                "/start",
+                "/health",
+                "Checkers",
+                "A fun board game",
+                "http://img"
+        );
+
+        when(gameRepository.findByName("Checkers")).thenReturn(Optional.empty());
+        when(gameHealthChecker.isHealthy(request)).thenReturn(false);
+
+        assertThatThrownBy(() -> service.register(request))
+                .isInstanceOf(GameUnhealthyException.class);
+
+        verify(gameRepository).findByName("Checkers");
+        verify(gameHealthChecker).isHealthy(request);
+        verify(gameRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("register → health check throws exception → propagates exception")
+    void register_healthCheckException() {
+        RegisterGameRequest request = new RegisterGameRequest(
+                "Checkers",
+                "http://localhost:8087",
+                "http://localhost:3000",
+                "/start",
+                "/health",
+                "Checkers",
+                "A fun board game",
+                "http://img"
+        );
+
+        when(gameRepository.findByName("Checkers")).thenReturn(Optional.empty());
+        when(gameHealthChecker.isHealthy(request)).thenThrow(new RuntimeException("Connection timeout"));
+
+        assertThatThrownBy(() -> service.register(request))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Connection timeout");
+
+        verify(gameRepository).findByName("Checkers");
+        verify(gameHealthChecker).isHealthy(request);
+        verify(gameRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("register → multiple games with same name → handles correctly")
+    void register_multipleGamesCheckUniqueness() {
+        RegisterGameRequest request1 = new RegisterGameRequest(
+                "TicTacToe",
+                "http://localhost:8088",
+                "http://localhost:3001",
+                "/start",
+                "/health",
+                "TicTacToe",
+                "A classic game",
+                "http://img"
+        );
+
+        when(gameRepository.findByName("TicTacToe")).thenReturn(Optional.empty());
+        when(gameHealthChecker.isHealthy(request1)).thenReturn(true);
+
+        Game registeredGame = service.register(request1);
+
+        assertThat(registeredGame.name()).isEqualTo("TicTacToe");
+
+        RegisterGameRequest request2 = new RegisterGameRequest(
+                "TicTacToe",
+                "http://localhost:8089",
+                "http://localhost:3002",
+                "/start",
+                "/health",
+                "TicTacToe",
+                "A classic game",
+                "http://img"
+        );
+
+        when(gameRepository.findByName("TicTacToe")).thenReturn(Optional.of(registeredGame));
+
+        assertThatThrownBy(() -> service.register(request2))
+                .isInstanceOf(DuplicateGameNameException.class);
+
+        verify(gameRepository, times(2)).findByName("TicTacToe");
     }
 }
