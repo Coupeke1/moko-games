@@ -10,7 +10,7 @@ services:
             - "8080:8080"
         environment:
             SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=user_service
-            SPRING_DATASOURCE_USER: user
+            SPRING_DATASOURCE_USERNAME: user
             SPRING_DATASOURCE_PASSWORD: password
             SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
 
@@ -22,6 +22,7 @@ services:
             SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
 
             GAME_SERVICE_URL: http://host.docker.internal:8084
+            CHAT_SERVICE_URL: http://host.docker.internal:8082
         healthcheck:
             test:
                 ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
@@ -44,7 +45,7 @@ services:
             - "8081:8081"
         environment:
             SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=session_service
-            SPRING_DATASOURCE_USER: user
+            SPRING_DATASOURCE_USERNAME: user
             SPRING_DATASOURCE_PASSWORD: password
             SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
 
@@ -58,6 +59,7 @@ services:
             USER_SERVICE_URL: http://host.docker.internal:8080
             SOCIAL_SERVICE_URL: http://host.docker.internal:8083
             GAME_SERVICE_URL: http://host.docker.internal:8084
+            CHAT_SERVICE_URL: http://host.docker.internal:8082
         healthcheck:
             test:
                 ["CMD", "wget", "-qO-", "http://localhost:8081/actuator/health"]
@@ -80,7 +82,7 @@ services:
             - "8083:8083"
         environment:
             SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=social_service
-            SPRING_DATASOURCE_USER: user
+            SPRING_DATASOURCE_USERNAME: user
             SPRING_DATASOURCE_PASSWORD: password
             SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
 
@@ -92,6 +94,7 @@ services:
             SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
 
             USER_SERVICE_URL: http://host.docker.internal:8080
+            CHAT_SERVICE_URL: http://host.docker.internal:8082
         healthcheck:
             test:
                 ["CMD", "wget", "-qO-", "http://localhost:8083/actuator/health"]
@@ -114,9 +117,11 @@ services:
             - "8084:8084"
         environment:
             SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=games_service
-            SPRING_DATASOURCE_USER: user
+            SPRING_DATASOURCE_USERNAME: user
             SPRING_DATASOURCE_PASSWORD: password
             SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+            SPRING_SQL_INIT_MODE: always
+            SPRING_SQL_DATA_FILE: docker.sql
 
             SPRING_RABBITMQ_HOST: app-rabbitmq
             SPRING_RABBITMQ_PORT: 5672
@@ -144,7 +149,7 @@ services:
         profiles: ["store"]
         environment:
             SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=store_service
-            SPRING_DATASOURCE_USER: user
+            SPRING_DATASOURCE_USERNAME: user
             SPRING_DATASOURCE_PASSWORD: password
             SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
 
@@ -157,6 +162,7 @@ services:
 
             USER_SERVICE_URL: http://host.docker.internal:8080
             GAME_SERVICE_URL: http://host.docker.internal:8084
+            CHAT_SERVICE_URL: http://host.docker.internal:8082
         ports:
             - "8085:8085"
         healthcheck:
@@ -179,7 +185,7 @@ services:
         profiles: ["communication"]
         environment:
             SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=communication_service
-            SPRING_DATASOURCE_USER: user
+            SPRING_DATASOURCE_USERNAME: user
             SPRING_DATASOURCE_PASSWORD: password
             SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
 
@@ -190,8 +196,10 @@ services:
 
             SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
 
-            USER_SERVICE_URL: http://host.docker.internal:8080
             SESSION_SERVICE_URL: http://host.docker.internal:8081
+            USER_SERVICE_URL: http://host.docker.internal:8080
+            SPRING_MAIL_USERNAME: mokogamesbe@gmail.com
+            SPRING_MAIL_PASSWORD: alofzkyfupctrpmw
         ports:
             - "8082:8082"
         healthcheck:
