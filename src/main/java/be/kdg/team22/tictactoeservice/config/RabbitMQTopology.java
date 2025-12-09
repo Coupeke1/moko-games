@@ -10,6 +10,7 @@ public class RabbitMQTopology {
 
     public static final String ROUTING_TICTACTOE_WON = "tictactoe.won";
     public static final String ROUTING_TICTACTOE_DRAW = "tictactoe.draw";
+    public static final String ROUTING_GAME_ENDED = "game.ended";
 
     public static final String QUEUE_TICTACTOE_EVENTS = "queue.tictactoe.events";
 
