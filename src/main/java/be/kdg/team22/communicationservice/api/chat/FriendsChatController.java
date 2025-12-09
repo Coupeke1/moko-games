@@ -53,4 +53,3 @@ public class FriendsChatController {
         return ResponseEntity.ok(messages.stream().map(ChatMessageResponse::from).toList());
     }
 }
-
