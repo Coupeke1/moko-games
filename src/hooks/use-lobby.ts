@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { type Subscription } from "rxjs";
 import type { Lobby } from "@/models/lobby/lobby";
-import { watchLobby } from "@/services/lobby/socket-service";
+import { watchLobby } from "@/services/lobby/socket.ts";
 import { useSocketStore } from "@/stores/socket-store";
-import { isPlayerInLobby } from "@/services/lobby/lobby-service";
+import { isPlayerInLobby } from "@/services/lobby/lobby.ts";
 import { useNavigate } from "react-router";
 
 export function useLobby(lobbyId?: string | null, userId?: string | null) {

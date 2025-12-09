@@ -1,4 +1,4 @@
-import { findEntry } from "@/services/store-service";
+import { findEntry } from "@/services/store/store.ts";
 import { useQuery } from "@tanstack/react-query";
 
 export function useEntry(id: string | undefined) {

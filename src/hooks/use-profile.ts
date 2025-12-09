@@ -1,5 +1,5 @@
 import type { Profile } from "@/models/profile/profile";
-import { parseProfile } from "@/services/profile-service";
+import { parseProfile } from "@/services/profile.ts";
 import { useAuthStore } from "@/stores/auth-store";
 import { useQuery } from "@tanstack/react-query";
 

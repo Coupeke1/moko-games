@@ -19,7 +19,7 @@ export default function LibraryCard({ entry }: Props) {
             href={`/library/${entry.id}`}
             height={Height.ExtraLarge}
             information={
-                <Row gap={Gap.None} items={Items.Center} responsive={false}>
+                <Row gap={Gap.Small} items={Items.Center} responsive={false}>
                     <ClockIcon />
                     <p>3h 40m</p>
                 </Row>

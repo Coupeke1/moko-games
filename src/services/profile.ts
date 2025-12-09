@@ -1,10 +1,10 @@
-import { client } from "@/lib/api-client";
+import {client} from "@/lib/api-client";
 
-import { environment } from "@/config";
-import { validIdCheck } from "@/lib/id";
-import type { Modules } from "@/models/profile/modules";
-import type { Profile } from "@/models/profile/profile";
-import type { KeycloakTokenParsed } from "keycloak-js";
+import {environment} from "@/config";
+import {validIdCheck} from "@/lib/id";
+import type {Modules} from "@/models/profile/modules";
+import type {Profile} from "@/models/profile/profile";
+import type {KeycloakTokenParsed} from "keycloak-js";
 import Keycloak from "keycloak-js";
 
 const BASE_URL = environment.userService;
@@ -12,7 +12,7 @@ const BASE_URL = environment.userService;
 export async function findProfile(id: string): Promise<Profile> {
     try {
         validIdCheck(id);
-        const { data } = await client.get<Profile>(`${BASE_URL}/me`);
+        const {data} = await client.get<Profile>(`${BASE_URL}/me`);
 
         if (data.id !== id) throw new Error("Profile not found!");
         return data;
@@ -40,14 +40,14 @@ export async function updateProfile(
 async function updateDescription(old: string, model: string) {
     if (old === model) return;
     await client.patch(`${BASE_URL}/me/description`, model, {
-        headers: { "Content-Type": "text/plain" },
+        headers: {"Content-Type": "text/plain"},
     });
 }
 
 async function updateImage(old: string, model: string) {
     if (old === model) return;
     await client.patch(`${BASE_URL}/me/image`, model, {
-        headers: { "Content-Type": "text/plain" },
+        headers: {"Content-Type": "text/plain"},
     });
 }
 
@@ -75,9 +75,7 @@ export async function parseProfile(
             throw new Error("Id could not be found");
 
         const id: string = parsedToken.sub;
-        const profile = await findProfile(id);
-
-        return profile;
+        return await findProfile(id);
     } catch {
         throw new Error("Profile could not be found");
     }

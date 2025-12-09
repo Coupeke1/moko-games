@@ -1,4 +1,4 @@
-import { isEntryFavourited } from "@/services/library-service";
+import { isEntryFavourited } from "@/services/library.ts";
 import { useQuery } from "@tanstack/react-query";
 
 export function useFavourite(id: string) {

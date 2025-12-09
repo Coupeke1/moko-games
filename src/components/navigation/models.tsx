@@ -29,7 +29,7 @@ export function getLinks(): Link[] {
     ];
 }
 
-export function getButtons(): Button[] {
+export function getButtons(onCart: () => void): Button[] {
     return [
         {
             title: "Notifications",
@@ -37,6 +37,6 @@ export function getButtons(): Button[] {
             onClick: () => {},
         },
         { title: "Chat", icon: <ChatIcon />, onClick: () => {} },
-        { title: "Cart", icon: <CartIcon />, onClick: () => {} },
+        { title: "Cart", icon: <CartIcon />, onClick: onCart },
     ];
 }

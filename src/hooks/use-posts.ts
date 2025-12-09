@@ -1,4 +1,4 @@
-import { findPost, findPosts } from "@/services/store-service";
+import { findPost, findPosts } from "@/services/store/posts";
 import { useQuery } from "@tanstack/react-query";
 
 export function usePosts(id: string | undefined) {

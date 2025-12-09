@@ -1,5 +1,6 @@
 import Card from "@/components/cards/card";
 import ClockIcon from "@/components/icons/clock-icon";
+import PriceIcon from "@/components/icons/price-icon";
 import { Gap } from "@/components/layout/gap";
 import { Items } from "@/components/layout/items";
 import Row from "@/components/layout/row";
@@ -18,8 +19,8 @@ export default function StoreCard({ entry }: Props) {
             href={`/store/${entry.id}`}
             height={Height.ExtraLarge}
             information={
-                <Row gap={Gap.None} items={Items.Center} responsive={false}>
-                    <ClockIcon />
+                <Row gap={Gap.Small} items={Items.Center} responsive={false}>
+                    <PriceIcon />
                     <p>3h 40m</p>
                 </Row>
             }

@@ -9,7 +9,7 @@ interface Props {
 export default function Statistic({ title, value }: Props) {
     return (
         <Column gap={Gap.None}>
-            <h4 className="text-sm md:text-xs text-fg-2">{title}</h4>
+            <h4 className="text-sm text-right md:text-xs text-fg-2">{title}</h4>
             <p className="text-lg text-right md:text-md">{value}</p>
         </Column>
     );

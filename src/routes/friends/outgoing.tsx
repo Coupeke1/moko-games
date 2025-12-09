@@ -12,7 +12,7 @@ import showToast from "@/components/toast";
 import { useOutgoingRequests } from "@/hooks/use-requests";
 import type { Profile } from "@/models/profile/profile";
 import { getTabs } from "@/routes/friends/components/tabs";
-import { cancelRequest } from "@/services/friends-service";
+import { cancelRequest } from "@/services/friends/requests.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function OutgoingRequestsPage() {

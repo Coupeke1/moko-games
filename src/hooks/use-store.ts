@@ -1,4 +1,4 @@
-import { findEntries } from "@/services/store-service";
+import { findEntries } from "@/services/store/store.ts";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useStore() {

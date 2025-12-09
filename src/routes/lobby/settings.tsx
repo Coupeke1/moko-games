@@ -19,7 +19,7 @@ import showToast from "@/components/toast";
 import {
     allPlayersReady,
     updateSettings,
-} from "@/services/lobby/lobby-service";
+} from "@/services/lobby/lobby.ts";
 
 export default function LobbySettingsPage() {
     const client = useQueryClient();

@@ -14,7 +14,10 @@ import showToast from "@/components/toast";
 import { useIncomingRequests } from "@/hooks/use-requests";
 import type { Profile } from "@/models/profile/profile";
 import { getTabs } from "@/routes/friends/components/tabs";
-import { acceptRequest, rejectRequest } from "@/services/friends-service";
+import {
+    acceptRequest,
+    rejectRequest,
+} from "@/services/friends/requests.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function IncomingRequestsPage() {

@@ -8,7 +8,7 @@ import showToast from "@/components/toast";
 import { useFriends } from "@/hooks/use-friends";
 import type { Lobby } from "@/models/lobby/lobby";
 import type { Profile } from "@/models/profile/profile";
-import { isPlayerInLobby, sendInvite } from "@/services/lobby/lobby-service";
+import { isPlayerInLobby, sendInvite } from "@/services/lobby/lobby.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface Props {

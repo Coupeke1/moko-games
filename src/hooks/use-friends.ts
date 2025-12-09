@@ -1,4 +1,4 @@
-import { findFriends } from "@/services/friends-service";
+import { findFriends } from "@/services/friends/friends.ts";
 import { useQuery } from "@tanstack/react-query";
 
 export function useFriends() {

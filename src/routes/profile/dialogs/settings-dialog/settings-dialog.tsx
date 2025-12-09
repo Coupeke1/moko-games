@@ -7,7 +7,7 @@ import TabRow from "@/components/tabs/buttons/row";
 import showToast from "@/components/toast";
 import type { Modules } from "@/models/profile/modules";
 import type { Profile } from "@/models/profile/profile";
-import { updateProfile } from "@/services/profile-service";
+import { updateProfile } from "@/services/profile.ts";
 import { useAuthStore } from "@/stores/auth-store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";

@@ -5,7 +5,7 @@ import PlusIcon from "@/components/icons/plus-icon";
 import showToast from "@/components/toast";
 import type { Lobby } from "@/models/lobby/lobby";
 import type { Bot } from "@/models/profile/bot";
-import { addBot } from "@/services/lobby/lobby-service";
+import { addBot } from "@/services/lobby/lobby.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface Props {

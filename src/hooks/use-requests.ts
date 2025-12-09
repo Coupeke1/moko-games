@@ -1,7 +1,7 @@
 import {
     findIncomingRequests,
     findOutgoingRequests,
-} from "@/services/friends-service";
+} from "@/services/friends/requests.ts";
 import { useQuery } from "@tanstack/react-query";
 
 export function useIncomingRequests() {

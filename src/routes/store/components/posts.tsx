@@ -45,7 +45,7 @@ export default function Posts({ entry }: Props) {
                             onClick={() => select(post)}
                             information={
                                 <Row
-                                    gap={Gap.None}
+                                    gap={Gap.Small}
                                     items={Items.Center}
                                     responsive={false}
                                 >

@@ -14,7 +14,8 @@ import { useFriends } from "@/hooks/use-friends";
 import type { Friend } from "@/models/friends/friend";
 import type { Profile } from "@/models/profile/profile";
 import { getTabs } from "@/routes/friends/components/tabs";
-import { removeFriend, sendRequest } from "@/services/friends-service";
+import { removeFriend } from "@/services/friends/friends.ts";
+import { sendRequest } from "@/services/friends/requests.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
