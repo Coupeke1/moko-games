@@ -166,4 +166,40 @@ class LibraryServiceTest {
 
         verify(repo, never()).save(any());
     }
+
+    @Test
+    @DisplayName("addGameToLibrary → adds game when not already owned")
+    void addGameToLibrary_addsNewGame() {
+        ProfileId userId = new ProfileId(UUID.randomUUID());
+        UUID gameId = UUID.randomUUID();
+
+        when(repo.findByUserIdAndGameId(userId.value(), gameId)).thenReturn(java.util.Optional.empty());
+
+        service.addGameToLibrary(userId, new GameId(gameId));
+
+        verify(repo).findByUserIdAndGameId(userId.value(), gameId);
+        verify(repo).save(argThat(entry ->
+                entry.id() == null &&
+                        entry.userId().equals(userId) &&
+                        entry.gameId().value().equals(gameId) &&
+                        !entry.favourite() &&
+                        entry.purchasedAt() != null
+        ));
+    }
+
+    @Test
+    @DisplayName("addGameToLibrary → silently skips when game already owned")
+    void addGameToLibrary_skipsExisting() {
+        ProfileId userId = new ProfileId(UUID.randomUUID());
+        UUID gameId = UUID.randomUUID();
+        UUID entryId = UUID.randomUUID();
+
+        LibraryEntry existingEntry = entry(entryId, userId.value(), gameId, false);
+        when(repo.findByUserIdAndGameId(userId.value(), gameId)).thenReturn(java.util.Optional.of(existingEntry));
+
+        service.addGameToLibrary(userId, new GameId(gameId));
+
+        verify(repo).findByUserIdAndGameId(userId.value(), gameId);
+        verify(repo, never()).save(any());
+    }
 }

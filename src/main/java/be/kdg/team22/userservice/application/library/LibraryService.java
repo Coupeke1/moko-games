@@ -4,7 +4,6 @@ import be.kdg.team22.userservice.api.library.models.LibraryGameModel;
 import be.kdg.team22.userservice.api.library.models.LibraryGamesModel;
 import be.kdg.team22.userservice.domain.library.GameId;
 import be.kdg.team22.userservice.domain.library.LibraryEntry;
-import be.kdg.team22.userservice.domain.library.LibraryId;
 import be.kdg.team22.userservice.domain.library.LibraryRepository;
 import be.kdg.team22.userservice.domain.library.exceptions.LibraryException;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
@@ -19,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -78,7 +76,7 @@ public class LibraryService {
         }
 
         LibraryEntry entry = new LibraryEntry(
-                LibraryId.from(UUID.randomUUID()),
+                null,
                 userId,
                 gameId,
                 Instant.now(),
