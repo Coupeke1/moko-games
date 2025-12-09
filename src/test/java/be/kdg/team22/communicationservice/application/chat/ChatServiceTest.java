@@ -5,8 +5,10 @@ import be.kdg.team22.communicationservice.domain.chat.bot.BotChatRepository;
 import be.kdg.team22.communicationservice.domain.chat.bot.BotResponse;
 import be.kdg.team22.communicationservice.domain.chat.exceptions.CantAutoCreateBotChannel;
 import be.kdg.team22.communicationservice.domain.chat.exceptions.ChatChannelNotFoundException;
+import be.kdg.team22.communicationservice.domain.chat.exceptions.NotFriendsException;
 import be.kdg.team22.communicationservice.domain.chat.exceptions.NotInLobbyException;
 import be.kdg.team22.communicationservice.infrastructure.lobby.ExternalSessionRepository;
+import be.kdg.team22.communicationservice.infrastructure.social.ExternalSocialRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -25,6 +27,7 @@ class ChatServiceTest {
     ChatChannelRepository channelRepo;
     BotChatRepository botRepo;
     ExternalSessionRepository sessionRepo;
+    ExternalSocialRepository socialRepo;
     ChatService service;
 
     Jwt jwt;
@@ -34,8 +37,9 @@ class ChatServiceTest {
         channelRepo = Mockito.mock(ChatChannelRepository.class);
         botRepo = Mockito.mock(BotChatRepository.class);
         sessionRepo = Mockito.mock(ExternalSessionRepository.class);
+        socialRepo = Mockito.mock(ExternalSocialRepository.class);
 
-        service = new ChatService(channelRepo, botRepo, sessionRepo);
+        service = new ChatService(channelRepo, botRepo, sessionRepo, socialRepo);
         jwt = Mockito.mock(Jwt.class);
         Mockito.when(jwt.getTokenValue()).thenReturn("jwt-token");
     }
@@ -220,6 +224,114 @@ class ChatServiceTest {
         assertEquals("l1", created.getReferenceId());
         assertEquals(ChatChannelType.LOBBY, created.getType());
         Mockito.verify(channelRepo).save(any());
+    }
+
+    @Test
+    void friendsMessage_notFriends_throws() {
+        Mockito.when(socialRepo.areFriends("user1", "friend1", "jwt-token"))
+                .thenReturn(false);
+
+        assertThrows(NotFriendsException.class, () ->
+                service.sendMessage(ChatChannelType.FRIENDS, "friend1", "user1", "hello", jwt)
+        );
+    }
+
+    @Test
+    void friendsMessage_areFriends_createsChannelAndReturnsUserMessage() {
+        String friendId = "friend-uuid";
+        String userId = "user-uuid";
+        String expectedReferenceId = "friend-uuid-user-uuid"; // alphabetically sorted
+
+        Mockito.when(socialRepo.areFriends(userId, friendId, "jwt-token")).thenReturn(true);
+        Mockito.when(channelRepo.findByTypeAndReferenceId(eq(ChatChannelType.FRIENDS), eq(expectedReferenceId)))
+                .thenReturn(Optional.empty());
+
+        Mockito.doAnswer(inv -> null).when(channelRepo).save(any());
+
+        ChatMessage result = service.sendMessage(ChatChannelType.FRIENDS, friendId, userId, "Hello friend!", jwt);
+
+        assertEquals(userId, result.senderId());
+        assertEquals("Hello friend!", result.content());
+        Mockito.verify(botRepo, Mockito.never()).askBot(any(), any(), any(), any());
+    }
+
+    @Test
+    void friendsMessage_existingChannelUsed() {
+        String friendId = "friend-uuid";
+        String userId = "user-uuid";
+        String expectedReferenceId = "friend-uuid-user-uuid";
+
+        Channel channel = Channel.createNew(ChatChannelType.FRIENDS, expectedReferenceId);
+
+        Mockito.when(socialRepo.areFriends(userId, friendId, "jwt-token")).thenReturn(true);
+        Mockito.when(channelRepo.findByTypeAndReferenceId(eq(ChatChannelType.FRIENDS), eq(expectedReferenceId)))
+                .thenReturn(Optional.of(channel));
+
+        ChatMessage result = service.sendMessage(ChatChannelType.FRIENDS, friendId, userId, "Hi!", jwt);
+
+        assertEquals(userId, result.senderId());
+        assertEquals("Hi!", result.content());
+    }
+
+    @Test
+    void getMessages_friends_notFriends_throws() {
+        Mockito.when(socialRepo.areFriends("user1", "friend1", "jwt-token"))
+                .thenReturn(false);
+
+        assertThrows(NotFriendsException.class, () ->
+                service.getMessages(ChatChannelType.FRIENDS, "friend1", null, "user1", jwt)
+        );
+    }
+
+    @Test
+    void getMessages_friends_areFriends_returnsMessages() {
+        String friendId = "friend-uuid";
+        String userId = "user-uuid";
+        String expectedReferenceId = "friend-uuid-user-uuid";
+
+        Channel channel = Channel.createNew(ChatChannelType.FRIENDS, expectedReferenceId);
+        channel.postUserMessage(userId, "msg1");
+
+        Mockito.when(socialRepo.areFriends(userId, friendId, "jwt-token")).thenReturn(true);
+        Mockito.when(channelRepo.findByTypeAndReferenceId(ChatChannelType.FRIENDS, expectedReferenceId))
+                .thenReturn(Optional.of(channel));
+
+        List<ChatMessage> result = service.getMessages(ChatChannelType.FRIENDS, friendId, null, userId, jwt);
+
+        assertEquals(1, result.size());
+        assertEquals("msg1", result.getFirst().content());
+    }
+
+    @Test
+    void friendsReferenceId_isSorted_userFirst() {
+        // When user < friend alphabetically, user comes first
+        String friendId = "zzz-friend";
+        String userId = "aaa-user";
+        String expectedReferenceId = "aaa-user-zzz-friend";
+
+        Mockito.when(socialRepo.areFriends(userId, friendId, "jwt-token")).thenReturn(true);
+        Mockito.when(channelRepo.findByTypeAndReferenceId(eq(ChatChannelType.FRIENDS), eq(expectedReferenceId)))
+                .thenReturn(Optional.empty());
+
+        service.sendMessage(ChatChannelType.FRIENDS, friendId, userId, "test", jwt);
+
+        Mockito.verify(channelRepo).findByTypeAndReferenceId(ChatChannelType.FRIENDS, expectedReferenceId);
+    }
+
+    @Test
+    void friendsReferenceId_isSorted_friendFirst() {
+        // When friend < user alphabetically, friend comes first
+        String friendId = "aaa-friend";
+        String userId = "zzz-user";
+        String expectedReferenceId = "aaa-friend-zzz-user";
+
+        Mockito.when(socialRepo.areFriends(userId, friendId, "jwt-token")).thenReturn(true);
+        Mockito.when(channelRepo.findByTypeAndReferenceId(eq(ChatChannelType.FRIENDS), eq(expectedReferenceId)))
+                .thenReturn(Optional.empty());
+
+        service.sendMessage(ChatChannelType.FRIENDS, friendId, userId, "test", jwt);
+
+        Mockito.verify(channelRepo).findByTypeAndReferenceId(ChatChannelType.FRIENDS, expectedReferenceId);
     }
 
     private ChatMessage injectMessage(Channel channel, ChatMessage message) throws Exception {

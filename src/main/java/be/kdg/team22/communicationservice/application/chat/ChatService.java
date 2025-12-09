@@ -4,12 +4,15 @@ import be.kdg.team22.communicationservice.domain.chat.Channel;
 import be.kdg.team22.communicationservice.domain.chat.ChatChannelRepository;
 import be.kdg.team22.communicationservice.domain.chat.ChatChannelType;
 import be.kdg.team22.communicationservice.domain.chat.ChatMessage;
+import be.kdg.team22.communicationservice.domain.chat.FriendshipId;
 import be.kdg.team22.communicationservice.domain.chat.bot.BotResponse;
 import be.kdg.team22.communicationservice.domain.chat.bot.BotChatRepository;
 import be.kdg.team22.communicationservice.domain.chat.exceptions.CantAutoCreateBotChannel;
 import be.kdg.team22.communicationservice.domain.chat.exceptions.ChatChannelNotFoundException;
+import be.kdg.team22.communicationservice.domain.chat.exceptions.NotFriendsException;
 import be.kdg.team22.communicationservice.domain.chat.exceptions.NotInLobbyException;
 import be.kdg.team22.communicationservice.infrastructure.lobby.ExternalSessionRepository;
+import be.kdg.team22.communicationservice.infrastructure.social.ExternalSocialRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -23,13 +26,16 @@ public class ChatService {
     private final ChatChannelRepository channelRepository;
     private final BotChatRepository botChatRepository;
     private final ExternalSessionRepository sessionRepository;
+    private final ExternalSocialRepository socialRepository;
 
     public ChatService(final ChatChannelRepository channelRepository,
                        final BotChatRepository botChatRepository,
-                       final ExternalSessionRepository sessionRepository) {
+                       final ExternalSessionRepository sessionRepository,
+                       final ExternalSocialRepository socialRepository) {
         this.channelRepository = channelRepository;
         this.botChatRepository = botChatRepository;
         this.sessionRepository = sessionRepository;
+        this.socialRepository = socialRepository;
     }
 
     public ChatMessage sendMessage(final ChatChannelType type,
@@ -37,14 +43,7 @@ public class ChatService {
                                    final String senderId,
                                    final String content,
                                    final Jwt token) {
-        if (type == ChatChannelType.BOT) referenceId = senderId;
-
-        if (type == ChatChannelType.LOBBY) {
-            boolean allowed = sessionRepository.isPlayerInLobby(senderId, referenceId, token.getTokenValue());
-            if (!allowed) {
-                throw new NotInLobbyException(senderId, referenceId);
-            }
-        }
+        referenceId = resolveReferenceId(type, referenceId, senderId, token);
 
         String finalReferenceId = referenceId;
         Channel channel = channelRepository
@@ -54,7 +53,7 @@ public class ChatService {
         ChatMessage userMessage = channel.postUserMessage(senderId, content);
         channelRepository.save(channel);
 
-        if (type == ChatChannelType.LOBBY) return userMessage;
+        if (type == ChatChannelType.LOBBY || type == ChatChannelType.FRIENDS) return userMessage;
 
         BotResponse botResponse = botChatRepository.askBot(
                 "platform-chatbot-v1",
@@ -74,14 +73,7 @@ public class ChatService {
                                          final Instant since,
                                          final String requesterId,
                                          final Jwt token) {
-
-        if (type == ChatChannelType.BOT) referenceId = requesterId;
-
-        if (type == ChatChannelType.LOBBY) {
-            if (!sessionRepository.isPlayerInLobby(requesterId, referenceId, token.getTokenValue())) {
-                throw new NotInLobbyException(requesterId, referenceId);
-            }
-        }
+        referenceId = resolveReferenceId(type, referenceId, requesterId, token);
 
         String finalReferenceId = referenceId;
         Channel channel = channelRepository
@@ -106,5 +98,27 @@ public class ChatService {
         Channel channel = Channel.createNew(type, referenceId);
         channelRepository.save(channel);
         return channel;
+    }
+
+    private String resolveReferenceId(final ChatChannelType type,
+                                      final String referenceId,
+                                      final String userId,
+                                      final Jwt token) {
+        return switch (type) {
+            case BOT -> userId;
+            case LOBBY -> {
+                if (!sessionRepository.isPlayerInLobby(userId, referenceId, token.getTokenValue())) {
+                    throw new NotInLobbyException(userId, referenceId);
+                }
+                yield referenceId;
+            }
+            case FRIENDS -> {
+                FriendshipId friendshipId = FriendshipId.create(referenceId);
+                if (!socialRepository.areFriends(userId, friendshipId.value().toString(), token.getTokenValue())) {
+                    throw new NotFriendsException(userId, friendshipId.value().toString());
+                }
+                yield FriendshipId.toReferenceId(userId, friendshipId.value().toString());
+            }
+        };
     }
 }
