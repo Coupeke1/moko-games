@@ -7,7 +7,7 @@ window.__APP_CONFIG__ = {
     socialService: "$VITE_SOCIAL_SERVICE",
     libraryService: "$VITE_LIBRARY_SERVICE",
     sessionService: "$VITE_SESSION_SERVICE",
-    sessionSocket?: "$VITE_SESSION_SOCKET",
+    sessionSocket: "$VITE_SESSION_SOCKET",
     gamesService: "$VITE_GAMES_SERVICE",
     storeService: "$VITE_STORE_SERVICE",
     cartService: "$VITE_CART_SERVICE"
