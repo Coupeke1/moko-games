@@ -32,8 +32,8 @@ public class CartController {
     }
 
     @GetMapping
-    public ResponseEntity<Collection<EntryModel>> getOrCreate(@AuthenticationPrincipal final Jwt jwt) {
-        UserId userId = UserId.get(jwt);
+    public ResponseEntity<Collection<EntryModel>> getOrCreate(@AuthenticationPrincipal final Jwt token) {
+        UserId userId = UserId.get(token);
         Cart cart = cartService.getOrCreate(userId);
         Collection<EntryModel> models = getEntries(cart);
         return ResponseEntity.ok(models);
@@ -44,22 +44,29 @@ public class CartController {
     }
 
     @PostMapping("/entries")
-    public ResponseEntity<Void> addEntry(@AuthenticationPrincipal final Jwt jwt, @Valid @RequestBody final AddEntryModel request) {
-        UserId userId = UserId.get(jwt);
-        cartService.addEntry(userId, GameId.from(request.id()), jwt.getTokenValue());
+    public ResponseEntity<Void> addEntry(@AuthenticationPrincipal final Jwt token, @Valid @RequestBody final AddEntryModel request) {
+        UserId userId = UserId.get(token);
+        cartService.addEntry(userId, GameId.from(request.id()), token.getTokenValue());
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/entries/{gameId}")
-    public ResponseEntity<Void> removeEntry(@AuthenticationPrincipal final Jwt jwt, @PathVariable final UUID gameId) {
-        UserId userId = UserId.get(jwt);
-        cartService.removeEntry(userId, GameId.from(gameId));
+    @GetMapping("/entries/{id}")
+    public ResponseEntity<Boolean> hasEntry(@AuthenticationPrincipal final Jwt token, @PathVariable final UUID id) {
+        UserId userId = UserId.get(token);
+        boolean hasEntry = cartService.hasEntry(userId, GameId.from(id));
+        return ResponseEntity.ok(hasEntry);
+    }
+
+    @DeleteMapping("/entries/{id}")
+    public ResponseEntity<Void> removeEntry(@AuthenticationPrincipal final Jwt token, @PathVariable final UUID id) {
+        UserId userId = UserId.get(token);
+        cartService.removeEntry(userId, GameId.from(id));
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> clear(@AuthenticationPrincipal final Jwt jwt) {
-        UserId userId = UserId.get(jwt);
+    public ResponseEntity<Void> clear(@AuthenticationPrincipal final Jwt token) {
+        UserId userId = UserId.get(token);
         cartService.clear(userId);
         return ResponseEntity.noContent().build();
     }

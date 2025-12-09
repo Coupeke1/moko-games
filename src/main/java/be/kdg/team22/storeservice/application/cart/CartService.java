@@ -39,11 +39,16 @@ public class CartService {
         return cartRepository.findByUserId(userId.value()).orElseThrow(userId::cartNotFound);
     }
 
-    public void addEntry(final UserId userId, final GameId gameId, final String jwt) {
+    public boolean hasEntry(final UserId userId, final GameId gameId) {
+        Cart cart = getOrCreate(userId);
+        return cart.entries().stream().filter(entry -> entry.gameId().equals(gameId)).findAny().isPresent();
+    }
+
+    public void addEntry(final UserId userId, final GameId gameId, final String token) {
         GameMetadataResponse meta = gamesRepository.fetchMetadata(gameId);
         validateMetadata(meta, gameId);
 
-        if (userRepository.userOwnsGame(gameId, jwt))
+        if (userRepository.userOwnsGame(gameId, token))
             throw new GameAlreadyOwnedException(gameId.value(), userId.value());
 
         Cart cart = getOrCreate(userId);
