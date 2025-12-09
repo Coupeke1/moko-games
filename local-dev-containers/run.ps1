@@ -1,22 +1,48 @@
 param (
     [switch]$All,
-    [string[]]$Services
+    [string[]]$Services,
+    [string[]]$Exclude
 )
 
-# If --all is provided, override services
+$ValidServices = @("user", "session", "social", "games", "store", "tic-tac-toe", "checkers", "chess")
+
+# If --all is provided, start with all services
 if ($All) {
-    $Services = @("user", "session", "social", "games", "store", "tic-tac-toe", "checkers", "chess")
+    $Services = $ValidServices.Clone()
     Write-Host "--all provided. Starting ALL services: $($Services -join ', ')"
 } else {
+    # If no services specified, start with all (they'll be filtered by exclude)
     if (-not $Services) {
-        Write-Host "No services specified. Only starting infrastructure."
+        if ($Exclude) {
+            $Services = $ValidServices.Clone()
+        } else {
+            Write-Host "No services specified. Only starting infrastructure."
+            $Services = @()
+        }
+    }
+}
+
+# Handle exclusions
+if ($Exclude) {
+    # Validate excluded services
+    foreach ($service in $Exclude) {
+        if ($ValidServices -notcontains $service) {
+            Write-Host "Error: Unknown service to exclude: $service"
+            Write-Host "Valid services: $($ValidServices -join ', ')"
+            exit 1
+        }
+    }
+    # Remove excluded services
+    $Services = $Services | Where-Object { $Exclude -notcontains $_ }
+    Write-Host "Excluding services: $($Exclude -join ', ')"
+    if ($Services) {
+        Write-Host "Starting services: $($Services -join ', ')"
     } else {
-        Write-Host "Starting selected services: $($Services -join ', ')"
+        Write-Host "No services to start. Only starting infrastructure."
     }
 }
 
 # Validate services and build profiles
-$ValidServices = @("user", "session", "social", "games", "store", "tic-tac-toe", "checkers", "chess")
 $Profiles = @()
 
 foreach ($service in $Services) {
