@@ -45,6 +45,10 @@ public class LibraryService {
         return new LibraryGamesModel(games);
     }
 
+    public boolean ownsGame(final ProfileId userId, final GameId gameId) {
+        return libraryRepository.findByUserIdAndGameId(userId.value(), gameId.value()).stream().findAny().isPresent();
+    }
+
     public boolean isFavourite(final ProfileId userId, final GameId gameId) {
         LibraryEntry entry = libraryRepository.findByUserIdAndGameId(userId.value(), gameId.value()).orElseThrow(LibraryException::notInLibrary);
         return entry.favourite();
