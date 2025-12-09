@@ -1,13 +1,11 @@
 package be.kdg.team22.userservice.handlers;
 
 import be.kdg.team22.userservice.application.achievement.AchievementService;
-import be.kdg.team22.userservice.events.GameDrawEvent;
-import be.kdg.team22.userservice.events.GameWonEvent;
+import be.kdg.team22.userservice.events.GameAchievementEvent;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
@@ -21,33 +19,21 @@ class GameplayEventListenerTest {
     @DisplayName("onGameWon → awards win achievement to winner")
     void onGameWon_awardsWinner() {
         UUID winnerId = UUID.randomUUID();
-        GameWonEvent event = new GameWonEvent(UUID.randomUUID(), winnerId, Instant.now());
+        GameAchievementEvent event = new GameAchievementEvent("TICTACTOE_WIN", UUID.randomUUID(), winnerId, Instant.now());
 
-        listener.onGameWon(event);
+        listener.onGameAchievement(event);
 
         verify(achievementService).award(winnerId, "TICTACTOE_WIN");
     }
 
     @Test
-    @DisplayName("onGameDraw → awards draw achievement to all players")
-    void onGameDraw_awardsAllPlayers() {
-        UUID p1 = UUID.randomUUID();
-        UUID p2 = UUID.randomUUID();
-        GameDrawEvent event = new GameDrawEvent(UUID.randomUUID(), List.of(p1, p2), Instant.now());
+    @DisplayName("onGameDraw → awards draw achievement to player")
+    void onGameDraw_awardsPlayer() {
+        UUID playerId = UUID.randomUUID();
+        GameAchievementEvent event = new GameAchievementEvent("TICTACTOE_DRAW", UUID.randomUUID(), playerId, Instant.now());
 
-        listener.onGameDraw(event);
+        listener.onGameAchievement(event);
 
-        verify(achievementService).award(p1, "TICTACTOE_DRAW");
-        verify(achievementService).award(p2, "TICTACTOE_DRAW");
-    }
-
-    @Test
-    @DisplayName("onGameDraw → no players = no awards")
-    void onGameDraw_emptyList() {
-        GameDrawEvent event = new GameDrawEvent(UUID.randomUUID(), List.of(), Instant.now());
-
-        listener.onGameDraw(event);
-
-        verifyNoInteractions(achievementService);
+        verify(achievementService).award(playerId, "TICTACTOE_DRAW");
     }
 }
