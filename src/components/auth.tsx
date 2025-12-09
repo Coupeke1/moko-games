@@ -1,6 +1,6 @@
 import Page from "@/components/layout/page";
 import LoadingState from "@/components/state/loading";
-import { useProfile } from "@/hooks/use-profile";
+import { useProfile } from "@/features/profile/hooks/use-profile.ts";
 import { useAuthStore } from "@/stores/auth-store";
 import { useEffect } from "react";
 import ErrorState from "@/components/state/error";

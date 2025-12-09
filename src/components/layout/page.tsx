@@ -4,7 +4,7 @@ import Footer from "@/components/navigation/footer";
 import { getButtons, getLinks } from "@/components/navigation/models";
 import { useState, type ReactNode } from "react";
 import Stack from "@/components/layout/stack";
-import CartDialog from "@/routes/cart/cart-dialog";
+import CartDialog from "@/features/cart/cart-dialog";
 
 interface Props {
     children: ReactNode;
