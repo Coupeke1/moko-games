@@ -1,5 +1,6 @@
 package be.kdg.team22.storeservice.application.catalog.services;
 
+import be.kdg.team22.storeservice.application.catalog.StoreService;
 import be.kdg.team22.storeservice.domain.catalog.Entry;
 import be.kdg.team22.storeservice.domain.catalog.EntryRepository;
 import be.kdg.team22.storeservice.domain.catalog.GameCategory;

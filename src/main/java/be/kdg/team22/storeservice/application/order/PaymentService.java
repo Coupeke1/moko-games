@@ -1,7 +1,7 @@
 package be.kdg.team22.storeservice.application.order;
 
 import be.kdg.team22.storeservice.application.cart.CartService;
-import be.kdg.team22.storeservice.application.catalog.services.StoreService;
+import be.kdg.team22.storeservice.application.catalog.StoreService;
 import be.kdg.team22.storeservice.domain.order.Order;
 import be.kdg.team22.storeservice.domain.order.OrderId;
 import be.kdg.team22.storeservice.domain.order.OrderRepository;

@@ -68,11 +68,11 @@ class CartControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/cart/items → successfully adds item")
+    @DisplayName("POST /api/cart/entries → successfully adds item")
     void addItem_succeeds() throws Exception {
         String body = """
                 {
-                  "gameId": "11111111-1111-1111-1111-111111111111"
+                  "id": "11111111-1111-1111-1111-111111111111"
                 }
                 """;
 
@@ -82,11 +82,11 @@ class CartControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/cart/items → invalid request returns 400")
+    @DisplayName("POST /api/cart/entries → invalid request returns 400")
     void addItem_invalidBody_400() throws Exception {
         String body = """
                 {
-                  "gameId": null
+                  "id": null
                 }
                 """;
 
@@ -94,7 +94,7 @@ class CartControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /api/cart/items/{gameId} → removes item")
+    @DisplayName("DELETE /api/cart/entries/{id} → removes item")
     void deleteItem_succeeds() throws Exception {
         mockMvc.perform(delete("/api/cart/items/{gameId}", GAME_ID).with(jwt().jwt(builder -> builder.subject(jwtUserId()))).with(csrf())).andExpect(status().isNoContent());
 
@@ -102,7 +102,7 @@ class CartControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /api/cart/items/{gameId} → missing JWT returns 401")
+    @DisplayName("DELETE /api/cart/entries/{id} → missing JWT returns 401")
     void deleteItem_missingJwt_401() throws Exception {
         mockMvc.perform(delete("/api/cart/items/{gameId}", GAME_ID)).andExpect(status().isUnauthorized());
     }

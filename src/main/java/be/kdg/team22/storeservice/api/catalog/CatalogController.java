@@ -3,8 +3,8 @@ package be.kdg.team22.storeservice.api.catalog;
 import be.kdg.team22.storeservice.api.catalog.models.*;
 import be.kdg.team22.storeservice.application.catalog.queries.FilterQuery;
 import be.kdg.team22.storeservice.application.catalog.queries.Pagination;
-import be.kdg.team22.storeservice.application.catalog.services.GameQueryService;
-import be.kdg.team22.storeservice.application.catalog.services.StoreService;
+import be.kdg.team22.storeservice.application.catalog.GameService;
+import be.kdg.team22.storeservice.application.catalog.StoreService;
 import be.kdg.team22.storeservice.domain.catalog.*;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +22,9 @@ import java.util.UUID;
 @RequestMapping("/api/store/games")
 public class CatalogController {
     private final StoreService storeService;
-    private final GameQueryService queryService;
+    private final GameService queryService;
 
-    public CatalogController(final StoreService storeService, final GameQueryService queryService) {
+    public CatalogController(final StoreService storeService, final GameService queryService) {
         this.storeService = storeService;
         this.queryService = queryService;
     }

@@ -4,7 +4,5 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
-public record AddCartItemRequestModel(
-        @NotNull UUID gameId
-) {
-}
+public record AddEntryModel(
+        @NotNull UUID id) {}
