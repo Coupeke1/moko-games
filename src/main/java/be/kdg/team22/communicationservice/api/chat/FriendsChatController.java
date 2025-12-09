@@ -26,9 +26,9 @@ public class FriendsChatController {
 
     @PostMapping("/{friendId}")
     public ResponseEntity<ChatMessageResponse> sendMessage(
-            @PathVariable UUID friendId,
-            @AuthenticationPrincipal Jwt token,
-            @RequestBody ChatMessageRequestModel request
+            @PathVariable final UUID friendId,
+            @AuthenticationPrincipal final Jwt token,
+            @RequestBody final ChatMessageRequestModel request
     ) {
         ChatMessage msg = chatService.sendMessage(
                 ChatChannelType.FRIENDS,
@@ -42,11 +42,10 @@ public class FriendsChatController {
 
     @GetMapping("/{friendId}")
     public ResponseEntity<List<ChatMessageResponse>> getMessages(
-            @PathVariable UUID friendId,
-            @AuthenticationPrincipal Jwt token,
+            @PathVariable final UUID friendId,
+            @AuthenticationPrincipal final Jwt token,
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            Instant since
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final Instant since
     ) {
         List<ChatMessage> messages =
                 chatService.getMessages(ChatChannelType.FRIENDS, friendId.toString(), since, token.getSubject(), token);
