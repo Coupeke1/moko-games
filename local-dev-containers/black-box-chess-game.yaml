@@ -17,7 +17,7 @@ services:
     image: registry.gitlab.com/kdg-ti/integratieproject-j3/demo-content/chessgame/back:latest
     profiles: ["chess"]
     ports:
-      - '8090:8080'
+      - '8080:8080'
     networks:
       - kdg-backend
     depends_on:
