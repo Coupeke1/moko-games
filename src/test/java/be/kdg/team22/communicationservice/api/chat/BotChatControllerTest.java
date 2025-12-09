@@ -1,21 +1,24 @@
 package be.kdg.team22.communicationservice.api.chat;
 
 import be.kdg.team22.communicationservice.application.chat.BotChatService;
+import be.kdg.team22.communicationservice.config.SecurityConfig;
 import be.kdg.team22.communicationservice.domain.chat.*;
+import be.kdg.team22.communicationservice.domain.chat.exceptions.NotBotChannelOwnerException;
 import be.kdg.team22.communicationservice.utils.TestJwtUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -23,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BotChatController.class)
+@Import(SecurityConfig.class)
 class BotChatControllerTest {
 
     @Autowired
@@ -30,6 +34,71 @@ class BotChatControllerTest {
 
     @MockitoBean
     BotChatService botChatService;
+
+    // ==================== Authentication Tests ====================
+
+    @Test
+    void createBotChannel_withoutToken_returnsUnauthorized() throws Exception {
+        mvc.perform(post("/api/chat/bot"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void sendMessage_withoutToken_returnsUnauthorized() throws Exception {
+        mvc.perform(post("/api/chat/bot/" + UUID.randomUUID() + "/messages")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"content": "Hello", "gameName": "GO"}
+                                """))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void getMessages_withoutToken_returnsUnauthorized() throws Exception {
+        mvc.perform(get("/api/chat/bot/" + UUID.randomUUID() + "/messages"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    // ==================== Authorization Tests ====================
+
+    @Test
+    void sendMessage_notOwner_returnsForbidden() throws Exception {
+        UUID channelId = UUID.randomUUID();
+
+        Mockito.when(botChatService.sendMessage(
+                eq(channelId),
+                eq("otherUser"),
+                any(),
+                any()
+        )).thenThrow(new NotBotChannelOwnerException("otherUser", channelId.toString()));
+
+        mvc.perform(post("/api/chat/bot/" + channelId + "/messages")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"content": "Hello", "gameName": "GO"}
+                                """)
+                        .with(jwt().jwt(TestJwtUtils.jwtFor("otherUser")))
+                )
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void getMessages_notOwner_returnsForbidden() throws Exception {
+        UUID channelId = UUID.randomUUID();
+
+        Mockito.when(botChatService.getMessages(
+                eq(channelId),
+                eq("otherUser"),
+                isNull()
+        )).thenThrow(new NotBotChannelOwnerException("otherUser", channelId.toString()));
+
+        mvc.perform(get("/api/chat/bot/" + channelId + "/messages")
+                        .with(jwt().jwt(TestJwtUtils.jwtFor("otherUser")))
+                )
+                .andExpect(status().isForbidden());
+    }
+
+    // ==================== Happy Path Tests ====================
 
     @Test
     void createBotChannel_returnsChannelResponse() throws Exception {
