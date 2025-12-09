@@ -5,6 +5,7 @@ import be.kdg.team22.tictactoeservice.api.models.GameSettingsModel;
 import be.kdg.team22.tictactoeservice.application.events.GameEventPublisher;
 import be.kdg.team22.tictactoeservice.config.BoardSizeProperties;
 import be.kdg.team22.tictactoeservice.domain.events.GameDrawEvent;
+import be.kdg.team22.tictactoeservice.domain.events.GameEndedEvent;
 import be.kdg.team22.tictactoeservice.domain.events.GameWonEvent;
 import be.kdg.team22.tictactoeservice.domain.game.Game;
 import be.kdg.team22.tictactoeservice.domain.game.GameId;
@@ -125,6 +126,7 @@ public class GameServiceTest {
         verify(repository).save(game);
         verify(publisher, never()).publishGameWon(any());
         verify(publisher, never()).publishGameDraw(any());
+        verify(publisher, never()).publishGameEnded(any());
     }
 
     @Test
@@ -176,6 +178,10 @@ public class GameServiceTest {
                 List.of(playerX.id().value(), playerO.id().value()),
                 event.players()
         );
+
+        ArgumentCaptor<GameEndedEvent> endedCaptor = ArgumentCaptor.forClass(GameEndedEvent.class);
+        verify(publisher).publishGameEnded(endedCaptor.capture());
+        assertEquals(id.value(), endedCaptor.getValue().instanceId());
     }
 
     @Test
@@ -196,5 +202,6 @@ public class GameServiceTest {
         service.requestMove(id, playerId, move);
 
         verify(publisher, times(1)).publishGameWon(any(GameWonEvent.class));
+        verify(publisher, times(1)).publishGameEnded(any(GameEndedEvent.class));
     }
 }
