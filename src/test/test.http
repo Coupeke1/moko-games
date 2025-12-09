@@ -20,8 +20,8 @@ Content-Type: application/x-www-form-urlencoded
 grant_type=password &
 client_id=communication-service &
 client_secret=cXwsnvyHm2NquygtuDb3QWTLjs9PUOzW &
-username=kaj &
-password=loginkaj &
+username=lee &
+password=loginlee &
 scope=openid
 
 > {%
@@ -106,7 +106,7 @@ POST http://localhost:8082/api/notifications/test
 
 ### 9) Send message to FRIEND (replace UUID with actual friend's user ID)
 # Note: You need to be friends with this user in social-service first!
-POST http://localhost:8082/api/chat/friends/{{friend_id}}
+POST http://localhost:8082/api/chat/friends/bd169114-8834-4a40-983f-59b4d8bc1334
 Authorization: Bearer {{chat_token}}
 Content-Type: application/json
 
@@ -115,15 +115,15 @@ Content-Type: application/json
 }
 
 ### 10) Get friend chat messages
-GET http://localhost:8082/api/chat/friends/{{friend_id}}
+GET http://localhost:8082/api/chat/friends/bd169114-8834-4a40-983f-59b4d8bc1334
 Authorization: Bearer {{chat_token}}
 
 ### 11) Get friend chat messages since timestamp
-GET http://localhost:8082/api/chat/friends/{{friend_id}}?since=2025-01-01T00:00:00Z
+GET http://localhost:8082/api/chat/friends/bd169114-8834-4a40-983f-59b4d8bc1334?since=2025-01-01T00:00:00Z
 Authorization: Bearer {{chat_token}}
 
 ### 12) Send message as the other friend (kaj to mathias)
-POST http://localhost:8082/api/chat/friends/{{mathias_id}}
+POST http://localhost:8082/api/chat/friends/cf36d3e1-a1e0-4c18-89eb-95fa76fc81ee
 Authorization: Bearer {{kaj_Token}}
 Content-Type: application/json
 
@@ -132,9 +132,8 @@ Content-Type: application/json
 }
 
 ### 13) Get chat as kaj - should see both messages
-GET http://localhost:8082/api/chat/friends/{{mathias_id}}
+GET http://localhost:8082/api/chat/friends/cf36d3e1-a1e0-4c18-89eb-95fa76fc81ee
 Authorization: Bearer {{kaj_Token}}
-Authorization: Bearer {{chat_token}}
 
 ### get unread notifications
 GET http://localhost:8082/api/notifications/unread
