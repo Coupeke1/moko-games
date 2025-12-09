@@ -3,6 +3,7 @@ package be.kdg.team22.communicationservice.infrastructure.notification;
 import be.kdg.team22.communicationservice.domain.notification.Notification;
 import be.kdg.team22.communicationservice.domain.notification.NotificationId;
 import be.kdg.team22.communicationservice.domain.notification.NotificationRepository;
+import be.kdg.team22.communicationservice.domain.notification.NotificationType;
 import be.kdg.team22.communicationservice.domain.notification.PlayerId;
 import be.kdg.team22.communicationservice.infrastructure.notification.jpa.NotificationEntity;
 import be.kdg.team22.communicationservice.infrastructure.notification.jpa.NotificationJpaRepository;
@@ -41,6 +42,14 @@ public class DbNotificationRepository implements NotificationRepository {
     @Override
     public List<Notification> findUnreadByRecipientId(final PlayerId playerId) {
         return jpa.findByRecipientIdAndReadFalseOrderByCreatedAtDesc(playerId.value())
+                .stream()
+                .map(NotificationEntity::to)
+                .toList();
+    }
+
+    @Override
+    public List<Notification> findByRecipientIdAndType(final PlayerId playerId, final NotificationType type) {
+        return jpa.findByRecipientIdAndTypeOrderByCreatedAtDesc(playerId.value(), type)
                 .stream()
                 .map(NotificationEntity::to)
                 .toList();
