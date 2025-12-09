@@ -50,6 +50,11 @@ public class GameService {
                 .orElseThrow(() -> new GameNotFoundException(id));
     }
 
+    public Game findByName(final String name) {
+        return gameRepository.findByName(name)
+                .orElseThrow(() -> new GameNotFoundException(name));
+    }
+
     public List<Game> findAll() {
         return gameRepository.findAll();
     }
@@ -65,6 +70,26 @@ public class GameService {
         }
 
         Game game = Game.register(request);
+        game.updateHealthStatus(true);
+        gameRepository.save(game);
+
+        return game;
+    }
+
+    public Game update(final GameId id, final RegisterGameRequest request) {
+        Game game = gameRepository.findById(id)
+                .orElseThrow(() -> new GameNotFoundException(id));
+
+        if (!game.name().equals(request.name()) && gameRepository.findByName(request.name()).isPresent()) {
+            throw new DuplicateGameNameException(request.name());
+        }
+
+        boolean isHealthy = gameHealthChecker.isHealthy(request);
+        if (!isHealthy) {
+            throw new GameUnhealthyException(request.name());
+        }
+
+        game.update(request);
         game.updateHealthStatus(true);
         gameRepository.save(game);
 

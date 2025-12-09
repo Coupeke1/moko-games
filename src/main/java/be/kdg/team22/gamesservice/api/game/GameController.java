@@ -48,10 +48,21 @@ public class GameController {
         return ResponseEntity.ok(GameDetailsModel.from(game));
     }
 
+    @GetMapping("/{name}")
+    public ResponseEntity<GameDetailsModel> getGameByName(final @PathVariable String name) {
+        Game game = service.findByName(name);
+        return ResponseEntity.ok(GameDetailsModel.from(game));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<GameDetailsModel> updateGame(final @PathVariable UUID id, final @RequestBody RegisterGameRequest request) {
+        Game game = service.update(GameId.from(id), request);
+        return ResponseEntity.ok(GameDetailsModel.from(game));
+    }
+
     @PostMapping("/register")
     public ResponseEntity<GameDetailsModel> registerGame(final @RequestBody RegisterGameRequest request) {
         Game game = service.register(request);
-
         return ResponseEntity.ok(GameDetailsModel.from(game));
     }
 }
