@@ -1,4 +1,3 @@
-import CartIcon from "@/components/icons/bar/cart-icon";
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import { Justify } from "@/components/layout/justify";
@@ -8,11 +7,12 @@ import Section from "@/components/section";
 import State from "@/components/state/state";
 import Statistic from "@/components/statistic";
 import Paragraph from "@/components/text/paragraph";
+import Posts from "@/features/store/components/posts";
 import { useEntry } from "@/features/store/hooks/use-entry.ts";
 import { format } from "@/features/store/models/entry/category.ts";
-import Posts from "@/features/store/components/posts";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
+import CartButton from "@/features/store/components/cart-button";
 
 export default function StoreGamePage() {
     const navigate = useNavigate();
@@ -45,9 +45,7 @@ export default function StoreGamePage() {
                                 </h3>
 
                                 <Row gap={Gap.Small} responsive={false}>
-                                    <button className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75">
-                                        <CartIcon big={true} />
-                                    </button>
+                                    <CartButton entry={entry} />
                                 </Row>
                             </Row>
                         </section>

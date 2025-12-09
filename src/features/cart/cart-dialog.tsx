@@ -5,7 +5,7 @@ import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
 import { useCart } from "@/features/cart/hooks/use-cart.ts";
 import type { Entry } from "@/features/cart/models/entry.ts";
-import CartCard from "@/features/cart/components/cart-card";
+import EntryCard from "@/features/cart/components/entry-card";
 import { getTotalPrice } from "@/features/cart/services/cart.ts";
 
 interface Props {
@@ -38,7 +38,7 @@ export default function CartDialog({ open, onChange }: Props) {
                 ) : (
                     <Grid>
                         {entries.map((entry: Entry) => (
-                            <CartCard key={entry.id} entry={entry} />
+                            <EntryCard key={entry.id} entry={entry} />
                         ))}
                     </Grid>
                 ))}

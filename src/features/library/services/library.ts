@@ -20,7 +20,7 @@ export async function findEntries(query?: string): Promise<Entry[]> {
     }
 }
 
-export async function isEntryFavourited(id: string) {
+export async function isEntryFavourited(id: string): Promise<boolean> {
     try {
         const { data } = await client.get<boolean>(
             `${BASE_URL}/${id}/favourite`,
@@ -28,24 +28,32 @@ export async function isEntryFavourited(id: string) {
 
         return data;
     } catch {
-        throw new Error(
-            `Could not check if Entry with id '${id}' is favourited`,
-        );
+        throw new Error("Could not check if entry is favourited");
     }
 }
 
-export async function favouriteEntry(id: string) {
+export async function hasEntry(id: string): Promise<boolean> {
+    try {
+        const { data } = await client.get<boolean>(`${BASE_URL}/${id}`);
+
+        return data;
+    } catch {
+        throw new Error("Could not check is entry is in library");
+    }
+}
+
+export async function favouriteEntry(id: string): Promise<void> {
     try {
         await client.patch(`${BASE_URL}/${id}/favourite`);
     } catch {
-        throw new Error(`Entry with id '${id}' could not be favourited`);
+        throw new Error("Entry could not be favourited");
     }
 }
 
-export async function unFavouriteEntry(id: string) {
+export async function unFavouriteEntry(id: string): Promise<void> {
     try {
         await client.patch(`${BASE_URL}/${id}/unfavourite`);
     } catch {
-        throw new Error(`Entry with id '${id}' could not be unfavourited`);
+        throw new Error("Entry could not be unfavourited");
     }
 }
