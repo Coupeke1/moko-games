@@ -5,7 +5,6 @@ import be.kdg.team22.storeservice.domain.cart.CartId;
 import be.kdg.team22.storeservice.domain.cart.CartRepository;
 import be.kdg.team22.storeservice.domain.cart.UserId;
 import be.kdg.team22.storeservice.domain.cart.exceptions.CartEmptyException;
-import be.kdg.team22.storeservice.domain.cart.exceptions.CartNotFoundException;
 import be.kdg.team22.storeservice.domain.cart.exceptions.GameAlreadyOwnedException;
 import be.kdg.team22.storeservice.domain.cart.exceptions.InvalidMetadataException;
 import be.kdg.team22.storeservice.domain.catalog.GameId;
@@ -14,8 +13,6 @@ import be.kdg.team22.storeservice.infrastructure.games.GameMetadataResponse;
 import be.kdg.team22.storeservice.infrastructure.user.ExternalUserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -32,40 +29,35 @@ public class CartService {
 
     public Cart getOrCreate(final UserId id) {
         return cartRepository.findByUserId(id.value()).orElseGet(() -> {
-            Cart cart = new Cart(CartId.create(), id.value());
+            Cart cart = new Cart(CartId.create(), id);
             cartRepository.save(cart);
             return cart;
         });
     }
 
     public Cart get(final UserId userId) {
-        return cartRepository.findByUserId(userId.value()).orElseThrow(() -> new CartNotFoundException(userId.value()));
+        return cartRepository.findByUserId(userId.value()).orElseThrow(userId::cartNotFound);
     }
 
-    public void addItem(final UserId userId, final GameId gameId, final String jwt) {
+    public void addEntry(final UserId userId, final GameId gameId, final String jwt) {
         GameMetadataResponse meta = gamesRepository.fetchMetadata(gameId);
         validateMetadata(meta, gameId);
 
-        if (userRepository.userOwnsGame(gameId.value(), jwt))
+        if (userRepository.userOwnsGame(gameId, jwt))
             throw new GameAlreadyOwnedException(gameId.value(), userId.value());
 
-        Cart cart = cartRepository.findByUserId(userId.value()).orElseGet(() -> {
-            Cart newCart = new Cart(new CartId(UUID.randomUUID()), userId.value());
-            cartRepository.save(newCart);
-            return newCart;
-        });
-
-        cart.addItem(gameId);
+        Cart cart = getOrCreate(userId);
+        cart.add(gameId);
         cartRepository.save(cart);
     }
 
-    public void removeItem(final UserId userId, final GameId gameId) {
+    public void removeEntry(final UserId userId, final GameId gameId) {
         Cart cart = get(userId);
-        cart.removeItem(gameId);
+        cart.remove(gameId);
         cartRepository.save(cart);
     }
 
-    public void clearCart(final UserId userId) {
+    public void clear(final UserId userId) {
         Cart cart = get(userId);
 
         if (cart.isEmpty())
@@ -75,7 +67,7 @@ public class CartService {
         cartRepository.save(cart);
     }
 
-    private void validateMetadata(GameMetadataResponse meta, GameId gameId) {
+    private void validateMetadata(final GameMetadataResponse meta, final GameId gameId) {
         if (meta == null)
             throw new InvalidMetadataException(gameId.value(), "Game metadata is null");
 

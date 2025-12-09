@@ -40,27 +40,27 @@ public class CartController {
     }
 
     private List<EntryModel> getEntries(final Cart cart) {
-        return cart.items().stream().map(item -> gameService.getGameWithMetadata(item.gameId())).toList();
+        return cart.entries().stream().map(item -> gameService.getGameWithMetadata(item.gameId())).toList();
     }
 
-    @PostMapping("/items")
-    public ResponseEntity<Void> addItem(@AuthenticationPrincipal final Jwt jwt, @Valid @RequestBody final AddEntryModel request) {
+    @PostMapping("/entries")
+    public ResponseEntity<Void> addEntry(@AuthenticationPrincipal final Jwt jwt, @Valid @RequestBody final AddEntryModel request) {
         UserId userId = UserId.get(jwt);
-        cartService.addItem(userId, GameId.from(request.id()), jwt.getTokenValue());
+        cartService.addEntry(userId, GameId.from(request.id()), jwt.getTokenValue());
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/items/{gameId}")
-    public ResponseEntity<Void> removeItem(@AuthenticationPrincipal final Jwt jwt, @PathVariable final UUID gameId) {
+    @DeleteMapping("/entries/{gameId}")
+    public ResponseEntity<Void> removeEntry(@AuthenticationPrincipal final Jwt jwt, @PathVariable final UUID gameId) {
         UserId userId = UserId.get(jwt);
-        cartService.removeItem(userId, GameId.from(gameId));
+        cartService.removeEntry(userId, GameId.from(gameId));
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping
     public ResponseEntity<Void> clear(@AuthenticationPrincipal final Jwt jwt) {
         UserId userId = UserId.get(jwt);
-        cartService.clearCart(userId);
+        cartService.clear(userId);
         return ResponseEntity.noContent().build();
     }
 }

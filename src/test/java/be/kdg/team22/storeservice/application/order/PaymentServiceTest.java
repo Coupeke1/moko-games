@@ -79,7 +79,7 @@ class PaymentServiceTest {
 
         assertThat(order.status()).isEqualTo(OrderStatus.PAID);
 
-        verify(cartService).clearCart(order.userId());
+        verify(cartService).clear(order.userId());
         verify(storeService).recordPurchase(GameId.from(gameId));
 
         verify(orderRepo).save(order);
@@ -156,7 +156,7 @@ class PaymentServiceTest {
 
         assertThat(result.status()).isEqualTo(OrderStatus.PAID);
 
-        verify(cartService).clearCart(order.userId());
+        verify(cartService).clear(order.userId());
         verify(storeService).recordPurchase(GameId.from(gameId));
 
         verify(orderRepo).save(order);

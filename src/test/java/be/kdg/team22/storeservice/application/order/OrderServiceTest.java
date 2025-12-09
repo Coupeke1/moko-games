@@ -52,7 +52,7 @@ class OrderServiceTest {
     @Test
     @DisplayName("createOrder → throws OrderEmptyException when cart is empty")
     void createOrder_emptyCart() {
-        Cart empty = new Cart(CartId.create(), USER);
+        Cart empty = new Cart(CartId.create(), UserId.from(USER));
 
         when(cartService.get(userId)).thenReturn(empty);
 
@@ -62,7 +62,7 @@ class OrderServiceTest {
     @Test
     @DisplayName("createOrder → throws GameNotFoundException when catalog has no entry")
     void createOrder_gameNotFound() {
-        Cart cart = new Cart(CartId.create(), USER, Set.of(new CartItem(GameId.from(GAME1))));
+        Cart cart = new Cart(CartId.create(), UserId.from(USER), Set.of(new CartItem(GameId.from(GAME1))));
 
         when(cartService.get(userId)).thenReturn(cart);
         when(catalog.findById(GAME1)).thenReturn(Optional.empty());
@@ -73,7 +73,7 @@ class OrderServiceTest {
     @Test
     @DisplayName("createOrder → creates valid order with catalog prices and saves to repo")
     void createOrder_success() {
-        Cart cart = new Cart(CartId.create(), USER, Set.of(new CartItem(GameId.from(GAME1))));
+        Cart cart = new Cart(CartId.create(), UserId.from(USER), Set.of(new CartItem(GameId.from(GAME1))));
 
         when(cartService.get(userId)).thenReturn(cart);
 
