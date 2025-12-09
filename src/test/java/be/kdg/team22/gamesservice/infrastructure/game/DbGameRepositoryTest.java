@@ -11,7 +11,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,6 +32,9 @@ class DbGameRepositoryTest {
                 "http://localhost:9999",
                 "/start",
                 "/start",
+                "/health",
+                Instant.parse("2024-01-02T10:00:00Z"),
+                true,
                 "Title",
                 "Description",
                 "http://image",
@@ -70,6 +72,9 @@ class DbGameRepositoryTest {
                 "http://localhost",
                 "/play",
                 "/play",
+                "/health",
+                Instant.parse("2024-01-01T12:00:00Z"),
+                true,
                 "T",
                 "D",
                 "http://img",
@@ -83,6 +88,8 @@ class DbGameRepositoryTest {
         assertThat(entity.name()).isEqualTo("engine");
         assertThat(entity.baseUrl()).isEqualTo("http://localhost");
         assertThat(entity.startEndpoint()).isEqualTo("/play");
+        assertThat(entity.healthEndpoint()).isEqualTo("/health");
+        assertThat(entity.healthy()).isEqualTo(true);
         assertThat(entity.title()).isEqualTo("T");
         assertThat(entity.description()).isEqualTo("D");
         assertThat(entity.image()).isEqualTo("http://img");
@@ -99,6 +106,7 @@ class DbGameRepositoryTest {
         assertThat(domain.name()).isEqualTo("engine-name");
         assertThat(domain.baseUrl()).isEqualTo("http://localhost:9999");
         assertThat(domain.startEndpoint()).isEqualTo("/start");
+        assertThat(domain.healthEndpoint()).isEqualTo("/health");
         assertThat(domain.title()).isEqualTo("Title");
         assertThat(domain.description()).isEqualTo("Description");
         assertThat(domain.image()).isEqualTo("http://image");

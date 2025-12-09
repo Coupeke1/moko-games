@@ -15,7 +15,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
@@ -35,6 +34,7 @@ class ExternalGamesRepositoryTest {
                 "http://engine-service",
                 "/start",
                 "/start",
+                "/health",
                 "Tic Tac Toe",
                 "desc",
                 "img");

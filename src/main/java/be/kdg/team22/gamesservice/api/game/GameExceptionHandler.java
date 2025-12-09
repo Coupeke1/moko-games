@@ -1,5 +1,8 @@
 package be.kdg.team22.gamesservice.api.game;
+
+import be.kdg.team22.gamesservice.domain.game.exceptions.DuplicateGameNameException;
 import be.kdg.team22.gamesservice.domain.game.exceptions.GameNotFoundException;
+import be.kdg.team22.gamesservice.domain.game.exceptions.GameUnhealthyException;
 import be.kdg.team22.gamesservice.domain.game.exceptions.PlayersListEmptyException;
 import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
 import org.slf4j.Logger;
@@ -41,6 +44,20 @@ public class GameExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalArgument(final IllegalArgumentException ex) {
         log.warn("Bad request: {}", ex.getMessage());
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateGameNameException.class)
+    public ResponseEntity<String> handleDuplicateGameName(final DuplicateGameNameException ex)
+    {
+        log.warn("Duplicate game: {}", ex.getMessage());
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    @ExceptionHandler(GameUnhealthyException.class)
+    public ResponseEntity<String> handleUnhealthyGameName(final GameUnhealthyException ex)
+    {
+        log.warn("Unhealthy game: {}", ex.getMessage());
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 }

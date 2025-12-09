@@ -11,5 +11,7 @@ public interface GameRepository {
 
     List<Game> findAll();
 
+    Optional<Game> findByName(String name);
+
     void save(Game game);
 }

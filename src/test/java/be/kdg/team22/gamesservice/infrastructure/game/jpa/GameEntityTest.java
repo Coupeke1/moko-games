@@ -4,7 +4,6 @@ import be.kdg.team22.gamesservice.domain.game.Game;
 import be.kdg.team22.gamesservice.domain.game.GameId;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -19,6 +18,9 @@ class GameEntityTest {
                 "http://localhost:9092",
                 "/start",
                 "/start",
+                "/health",
+                Instant.parse("2024-01-02T00:00:00Z"),
+                true,
                 "Checkers",
                 "Strategy board game",
                 "http://image",
@@ -49,6 +51,7 @@ class GameEntityTest {
         UUID id = UUID.randomUUID();
         Instant created = Instant.parse("2024-01-01T12:00:00Z");
         Instant updated = Instant.parse("2024-01-02T12:00:00Z");
+        Instant healthCheck = Instant.parse("2024-01-02T12:00:00Z");
 
         GameEntity entity = new GameEntity(
                 id,
@@ -56,6 +59,9 @@ class GameEntityTest {
                 "http://localhost:9091",
                 "/start",
                 "/start",
+                "/health",
+                healthCheck,
+                true,
                 "Tic Tac Toe",
                 "Classic game",
                 "http://image",
@@ -69,6 +75,9 @@ class GameEntityTest {
         assertThat(domain.name()).isEqualTo("tic-tac-toe");
         assertThat(domain.baseUrl()).isEqualTo("http://localhost:9091");
         assertThat(domain.startEndpoint()).isEqualTo("/start");
+        assertThat(domain.healthEndpoint()).isEqualTo("/health");
+        assertThat(domain.lastHealthCheck()).isEqualTo(healthCheck);
+        assertThat(domain.healthy()).isTrue();
         assertThat(domain.title()).isEqualTo("Tic Tac Toe");
         assertThat(domain.description()).isEqualTo("Classic game");
         assertThat(domain.image()).isEqualTo("http://image");
@@ -88,6 +97,9 @@ class GameEntityTest {
         assertThat(converted.baseUrl()).isEqualTo(original.baseUrl());
         assertThat(converted.startEndpoint()).isEqualTo(original.startEndpoint());
         assertThat(converted.title()).isEqualTo(original.title());
+        assertThat(converted.healthEndpoint()).isEqualTo(original.healthEndpoint());
+        assertThat(converted.lastHealthCheck()).isEqualTo(original.lastHealthCheck());
+        assertThat(converted.healthy()).isEqualTo(original.healthy());
         assertThat(converted.description()).isEqualTo(original.description());
         assertThat(converted.image()).isEqualTo(original.image());
         assertThat(converted.createdAt()).isEqualTo(original.createdAt());

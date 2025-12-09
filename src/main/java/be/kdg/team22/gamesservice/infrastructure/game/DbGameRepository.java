@@ -30,6 +30,11 @@ public class DbGameRepository implements GameRepository {
     }
 
     @Override
+    public Optional<Game> findByName(String name) {
+        return jpa.findByName(name).map(GameEntity::toDomain);
+    }
+
+    @Override
     public void save(Game game) {
         jpa.save(GameEntity.fromDomain(game));
     }

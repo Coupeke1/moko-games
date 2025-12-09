@@ -13,6 +13,8 @@ public record GameDetailsModel(
         String image,
         String frontendUrl,
         String startEndpoint,
+        boolean healthy,
+        Instant lastHealthCheck,
         Instant createdAt,
         Instant updatedAt
 ) {
@@ -25,6 +27,8 @@ public record GameDetailsModel(
                 game.image(),
                 game.frontendUrl(),
                 game.startEndpoint(),
+                game.healthy(),
+                game.lastHealthCheck(),
                 game.createdAt(),
                 game.updatedAt()
         );

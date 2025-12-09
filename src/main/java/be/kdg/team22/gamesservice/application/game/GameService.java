@@ -1,14 +1,14 @@
 package be.kdg.team22.gamesservice.application.game;
 
+import be.kdg.team22.gamesservice.api.game.models.RegisterGameRequest;
 import be.kdg.team22.gamesservice.api.game.models.StartGameRequest;
 import be.kdg.team22.gamesservice.api.game.models.StartGameResponseModel;
 import be.kdg.team22.gamesservice.domain.game.Game;
 import be.kdg.team22.gamesservice.domain.game.GameId;
 import be.kdg.team22.gamesservice.domain.game.GameRepository;
-import be.kdg.team22.gamesservice.domain.game.exceptions.GameNotFoundException;
-import be.kdg.team22.gamesservice.domain.game.exceptions.InvalidGameConfigurationException;
-import be.kdg.team22.gamesservice.domain.game.exceptions.PlayersListEmptyException;
+import be.kdg.team22.gamesservice.domain.game.exceptions.*;
 import be.kdg.team22.gamesservice.infrastructure.game.engine.ExternalGamesRepository;
+import be.kdg.team22.gamesservice.infrastructure.game.health.GameHealthChecker;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,12 +16,13 @@ import java.util.UUID;
 
 @Service
 public class GameService {
-
     private final GameRepository gameRepository;
+    private final GameHealthChecker gameHealthChecker;
     private final ExternalGamesRepository engine;
 
-    public GameService(GameRepository gameRepository, ExternalGamesRepository engine) {
+    public GameService(GameRepository gameRepository, GameHealthChecker gameHealthChecker, ExternalGamesRepository engine) {
         this.gameRepository = gameRepository;
+        this.gameHealthChecker = gameHealthChecker;
         this.engine = engine;
     }
 
@@ -51,5 +52,22 @@ public class GameService {
 
     public List<Game> findAll() {
         return gameRepository.findAll();
+    }
+
+    public Game register(final RegisterGameRequest request) {
+        if (gameRepository.findByName(request.name()).isPresent()) {
+            throw new DuplicateGameNameException(request.name());
+        }
+
+        boolean isHealthy = gameHealthChecker.isHealthy(request);
+        if (!isHealthy) {
+            throw new GameUnhealthyException(request.name());
+        }
+
+        Game game = Game.register(request);
+        game.updateHealthStatus(true);
+        gameRepository.save(game);
+
+        return game;
     }
 }
