@@ -15,6 +15,11 @@ public class ExceptionController {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(NotFriendsException.class)
+    public ResponseEntity<String> handleNotFriends(final NotFriendsException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler({ChatChannelNotFoundException.class, NotificationNotFoundException.class, UserProfileNotFoundException.class, UserPreferencesNotFoundException.class})
     public ResponseEntity<String> handleNotFound(final Exception ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
