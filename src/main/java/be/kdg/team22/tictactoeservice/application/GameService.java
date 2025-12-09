@@ -3,9 +3,9 @@ package be.kdg.team22.tictactoeservice.application;
 import be.kdg.team22.tictactoeservice.api.models.CreateGameModel;
 import be.kdg.team22.tictactoeservice.application.events.GameEventPublisher;
 import be.kdg.team22.tictactoeservice.config.BoardSizeProperties;
-import be.kdg.team22.tictactoeservice.domain.events.GameDrawEvent;
+import be.kdg.team22.tictactoeservice.domain.events.AchievementCode;
+import be.kdg.team22.tictactoeservice.domain.events.GameAchievementEvent;
 import be.kdg.team22.tictactoeservice.domain.events.GameEndedEvent;
-import be.kdg.team22.tictactoeservice.domain.events.GameWonEvent;
 import be.kdg.team22.tictactoeservice.domain.events.exceptions.PublishAchievementException;
 import be.kdg.team22.tictactoeservice.domain.events.exceptions.RabbitNotReachableException;
 import be.kdg.team22.tictactoeservice.domain.game.Game;
@@ -69,23 +69,24 @@ public class GameService {
         repository.save(game);
 
         try {
-            if (game.status() == GameStatus.WON) {
-                publisher.publishGameWon(
-                        new GameWonEvent(
-                                game.id().value(),
-                                game.winner().value(),
-                                Instant.now()
-                        )
-                );
+            if (game.status() == GameStatus.TIE) {
+                game.players().forEach(player ->
+                        publisher.publishAchievement(
+                                new GameAchievementEvent(
+                                        AchievementCode.TICTACTOE_DRAW.name(),
+                                        game.id().value(),
+                                        player.id().value(),
+                                        Instant.now()
+                                )
+                        ));
             }
 
-            if (game.status() == GameStatus.TIE) {
-                publisher.publishGameDraw(
-                        new GameDrawEvent(
+            if (game.status() == GameStatus.WON) {
+                publisher.publishAchievement(
+                        new GameAchievementEvent(
+                                AchievementCode.TICTACTOE_WIN.name(),
                                 game.id().value(),
-                                game.players().stream()
-                                        .map(p -> p.id().value())
-                                        .toList(),
+                                game.winner().value(),
                                 Instant.now()
                         )
                 );

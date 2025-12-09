@@ -3,8 +3,9 @@ package be.kdg.team22.tictactoeservice.domain.events;
 import java.time.Instant;
 import java.util.UUID;
 
-public record GameWonEvent(
+public record GameAchievementEvent(
+        String achievementCode,
         UUID gameId,
-        UUID winnerId,
+        UUID playerId,
         Instant occurredAt
 ) {}
