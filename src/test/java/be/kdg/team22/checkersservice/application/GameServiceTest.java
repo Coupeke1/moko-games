@@ -93,7 +93,7 @@ public class GameServiceTest {
                 .orElseThrow(() -> new AssertionError("Draw event not found"));
         assertEquals(id.value(), playerBlackDrawEvent.gameId());
         assertEquals(playerBlack.id().value(), playerBlackDrawEvent.playerId());
-        assertEquals("CHECKERS_DRAW", playerBlackDrawEvent.achievementCode());
+        assertEquals(AchievementCode.CHECKERS_DRAW, playerBlackDrawEvent.achievementCode());
 
         GameAchievementEvent playerWhiteDrawEvent = allValues.stream()
                 .filter(event -> event.playerId().equals(playerWhite.id().value()))
@@ -101,7 +101,7 @@ public class GameServiceTest {
                 .orElseThrow(() -> new AssertionError("Draw event not found"));
         assertEquals(id.value(), playerWhiteDrawEvent.gameId());
         assertEquals(playerWhite.id().value(), playerWhiteDrawEvent.playerId());
-        assertEquals("CHECKERS_DRAW", playerWhiteDrawEvent.achievementCode());
+        assertEquals(AchievementCode.CHECKERS_DRAW, playerWhiteDrawEvent.achievementCode());
     }
 
     @Test
@@ -131,7 +131,7 @@ public class GameServiceTest {
                 .orElseThrow(() -> new AssertionError("Win event not found"));
         assertEquals(id.value(), winEvent.gameId());
         assertEquals(playerBlack.id().value(), winEvent.playerId());
-        assertEquals("CHECKERS_WIN", winEvent.achievementCode());
+        assertEquals(AchievementCode.CHECKERS_WIN, winEvent.achievementCode());
 
         GameAchievementEvent lossEvent = allValues.stream()
                 .filter(event -> event.playerId().equals(playerWhite.id().value()))
@@ -139,7 +139,7 @@ public class GameServiceTest {
                 .orElseThrow(() -> new AssertionError("Loss event not found"));
         assertEquals(id.value(), lossEvent.gameId());
         assertEquals(playerWhite.id().value(), lossEvent.playerId());
-        assertEquals("CHECKERS_LOSS", lossEvent.achievementCode());
+        assertEquals(AchievementCode.CHECKERS_LOSS, lossEvent.achievementCode());
     }
 
     @Test
@@ -169,7 +169,7 @@ public class GameServiceTest {
                 .orElseThrow(() -> new AssertionError("Win event not found"));
         assertEquals(id.value(), winEvent.gameId());
         assertEquals(playerWhite.id().value(), winEvent.playerId());
-        assertEquals("CHECKERS_WIN", winEvent.achievementCode());
+        assertEquals(AchievementCode.CHECKERS_WIN, winEvent.achievementCode());
 
         GameAchievementEvent lossEvent = allValues.stream()
                 .filter(event -> event.playerId().equals(playerBlack.id().value()))
@@ -177,7 +177,7 @@ public class GameServiceTest {
                 .orElseThrow(() -> new AssertionError("Loss event not found"));
         assertEquals(id.value(), lossEvent.gameId());
         assertEquals(playerBlack.id().value(), lossEvent.playerId());
-        assertEquals("CHECKERS_LOSS", lossEvent.achievementCode());
+        assertEquals(AchievementCode.CHECKERS_LOSS, lossEvent.achievementCode());
     }
 
     @Test
@@ -205,7 +205,7 @@ public class GameServiceTest {
                 playerBlack.id().value(),
                 event.playerId()
         );
-        assertEquals("CHECKERS_PROMOTION", event.achievementCode());
+        assertEquals(AchievementCode.CHECKERS_PROMOTION, event.achievementCode());
     }
 
     @Test
@@ -233,7 +233,7 @@ public class GameServiceTest {
                 playerBlack.id().value(),
                 event.playerId()
         );
-        assertEquals("CHECKERS_MULTICAPTURE", event.achievementCode());
+        assertEquals(AchievementCode.CHECKERS_MULTICAPTURE, event.achievementCode());
     }
 
     @Test
@@ -261,6 +261,6 @@ public class GameServiceTest {
                 playerBlack.id().value(),
                 event.playerId()
         );
-        assertEquals("CHECKERS_THREE_KINGS", event.achievementCode());
+        assertEquals(AchievementCode.CHECKERS_THREE_KINGS, event.achievementCode());
     }
 }

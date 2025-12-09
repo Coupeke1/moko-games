@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record GameAchievementEvent(
-        String achievementCode,
+        AchievementCode achievementCode,
         UUID gameId,
         UUID playerId,
         Instant occurredAt
