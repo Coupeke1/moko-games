@@ -72,6 +72,10 @@ public class NotificationService {
         return repository.findUnreadByRecipientId(playerId);
     }
 
+    public List<Notification> getNotificationsByType(final PlayerId playerId, final NotificationType type) {
+        return repository.findByRecipientIdAndType(playerId, type);
+    }
+
     public void markAsRead(final NotificationId id) {
         Notification notification =
                 repository.findById(id).orElseThrow(() -> new NotificationNotFoundException(id));

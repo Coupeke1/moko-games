@@ -1,5 +1,6 @@
 package be.kdg.team22.communicationservice.infrastructure.notification.jpa;
 
+import be.kdg.team22.communicationservice.domain.notification.NotificationType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -9,4 +10,6 @@ public interface NotificationJpaRepository extends JpaRepository<NotificationEnt
     List<NotificationEntity> findByRecipientIdOrderByCreatedAtDesc(UUID recipientId);
 
     List<NotificationEntity> findByRecipientIdAndReadFalseOrderByCreatedAtDesc(UUID recipientId);
+
+    List<NotificationEntity> findByRecipientIdAndTypeOrderByCreatedAtDesc(UUID recipientId, NotificationType type);
 }

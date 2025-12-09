@@ -11,4 +11,6 @@ public interface NotificationRepository {
     List<Notification> findByRecipientId(PlayerId recipientId);
 
     List<Notification> findUnreadByRecipientId(PlayerId recipientId);
+
+    List<Notification> findByRecipientIdAndType(PlayerId recipientId, NotificationType type);
 }
