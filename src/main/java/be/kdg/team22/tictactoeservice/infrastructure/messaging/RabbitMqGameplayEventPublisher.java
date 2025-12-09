@@ -24,7 +24,7 @@ public class RabbitMqGameplayEventPublisher implements GameEventPublisher {
     }
 
     @Override
-    public void publishGameWon(GameWonEvent event) {
+    public void publishGameWon(final GameWonEvent event) {
         try {
             rabbitTemplate.convertAndSend(
                     RabbitMQTopology.EXCHANGE_GAMEPLAY,
@@ -44,7 +44,7 @@ public class RabbitMqGameplayEventPublisher implements GameEventPublisher {
     }
 
     @Override
-    public void publishGameDraw(GameDrawEvent event) {
+    public void publishGameDraw(final GameDrawEvent event) {
         try {
             rabbitTemplate.convertAndSend(
                     RabbitMQTopology.EXCHANGE_GAMEPLAY,
@@ -64,7 +64,7 @@ public class RabbitMqGameplayEventPublisher implements GameEventPublisher {
     }
 
     @Override
-    public void publishGameEnded(GameEndedEvent event) {
+    public void publishGameEnded(final GameEndedEvent event) {
         try {
             rabbitTemplate.convertAndSend(
                     RabbitMQTopology.EXCHANGE_GAMEPLAY,
