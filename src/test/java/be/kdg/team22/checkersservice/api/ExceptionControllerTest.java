@@ -107,6 +107,20 @@ public class ExceptionControllerTest {
     }
 
     @Test
+    void handleAiMoveRequestFailedExceptions() {
+        AiMoveRequestFailedException aiMoveRequestFailedEx = new AiMoveRequestFailedException("");
+        ResponseEntity<String> response = controller.handleAiMoveRequestFailedException(aiMoveRequestFailedEx);
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @Test
+    void handleAiServiceNotReachableException() {
+        AiServiceNotReachableException aiServiceNotReachableEx = new AiServiceNotReachableException("");
+        ResponseEntity<String> response = controller.handleAiServiceNotReachableException(aiServiceNotReachableEx);
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @Test
     void handleForbiddenActions() {
         PlayerIdentityMismatchException playerIdentityMismatchEx = new PlayerIdentityMismatchException();
         ResponseEntity<String> response = controller.handleForbiddenActionErrors(playerIdentityMismatchEx);
