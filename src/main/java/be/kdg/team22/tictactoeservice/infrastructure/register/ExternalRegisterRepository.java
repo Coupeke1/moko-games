@@ -1,6 +1,6 @@
 package be.kdg.team22.tictactoeservice.infrastructure.register;
 
-import be.kdg.team22.tictactoeservice.domain.game.exceptions.GameServiceNotReachableException;
+import be.kdg.team22.tictactoeservice.domain.register.exceptions.GameServiceNotReachableException;
 import be.kdg.team22.tictactoeservice.domain.register.GameRegisterId;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;

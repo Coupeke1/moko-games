@@ -1,4 +1,4 @@
-package be.kdg.team22.tictactoeservice.domain.game.exceptions;
+package be.kdg.team22.tictactoeservice.domain.register.exceptions;
 
 public class GameNotRegisteredException extends RuntimeException {
     public GameNotRegisteredException() {

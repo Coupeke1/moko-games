@@ -1,7 +1,7 @@
 package be.kdg.team22.tictactoeservice.application;
 
 import be.kdg.team22.tictactoeservice.config.GameInfoProperties;
-import be.kdg.team22.tictactoeservice.domain.game.exceptions.GameNotRegisteredException;
+import be.kdg.team22.tictactoeservice.domain.register.exceptions.GameNotRegisteredException;
 import be.kdg.team22.tictactoeservice.domain.register.GameRegisterId;
 import be.kdg.team22.tictactoeservice.infrastructure.register.ExternalRegisterRepository;
 import be.kdg.team22.tictactoeservice.infrastructure.register.GameResponse;
