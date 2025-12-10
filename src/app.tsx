@@ -4,6 +4,8 @@ import LoadingState from "@/components/state/loading";
 import FriendsPage from "@/features/friends/friends";
 import IncomingRequestsPage from "@/features/friends/incoming";
 import OutgoingRequestsPage from "@/features/friends/outgoing";
+import GamePage from "@/features/game/game";
+import InvitesPage from "@/features/invites/invites";
 import LibraryGamePage from "@/features/library/game";
 import LibraryPage from "@/features/library/library";
 import LobbyPage from "@/features/lobby/lobby";
@@ -60,8 +62,9 @@ function Content() {
                 <Route path="/library" element={<LibraryPage />} />
                 <Route path="/library/:id" element={<LibraryGamePage />} />
 
-                <Route path="/lobby/:id" element={<LobbyPage />} />
-                <Route path="/lobby/:id/game" element={<GamePage />} />
+                <Route path="/lobbies/:id" element={<LobbyPage />} />
+                <Route path="/lobbies/:id/game" element={<GamePage />} />
+                <Route path="/invites" element={<InvitesPage />} />
 
                 <Route path="/profile" element={<ProfilePage />} />
 

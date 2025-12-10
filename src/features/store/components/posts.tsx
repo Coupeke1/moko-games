@@ -12,6 +12,8 @@ import type { Post } from "@/features/store/models/post/post";
 import { format } from "@/features/store/models/post/type";
 import PostDialog from "@/features/store/dialogs/post-dialog";
 import { useState } from "react";
+import ErrorState from "@/components/state/error";
+import Section from "@/components/section";
 
 interface Props {
     entry: Entry;
@@ -28,35 +30,38 @@ export default function Posts({ entry }: Props) {
     };
 
     return (
-        <>
+        <Section title="Posts">
             <State data={posts} loading={loading} error={error} />
 
             {posts && selected && (
                 <PostDialog post={selected} open={post} onChange={setPost} />
             )}
 
-            {posts && (
-                <Grid size={GridSize.Small}>
-                    {posts.map((post: Post) => (
-                        <Card
-                            key={post.id}
-                            title={post.title}
-                            image={post.image}
-                            onClick={() => select(post)}
-                            information={
-                                <Row
-                                    gap={Gap.Small}
-                                    items={Items.Center}
-                                    responsive={false}
-                                >
-                                    <NewsIcon />
-                                    <p>{format(post.type)}</p>
-                                </Row>
-                            }
-                        />
-                    ))}
-                </Grid>
-            )}
-        </>
+            {posts &&
+                (posts.length == 0 ? (
+                    <ErrorState>No posts</ErrorState>
+                ) : (
+                    <Grid>
+                        {posts.map((post: Post) => (
+                            <Card
+                                key={post.id}
+                                title={post.title}
+                                image={post.image}
+                                onClick={() => select(post)}
+                                information={
+                                    <Row
+                                        gap={Gap.Small}
+                                        items={Items.Center}
+                                        responsive={false}
+                                    >
+                                        <NewsIcon />
+                                        <p>{format(post.type)}</p>
+                                    </Row>
+                                }
+                            />
+                        ))}
+                    </Grid>
+                ))}
+        </Section>
     );
 }

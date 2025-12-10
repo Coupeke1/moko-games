@@ -67,10 +67,7 @@ export default function StoreGamePage() {
                     </Row>
 
                     <Paragraph>{entry.description}</Paragraph>
-
-                    <Section title="Posts">
-                        <Posts entry={entry} />
-                    </Section>
+                    <Posts entry={entry} />
                 </Column>
             )}
         </Page>

@@ -7,7 +7,6 @@ import Section from "@/components/section";
 import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
 import showToast from "@/components/toast";
-import type { Player } from "@/features/lobby/models/player.ts";
 import BotCard from "@/features/lobby/components/bot-card";
 import GameInformation from "@/features/lobby/components/information";
 import Page from "@/features/lobby/components/page";
@@ -15,6 +14,7 @@ import PlayerCard from "@/features/lobby/components/player-card";
 import InviteDialog from "@/features/lobby/dialogs/invite-dialog/invite-dialog";
 import SettingsDialog from "@/features/lobby/dialogs/settings-dialog/settings-dialog";
 import { useSession } from "@/features/lobby/hooks/use-session";
+import type { Player } from "@/features/lobby/models/player.ts";
 import { closeLobby, startGame } from "@/features/lobby/services/lobby.ts";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
@@ -30,13 +30,8 @@ export default function LobbyPage() {
     const start = useMutation({
         mutationFn: async ({ lobby }: { lobby: string }) =>
             await startGame(lobby),
-        onSuccess: async (data) => {
-            if (!game) return;
-            showToast("Lobby", "Starting...");
-
-            window.location.replace(
-                `${game.frontendUrl}${game.startEndpoint}/${data}`,
-            );
+        onSuccess: async () => {
+            showToast("Lobby", "Starting");
         },
         onError: (error: Error) => {
             showToast("Lobby", error.message);

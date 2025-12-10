@@ -1,4 +1,4 @@
-import { findInvites } from "@/features/lobby/services/lobby.ts";
+import { findInvites } from "@/features/lobby/services/invites.ts";
 import { useQuery } from "@tanstack/react-query";
 
 export function useInvites(game: string) {
