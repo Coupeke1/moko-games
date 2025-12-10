@@ -4,6 +4,7 @@ import be.kdg.team22.gamesservice.api.game.models.RegisterGameRequest;
 import be.kdg.team22.gamesservice.api.game.models.StartGameRequest;
 import be.kdg.team22.gamesservice.api.game.models.StartGameResponseModel;
 import be.kdg.team22.gamesservice.domain.game.Game;
+import be.kdg.team22.gamesservice.domain.game.GameCategory;
 import be.kdg.team22.gamesservice.domain.game.GameId;
 import be.kdg.team22.gamesservice.domain.game.GameRepository;
 import be.kdg.team22.gamesservice.domain.game.exceptions.*;
@@ -11,8 +12,11 @@ import be.kdg.team22.gamesservice.infrastructure.game.engine.ExternalGamesReposi
 import be.kdg.team22.gamesservice.infrastructure.game.health.GameHealthChecker;
 import be.kdg.team22.gamesservice.infrastructure.store.ExternalStoreRepository;
 import be.kdg.team22.gamesservice.infrastructure.store.NewStoreEntryModel;
+import be.kdg.team22.gamesservice.infrastructure.store.StoreEntryModel;
+import be.kdg.team22.gamesservice.infrastructure.store.UpdateStoreEntryModel;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -77,11 +81,7 @@ public class GameService {
         game.updateHealthStatus(true);
         gameRepository.save(game);
 
-        externalStoreRepository.addToStore(new NewStoreEntryModel(
-                game.id().value(),
-                request.price(),
-                request.category()
-        ));
+        handleStoreEntry(game.id(), request.price(), request.category());
 
         return game;
     }
@@ -103,6 +103,21 @@ public class GameService {
         game.updateHealthStatus(true);
         gameRepository.save(game);
 
+        handleStoreEntry(game.id(), request.price(), request.category());
+
         return game;
+    }
+
+    private void handleStoreEntry(GameId id, BigDecimal price, GameCategory category) {
+        StoreEntryModel storeEntry = externalStoreRepository.getStoreEntry(id);
+        if (storeEntry != null) externalStoreRepository.updateStoreEntry(id, new UpdateStoreEntryModel(
+                price,
+                category
+        ));
+        else externalStoreRepository.createStoreEntry(new NewStoreEntryModel(
+                id.value(),
+                price,
+                category
+        ));
     }
 }
