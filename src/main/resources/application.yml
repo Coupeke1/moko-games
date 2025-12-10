@@ -36,7 +36,7 @@ management:
       show-details: always
 
 business:
-  game:
+  game-service:
     url: ${GAME_SERVICE_URL:http://localhost:8084}
   ai:
     url: ${BUSINESS_AI_URL:https://team3.techtitans.be}

@@ -12,7 +12,7 @@ import java.util.List;
 @Configuration
 public class ExternalRegisterRepositoryConfig {
     @Bean("registerRepository")
-    RestClient registerRestClient(@Value("${business.game.url}") final String baseUrl) {
+    RestClient registerRestClient(@Value("${business.game-service.url}") final String baseUrl) {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(5000);
         requestFactory.setReadTimeout(5000);
