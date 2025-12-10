@@ -61,13 +61,21 @@ services:
     networks:
       - moko_frontend
 
-  #  checkers-platform:
-  #    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/checkers-frontend:main-latest
-  #    restart: always
-  #    expose:
-  #      - "80"
-  #    networks:
-  #      - moko_frontend
+  frontend-checkers:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/checkers-frontend:main-latest
+    restart: always
+    pull_policy: always
+    environment:
+      VITE_AUTH_URL: http://localhost/auth
+      VITE_AUTH_REALM: moko
+      VITE_AUTH_CLIENT: checkers-frontend
+
+      VITE_TIC_TAC_TOE_SERVICE: http://localhost/checkers/api/games
+      VITE_USER_SERVICE: http://localhost/user-service/api/profiles
+    expose:
+      - "80"
+    networks:
+      - moko_frontend
 
   # Backend Services
   service-user:
