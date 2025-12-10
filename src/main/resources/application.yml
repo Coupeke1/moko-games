@@ -36,8 +36,21 @@ management:
       show-details: always
 
 business:
+  game-service:
+    url: ${GAME_SERVICE_URL:http://localhost:8084}
   ai:
     url: ${BUSINESS_AI_URL:https://team3.techtitans.be}
 
-cors:
-  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5174,http://localhost:8084}
+cors.allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5174,http://localhost:8084}
+
+game-info:
+    name: ${GAME_NAME:tic-tac-toe}
+    title: ${GAME_TITLE:Tic Tac Toe}
+    description: ${GAME_DESCRIPTION:A classic 3x3 grid strategy game where two players take turns marking spaces to get three in a row}
+    image: ${GAME_IMAGE:https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse4.mm.bing.net%2Fth%2Fid%2FOIP.od5neF1COpwS6Nizg-DuYwHaFF%3Fpid%3DApi&f=1&ipt=2527b1aa91bb8e312a7a6211eda631300c7c1d4c73368d1c5eda5b5c3b44eed7}
+    backend-url: ${GAME_BACKEND_URL:http://localhost:8086}
+    frontend-url: ${GAME_FRONTEND_URL:http://localhost:5174/tic-tac-toe/game}
+    start-endpoint: ${GAME_START_ENDPOINT:/api/games}
+    health-endpoint: ${GAME_HEALTH_ENDPOINT:/actuator/health}
+    price: 25
+    category: PARTY
