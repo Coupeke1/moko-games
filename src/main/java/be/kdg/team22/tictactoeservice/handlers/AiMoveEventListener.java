@@ -32,6 +32,8 @@ public class AiMoveEventListener {
         );
         AiMoveResponse response = aiRepository.requestMove(request);
 
+        if (!event.expectResponse()) return;
+
         if (response != null) {
             GameId gameId = new GameId(UUID.fromString(event.gameId()));
             PlayerId aiPlayerId = gameService.getGame(gameId).players().stream()

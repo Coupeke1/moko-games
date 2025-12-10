@@ -104,8 +104,9 @@ public class GameService {
             logger.error(exception.getMessage());
         }
 
-        if (game.status() == GameStatus.IN_PROGRESS && game.currentPlayer().aiPlayer()) {
-            applicationEventPublisher.publishEvent(AiMoveRequestedEvent.from(game));
+        if (game.currentPlayer().aiPlayer()) {
+            boolean expectResponse = game.status() == GameStatus.IN_PROGRESS;
+            applicationEventPublisher.publishEvent(AiMoveRequestedEvent.from(game, expectResponse));
         }
 
         return game;
