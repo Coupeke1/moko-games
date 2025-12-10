@@ -1,5 +1,6 @@
 package be.kdg.team22.userservice.application.achievement;
 
+import be.kdg.team22.userservice.application.profile.ProfileService;
 import be.kdg.team22.userservice.domain.achievement.*;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
 import be.kdg.team22.userservice.events.AchievementUnlockedEvent;
@@ -17,10 +18,12 @@ public class AchievementService {
 
     private final AchievementRepository achievements;
     private final AchievementEventPublisher eventPublisher;
+    private final ProfileService profileService;
 
-    public AchievementService(AchievementRepository achievements, AchievementEventPublisher eventPublisher) {
+    public AchievementService(final AchievementRepository achievements, final AchievementEventPublisher eventPublisher, final ProfileService profileService) {
         this.achievements = achievements;
         this.eventPublisher = eventPublisher;
+        this.profileService = profileService;
     }
 
     public void award(final UUID userId, final String code) {
@@ -45,6 +48,9 @@ public class AchievementService {
 
         achievements.save(achievement);
 
+        int levels = AchievementMetadata.getLevels(code);
+        profileService.addLevels(profileId, levels);
+
         AchievementUnlockedEvent event = new AchievementUnlockedEvent(
                 userId,
                 achievement.id().value(),
@@ -54,7 +60,7 @@ public class AchievementService {
         eventPublisher.publishAchievementUnlocked(event);
     }
 
-    public List<Achievement> findByProfile(ProfileId profileId) {
+    public List<Achievement> findByProfile(final ProfileId profileId) {
         return achievements.findByProfile(profileId);
     }
 }

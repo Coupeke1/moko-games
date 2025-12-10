@@ -22,4 +22,8 @@ public class CannotUpdateProfileException extends RuntimeException {
     public static CannotUpdateProfileException preferences(ProfileId id) {
         return new CannotUpdateProfileException(id, "preferences");
     }
+
+    public static CannotUpdateProfileException levels(ProfileId id) {
+        return new CannotUpdateProfileException(id, "levels");
+    }
 }

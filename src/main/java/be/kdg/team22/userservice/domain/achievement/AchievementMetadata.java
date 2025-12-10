@@ -23,16 +23,30 @@ public class AchievementMetadata {
             "CHECKERS_MULTICAPTURE", "Make a multicapture in Checkers!",
             "CHECKERS_THREE_KINGS", "Own 3 kings in Checkers!"
             );
+    private static final Map<String, Integer> ACHIEVEMENT_LEVELS = Map.of(
+            "TICTACTOE_DRAW", 2,
+            "TICTACTOE_WIN", 3,
+            "CHECKERS_DRAW", 2,
+            "CHECKERS_LOSS", 1,
+            "CHECKERS_WIN", 3,
+            "CHECKERS_PROMOTION", 4,
+            "CHECKERS_MULTICAPTURE", 5,
+            "CHECKERS_THREE_KINGS", 5
+    );
 
     private AchievementMetadata() {
         throw new UnsupportedOperationException("Utility class cannot be instantiated");
     }
 
-    public static String getName(String code) {
+    public static String getName(final String code) {
         return ACHIEVEMENT_NAMES.getOrDefault(code, code);
     }
 
-    public static String getDescription(String code) {
+    public static String getDescription(final String code) {
         return ACHIEVEMENT_DESCRIPTIONS.getOrDefault(code, "Achievement unlocked!");
+    }
+
+    public static int getLevels(final String code) {
+        return ACHIEVEMENT_LEVELS.getOrDefault(code, 1);
     }
 }

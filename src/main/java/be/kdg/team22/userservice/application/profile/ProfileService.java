@@ -113,4 +113,10 @@ public class ProfileService {
 
         return profile;
     }
+
+    public void addLevels(final ProfileId id, final int amount) {
+        Profile profile = getById(id);
+        profile.addLevels(amount);
+        profileRepository.save(profile);
+    }
 }
