@@ -9,7 +9,7 @@ function App() {
     return (
         <QueryClientProvider client={queryClient}>
             <Auth />
-            <BrowserRouter>
+            <BrowserRouter basename="/checkers">
                 <Routes>
                     <Route path="/game/:gameId" element={<GamePage />} />
                     <Route path="/" element={<GamePage />} />
