@@ -12,10 +12,12 @@ import be.kdg.team22.checkersservice.domain.game.GameId;
 import be.kdg.team22.checkersservice.domain.move.MoveResult;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 import be.kdg.team22.checkersservice.domain.player.exceptions.PlayerIdentityMismatchException;
+import be.kdg.team22.checkersservice.events.AiMoveRequestedEvent;
 import be.kdg.team22.checkersservice.infrastructure.game.GameRepository;
 import be.kdg.team22.checkersservice.domain.player.PlayerId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -25,12 +27,14 @@ import java.util.List;
 public class GameService {
     private final GameRepository repository;
     private final GameEventPublisher publisher;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     private final Logger logger;
 
-    public GameService(final GameRepository repository, final GameEventPublisher publisher) {
+    public GameService(final GameRepository repository, final GameEventPublisher publisher, final ApplicationEventPublisher applicationEventPublisher) {
         this.repository = repository;
         this.publisher = publisher;
+        this.applicationEventPublisher = applicationEventPublisher;
         logger = LoggerFactory.getLogger(GameService.class);
     }
 
@@ -133,6 +137,11 @@ public class GameService {
             }
         } catch (PublishAchievementException | RabbitNotReachableException exception) {
             logger.error(exception.getMessage());
+        }
+
+        if (game.currentPlayer().aiPlayer()) {
+            boolean expectResponse = game.status() == GameStatus.RUNNING;
+            applicationEventPublisher.publishEvent(AiMoveRequestedEvent.from(game, expectResponse));
         }
 
         return game;
