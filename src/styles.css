@@ -5,6 +5,19 @@
     --font-sans: "Nunito", "sans-serif";
     --color-bg: oklch(0.1749 0.0082 285.52);
     --color-bg-2: oklch(0.234 0.0096 294.82);
+    --color-bg-3: oklch(0.18 0.01 285);
     --color-fg: oklch(0.9612 0 0);
     --color-fg-2: oklch(0.5694 0.0128 269.45);
+
+    --color-tile-light: oklch(0.85 0.02 80);
+    --color-tile-dark: oklch(0.35 0.05 30);
+
+    --color-piece-black: oklch(0.25 0.01 0);
+    --color-piece-black-highlight: oklch(0.35 0.02 0);
+    --color-piece-white: oklch(0.92 0.02 90);
+    --color-piece-white-highlight: oklch(0.85 0.03 90);
+    --color-piece-crown: oklch(0.75 0.15 55);
+
+    --color-selected: oklch(0.7 0.2 145);
+    --color-valid-move: oklch(0.6 0.15 145);
 }
