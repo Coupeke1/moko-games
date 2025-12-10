@@ -1,15 +1,9 @@
-import Page from "@/components/layout/page";
-import LoadingState from "@/components/state/loading";
-import { useProfile } from "@/features/profile/hooks/use-profile.ts";
-import { useAuthStore } from "@/stores/auth-store";
 import { useEffect } from "react";
-import ErrorState from "@/components/state/error";
+import { useAuthStore } from "@/stores/auth-store";
 import { environment } from "@/config";
 
 export default function Auth() {
     const initAuth = useAuthStore((state) => state.init);
-    const initialized = useAuthStore((state) => state.initialized);
-    const { loading: isLoading, error: isError } = useProfile();
 
     useEffect(() => {
         initAuth({
@@ -19,19 +13,5 @@ export default function Auth() {
         } as Keycloak.KeycloakConfig);
     }, []);
 
-    if (!initialized || isLoading)
-        return (
-            <Page>
-                <LoadingState />
-            </Page>
-        );
-
-    if (isError)
-        return (
-            <Page>
-                <ErrorState />
-            </Page>
-        );
-
-    return <></>;
+    return null;
 }
