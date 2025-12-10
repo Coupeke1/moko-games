@@ -1,7 +1,8 @@
-import type { GameStatus } from "@/routes/game/model/game-status.ts";
-import type { Player } from "@/routes/game/model/Player.ts";
-import type { PlayerRole } from "@/routes/game/model/player-role.ts";
-import type { KingMovementMode } from "@/routes/game/model/king-movement-mode.ts";
+import type {Player} from "./player";
+import {PlayerRole} from "./player-role";
+import {KingMovementMode} from "./king-movement-mode";
+import {GameStatus} from "./game-status";
+
 
 export interface GameState {
     id: string;
