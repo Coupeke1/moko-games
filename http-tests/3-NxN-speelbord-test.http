@@ -62,6 +62,11 @@ Content-Type: application/json
   }
 }
 
+> {%
+    client.global.set("game_id", response.body.id);
+    client.log("Created tic tac toe game with ID: " + response.body.id);
+%}
+
 ### AI
 POST http://34.79.40.150/ai-player/move
 Content-Type: application/json

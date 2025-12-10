@@ -139,8 +139,7 @@ public class Game {
         if (status == GameStatus.WON)
             winner = move.playerId();
 
-        if (status == GameStatus.IN_PROGRESS)
-            nextPlayer();
+        nextPlayer();
     }
 
     public GameId id() {

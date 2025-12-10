@@ -10,15 +10,17 @@ public record AiMoveRequestedEvent(
         String gameName,
         List<List<String>> board,
         PlayerRole currentPlayer,
-        PlayerRole aiPlayer
+        PlayerRole aiPlayer,
+        boolean expectResponse
 ) {
-    public static AiMoveRequestedEvent from(Game game) {
+    public static AiMoveRequestedEvent from(Game game, boolean expectResponse) {
         return new AiMoveRequestedEvent(
                 game.id().value().toString(),
                 "TICTACTOE",
                 game.board().boardState(),
                 game.currentRole(),
-                game.aiPlayer()
+                game.aiPlayer(),
+                expectResponse
         );
     }
 }
