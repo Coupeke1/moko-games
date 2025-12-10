@@ -10,7 +10,7 @@ public class Profile {
     private final ProfileId id;
     private final ProfileName username;
     private final ProfileEmail email;
-    private final Statistics statistics;
+    private Statistics statistics;
     private final Instant createdAt;
     private NotificationPreferences preferences;
     private String description;
@@ -59,6 +59,13 @@ public class Profile {
             throw CannotUpdateProfileException.preferences(id);
 
         this.preferences = prefs;
+    }
+
+    public void addLevels(final int amount) {
+        if (amount < 0) {
+            throw CannotUpdateProfileException.levels(id);
+        }
+        this.statistics = new Statistics(this.statistics.level() + amount, this.statistics.playTime());
     }
 
     public NotificationPreferences preferences() {
