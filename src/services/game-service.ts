@@ -1,15 +1,33 @@
 import validIdCheck from "@/lib/id.ts";
 import axios from "axios";
 import {type GameState} from "../models/game-state";
+import {useAuthStore} from "@/stores/auth-store";
 
-const BASE_URL = import.meta.env.VITE_CHECKERS_API;
+const BASE_URL = import.meta.env.VITE_CHECKERS_SERVICE;
+
+const axiosInstance = axios.create({
+    baseURL: BASE_URL,
+});
+
+axiosInstance.interceptors.request.use(
+    async (config) => {
+        const token = await useAuthStore.getState().getValidToken();
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
 
 export async function getGameState(gameId: string): Promise<GameState> {
     try {
         validIdCheck(gameId);
 
-        const {data} = await axios.get<GameState>(`${BASE_URL}/${gameId}`);
-        return data
+        const {data} = await axiosInstance.get<GameState>(`/${gameId}`);
+        return data;
     } catch (error) {
         if (error instanceof Error) {
             throw new Error(`Could not fetch game with id '${gameId}': ${error.message}`);
@@ -25,7 +43,7 @@ export async function requestMove(gameId: string, playerId: string, cells: numbe
             cells: cells,
         };
 
-        const response = await axios.post<GameState>(`${BASE_URL}/${gameId}/move`, moveRequest);
+        const response = await axiosInstance.post<GameState>(`/${gameId}/move`, moveRequest);
         return response.data;
     } catch (error) {
         if (error instanceof Error) {
@@ -37,7 +55,7 @@ export async function requestMove(gameId: string, playerId: string, cells: numbe
 
 export async function resetGame(gameId: string) {
     try {
-        const response = await axios.post<GameState>(`${BASE_URL}/${gameId}/reset`);
+        const response = await axiosInstance.post<GameState>(`/${gameId}/reset`);
         return response.data;
     } catch (error) {
         if (error instanceof Error) {

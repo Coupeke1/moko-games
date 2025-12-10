@@ -51,7 +51,7 @@ export default function GamePage() {
         return <ErrorState msg={`Could not load game ${id}`}/>;
     }
 
-    const boardSize = gameState.board.length;
+    const boardSize = 8
 
     return (
         <div className="min-h-screen bg-bg flex flex-col items-center justify-center p-4 gap-6">
