@@ -1,6 +1,6 @@
 import validIdCheck from "@/lib/id.ts";
-import type {GameState} from "@/routes/game/model/game-state.ts";
 import axios from "axios";
+import {type GameState} from "../models/game-state";
 
 const BASE_URL = import.meta.env.VITE_CHECKERS_API;
 

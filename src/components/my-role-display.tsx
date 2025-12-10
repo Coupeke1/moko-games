@@ -1,15 +1,16 @@
-import { PlayerRoleBadge } from "@/routes/game/components/player-role-badge.tsx";
-import type { Profile } from "@/models/profile.ts";
-import PlayerImage from "@/routes/game/components/player-image.tsx";
-import type { PlayerRole } from "@/routes/game/model/player-role.ts";
+import {type Profile} from "../models/profile";
+import {PlayerRole} from "../models/player-role";
+import PlayerImage from "./player-image";
+import {PlayerRoleBadge} from "./player-role-badge";
+
 
 interface MyRoleDisplayProps {
     profile: Profile;
-    role: PlayerRole | null;
+    role: PlayerRole | null ;
     isAI?: boolean;
 }
 
-export function MyRoleDisplay({ profile, role, isAI = false }: MyRoleDisplayProps) {
+export function MyRoleDisplay({profile, role, isAI = false}: MyRoleDisplayProps) {
     if (!role) {
         return (
             <div className="bg-yellow-500/20 border border-yellow-500 text-yellow-500 px-4 py-3 rounded-lg text-sm">
@@ -22,7 +23,7 @@ export function MyRoleDisplay({ profile, role, isAI = false }: MyRoleDisplayProp
 
     return (
         <div className="flex items-center gap-4 bg-bg-2 p-4 rounded-lg border border-fg-2/20">
-            <PlayerImage src={profile.image} big={false} />
+            <PlayerImage src={profile.image} big={false}/>
             <div className="flex flex-col">
                 <div className="flex items-center gap-2">
                     <span className="text-fg text-lg font-medium">{profile.username}</span>
@@ -32,7 +33,7 @@ export function MyRoleDisplay({ profile, role, isAI = false }: MyRoleDisplayProp
                 </div>
                 <div className="flex items-center gap-2 mt-1">
                     <span className="text-fg-2 text-sm">You are:</span>
-                    <PlayerRoleBadge role={role} />
+                    <PlayerRoleBadge role={role}/>
                     <span className={`font-bold ${isBlack ? 'text-neutral-900' : 'text-neutral-100'}`}>
                         {role}
                     </span>

@@ -1,10 +1,10 @@
-import type {PlayerRole} from "@/routes/game/model/player-role.ts";
+import {PlayerRole} from "../models/player-role";
 
 interface PlayerRoleBadgeProps {
     role: PlayerRole | null;
 }
 
-export function PlayerRoleBadge({ role }: PlayerRoleBadgeProps) {
+export function PlayerRoleBadge({role}: PlayerRoleBadgeProps) {
     if (!role) {
         return null;
     }

@@ -1,8 +1,8 @@
 import type {Profile} from "@/models/profile.ts";
 import {useQueryClient} from "@tanstack/react-query";
-import {requestMove} from "@/routes/game/services/game-service.ts";
 import {useState} from "react";
-import {GameStatus} from "@/routes/game/model/game-status.ts";
+import {GameStatus} from "../models/game-status";
+import {requestMove} from "../services/game-service";
 
 export function useMakeMove(gameId: string, profile: Profile | undefined, status: GameStatus | undefined) {
     const queryClient = useQueryClient();
@@ -26,5 +26,5 @@ export function useMakeMove(gameId: string, profile: Profile | undefined, status
 
     const closeToast = () => setErrorMsg(null);
 
-    return { makeMove, errorMsg, closeToast };
+    return {makeMove, errorMsg, closeToast};
 }

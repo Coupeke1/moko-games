@@ -1,10 +1,11 @@
-import type {GameState} from "@/routes/game/model/game-state.ts";
-import type {Profile} from "@/models/profile.ts";
-import {GameWin} from "@/routes/game/components/modals/game-win.tsx";
-import {GameTie} from "@/routes/game/components/modals/game-tie.tsx";
-import {GameStateDisplay} from "@/routes/game/components/game-state-display.tsx";
-import {GameStatus} from "@/routes/game/model/game-status.ts";
-import {PlayerRole} from "@/routes/game/model/player-role.ts";
+import {type GameState} from "../../models/game-state";
+import {type Profile} from "../../models/profile";
+import {GameStatus} from "../../models/game-status";
+import {PlayerRole} from "../../models/player-role";
+import {GameTie} from "./game-tie";
+import {GameStateDisplay} from "../game-state-display";
+import {GameWin} from "./game-win";
+
 
 interface GameEndModalProps {
     gameState: GameState;
