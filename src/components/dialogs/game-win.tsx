@@ -1,8 +1,8 @@
-import {PlayerRoleBadge} from "@/routes/game/components/player-role-badge.tsx";
-import PlayerImage from "@/routes/game/components/player-image.tsx";
-import type {Profile} from "@/models/profile.ts";
-import type {Player} from "@/routes/game/model/Player.ts";
-import {usePlayerProfile} from "@/routes/game/hooks/use-player-profile.ts";
+import {type Profile} from "../../models/profile";
+import {type Player} from "../../models/player";
+import {usePlayerProfile} from "../../hooks/use-player-profile";
+import {PlayerRoleBadge} from "../player-role-badge";
+import PlayerImage from "../player-image";
 
 interface GameWinProps {
     myProfile: Profile;

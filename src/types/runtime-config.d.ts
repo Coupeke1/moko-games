@@ -4,7 +4,6 @@ declare global {
             authUrl?: string;
             authRealm?: string;
             authClientId?: string;
-
             userService?: string;
             checkersService?: string;
         };

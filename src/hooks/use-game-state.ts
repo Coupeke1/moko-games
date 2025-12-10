@@ -1,5 +1,5 @@
-import {getGameState} from "@/routes/game/services/game-service.ts";
 import {useQuery} from "@tanstack/react-query";
+import {getGameState} from "../services/game-service";
 
 export function useGameState(id: string) {
     return useQuery({

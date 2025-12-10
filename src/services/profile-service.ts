@@ -17,6 +17,15 @@ export function removeToken() {
     delete axios.defaults.headers.common['Authorization']
 }
 
+export async function getMyProfile(): Promise<Profile> {
+    try {
+        const { data } = await axios.get<Profile>(`${BASE_URL}/me`);
+        return data;
+    } catch {
+        throw new Error("Could not fetch my profile");
+    }
+}
+
 export async function findProfile(id: string): Promise<Profile> {
     try {
         validIdCheck(id);
@@ -37,14 +46,18 @@ export async function parseProfile(keycloak: Keycloak, token: string | null): Pr
     try {
         addToken(token);
 
-        const parsedToken: KeycloakTokenParsed | undefined = keycloak.tokenParsed;
-        if (parsedToken === undefined) throw new Error("Token could not be parsed");
-
-        if (parsedToken.sub === undefined) throw new Error("Id could not be found");
-
-        const id: string = parsedToken.sub;
-        return await findProfile(id);
+        // Call /me endpoint which auto-creates profile if needed
+        return await getMyProfile();
     } catch {
+        // Fallback: try to get by ID from token
+        const parsedToken: KeycloakTokenParsed | undefined = keycloak.tokenParsed;
+        if (parsedToken?.sub) {
+            try {
+                return await findProfile(parsedToken.sub);
+            } catch {
+                // ignore
+            }
+        }
         throw new Error("Profile could not be found");
     }
 }

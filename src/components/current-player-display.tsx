@@ -1,7 +1,7 @@
 import type {Profile} from "@/models/profile.ts";
-import type {Player} from "@/routes/game/model/Player.ts";
-import PlayerImage from "@/routes/game/components/player-image.tsx";
-import type {PlayerRole} from "@/routes/game/model/player-role.ts";
+import {PlayerRole} from "../models/player-role";
+import {type Player} from "../models/player";
+import PlayerImage from "./player-image";
 
 interface PlayerDisplayProps {
     role: PlayerRole;

@@ -1,5 +1,5 @@
-import type {GameState} from "@/routes/game/model/game-state.ts";
 import {Row} from "@/components/layout/row.tsx";
+import {type GameState} from "../models/game-state";
 
 interface GameStateDisplayProps {
     gameState: GameState;
