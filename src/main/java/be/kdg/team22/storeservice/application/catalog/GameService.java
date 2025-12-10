@@ -6,6 +6,7 @@ import be.kdg.team22.storeservice.application.catalog.queries.Pagination;
 import be.kdg.team22.storeservice.domain.catalog.Entry;
 import be.kdg.team22.storeservice.domain.catalog.EntryRepository;
 import be.kdg.team22.storeservice.domain.catalog.GameId;
+import be.kdg.team22.storeservice.domain.catalog.exceptions.GameNotFoundException;
 import be.kdg.team22.storeservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.storeservice.infrastructure.games.GameMetadataResponse;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,7 @@ public class GameService {
     }
 
     public EntryModel getGameWithMetadata(final GameId id) {
-        Entry entry = repo.findById(id.value()).orElseThrow();
+        Entry entry = repo.findById(id.value()).orElseThrow(() -> new GameNotFoundException(id));
         GameMetadataResponse meta = games.fetchMetadata(id);
         return EntryModel.from(entry, meta);
     }
