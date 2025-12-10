@@ -63,7 +63,7 @@ public class CatalogController {
         return ResponseEntity.ok(PostModel.from(post));
     }
 
-    @PostMapping
+    @PostMapping({"/", ""})
     public ResponseEntity<EntryModel> create(@Valid @RequestBody final NewEntryModel request) {
         Entry entry = storeService.create(GameId.from(request.id()), request.price(), request.category());
         EntryModel response = queryService.getGameWithMetadata(entry.id());
