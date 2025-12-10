@@ -34,6 +34,8 @@ services:
       timeout: 15s
       retries: 5
       start_period: 5m
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - moko_backend
       - moko_kc
@@ -70,6 +72,8 @@ services:
       timeout: 15s
       retries: 5
       start_period: 5m
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - moko_backend
       - moko_kc
