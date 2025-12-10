@@ -54,7 +54,7 @@ public class GameController {
         return ResponseEntity.ok(GameDetailsModel.from(game));
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<GameDetailsModel> updateGame(final @PathVariable UUID id, final @RequestBody RegisterGameRequest request) {
         Game game = service.update(GameId.from(id), request);
         return ResponseEntity.ok(GameDetailsModel.from(game));
