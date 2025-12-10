@@ -27,7 +27,7 @@ services:
     pull_policy: always
     profiles: ["frontend_tic_tac_toe"]
     environment:
-      VITE_AUTH_URL: http://localhost:8180/auth
+      VITE_AUTH_URL: http://localhost:8180
       VITE_AUTH_REALM: moko
       VITE_AUTH_CLIENT: tic-tac-toe-frontend
 
@@ -35,3 +35,18 @@ services:
       VITE_USER_SERVICE: http://localhost:8080/api/profiles
     ports:
       - "5174:80"
+
+  frontend-checkers:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/checkers-frontend:main-latest
+    restart: always
+    pull_policy: always
+    profiles: ["frontend_checkers"]
+    environment:
+      VITE_AUTH_URL: http://localhost:8180
+      VITE_AUTH_REALM: moko
+      VITE_AUTH_CLIENT: checkers-frontend
+
+      VITE_CHECKERS_SERVICE: http://localhost:8087/api/games
+      VITE_USER_SERVICE: http://localhost:8080/api/profiles
+    ports:
+      - "5175:80"

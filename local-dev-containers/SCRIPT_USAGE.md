@@ -30,10 +30,16 @@ The scripts can orchestrate the following services:
 - `social` - Social features service
 - `games` - Core games service
 - `store` - Store backend service
+- `communication` - Notifications and messages
 
 ### Game Services
-- `tic-tac-toe` - Tic-Tac-Toe game
-- `checkers` - Checkers game
+- `tic-tac-toe` - Tic-Tac-Toe game backend
+- `checkers` - Checkers game backend
+
+### Frontend
+- `frontend_platform` - Main moko platform
+- `frontend_tic_tac_toe` - Tic-Tac-Toe game frontend
+- `frontend_checkers` - Checkers game frontend
 
 ### Black Box (Chess) Services
 - `chess` - Frontend, backend of chess game and related infrastructure (Black Box)
@@ -100,7 +106,7 @@ Starts only the infrastructure (no platform or game services).
 ```powershell
 .\run.ps1 -All
 ```
-Starts all available services: user, session, social, games, store, tic-tac-toe, checkers, chess, frontend-platform, frontend-tic-tac-toe.
+Starts all available services: user, session, social, games, store, communication, tic-tac-toe, checkers, chess, frontend-platform, frontend-tic-tac-toe, frontend_checkers.
 
 #### Starting All Services Except Some
 ```powershell
@@ -112,11 +118,11 @@ Starts all available services: user, session, social, games, store, tic-tac-toe,
 ```
 
 #### Parameter Details
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `-Services` | String array | Comma-separated list of services to start |
-| `-All` | Switch | Start all available services (overrides `-Services`) |
-| `-Exclude` | String array | Comma-separated list of services to exclude (works with `-All` or when starting with all services) |
+| Parameter   | Type         | Description                                                                                        |
+|-------------|--------------|----------------------------------------------------------------------------------------------------|
+| `-Services` | String array | Comma-separated list of services to start                                                          |
+| `-All`      | Switch       | Start all available services (overrides `-Services`)                                               |
+| `-Exclude`  | String array | Comma-separated list of services to exclude (works with `-All` or when starting with all services) |
 
 ---
 
@@ -141,7 +147,7 @@ Starts only the infrastructure (no platform or game services).
 ```bash
 ./run.sh --all
 ```
-Starts all available services: user, session, social, games, store, tic-tac-toe, checkers, chess, frontend-platform, frontend-tic-tac-toe.
+Starts all available services: services: user, session, social, games, store, communication, tic-tac-toe, checkers, chess, frontend-platform, frontend-tic-tac-toe, frontend_checkers.
 
 #### Starting All Services Except Some
 ```bash

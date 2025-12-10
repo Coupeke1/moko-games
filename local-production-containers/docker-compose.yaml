@@ -70,7 +70,7 @@ services:
       VITE_AUTH_REALM: moko
       VITE_AUTH_CLIENT: checkers-frontend
 
-      VITE_TIC_TAC_TOE_SERVICE: http://localhost/checkers/api/games
+      VITE_CHECKERS_SERVICE: http://localhost/checkers/api/games
       VITE_USER_SERVICE: http://localhost/user-service/api/profiles
     expose:
       - "80"
