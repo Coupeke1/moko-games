@@ -51,37 +51,56 @@ export default function GamePage() {
         return <ErrorState msg={`Could not load game ${id}`}/>;
     }
 
-    const boardSize = 8
+    const boardSize = gameState.board.length;
 
     return (
-        <div className="min-h-screen bg-bg flex flex-col items-center justify-center p-4 gap-6">
-            <h1 className="text-fg text-3xl font-bold">Checkers</h1>
+        <div className="min-h-screen bg-bg flex flex-col md:flex-row p-10 gap-12">
 
-            <MyRoleDisplay
-                profile={profile}
-                role={myRole}
-                isAI={isAI}
-            />
+            {/* Sidebar */}
+            <aside className="md:w-[28rem] w-full flex flex-col gap-8">
 
-            {gameState.status === GameStatus.RUNNING && (
-                <TurnIndicator gameState={gameState}/>
-            )}
+                <h1 className="text-fg text-5xl font-extrabold tracking-tight drop-shadow text-center md:text-left">
+                    Checkers
+                </h1>
 
-            <GameGrid
-                board={gameState.board}
-                selectedCell={selectedCell}
-                validMoves={[]}
-                movePath={[]}
-                onCellClick={handleCellClick}
-            />
+                <div className="flex flex-col gap-6">
+                    <div className="bg-bg-1/70 p-6 rounded-2xl border border-fg-2/10 backdrop-blur-sm">
+                        <MyRoleDisplay profile={profile} role={myRole} isAI={isAI} />
+                    </div>
 
-            <div className="text-fg-2 text-sm">
-                Board size: {boardSize}x{boardSize} | Mode: {gameState.kingMovementMode}
-            </div>
+                    <div className="bg-bg-1/70 p-6 rounded-2xl border border-fg-2/10 backdrop-blur-sm">
+                        {gameState.status === GameStatus.RUNNING && (
+                            <TurnIndicator gameState={gameState} />
+                        )}
+                    </div>
 
-            <div className="mt-2 text-fg-2 text-xs">
-                {selectedCell ? `Selected cell: ${selectedCell}` : "Click a piece to select it"}
-            </div>
+                    <div className="bg-bg-1/70 p-6 rounded-2xl border border-fg-2/10 backdrop-blur-sm text-sm text-fg-2">
+                        <h2 className="text-fg font-semibold text-lg mb-2">Game Details</h2>
+                        <div className="space-y-1">
+                            <p>Board size: {boardSize}x{boardSize}</p>
+                            <p>Mode: {gameState.kingMovementMode}</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            {/* Game Board */}
+            <main className="flex-1 flex flex-col items-center justify-center ">
+                <div className="w-full max-w-[min(90vw,52rem)] mx-auto">
+                    <GameGrid
+                        board={gameState.board}
+                        selectedCell={selectedCell}
+                        validMoves={[]}
+                        movePath={[]}
+                        onCellClick={handleCellClick}
+                    />
+                </div>
+
+                <div className="mt-6 text-fg-2 text-sm text-center">
+                    {selectedCell ? `Selected cell: ${selectedCell}` : "Click a piece to select it"}
+                </div>
+            </main>
+
         </div>
     );
 }
