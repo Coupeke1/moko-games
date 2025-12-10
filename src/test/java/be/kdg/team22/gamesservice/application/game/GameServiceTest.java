@@ -6,6 +6,7 @@ import be.kdg.team22.gamesservice.api.game.models.RegisterGameRequest;
 import be.kdg.team22.gamesservice.api.game.models.StartGameRequest;
 import be.kdg.team22.gamesservice.api.game.models.StartGameResponseModel;
 import be.kdg.team22.gamesservice.domain.game.Game;
+import be.kdg.team22.gamesservice.domain.game.GameCategory;
 import be.kdg.team22.gamesservice.domain.game.GameId;
 import be.kdg.team22.gamesservice.domain.game.GameRepository;
 import be.kdg.team22.gamesservice.domain.game.exceptions.DuplicateGameNameException;
@@ -19,6 +20,7 @@ import be.kdg.team22.gamesservice.infrastructure.store.ExternalStoreRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -187,7 +189,9 @@ class GameServiceTest {
                 "/health",
                 "Checkers",
                 "A fun board game",
-                "http://img"
+                "http://img",
+                BigDecimal.valueOf(25),
+                GameCategory.PARTY
         );
 
         when(gameRepository.findByName("Checkers")).thenReturn(Optional.empty());
@@ -222,7 +226,9 @@ class GameServiceTest {
                 "/health",
                 "Checkers",
                 "A fun board game",
-                "http://img"
+                "http://img",
+                BigDecimal.valueOf(25),
+                GameCategory.PARTY
         );
 
         GameId existingId = GameId.from(UUID.randomUUID());
@@ -249,7 +255,9 @@ class GameServiceTest {
                 "/health",
                 "Checkers",
                 "A fun board game",
-                "http://img"
+                "http://img",
+                BigDecimal.valueOf(25),
+                GameCategory.PARTY
         );
 
         when(gameRepository.findByName("Checkers")).thenReturn(Optional.empty());
@@ -274,7 +282,9 @@ class GameServiceTest {
                 "/health",
                 "Checkers",
                 "A fun board game",
-                "http://img"
+                "http://img",
+                BigDecimal.valueOf(25),
+                GameCategory.PARTY
         );
 
         when(gameRepository.findByName("Checkers")).thenReturn(Optional.empty());
@@ -300,7 +310,9 @@ class GameServiceTest {
                 "/health",
                 "TicTacToe",
                 "A classic game",
-                "http://img"
+                "http://img",
+                BigDecimal.valueOf(25),
+                GameCategory.PARTY
         );
 
         when(gameRepository.findByName("TicTacToe")).thenReturn(Optional.empty());
@@ -318,7 +330,9 @@ class GameServiceTest {
                 "/health",
                 "TicTacToe",
                 "A classic game",
-                "http://img"
+                "http://img",
+                BigDecimal.valueOf(25),
+                GameCategory.PARTY
         );
 
         when(gameRepository.findByName("TicTacToe")).thenReturn(Optional.of(registeredGame));
@@ -327,5 +341,198 @@ class GameServiceTest {
                 .isInstanceOf(DuplicateGameNameException.class);
 
         verify(gameRepository, times(2)).findByName("TicTacToe");
+    }
+
+    @Test
+    @DisplayName("update → happy path → updates game")
+    void update_happyPath() {
+        GameId id = GameId.from(UUID.randomUUID());
+        Game existingGame = sampleGame(id);
+
+        RegisterGameRequest request = new RegisterGameRequest(
+                "UpdatedCheckers",
+                "http://localhost:8088",
+                "http://localhost:3001",
+                "/newStart",
+                "/newHealth",
+                "Updated Checkers",
+                "An updated game",
+                "http://newImg",
+                BigDecimal.valueOf(30),
+                GameCategory.STRATEGY
+        );
+
+        when(gameRepository.findById(id)).thenReturn(Optional.of(existingGame));
+        when(gameRepository.findByName("UpdatedCheckers")).thenReturn(Optional.empty());
+        when(gameHealthChecker.isHealthy(request)).thenReturn(true);
+
+        Game result = service.update(id, request);
+
+        assertThat(result).isNotNull();
+        assertThat(result.name()).isEqualTo("UpdatedCheckers");
+        assertThat(result.baseUrl()).isEqualTo("http://localhost:8088");
+        assertThat(result.frontendUrl()).isEqualTo("http://localhost:3001");
+        assertThat(result.startEndpoint()).isEqualTo("/newStart");
+        assertThat(result.healthEndpoint()).isEqualTo("/newHealth");
+        assertThat(result.title()).isEqualTo("Updated Checkers");
+        assertThat(result.description()).isEqualTo("An updated game");
+        assertThat(result.image()).isEqualTo("http://newImg");
+        assertThat(result.healthy()).isTrue();
+
+        verify(gameRepository).findById(id);
+        verify(gameRepository).findByName("UpdatedCheckers");
+        verify(gameHealthChecker).isHealthy(request);
+        verify(gameRepository).save(any(Game.class));
+    }
+
+    @Test
+    @DisplayName("update → game not found → throws GameNotFoundException")
+    void update_gameNotFound() {
+        GameId id = GameId.from(UUID.randomUUID());
+
+        RegisterGameRequest request = new RegisterGameRequest(
+                "UpdatedCheckers",
+                "http://localhost:8088",
+                "http://localhost:3001",
+                "/start",
+                "/health",
+                "Updated Checkers",
+                "An updated game",
+                "http://newImg",
+                BigDecimal.valueOf(30),
+                GameCategory.STRATEGY
+        );
+
+        when(gameRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.update(id, request))
+                .isInstanceOf(GameNotFoundException.class);
+
+        verify(gameRepository).findById(id);
+        verifyNoInteractions(gameHealthChecker);
+        verify(gameRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("update → duplicate name (different from current) → throws DuplicateGameNameException")
+    void update_duplicateGameName() {
+        GameId id = GameId.from(UUID.randomUUID());
+        Game existingGame = sampleGame(id);
+
+        RegisterGameRequest request = new RegisterGameRequest(
+                "DifferentName",
+                "http://localhost:8088",
+                "http://localhost:3001",
+                "/start",
+                "/health",
+                "Different Title",
+                "Different game",
+                "http://newImg",
+                BigDecimal.valueOf(30),
+                GameCategory.STRATEGY
+        );
+
+        GameId otherId = GameId.from(UUID.randomUUID());
+        Game otherGameWithName = sampleGame(otherId);
+
+        when(gameRepository.findById(id)).thenReturn(Optional.of(existingGame));
+        when(gameRepository.findByName("DifferentName")).thenReturn(Optional.of(otherGameWithName));
+
+        assertThatThrownBy(() -> service.update(id, request))
+                .isInstanceOf(DuplicateGameNameException.class);
+
+        verify(gameRepository).findById(id);
+        verify(gameRepository).findByName("DifferentName");
+        verifyNoInteractions(gameHealthChecker);
+        verify(gameRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("update → unhealthy game → throws GameUnhealthyException")
+    void update_unhealthyGame() {
+        GameId id = GameId.from(UUID.randomUUID());
+        Game existingGame = sampleGame(id);
+
+        RegisterGameRequest request = new RegisterGameRequest(
+                "UpdatedCheckers",
+                "http://localhost:8088",
+                "http://localhost:3001",
+                "/start",
+                "/health",
+                "Updated Checkers",
+                "An updated game",
+                "http://newImg",
+                BigDecimal.valueOf(30),
+                GameCategory.STRATEGY
+        );
+
+        when(gameRepository.findById(id)).thenReturn(Optional.of(existingGame));
+        when(gameRepository.findByName("UpdatedCheckers")).thenReturn(Optional.empty());
+        when(gameHealthChecker.isHealthy(request)).thenReturn(false);
+
+        assertThatThrownBy(() -> service.update(id, request))
+                .isInstanceOf(GameUnhealthyException.class);
+
+        verify(gameRepository).findById(id);
+        verify(gameRepository).findByName("UpdatedCheckers");
+        verify(gameHealthChecker).isHealthy(request);
+        verify(gameRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("update → same name as current → allows update")
+    void update_sameNameAsCurrentGame() {
+        GameId id = GameId.from(UUID.randomUUID());
+        Game existingGame = sampleGame(id);
+
+        RegisterGameRequest request = new RegisterGameRequest(
+                "checkers",
+                "http://localhost:8088",
+                "http://localhost:3001",
+                "/newStart",
+                "/newHealth",
+                "Updated Checkers",
+                "An updated game",
+                "http://newImg",
+                BigDecimal.valueOf(30),
+                GameCategory.STRATEGY
+        );
+
+        when(gameRepository.findById(id)).thenReturn(Optional.of(existingGame));
+        when(gameHealthChecker.isHealthy(request)).thenReturn(true);
+
+        Game result = service.update(id, request);
+
+        assertThat(result).isNotNull();
+        assertThat(result.name()).isEqualTo("checkers");
+
+        verify(gameRepository).findById(id);
+        verify(gameHealthChecker).isHealthy(request);
+        verify(gameRepository).save(any(Game.class));
+        verify(gameRepository, never()).findByName("checkers");
+    }
+
+    @Test
+    @DisplayName("findByName → returns entity when present")
+    void findByName_found() {
+        Game game = sampleGame(GameId.from(UUID.randomUUID()));
+
+        when(gameRepository.findByName("checkers")).thenReturn(Optional.of(game));
+
+        Game result = service.findByName("checkers");
+
+        assertThat(result).isEqualTo(game);
+        verify(gameRepository).findByName("checkers");
+    }
+
+    @Test
+    @DisplayName("findByName → throws when missing")
+    void findByName_notFound() {
+        when(gameRepository.findByName("nonexistent")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.findByName("nonexistent"))
+                .isInstanceOf(GameNotFoundException.class);
+
+        verify(gameRepository).findByName("nonexistent");
     }
 }

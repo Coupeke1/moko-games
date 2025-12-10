@@ -1,9 +1,11 @@
 package be.kdg.team22.gamesservice.api.game;
 
+import be.kdg.team22.gamesservice.api.game.models.RegisterGameRequest;
 import be.kdg.team22.gamesservice.api.game.models.StartGameRequest;
 import be.kdg.team22.gamesservice.api.game.models.StartGameResponseModel;
 import be.kdg.team22.gamesservice.application.game.GameService;
 import be.kdg.team22.gamesservice.domain.game.Game;
+import be.kdg.team22.gamesservice.domain.game.GameCategory;
 import be.kdg.team22.gamesservice.domain.game.GameId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,8 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -122,5 +124,109 @@ class GameControllerTest {
                 .andExpect(jsonPath("$.title").value("Tic Tac Toe"));
 
         verify(gameService).findById(GameId.from(id));
+    }
+
+    @Test
+    @DisplayName("GET /api/games/{name} → returns game by name")
+    void getGameByName_returnsOne() throws Exception {
+        UUID id = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+        Game game = sampleGame(id);
+
+        when(gameService.findByName("tic-tac-toe")).thenReturn(game);
+
+        mockMvc.perform(get("/api/games/{name}", "tic-tac-toe"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id.toString()))
+                .andExpect(jsonPath("$.title").value("Tic Tac Toe"));
+
+        verify(gameService).findByName("tic-tac-toe");
+    }
+
+    @Test
+    @DisplayName("PUT /api/games/{id} → updates game")
+    void updateGame_returns200AndUpdatedGame() throws Exception {
+        UUID id = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+        GameId gid = GameId.from(id);
+        Game updatedGame = sampleGame(id);
+
+        RegisterGameRequest request = new RegisterGameRequest(
+                "tic-tac-toe",
+                "http://engine",
+                "/play",
+                "/start",
+                "/health",
+                "Tic Tac Toe",
+                "desc",
+                "http://img",
+                BigDecimal.valueOf(29.99),
+                GameCategory.STRATEGY
+        );
+
+        when(gameService.update(gid, request)).thenReturn(updatedGame);
+
+        String json = """
+                {
+                  "name": "tic-tac-toe",
+                  "backendUrl": "http://engine",
+                  "frontendUrl": "/play",
+                  "startEndpoint": "/start",
+                  "healthEndpoint": "/health",
+                  "title": "Tic Tac Toe",
+                  "description": "desc",
+                  "image": "http://img",
+                  "price": 29.99,
+                  "category": "STRATEGY"
+                }
+                """;
+
+        mockMvc.perform(put("/api/games/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id.toString()))
+                .andExpect(jsonPath("$.title").value("Tic Tac Toe"));
+
+        ArgumentCaptor<RegisterGameRequest> captor = ArgumentCaptor.forClass(RegisterGameRequest.class);
+        verify(gameService).update(any(GameId.class), captor.capture());
+
+        RegisterGameRequest capturedRequest = captor.getValue();
+        assertThat(capturedRequest.name()).isEqualTo("tic-tac-toe");
+    }
+
+    @Test
+    @DisplayName("POST /api/games/register → registers new game")
+    void registerGame_returns200AndNewGame() throws Exception {
+        UUID id = UUID.fromString("bbbbbbbb-cccc-dddd-eeee-ffffffffffff");
+        Game newGame = sampleGame(id);
+
+        when(gameService.register(any(RegisterGameRequest.class))).thenReturn(newGame);
+
+        String json = """
+                {
+                  "name": "tic-tac-toe",
+                  "backendUrl": "http://engine",
+                  "frontendUrl": "/play",
+                  "startEndpoint": "/start",
+                  "healthEndpoint": "/health",
+                  "title": "Tic Tac Toe",
+                  "description": "desc",
+                  "image": "http://img",
+                  "price": 19.99,
+                  "category": "PARTY"
+                }
+                """;
+
+        mockMvc.perform(post("/api/games/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("Tic Tac Toe"))
+                .andExpect(jsonPath("$.name").value("tic-tac-toe"));
+
+        ArgumentCaptor<RegisterGameRequest> captor = ArgumentCaptor.forClass(RegisterGameRequest.class);
+        verify(gameService).register(captor.capture());
+
+        RegisterGameRequest capturedRequest = captor.getValue();
+        assertThat(capturedRequest.name()).isEqualTo("tic-tac-toe");
     }
 }
