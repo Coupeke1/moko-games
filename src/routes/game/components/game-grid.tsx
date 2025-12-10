@@ -17,7 +17,6 @@ export function GameGrid({
 }: GameGridProps) {
     const size = board.length;
 
-    // Render the board with BLACK at bottom (row 0 displayed at top = WHITE's side)
     return (
         <div
             className="grid bg-bg-3 rounded-xl shadow-lg p-2 w-full max-w-[min(90vw,32rem)] aspect-square"

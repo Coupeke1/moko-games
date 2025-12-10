@@ -3,7 +3,7 @@ import {useEffect} from "react";
 interface ToastProps {
     message: string;
     onClose: () => void;
-    duration?: number; // ms
+    duration?: number;
 }
 
 export function Toast({ message, onClose, duration = 4000 }: ToastProps) {
