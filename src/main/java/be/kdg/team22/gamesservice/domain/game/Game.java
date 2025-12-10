@@ -102,12 +102,29 @@ public class Game {
             final String image
     ) {
         if (id == null) throw new GameIdNullException();
+        validate(name, baseUrl, frontendUrl, startEndpoint, healthEndpoint, title, description, image);
+    }
+
+    private void validate(
+            final String name,
+            final String baseUrl,
+            final String frontendUrl,
+            final String startEndpoint,
+            final String healthEndpoint,
+            final String title,
+            final String description,
+            final String image
+    ) {
         if (name == null || name.isBlank()) throw new GameNameInvalidException();
         if (baseUrl == null || baseUrl.isBlank()) throw new GameBaseUrlInvalidException();
         if (frontendUrl == null || frontendUrl.isBlank()) throw new GameFrontendUrlInvalidException();
         if (startEndpoint == null || startEndpoint.isBlank()) throw new GameStartEndpointInvalidException();
         if (healthEndpoint == null || healthEndpoint.isBlank()) throw new GameHealthEndpointInvalidException();
         validateMetaData(title, description, image);
+    }
+
+    private void validate(RegisterGameRequest request) {
+        validate(request.name(), request.backendUrl(), request.frontendUrl(), request.startEndpoint(), request.healthEndpoint(), request.title(), request.description(), request.image());
     }
 
     public void rename(final String newName) {
@@ -169,6 +186,19 @@ public class Game {
                 request.description(),
                 request.image()
         );
+    }
+
+    public void update(RegisterGameRequest request) {
+        validate(request);
+        this.name = request.name();
+        this.baseUrl = request.backendUrl();
+        this.frontendUrl = request.frontendUrl();
+        this.startEndpoint = request.startEndpoint();
+        this.healthEndpoint = request.healthEndpoint();
+        this.title = request.title();
+        this.description = request.description();
+        this.image = request.image();
+        this.updatedAt = Instant.now();
     }
 
     public void updateHealthStatus(boolean isHealthy) {

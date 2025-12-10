@@ -21,7 +21,7 @@ spring:
 
   sql:
     init:
-      mode: ${SPRING_SQL_INIT_MODE:always}
+      mode: ${SPRING_SQL_INIT_MODE:never}
       data-locations: classpath:${SPRING_SQL_DATA_FILE:local.sql}
 
   rabbitmq:
@@ -54,5 +54,9 @@ management:
           WARNING: 200
           DOWN: 503
           OUT_OF_SERVICE: 503
+
+business:
+  store-service:
+    url: ${STORE_SERVICE_URL:http://localhost:8085}
 
 cors.allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}

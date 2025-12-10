@@ -42,16 +42,27 @@ public class GameController {
         return ResponseEntity.ok(new GameListModel(models));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<GameDetailsModel> getGameById(final @PathVariable UUID id) {
-        Game game = service.findById(GameId.from(id));
+    @GetMapping("/{value}")
+    public ResponseEntity<GameDetailsModel> getGame(final @PathVariable String value) {
+        try {
+            GameId id = GameId.from(value);
+            Game game = service.findById(id);
+            return ResponseEntity.ok(GameDetailsModel.from(game));
+        } catch (IllegalArgumentException ignored) {}
+
+        Game game = service.findByName(value);
+        return ResponseEntity.ok(GameDetailsModel.from(game));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<GameDetailsModel> updateGame(final @PathVariable UUID id, final @RequestBody RegisterGameRequest request) {
+        Game game = service.update(GameId.from(id), request);
         return ResponseEntity.ok(GameDetailsModel.from(game));
     }
 
     @PostMapping("/register")
     public ResponseEntity<GameDetailsModel> registerGame(final @RequestBody RegisterGameRequest request) {
         Game game = service.register(request);
-
         return ResponseEntity.ok(GameDetailsModel.from(game));
     }
 }
