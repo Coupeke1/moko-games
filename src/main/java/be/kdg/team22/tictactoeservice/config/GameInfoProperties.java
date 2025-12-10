@@ -3,6 +3,8 @@ package be.kdg.team22.tictactoeservice.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 @Component
 @ConfigurationProperties(prefix = "game-info")
 public class GameInfoProperties {
@@ -14,6 +16,8 @@ public class GameInfoProperties {
     private String frontendUrl;
     private String startEndpoint;
     private String healthEndpoint;
+    private BigDecimal price;
+    private String category;
 
     public String name() {
         return name;
@@ -47,6 +51,14 @@ public class GameInfoProperties {
         return healthEndpoint;
     }
 
+    public BigDecimal price() {
+        return price;
+    }
+
+    public String category() {
+        return category;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -77,5 +89,13 @@ public class GameInfoProperties {
 
     public void setHealthEndpoint(String healthEndpoint) {
         this.healthEndpoint = healthEndpoint;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }

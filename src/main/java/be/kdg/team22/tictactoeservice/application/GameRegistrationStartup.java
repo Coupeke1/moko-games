@@ -2,7 +2,6 @@ package be.kdg.team22.tictactoeservice.application;
 
 import be.kdg.team22.tictactoeservice.config.GameInfoProperties;
 import be.kdg.team22.tictactoeservice.domain.game.exceptions.GameNotRegisteredException;
-import be.kdg.team22.tictactoeservice.domain.game.exceptions.GameServiceNotReachableException;
 import be.kdg.team22.tictactoeservice.domain.register.GameRegisterId;
 import be.kdg.team22.tictactoeservice.infrastructure.register.ExternalRegisterRepository;
 import be.kdg.team22.tictactoeservice.infrastructure.register.GameResponse;
@@ -31,7 +30,9 @@ public class GameRegistrationStartup {
                 gameInfo.healthEndpoint(),
                 gameInfo.title(),
                 gameInfo.description(),
-                gameInfo.image()
+                gameInfo.image(),
+                gameInfo.price(),
+                gameInfo.category()
         );
 
         GameResponse existingGame = externalRegisterRepository.getGame(gameInfo.name());

@@ -23,8 +23,7 @@ public class ExternalRegisterRepositoryConfig {
                 .defaultHeaders(headers -> {
                     headers.setContentType(MediaType.APPLICATION_JSON);
                     headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-                        }
-                )
+                })
                 .build();
     }
 }
