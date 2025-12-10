@@ -15,6 +15,7 @@ import be.kdg.team22.gamesservice.domain.game.exceptions.InvalidGameConfiguratio
 import be.kdg.team22.gamesservice.domain.game.exceptions.PlayersListEmptyException;
 import be.kdg.team22.gamesservice.infrastructure.game.engine.ExternalGamesRepository;
 import be.kdg.team22.gamesservice.infrastructure.game.health.GameHealthChecker;
+import be.kdg.team22.gamesservice.infrastructure.store.ExternalStoreRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -31,8 +32,9 @@ class GameServiceTest {
 
     private final GameRepository gameRepository = mock(GameRepository.class);
     private final GameHealthChecker gameHealthChecker = mock(GameHealthChecker.class);
+    private final ExternalStoreRepository externalStoreRepository = mock(ExternalStoreRepository.class);
     private final ExternalGamesRepository engine = mock(ExternalGamesRepository.class);
-    private final GameService service = new GameService(gameRepository, gameHealthChecker, engine);
+    private final GameService service = new GameService(gameRepository, gameHealthChecker, externalStoreRepository, engine);
 
     private Game sampleGame(GameId id) {
         return new Game(

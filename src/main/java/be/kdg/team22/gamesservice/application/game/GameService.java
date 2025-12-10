@@ -9,6 +9,8 @@ import be.kdg.team22.gamesservice.domain.game.GameRepository;
 import be.kdg.team22.gamesservice.domain.game.exceptions.*;
 import be.kdg.team22.gamesservice.infrastructure.game.engine.ExternalGamesRepository;
 import be.kdg.team22.gamesservice.infrastructure.game.health.GameHealthChecker;
+import be.kdg.team22.gamesservice.infrastructure.store.ExternalStoreRepository;
+import be.kdg.team22.gamesservice.infrastructure.store.NewStoreEntryModel;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,11 +20,13 @@ import java.util.UUID;
 public class GameService {
     private final GameRepository gameRepository;
     private final GameHealthChecker gameHealthChecker;
+    private final ExternalStoreRepository externalStoreRepository;
     private final ExternalGamesRepository engine;
 
-    public GameService(GameRepository gameRepository, GameHealthChecker gameHealthChecker, ExternalGamesRepository engine) {
+    public GameService(final GameRepository gameRepository, final GameHealthChecker gameHealthChecker, final ExternalStoreRepository externalStoreRepository, final ExternalGamesRepository engine) {
         this.gameRepository = gameRepository;
         this.gameHealthChecker = gameHealthChecker;
+        this.externalStoreRepository = externalStoreRepository;
         this.engine = engine;
     }
 
@@ -72,6 +76,12 @@ public class GameService {
         Game game = Game.register(request);
         game.updateHealthStatus(true);
         gameRepository.save(game);
+
+        externalStoreRepository.addToStore(new NewStoreEntryModel(
+                game.id().value(),
+                request.price(),
+                request.category()
+        ));
 
         return game;
     }
