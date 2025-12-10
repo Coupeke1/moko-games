@@ -201,6 +201,8 @@ services:
 
             SESSION_SERVICE_URL: http://host.docker.internal:8081
             USER_SERVICE_URL: http://host.docker.internal:8080
+            SOCIAL_SERVICE_URL: http://host.docker.internal:8083
+
             SPRING_MAIL_USERNAME: mokogamesbe@gmail.com
             SPRING_MAIL_PASSWORD: alofzkyfupctrpmw
         ports:
