@@ -1,9 +1,7 @@
 package be.kdg.team22.userservice.application.achievement;
 
-import be.kdg.team22.userservice.domain.achievement.Achievement;
-import be.kdg.team22.userservice.domain.achievement.AchievementCode;
-import be.kdg.team22.userservice.domain.achievement.AchievementId;
-import be.kdg.team22.userservice.domain.achievement.AchievementRepository;
+import be.kdg.team22.userservice.application.profile.ProfileService;
+import be.kdg.team22.userservice.domain.achievement.*;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
 import be.kdg.team22.userservice.infrastructure.messaging.AchievementEventPublisher;
 import org.junit.jupiter.api.DisplayName;
@@ -14,15 +12,16 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyInt;
 
 class AchievementServiceTest {
 
     private final AchievementRepository repo = mock(AchievementRepository.class);
     private final AchievementEventPublisher achievementRepository = mock(AchievementEventPublisher.class);
-    private final AchievementService service = new AchievementService(repo, achievementRepository);
+    private final ProfileService profileService = mock(ProfileService.class);
+    private final AchievementService service = new AchievementService(repo, achievementRepository, profileService);
 
     @Test
     @DisplayName("award(userId, code) → creëert nieuw achievement wanneer niet bestaat")
@@ -105,5 +104,40 @@ class AchievementServiceTest {
 
         assertThat(result).containsExactly(a);
         verify(repo).findByProfile(profileId);
+    }
+
+    @Test
+    @DisplayName("award(userId, code) → adds levels to profile based on achievement code")
+    void award_addsLevelsToProfile() {
+        UUID userId = UUID.randomUUID();
+        String code = "TICTACTOE_WIN";
+
+        ProfileId profileId = new ProfileId(userId);
+        AchievementCode achievementCode = new AchievementCode(code);
+
+        when(repo.existsByProfileAndCode(profileId, achievementCode))
+                .thenReturn(false);
+
+        service.award(userId, code);
+
+        int expectedLevels = AchievementMetadata.getLevels(code);
+        verify(profileService).addLevels(eq(profileId), eq(expectedLevels));
+    }
+
+    @Test
+    @DisplayName("award(...): bestaat achievement al → geen levels toegevoegd")
+    void award_doesNotAddLevelsWhenDuplicate() {
+        UUID userId = UUID.randomUUID();
+        String code = "TICTACTOE_WIN";
+
+        ProfileId profileId = new ProfileId(userId);
+        AchievementCode achievementCode = new AchievementCode(code);
+
+        when(repo.existsByProfileAndCode(profileId, achievementCode))
+                .thenReturn(true);
+
+        service.award(userId, code);
+
+        verify(profileService, never()).addLevels(any(), anyInt());
     }
 }
