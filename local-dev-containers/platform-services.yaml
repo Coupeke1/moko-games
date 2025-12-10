@@ -120,13 +120,15 @@ services:
             SPRING_DATASOURCE_USERNAME: user
             SPRING_DATASOURCE_PASSWORD: password
             SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
-            SPRING_SQL_INIT_MODE: always
+            SPRING_SQL_INIT_MODE: never
             SPRING_SQL_DATA_FILE: docker.sql
 
             SPRING_RABBITMQ_HOST: app-rabbitmq
             SPRING_RABBITMQ_PORT: 5672
             SPRING_RABBITMQ_USERNAME: user
             SPRING_RABBITMQ_PASSWORD: password
+
+            STORE_SERVICE_URL: http://host.docker.internal:8085
 
             SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
         healthcheck:
@@ -152,6 +154,7 @@ services:
             SPRING_DATASOURCE_USERNAME: user
             SPRING_DATASOURCE_PASSWORD: password
             SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+            SPRING_SQL_INIT_MODE: never
 
             SPRING_RABBITMQ_HOST: app-rabbitmq
             SPRING_RABBITMQ_PORT: 5672

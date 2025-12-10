@@ -17,9 +17,15 @@ services:
       SPRING_RABBITMQ_USERNAME: user
       SPRING_RABBITMQ_PASSWORD: password
 
+      GAME_SERVICE_URL: http://host.docker.internal:8084
+      BUSINESS_AI_URL: https://team3.techtitans.be
+
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
 
       AI_URL: https://team3.techtitans.be
+
+      GAME_BACKEND_URL: http://host.docker.internal:8086
+      GAME_FRONTEND_URL: http://localhost:5174/tic-tac-toe/game
     ports:
       - "8086:8086"
     healthcheck:
@@ -48,9 +54,14 @@ services:
       SPRING_RABBITMQ_USERNAME: user
       SPRING_RABBITMQ_PASSWORD: password
 
+      GAME_SERVICE_URL: http://host.docker.internal:8084
+
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
 
       AI_URL: https://team3.techtitans.be
+
+      GAME_BACKEND_URL: http://host.docker.internal:8087
+      GAME_FRONTEND_URL: http://localhost:5175/checkers/game
     ports:
       - "8087:8087"
     healthcheck:
