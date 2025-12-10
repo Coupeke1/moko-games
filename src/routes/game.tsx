@@ -1,5 +1,5 @@
 import {useParams} from "react-router";
-import {useState} from "react";
+import {useMemo, useState} from "react";
 import {useMyProfile} from "../hooks/use-my-profile";
 import {useGameState} from "../hooks/use-game-state";
 import {useMyPlayerRole} from "../hooks/use-my-player-role";
@@ -9,24 +9,85 @@ import {MyRoleDisplay} from "../components/my-role-display";
 import {GameStatus} from "../models/game-status";
 import {TurnIndicator} from "../components/turn-indicator";
 import {GameGrid} from "../components/game-grid";
-
+import {calculateValidMoves, type ValidMove} from "../services/move-calculator";
+import {requestMove} from "../services/game-service";
+import {toast} from "sonner";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
 
 export default function GamePage() {
     const {id} = useParams<{ id: string }>();
     const [selectedCell, setSelectedCell] = useState<number | null>(null);
+    const [movePath, setMovePath] = useState<number[]>([]);
 
     const {profile, isLoading: profileLoading, isError: profileError} = useMyProfile();
     const {data: gameState, isLoading: gameLoading, isError: gameError} = useGameState(id || "");
+    const queryClient = useQueryClient();
 
     const myRole = useMyPlayerRole(gameState?.players, profile?.id);
-
     const isAI = gameState?.aiPlayer === myRole;
+    const isMyTurn = gameState?.currentRole === myRole;
+
+    const validMoves = useMemo<ValidMove[]>(() => {
+        if (!selectedCell || !gameState || !profile?.id || !isMyTurn) {
+            return [];
+        }
+        return calculateValidMoves(gameState, selectedCell);
+    }, [selectedCell, gameState, profile?.id, isMyTurn]);
+
+    const validDestinations = useMemo(() => {
+        return validMoves.map(move => move.cells[move.cells.length - 1]);
+    }, [validMoves]);
+
+    const moveMutation = useMutation({
+        mutationFn: (cells: number[]) => requestMove(id!, profile!.id, cells),
+        onSuccess: () => {
+            setSelectedCell(null);
+            setMovePath([]);
+            queryClient.invalidateQueries({queryKey: ['gameState', id]})
+                .then(() => toast.success("Move successful!"));
+        },
+        onError: (error: Error) => {
+            toast.error(`Move failed: ${error.message}`);
+        }
+    });
 
     const handleCellClick = (cellIndex: number) => {
+        console.log(`Cell ${cellIndex} clicked by ${myRole}`);
+        if (!isMyTurn || isAI || gameState?.status !== GameStatus.RUNNING) {
+            console.log("Not my turn or AI, ignoring click");
+            return;
+        }
+
         if (selectedCell === cellIndex) {
             setSelectedCell(null);
+            setMovePath([]);
+            return;
+        }
+
+        if (!selectedCell) {
+            const piece = getPieceAtCell(gameState!.board, cellIndex);
+            if (piece && isPieceOwnedByCurrentPlayer(piece, myRole!)) {
+                setSelectedCell(cellIndex);
+                setMovePath([]);
+            }
+            return;
+        }
+
+        if (validDestinations.includes(cellIndex)) {
+
+            const move = validMoves.find(m => m.cells[m.cells.length - 1] === cellIndex);
+            if (move) {
+                moveMutation.mutate(move.cells);
+            }
         } else {
-            setSelectedCell(cellIndex);
+            const piece = getPieceAtCell(gameState!.board, cellIndex);
+            if (piece && isPieceOwnedByCurrentPlayer(piece, myRole!)) {
+                setSelectedCell(cellIndex);
+                setMovePath([]);
+            } else {
+                setSelectedCell(null);
+                setMovePath([]);
+            }
         }
     };
 
@@ -65,16 +126,17 @@ export default function GamePage() {
 
                 <div className="flex flex-col gap-6">
                     <div className="bg-bg-1/70 p-6 rounded-2xl border border-fg-2/10 backdrop-blur-sm">
-                        <MyRoleDisplay profile={profile} role={myRole} isAI={isAI} />
+                        <MyRoleDisplay profile={profile} role={myRole} isAI={isAI}/>
                     </div>
 
                     <div className="bg-bg-1/70 p-6 rounded-2xl border border-fg-2/10 backdrop-blur-sm">
                         {gameState.status === GameStatus.RUNNING && (
-                            <TurnIndicator gameState={gameState} />
+                            <TurnIndicator gameState={gameState}/>
                         )}
                     </div>
 
-                    <div className="bg-bg-1/70 p-6 rounded-2xl border border-fg-2/10 backdrop-blur-sm text-sm text-fg-2">
+                    <div
+                        className="bg-bg-1/70 p-6 rounded-2xl border border-fg-2/10 backdrop-blur-sm text-sm text-fg-2">
                         <h2 className="text-fg font-semibold text-lg mb-2">Game Details</h2>
                         <div className="space-y-1">
                             <p>Board size: {boardSize}x{boardSize}</p>
@@ -85,22 +147,41 @@ export default function GamePage() {
             </aside>
 
             {/* Game Board */}
-            <main className="flex-1 flex flex-col items-center justify-center ">
+            <main className="flex-1 flex flex-col items-center justify-center">
                 <div className="w-full max-w-[min(90vw,52rem)] mx-auto">
                     <GameGrid
                         board={gameState.board}
                         selectedCell={selectedCell}
-                        validMoves={[]}
-                        movePath={[]}
+                        validMoves={validDestinations}
+                        movePath={movePath}
                         onCellClick={handleCellClick}
                     />
                 </div>
 
                 <div className="mt-6 text-fg-2 text-sm text-center">
-                    {selectedCell ? `Selected cell: ${selectedCell}` : "Click a piece to select it"}
+                    {!isMyTurn
+                        ? "Waiting for opponent..."
+                        : selectedCell
+                            ? `Selected cell: ${selectedCell} - Click a highlighted cell to move`
+                            : "Click a piece to select it"}
                 </div>
             </main>
 
         </div>
     );
+}
+
+function getPieceAtCell(board: string[][], cell: number): string | null {
+    const boardSize = board.length;
+    const row = Math.floor((cell - 1) / boardSize);
+    const col = (cell - 1) % boardSize;
+    return board[row][col] === "" ? null : board[row][col];
+}
+
+function isPieceOwnedByCurrentPlayer(piece: string, role: string): boolean {
+    if (role === "WHITE") {
+        return piece === "w" || piece === "W";
+    } else {
+        return piece === "b" || piece === "B";
+    }
 }
