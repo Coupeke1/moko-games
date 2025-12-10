@@ -54,7 +54,7 @@ public class LobbyService {
 
         publisher.saveAndPublish(lobby);
 
-        chatRepository.createLobbyChat(lobby.id());
+        chatRepository.createLobbyChat(lobby.id(), token);
 
         return lobby;
     }

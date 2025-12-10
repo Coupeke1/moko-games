@@ -24,7 +24,8 @@ public class ExternalGamesRepository implements GameRepository {
     public StartGameResponse startGame(StartGameRequest request, Jwt token) {
         try {
             return client.post().uri("").header("Authorization", "Bearer " + token.getTokenValue()).body(request).retrieve().body(StartGameResponse.class);
-        } catch (HttpClientErrorException exception) {
+        } catch (
+                HttpClientErrorException exception) {
 
             if (exception.getStatusCode() == HttpStatus.NOT_FOUND) {
                 throw new GameNotFoundException(request.gameId());
@@ -32,22 +33,21 @@ public class ExternalGamesRepository implements GameRepository {
 
             throw exception;
         } catch (RestClientException exception) {
+            System.out.println("\n\n" + exception.getMessage() + "\n\n");
             throw NotReachableException.GamesService();
         }
     }
 
     public String findGameNameById(final GameId gameId) {
         try {
-            GameResponse response = client.get()
-                    .uri("/" + gameId.value())
-                    .retrieve()
-                    .body(GameResponse.class);
+            GameResponse response = client.get().uri("/" + gameId.value()).retrieve().body(GameResponse.class);
 
             if (response == null)
                 throw new GameNotFoundException(gameId.value());
 
             return response.name();
-        } catch (HttpClientErrorException exception) {
+        } catch (
+                HttpClientErrorException exception) {
             if (exception.getStatusCode() == HttpStatus.NOT_FOUND)
                 throw new GameNotFoundException(gameId.value());
             throw exception;
