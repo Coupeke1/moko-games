@@ -30,7 +30,7 @@ public class AiMoveEventListener {
     @EventListener
     public void handleAiMoveRequest(AiMoveRequestedEvent event) {
         AiMoveRequest request = new AiMoveRequest(event.gameId(), event.gameName(),
-                event.board(), event.currentPlayer().name(), event.aiPlayer().name(), event.kingMovementMode().name()
+                event.board(), String.valueOf(event.currentPlayer().symbol()), String.valueOf(event.aiPlayer().symbol()), event.kingMovementMode().name()
         );
         AiMoveResponse response = aiRepository.requestMove(request);
 

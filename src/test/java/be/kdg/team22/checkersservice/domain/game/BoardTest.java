@@ -42,42 +42,42 @@ public class BoardTest {
 
     @Test
     void stateShouldReturnCorrectArraySize() {
-        String[][] state8x8 = board8x8.state();
-        assertEquals(8, state8x8.length);
-        assertEquals(8, state8x8[0].length);
+        List<List<String>> state8x8 = board8x8.state();
+        assertEquals(8, state8x8.size());
+        assertEquals(8, state8x8.getFirst().size());
 
-        String[][] state10x10 = board10x10.state();
-        assertEquals(10, state10x10.length);
-        assertEquals(10, state10x10[0].length);
+        List<List<String>> state10x10 = board10x10.state();
+        assertEquals(10, state10x10.size());
+        assertEquals(10, state10x10.getFirst().size());
     }
 
     @Test
     void stateShouldHaveEmptyWhiteSquares() {
-        String[][] state = board8x8.state();
+        List<List<String>> state = board8x8.state();
 
-        assertEquals("  ", state[0][0]);
-        assertEquals("  ", state[0][2]);
-        assertEquals("  ", state[1][1]);
-        assertEquals("  ", state[1][3]);
+        assertEquals("  ", state.get(0).get(0));
+        assertEquals("  ", state.get(0).get(2));
+        assertEquals("  ", state.get(1).get(1));
+        assertEquals("  ", state.get(1).get(3));
     }
 
     @Test
     void stateShouldShowPiecesOnBlackSquares() {
-        String[][] state = board8x8.state();
+        List<List<String>> state = board8x8.state();
 
-        assertNotEquals("  ", state[0][1]);
-        assertNotEquals("  ", state[0][3]);
-        assertNotEquals("  ", state[1][0]);
-        assertNotEquals("  ", state[1][2]);
+        assertNotEquals("  ", state.get(0).get(1));
+        assertNotEquals("  ", state.get(0).get(3));
+        assertNotEquals("  ", state.get(1).get(0));
+        assertNotEquals("  ", state.get(1).get(2));
     }
 
     @Test
     void setupInitialPiecesShouldPlaceCorrectNumberOfPieces() {
-        String[][] state8x8 = board8x8.state();
+        List<List<String>> state8x8 = board8x8.state();
         int pieceCount8x8 = countPieces(state8x8);
         assertEquals(24, pieceCount8x8); // 3 rows per player * 4 pieces per row * 2 players
 
-        String[][] state10x10 = board10x10.state();
+        List<List<String>> state10x10 = board10x10.state();
         int pieceCount10x10 = countPieces(state10x10);
         assertEquals(40, pieceCount10x10); // 4 rows per player * 5 pieces per row * 2 players
     }
@@ -95,55 +95,55 @@ public class BoardTest {
 
     @Test
     void piecesShouldBeInCorrectPositionsFor8x8() {
-        String[][] state = board8x8.state();
+        List<List<String>> state = board8x8.state();
 
-        assertPieceColor(state[0][1], PlayerRole.WHITE);
-        assertPieceColor(state[0][3], PlayerRole.WHITE);
-        assertPieceColor(state[0][5], PlayerRole.WHITE);
-        assertPieceColor(state[0][7], PlayerRole.WHITE);
+        assertPieceColor(state.get(0).get(1), PlayerRole.WHITE);
+        assertPieceColor(state.get(0).get(3), PlayerRole.WHITE);
+        assertPieceColor(state.get(0).get(5), PlayerRole.WHITE);
+        assertPieceColor(state.get(0).get(7), PlayerRole.WHITE);
 
-        assertPieceColor(state[1][0], PlayerRole.WHITE);
-        assertPieceColor(state[1][2], PlayerRole.WHITE);
-        assertPieceColor(state[1][4], PlayerRole.WHITE);
-        assertPieceColor(state[1][6], PlayerRole.WHITE);
+        assertPieceColor(state.get(1).get(0), PlayerRole.WHITE);
+        assertPieceColor(state.get(1).get(2), PlayerRole.WHITE);
+        assertPieceColor(state.get(1).get(4), PlayerRole.WHITE);
+        assertPieceColor(state.get(1).get(6), PlayerRole.WHITE);
 
-        assertPieceColor(state[2][1], PlayerRole.WHITE);
-        assertPieceColor(state[2][3], PlayerRole.WHITE);
-        assertPieceColor(state[2][5], PlayerRole.WHITE);
-        assertPieceColor(state[2][7], PlayerRole.WHITE);
+        assertPieceColor(state.get(2).get(1), PlayerRole.WHITE);
+        assertPieceColor(state.get(2).get(3), PlayerRole.WHITE);
+        assertPieceColor(state.get(2).get(5), PlayerRole.WHITE);
+        assertPieceColor(state.get(2).get(7), PlayerRole.WHITE);
 
         for (int row = 3; row < 5; row++) {
             for (int col = 0; col < 8; col++) {
                 if ((row + col) % 2 != 0) {
-                    assertEquals("  ", state[row][col]);
+                    assertEquals("  ", state.get(row).get(col));
                 }
             }
         }
 
-        assertPieceColor(state[5][0], PlayerRole.BLACK);
-        assertPieceColor(state[5][2], PlayerRole.BLACK);
-        assertPieceColor(state[5][4], PlayerRole.BLACK);
-        assertPieceColor(state[5][6], PlayerRole.BLACK);
+        assertPieceColor(state.get(5).get(0), PlayerRole.BLACK);
+        assertPieceColor(state.get(5).get(2), PlayerRole.BLACK);
+        assertPieceColor(state.get(5).get(4), PlayerRole.BLACK);
+        assertPieceColor(state.get(5).get(6), PlayerRole.BLACK);
 
-        assertPieceColor(state[6][1], PlayerRole.BLACK);
-        assertPieceColor(state[6][3], PlayerRole.BLACK);
-        assertPieceColor(state[6][5], PlayerRole.BLACK);
-        assertPieceColor(state[6][7], PlayerRole.BLACK);
+        assertPieceColor(state.get(6).get(1), PlayerRole.BLACK);
+        assertPieceColor(state.get(6).get(3), PlayerRole.BLACK);
+        assertPieceColor(state.get(6).get(5), PlayerRole.BLACK);
+        assertPieceColor(state.get(6).get(7), PlayerRole.BLACK);
 
-        assertPieceColor(state[7][0], PlayerRole.BLACK);
-        assertPieceColor(state[7][2], PlayerRole.BLACK);
-        assertPieceColor(state[7][4], PlayerRole.BLACK);
-        assertPieceColor(state[7][6], PlayerRole.BLACK);
+        assertPieceColor(state.get(7).get(0), PlayerRole.BLACK);
+        assertPieceColor(state.get(7).get(2), PlayerRole.BLACK);
+        assertPieceColor(state.get(7).get(4), PlayerRole.BLACK);
+        assertPieceColor(state.get(7).get(6), PlayerRole.BLACK);
     }
 
     @Test
     void piecesShouldBeInCorrectPositionsFor10x10() {
-        String[][] state = board10x10.state();
+        List<List<String>> state = board10x10.state();
 
         for (int row = 0; row < 4; row++) {
             for (int col = 0; col < 10; col++) {
                 if ((row + col) % 2 != 0) {
-                    assertPieceColor(state[row][col], PlayerRole.WHITE);
+                    assertPieceColor(state.get(row).get(col), PlayerRole.WHITE);
                 }
             }
         }
@@ -151,7 +151,7 @@ public class BoardTest {
         for (int row = 4; row < 6; row++) {
             for (int col = 0; col < 10; col++) {
                 if ((row + col) % 2 != 0) {
-                    assertEquals("  ", state[row][col]);
+                    assertEquals("  ", state.get(row).get(col));
                 }
             }
         }
@@ -159,7 +159,7 @@ public class BoardTest {
         for (int row = 6; row < 10; row++) {
             for (int col = 0; col < 10; col++) {
                 if ((row + col) % 2 != 0) {
-                    assertPieceColor(state[row][col], PlayerRole.BLACK);
+                    assertPieceColor(state.get(row).get(col), PlayerRole.BLACK);
                 }
             }
         }
@@ -247,13 +247,13 @@ public class BoardTest {
 
     @Test
     void initialPiecesShouldNotBeKings() {
-        String[][] state8x8 = board8x8.state();
-        String[][] state10x10 = board10x10.state();
+        List<List<String>> state8x8 = board8x8.state();
+        List<List<String>> state10x10 = board10x10.state();
 
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                if ((row + col) % 2 != 0 && !state8x8[row][col].equals("  ")) {
-                    String piece = state8x8[row][col];
+                if ((row + col) % 2 != 0 && !state8x8.get(row).get(col).equals("  ")) {
+                    String piece = state8x8.get(row).get(col);
                     assertTrue(piece.endsWith(" "));
                 }
             }
@@ -261,8 +261,8 @@ public class BoardTest {
 
         for (int row = 0; row < 10; row++) {
             for (int col = 0; col < 10; col++) {
-                if ((row + col) % 2 != 0 && !state10x10[row][col].equals("  ")) {
-                    String piece = state10x10[row][col];
+                if ((row + col) % 2 != 0 && !state10x10.get(row).get(col).equals("  ")) {
+                    String piece = state10x10.get(row).get(col);
                     assertTrue(piece.endsWith(" "));
                 }
             }
@@ -344,9 +344,9 @@ public class BoardTest {
     }
 
     // Helper methods
-    private int countPieces(String[][] state) {
+    private int countPieces(List<List<String>> state) {
         int count = 0;
-        for (String[] row : state) {
+        for (List<String> row : state) {
             for (String cell : row) {
                 if (cell != null && !cell.equals("  ")) {
                     count++;

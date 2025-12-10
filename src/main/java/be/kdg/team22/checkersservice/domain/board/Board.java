@@ -8,10 +8,7 @@ import be.kdg.team22.checkersservice.domain.move.MoveResult;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 import org.jmolecules.ddd.annotation.ValueObject;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static be.kdg.team22.checkersservice.domain.move.MoveValidator.isCaptureMove;
 
@@ -152,18 +149,20 @@ public class Board {
         return cells;
     }
 
-    public String[][] state() {
-        String[][] state = new String[size][size];
+    public List<List<String>> state() {
+        List<List<String>> state = new ArrayList<>();
         for (int row = 0; row < size; row++) {
+            List<String> rowList = new ArrayList<>();
             for (int col = 0; col < size; col++) {
                 if ((row + col) % 2 != 0) {
                     int cellNumber = convertCoordinatesToCellNumber(row, col);
                     Piece piece = grid.get(cellNumber);
-                    state[row][col] = piece != null ? piece.toString() : "  ";
+                    rowList.add(piece != null ? piece.toString() : "  ");
                 } else {
-                    state[row][col] = "  ";
+                    rowList.add("  ");
                 }
             }
+            state.add(rowList);
         }
         return state;
     }

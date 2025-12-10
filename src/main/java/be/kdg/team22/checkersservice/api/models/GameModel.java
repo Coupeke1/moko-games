@@ -13,7 +13,7 @@ public record GameModel(
         List<PlayerModel> players,
         PlayerRole aiPlayer,
         PlayerRole currentRole,
-        String[][] board,
+        List<List<String>> board,
         KingMovementMode kingMovementMode,
         GameStatus status
 ) {

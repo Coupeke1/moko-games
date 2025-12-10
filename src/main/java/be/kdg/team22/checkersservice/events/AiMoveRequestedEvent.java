@@ -4,10 +4,12 @@ import be.kdg.team22.checkersservice.domain.game.Game;
 import be.kdg.team22.checkersservice.domain.move.KingMovementMode;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 
+import java.util.List;
+
 public record AiMoveRequestedEvent(
         String gameId,
         String gameName,
-        String[][] board,
+        List<List<String>> board,
         PlayerRole currentPlayer,
         PlayerRole aiPlayer,
         KingMovementMode kingMovementMode,
