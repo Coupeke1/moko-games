@@ -18,6 +18,6 @@ export const environment = {
         "",
     checkersService:
         window.__APP_CONFIG__?.checkersService ??
-        import.meta.env.VITE_USER_SERVICE ??
+        import.meta.env.VITE_CHECKERS_SERVICE ??
         "",
 };
