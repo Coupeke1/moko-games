@@ -1,11 +1,12 @@
 import {useAuthStore} from "@/stores/auth-store.tsx";
 import {useEffect} from "react";
 import LoadingState from "@/components/state/loading.tsx";
+import {environment} from "@/config.ts";
 
 const config: Keycloak.KeycloakConfig = {
-    url: import.meta.env.VITE_AUTH_URL,
-    realm: import.meta.env.VITE_AUTH_REALM,
-    clientId: import.meta.env.VITE_AUTH_CLIENT
+    url: environment.authUrl,
+    realm: environment.authRealm,
+    clientId: environment.authClientId
 };
 
 export default function Auth() {
