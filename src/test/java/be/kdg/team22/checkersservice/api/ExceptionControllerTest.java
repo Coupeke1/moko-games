@@ -108,15 +108,15 @@ public class ExceptionControllerTest {
 
     @Test
     void handleBotMoveRequestFailedExceptions() {
-        BotMoveRequestFailedException aiMoveRequestFailedEx = new BotMoveRequestFailedException("");
-        ResponseEntity<String> response = controller.handleBotMoveRequestFailedException(aiMoveRequestFailedEx);
+        BotMoveRequestFailedException botMoveRequestFailedEx = new BotMoveRequestFailedException("");
+        ResponseEntity<String> response = controller.handleBotMoveRequestFailedException(botMoveRequestFailedEx);
         assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
 
     @Test
     void handleBotServiceNotReachableException() {
-        BotServiceNotReachableException aiServiceNotReachableEx = new BotServiceNotReachableException("");
-        ResponseEntity<String> response = controller.handleBotServiceNotReachableException(aiServiceNotReachableEx);
+        BotServiceNotReachableException botServiceNotReachableEx = new BotServiceNotReachableException("");
+        ResponseEntity<String> response = controller.handleBotServiceNotReachableException(botServiceNotReachableEx);
         assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
 
