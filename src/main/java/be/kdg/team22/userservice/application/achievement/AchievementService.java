@@ -20,17 +20,16 @@ import java.util.UUID;
 @Service
 @Transactional
 public class AchievementService {
-
     private final AchievementRepository achievements;
     private final AchievementEventPublisher eventPublisher;
     private final ProfileService profileService;
-    private final ExternalGamesRepository gamerepo;
+    private final ExternalGamesRepository gamesRepository;
 
     public AchievementService(final AchievementRepository achievements, final AchievementEventPublisher eventPublisher, final ProfileService profileService, final ExternalGamesRepository gameRepo) {
         this.achievements = achievements;
         this.eventPublisher = eventPublisher;
         this.profileService = profileService;
-        this.gamerepo = gameRepo;
+        this.gamesRepository = gameRepo;
     }
 
     public void award(final UUID userId, final String code) {
@@ -78,7 +77,7 @@ public class AchievementService {
                     GameDetailsResponse game = null;
 
                     try {
-                        game = gamerepo.getGame(a.gameId(), token);
+                        game = gamesRepository.getGame(a.gameId(), token);
                     } catch (ExternalGameNotFoundException ex) {
                         // Laat game null → geen image of name
                     }

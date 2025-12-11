@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class GameplayEventListener {
-
     private final AchievementService achievementService;
 
     public GameplayEventListener(AchievementService achievementService) {
