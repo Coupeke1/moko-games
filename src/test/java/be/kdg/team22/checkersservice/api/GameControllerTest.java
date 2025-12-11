@@ -68,7 +68,7 @@ public class GameControllerTest {
     @Test
     void createShouldCreateGameWithBotPlayer() throws Exception {
         mockMvc.perform(post("/api/games")
-                        .param("botPlayer", "true")
+                        .param("aiPlayer", "true")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(model))
                 ).andExpect(status().isOk())
