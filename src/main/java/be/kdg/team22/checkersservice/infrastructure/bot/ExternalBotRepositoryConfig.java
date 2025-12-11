@@ -1,4 +1,4 @@
-package be.kdg.team22.checkersservice.infrastructure.ai;
+package be.kdg.team22.checkersservice.infrastructure.bot;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -8,10 +8,10 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
 @Configuration
-public class ExternalAiRepositoryConfig {
+public class ExternalBotRepositoryConfig {
 
-    @Bean("aiService")
-    RestClient aiRestClient(@Value("${business.ai.url}") final String baseUrl) {
+    @Bean("botService")
+    RestClient botRestClient(@Value("${business.ai.url}") final String baseUrl) {
 
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(2000);

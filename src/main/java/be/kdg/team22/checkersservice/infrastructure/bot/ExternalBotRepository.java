@@ -1,7 +1,7 @@
-package be.kdg.team22.checkersservice.infrastructure.ai;
+package be.kdg.team22.checkersservice.infrastructure.bot;
 
-import be.kdg.team22.checkersservice.domain.game.exceptions.AiMoveRequestFailedException;
-import be.kdg.team22.checkersservice.domain.game.exceptions.AiServiceNotReachableException;
+import be.kdg.team22.checkersservice.domain.game.exceptions.BotMoveRequestFailedException;
+import be.kdg.team22.checkersservice.domain.game.exceptions.BotServiceNotReachableException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -11,14 +11,14 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
 @Component
-public class ExternalAiRepository {
+public class ExternalBotRepository {
     private final RestClient client;
 
-    public ExternalAiRepository(@Qualifier("aiService") final RestClient client) {
+    public ExternalBotRepository(@Qualifier("botService") final RestClient client) {
         this.client = client;
     }
 
-    public AiMoveResponse requestMove(AiMoveRequest request) {
+    public BotMoveResponse requestMove(BotMoveRequest request) {
         try {
             return client.post()
                     .uri("/ai-player/move")
@@ -26,15 +26,15 @@ public class ExternalAiRepository {
                     .body(request)
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
-                    .body(AiMoveResponse.class);
+                    .body(BotMoveResponse.class);
         } catch (HttpClientErrorException exception) {
             if (exception.getStatusCode() == HttpStatus.NOT_FOUND) {
-                throw new AiMoveRequestFailedException(request.toString());
+                throw new BotMoveRequestFailedException(request.toString());
             }
 
             throw exception;
         } catch (RestClientException ex) {
-            throw new AiServiceNotReachableException(client.toString());
+            throw new BotServiceNotReachableException(client.toString());
         }
     }
 }

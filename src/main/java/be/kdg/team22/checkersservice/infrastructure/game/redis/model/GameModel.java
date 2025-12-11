@@ -14,7 +14,7 @@ import java.util.*;
 public class GameModel {
     public String id;
     public List<PlayerModel> players;
-    public PlayerRole aiPlayer;
+    public PlayerRole botPlayer;
     public PlayerRole currentRole;
     public int size;
     public Map<Integer, PieceModel> grid;
@@ -26,7 +26,7 @@ public class GameModel {
         GameModel gameModel = new GameModel();
         gameModel.id = game.id().value().toString();
         gameModel.players = game.players().stream().map(PlayerModel::fromDomain).toList();
-        gameModel.aiPlayer = game.aiPlayer();
+        gameModel.botPlayer = game.botPlayer();
         gameModel.currentRole = game.currentRole();
         gameModel.size = game.board().size();
         gameModel.grid = new HashMap<>();
@@ -65,6 +65,6 @@ public class GameModel {
 
         Board board = new Board(size, reconstructedGrid, movesSinceLastCapture);
 
-        return new Game(GameId.fromString(id), playerSet, aiPlayer, currentRole, board, kingMovementMode, status);
+        return new Game(GameId.fromString(id), playerSet, botPlayer, currentRole, board, kingMovementMode, status);
     }
 }

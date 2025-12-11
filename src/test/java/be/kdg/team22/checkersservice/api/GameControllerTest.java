@@ -47,7 +47,7 @@ public class GameControllerTest {
     }
 
     @Test
-    void createShouldCreateGameWithoutAIPlayer() throws Exception {
+    void createShouldCreateGameWithoutBotPlayer() throws Exception {
         String response = mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(model))
@@ -55,7 +55,7 @@ public class GameControllerTest {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.players").isArray())
                 .andExpect(jsonPath("$.players.length()").value(2))
-                .andExpect(jsonPath("$.aiPlayer").isEmpty())
+                .andExpect(jsonPath("$.botPlayer").isEmpty())
                 .andExpect(jsonPath("$.currentRole").value(PlayerRole.BLACK.name()))
                 .andExpect(jsonPath("$.board").isArray())
                 .andExpect(jsonPath("$.status").value("RUNNING"))
@@ -66,15 +66,15 @@ public class GameControllerTest {
     }
 
     @Test
-    void createShouldCreateGameWithAIPlayer() throws Exception {
+    void createShouldCreateGameWithBotPlayer() throws Exception {
         mockMvc.perform(post("/api/games")
-                        .param("aiPlayer", "true")
+                        .param("botPlayer", "true")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(model))
                 ).andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.aiPlayer").exists())
-                .andExpect(jsonPath("$.aiPlayer").value(PlayerRole.WHITE.name()));
+                .andExpect(jsonPath("$.botPlayer").exists())
+                .andExpect(jsonPath("$.botPlayer").value(PlayerRole.WHITE.name()));
     }
 
     @Test

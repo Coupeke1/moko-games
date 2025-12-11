@@ -47,8 +47,8 @@ Content-Type: application/json
   ]
 }
 
-### Generate Game With AI Player
-POST localhost:8087/api/games?aiPlayer=true
+### Generate Game With Bot Player
+POST localhost:8087/api/games?botPlayer=true
 Content-Type: application/json
 
 {

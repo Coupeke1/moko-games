@@ -12,7 +12,7 @@ import be.kdg.team22.checkersservice.domain.game.GameId;
 import be.kdg.team22.checkersservice.domain.move.MoveResult;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 import be.kdg.team22.checkersservice.domain.player.exceptions.PlayerIdentityMismatchException;
-import be.kdg.team22.checkersservice.events.AiMoveRequestedEvent;
+import be.kdg.team22.checkersservice.events.BotMoveRequestedEvent;
 import be.kdg.team22.checkersservice.infrastructure.game.GameRepository;
 import be.kdg.team22.checkersservice.domain.player.PlayerId;
 import org.slf4j.Logger;
@@ -38,9 +38,9 @@ public class GameService {
         logger = LoggerFactory.getLogger(GameService.class);
     }
 
-    public Game create(final CreateGameModel model, final boolean aiPlayer) {
+    public Game create(final CreateGameModel model, final boolean botPlayer) {
         List<PlayerId> players = model.players().stream().map(PlayerId::new).toList();
-        Game game = Game.create(players, aiPlayer, model.settings().kingMovementMode());
+        Game game = Game.create(players, botPlayer, model.settings().kingMovementMode());
         repository.save(game);
         return game;
     }
@@ -139,9 +139,9 @@ public class GameService {
             logger.error(exception.getMessage());
         }
 
-        if (game.currentPlayer().aiPlayer()) {
+        if (game.currentPlayer().botPlayer()) {
             boolean expectResponse = game.status() == GameStatus.RUNNING;
-            applicationEventPublisher.publishEvent(AiMoveRequestedEvent.from(game, expectResponse));
+            applicationEventPublisher.publishEvent(BotMoveRequestedEvent.from(game, expectResponse));
         }
 
         return game;

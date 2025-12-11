@@ -4,10 +4,10 @@ import be.kdg.team22.checkersservice.application.GameService;
 import be.kdg.team22.checkersservice.domain.game.GameId;
 import be.kdg.team22.checkersservice.domain.move.Move;
 import be.kdg.team22.checkersservice.domain.player.PlayerId;
-import be.kdg.team22.checkersservice.events.AiMoveRequestedEvent;
-import be.kdg.team22.checkersservice.infrastructure.ai.AiMoveRequest;
-import be.kdg.team22.checkersservice.infrastructure.ai.AiMoveResponse;
-import be.kdg.team22.checkersservice.infrastructure.ai.ExternalAiRepository;
+import be.kdg.team22.checkersservice.events.BotMoveRequestedEvent;
+import be.kdg.team22.checkersservice.infrastructure.bot.BotMoveRequest;
+import be.kdg.team22.checkersservice.infrastructure.bot.BotMoveResponse;
+import be.kdg.team22.checkersservice.infrastructure.bot.ExternalBotRepository;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -17,29 +17,29 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
-public class AiMoveEventListener {
+public class BotMoveEventListener {
     private final GameService gameService;
-    private final ExternalAiRepository aiRepository;
+    private final ExternalBotRepository aiRepository;
 
-    public AiMoveEventListener(GameService gameService, ExternalAiRepository aiRepository) {
+    public BotMoveEventListener(GameService gameService, ExternalBotRepository aiRepository) {
         this.gameService = gameService;
         this.aiRepository = aiRepository;
     }
 
     @Async
     @EventListener
-    public void handleAiMoveRequest(AiMoveRequestedEvent event) {
-        AiMoveRequest request = new AiMoveRequest(event.gameId(), event.gameName(),
-                event.board(), String.valueOf(event.currentPlayer().symbol()), String.valueOf(event.aiPlayer().symbol()), event.kingMovementMode().name()
+    public void handleBotMoveRequest(BotMoveRequestedEvent event) {
+        BotMoveRequest request = new BotMoveRequest(event.gameId(), event.gameName(),
+                event.board(), String.valueOf(event.currentPlayer().symbol()), String.valueOf(event.botPlayer().symbol()), event.kingMovementMode().name()
         );
-        AiMoveResponse response = aiRepository.requestMove(request);
+        BotMoveResponse response = aiRepository.requestMove(request);
 
         if (!event.expectResponse()) return;
 
         if (response != null) {
             GameId gameId = new GameId(UUID.fromString(event.gameId()));
-            PlayerId aiPlayerId = gameService.getById(gameId).players().stream()
-                    .filter(p -> p.role() == event.aiPlayer())
+            PlayerId botPlayerId = gameService.getById(gameId).players().stream()
+                    .filter(p -> p.role() == event.botPlayer())
                     .findFirst()
                     .orElseThrow()
                     .id();
@@ -47,8 +47,8 @@ public class AiMoveEventListener {
                     .map(Integer::parseInt)
                     .toList();
 
-            Move move = new Move(aiPlayerId, cells);
-            gameService.requestMove(gameId, aiPlayerId, move);
+            Move move = new Move(botPlayerId, cells);
+            gameService.requestMove(gameId, botPlayerId, move);
         }
     }
 }

@@ -87,31 +87,31 @@ public class GameTest {
     }
 
     @Test
-    void createWithAIPlayerShouldSetAiPlayerField() {
-        Game gameWithAI = Game.create(
+    void createWithBotPlayerShouldSetBotPlayerField() {
+        Game gameWithBot = Game.create(
                 List.of(playerBlackId, playerWhiteId),
                 true, KingMovementMode.FLYING
         );
 
-        assertEquals(PlayerRole.WHITE, gameWithAI.aiPlayer());
+        assertEquals(PlayerRole.WHITE, gameWithBot.botPlayer());
 
-        Player whitePlayer = gameWithAI.players().stream()
+        Player whitePlayer = gameWithBot.players().stream()
                 .filter(p -> p.role() == PlayerRole.WHITE)
                 .findFirst()
                 .orElseThrow();
-        assertTrue(whitePlayer.aiPlayer());
+        assertTrue(whitePlayer.botPlayer());
 
-        Player blackPlayer = gameWithAI.players().stream()
+        Player blackPlayer = gameWithBot.players().stream()
                 .filter(p -> p.role() == PlayerRole.BLACK)
                 .findFirst()
                 .orElseThrow();
-        assertFalse(blackPlayer.aiPlayer());
+        assertFalse(blackPlayer.botPlayer());
     }
 
     @Test
-    void createWithoutAIPlayerShouldHaveNullAiPlayer() {
-        assertNull(game.aiPlayer());
-        game.players().forEach(player -> assertFalse(player.aiPlayer()));
+    void createWithoutBotPlayerShouldHaveNullBotPlayer() {
+        assertNull(game.botPlayer());
+        game.players().forEach(player -> assertFalse(player.botPlayer()));
     }
 
     @Test

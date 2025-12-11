@@ -56,13 +56,13 @@ public class ExceptionController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
-    @ExceptionHandler(AiMoveRequestFailedException.class)
-    public ResponseEntity<String> handleAiMoveRequestFailedException(AiMoveRequestFailedException ex) {
+    @ExceptionHandler(BotMoveRequestFailedException.class)
+    public ResponseEntity<String> handleBotMoveRequestFailedException(BotMoveRequestFailedException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
-    @ExceptionHandler(AiServiceNotReachableException.class)
-    public ResponseEntity<String> handleAiServiceNotReachableException(AiServiceNotReachableException ex) {
+    @ExceptionHandler(BotServiceNotReachableException.class)
+    public ResponseEntity<String> handleBotServiceNotReachableException(BotServiceNotReachableException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 

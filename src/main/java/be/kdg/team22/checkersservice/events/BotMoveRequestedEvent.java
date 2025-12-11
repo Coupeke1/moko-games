@@ -6,22 +6,22 @@ import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 
 import java.util.List;
 
-public record AiMoveRequestedEvent(
+public record BotMoveRequestedEvent(
         String gameId,
         String gameName,
         List<List<String>> board,
         PlayerRole currentPlayer,
-        PlayerRole aiPlayer,
+        PlayerRole botPlayer,
         KingMovementMode kingMovementMode,
         boolean expectResponse
 ) {
-    public static AiMoveRequestedEvent from(Game game, boolean expectResponse) {
-        return new AiMoveRequestedEvent(
+    public static BotMoveRequestedEvent from(Game game, boolean expectResponse) {
+        return new BotMoveRequestedEvent(
                 game.id().value().toString(),
                 "CHECKERS",
                 game.board().state(),
                 game.currentRole(),
-                game.aiPlayer(),
+                game.botPlayer(),
                 game.kingMovementMode(),
                 expectResponse
         );

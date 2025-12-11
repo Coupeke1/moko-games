@@ -20,34 +20,34 @@ import java.util.TreeSet;
 public class Game {
     private final GameId id;
     private final TreeSet<Player> players;
-    private final PlayerRole aiPlayer;
+    private final PlayerRole botPlayer;
     private PlayerRole currentRole;
     private final Board board;
     private final KingMovementMode kingMovementMode;
     private GameStatus status;
 
-    private Game(final List<Player> players, final PlayerRole aiPlayer, final KingMovementMode kingMovementMode) {
+    private Game(final List<Player> players, final PlayerRole botPlayer, final KingMovementMode kingMovementMode) {
         this.id = GameId.create();
         this.players = new TreeSet<>(Comparator.comparing((Player p) -> p.role().order()));
         this.players.addAll(players);
-        this.aiPlayer = aiPlayer;
+        this.botPlayer = botPlayer;
         this.currentRole = this.players.getFirst().role();
         this.board = Board.create(8);
         this.kingMovementMode = kingMovementMode;
         this.status = GameStatus.RUNNING;
     }
 
-    public Game(final GameId id, final TreeSet<Player> players, final PlayerRole aiPlayer, final PlayerRole currentRole, final Board board, final KingMovementMode kingMovementMode, final GameStatus status) {
+    public Game(final GameId id, final TreeSet<Player> players, final PlayerRole botPlayer, final PlayerRole currentRole, final Board board, final KingMovementMode kingMovementMode, final GameStatus status) {
         this.id = id;
         this.players = players;
-        this.aiPlayer = aiPlayer;
+        this.botPlayer = botPlayer;
         this.currentRole = currentRole;
         this.board = board;
         this.kingMovementMode = kingMovementMode;
         this.status = status;
     }
 
-    public static Game create(final List<PlayerId> playerIds, final boolean aiPlayer, final KingMovementMode kingMovementMode) {
+    public static Game create(final List<PlayerId> playerIds, final boolean botPlayer, final KingMovementMode kingMovementMode) {
         if (playerIds.size() != 2) {
             throw new PlayerCountException();
         }
@@ -58,9 +58,9 @@ public class Game {
 
         List<Player> players = new ArrayList<>();
         players.add(new Player(playerIds.getFirst(), PlayerRole.BLACK, false));
-        players.add(new Player(playerIds.get(1), PlayerRole.WHITE, aiPlayer));
+        players.add(new Player(playerIds.get(1), PlayerRole.WHITE, botPlayer));
 
-        return new Game(players, aiPlayer ? PlayerRole.WHITE : null, kingMovementMode);
+        return new Game(players, botPlayer ? PlayerRole.WHITE : null, kingMovementMode);
     }
 
     public MoveResult requestMove(final Move move) {
@@ -98,8 +98,8 @@ public class Game {
         return players;
     }
 
-    public PlayerRole aiPlayer() {
-        return aiPlayer;
+    public PlayerRole botPlayer() {
+        return botPlayer;
     }
 
     public PlayerRole currentRole() {
