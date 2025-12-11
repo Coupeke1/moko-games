@@ -1,7 +1,7 @@
 import { findEntries } from "@/features/cart/services/cart.ts";
 import { useQuery } from "@tanstack/react-query";
 
-export function useCart(enabled: boolean) {
+export function useCart(enabled?: boolean) {
     const {
         isLoading: loading,
         isError: error,
@@ -9,7 +9,7 @@ export function useCart(enabled: boolean) {
     } = useQuery({
         queryKey: ["cart"],
         queryFn: () => findEntries(),
-        enabled,
+        enabled: enabled ?? true,
     });
 
     return { loading, error, entries: data };

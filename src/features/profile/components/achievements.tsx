@@ -1,9 +1,9 @@
 import Section from "@/components/section";
 import State from "@/components/state/state";
 import Column from "@/components/layout/column";
-import {useAchievements} from "@/features/profile/hooks/use-achievements";
+import { useAchievements } from "@/features/profile/hooks/use-achievements";
 import AchievementCard from "@/features/profile/components/achievement-card";
-import {Gap} from "@/components/layout/gap";
+import { Gap } from "@/components/layout/gap";
 import ErrorState from "@/components/state/error";
 
 export default function ProfileAchievements() {
@@ -23,8 +23,9 @@ export default function ProfileAchievements() {
                                 key={achievement.id}
                                 image={achievement.gameImage ?? ""}
                                 title={achievement.name}
-                                description={achievement.description}
-                                date={new Date(achievement.unlockedAt).toLocaleDateString()}
+                                date={new Date(
+                                    achievement.unlockedAt,
+                                ).toLocaleDateString()}
                                 game={achievement.gameName ?? ""}
                             />
                         ))}

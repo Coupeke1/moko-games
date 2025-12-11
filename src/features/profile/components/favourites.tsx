@@ -5,6 +5,7 @@ import { useFavourites } from "@/features/profile/hooks/use-favourites";
 import FavouriteCard from "@/features/profile/components/favourite-card";
 import { Gap } from "@/components/layout/gap";
 import ErrorState from "@/components/state/error";
+import type { Entry } from "@/features/library/models/entry";
 
 export default function ProfileFavourites() {
     const { favourites, loading, error } = useFavourites();
@@ -14,16 +15,16 @@ export default function ProfileFavourites() {
             <State data={favourites} loading={loading} error={error} />
 
             {favourites &&
-                (favourites.games.length === 0 ? (
+                (favourites.length === 0 ? (
                     <ErrorState>No favourites</ErrorState>
                 ) : (
                     <Column gap={Gap.Large}>
-                        {favourites.games.map((game) => (
+                        {favourites.map((entry: Entry) => (
                             <FavouriteCard
-                                key={game.id}
-                                image={game.image}
-                                title={game.title}
-                                description={game.description}
+                                key={entry.id}
+                                image={entry.image}
+                                title={entry.title}
+                                description={entry.description}
                             />
                         ))}
                     </Column>

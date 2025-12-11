@@ -11,7 +11,7 @@ export function useProfile() {
         isLoading: loading,
         isError: error,
     } = useQuery({
-        queryKey: ["profile", "me", token],
+        queryKey: ["profile", "me"],
         queryFn: async (): Promise<Profile> => {
             const { keycloak: freshKeycloak, token: freshToken } =
                 useAuthStore.getState();

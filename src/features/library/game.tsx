@@ -29,7 +29,7 @@ export default function LibraryGamePage() {
         if (!id) navigate("/library");
     }, [id, navigate]);
 
-    const { game, loading: gameLoading, error: gameError } = useGame(id!);
+    const { game, loading: gameLoading, error: gameError } = useGame(id);
 
     const {
         favourited,
