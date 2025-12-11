@@ -4,7 +4,7 @@ param (
     [string[]]$Exclude
 )
 
-$ValidServices = @("user", "session", "social", "games", "store", "tic-tac-toe", "checkers", "chess")
+$ValidServices = @("user", "session", "social", "games", "store", "tic-tac-toe", "checkers", "chess","communication")
 
 # If --all is provided, start with all services
 if ($All) {
