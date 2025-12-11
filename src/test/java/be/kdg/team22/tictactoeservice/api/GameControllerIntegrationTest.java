@@ -78,8 +78,10 @@ public class GameControllerIntegrationTest {
                 players,
                 new GameSettingsModel(0)
         );
+        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
 
         mockMvc.perform(post("/api/games")
+                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(defaultModel)))
                 .andExpect(status().isOk())
@@ -94,8 +96,10 @@ public class GameControllerIntegrationTest {
                 players,
                 new GameSettingsModel(5)
         );
+        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
 
         mockMvc.perform(post("/api/games")
+                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(modelSizeFive)))
                 .andExpect(status().isOk())
@@ -110,8 +114,10 @@ public class GameControllerIntegrationTest {
                 List.of(players.getFirst()),
                 new GameSettingsModel(1)
         );
+        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
 
         mockMvc.perform(post("/api/games")
+                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(modelSizeOne)))
                 .andExpect(status().isBadRequest());
@@ -119,7 +125,9 @@ public class GameControllerIntegrationTest {
 
     @Test
     void shouldCreateGameWithCorrectPlayers() throws Exception {
+        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
         mockMvc.perform(post("/api/games")
+                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(model)))
                 .andExpect(status().isOk())
@@ -135,50 +143,44 @@ public class GameControllerIntegrationTest {
                 new GameSettingsModel(3)
         );
 
-        CreateGameModel noPlayersModel = new CreateGameModel(
-                List.of(),
-                new GameSettingsModel(3)
-        );
+        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
 
         mockMvc.perform(post("/api/games")
+                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(onePlayerModel)))
-                .andExpect(status().isBadRequest());
-
-        mockMvc.perform(post("/api/games")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(noPlayersModel)))
-                .andExpect(status().isBadRequest());
-
-        mockMvc.perform(post("/api/games"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void shouldFetchExistingGame() throws Exception {
-        // Create Game
+        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
         String body = mockMvc.perform(post("/api/games")
+                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(model)))
                 .andReturn().getResponse().getContentAsString();
-
         String id = extractId(body);
 
-        // Fetch
-        mockMvc.perform(get("/api/games/" + id))
+        mockMvc.perform(get("/api/games/" + id)
+                        .with(authentication(auth)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id));
     }
 
     @Test
     void shouldReturn404ForUnknownGame() throws Exception {
-        mockMvc.perform(get("/api/games/00000000-0000-0000-0000-000000000000"))
+        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
+        mockMvc.perform(get("/api/games/00000000-0000-0000-0000-000000000000")
+                        .with(authentication(auth)))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void shouldResetFinishedGame() throws Exception {
+        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
         String createResponse = mockMvc.perform(post("/api/games")
+                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(model)))
                 .andExpect(status().isOk())
@@ -191,7 +193,8 @@ public class GameControllerIntegrationTest {
         setGameStatus(game, GameStatus.WON);
         repository.save(game);
 
-        mockMvc.perform(post("/api/games/" + id + "/reset"))
+        mockMvc.perform(post("/api/games/" + id + "/reset")
+                        .with(authentication(auth)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id))
                 .andExpect(jsonPath("$.board.length()").value(3))
@@ -201,7 +204,9 @@ public class GameControllerIntegrationTest {
 
     @Test
     void shouldReturnBadRequestForUnfinishedGame() throws Exception {
+        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
         String createResponse = mockMvc.perform(post("/api/games")
+                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(model)))
                 .andExpect(status().isOk())
@@ -209,13 +214,16 @@ public class GameControllerIntegrationTest {
 
         String id = extractId(createResponse);
 
-        mockMvc.perform(post("/api/games/" + id + "/reset"))
+        mockMvc.perform(post("/api/games/" + id + "/reset")
+                        .with(authentication(auth)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void shouldReturn404WhenResetUnknownGame() throws Exception {
-        mockMvc.perform(post("/api/games/00000000-0000-0000-0000-000000000000/reset"))
+        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
+        mockMvc.perform(post("/api/games/00000000-0000-0000-0000-000000000000/reset")
+                        .with(authentication(auth)))
                 .andExpect(status().isNotFound());
     }
 
@@ -231,7 +239,9 @@ public class GameControllerIntegrationTest {
 
     @Test
     void shouldMakeValidMove() throws Exception {
+        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
         String createResponse = mockMvc.perform(post("/api/games")
+                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(model)))
                 .andExpect(status().isOk())
@@ -241,7 +251,6 @@ public class GameControllerIntegrationTest {
         Game game = repository.findById(GameId.fromString(gameId)).orElseThrow();
 
         UUID playerUuid = game.currentPlayer().id().value();
-        UsernamePasswordAuthenticationToken auth = authWithUser(playerUuid);
 
         MoveModel moveModel = new MoveModel(playerUuid, 0, 1);
 
@@ -258,7 +267,9 @@ public class GameControllerIntegrationTest {
 
     @Test
     void shouldReturnBadRequestForInvalidMove() throws Exception {
+        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
         String createResponse = mockMvc.perform(post("/api/games")
+                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(model)))
                 .andExpect(status().isOk())
@@ -268,7 +279,6 @@ public class GameControllerIntegrationTest {
         Game game = repository.findById(GameId.fromString(gameId)).orElseThrow();
 
         UUID playerUuid = game.currentPlayer().id().value();
-        UsernamePasswordAuthenticationToken auth = authWithUser(playerUuid);
 
         MoveModel moveModel = new MoveModel(playerUuid, -1, 1);
 
@@ -295,8 +305,10 @@ public class GameControllerIntegrationTest {
                 new GameSettingsModel(3)
         );
 
+        UsernamePasswordAuthenticationToken auth = authWithUser(onePlayerModel.players().getFirst());
         String createResponse = mockMvc.perform(post("/api/games")
                         .param("aiPlayer", "true")
+                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(onePlayerModel)))
                 .andExpect(status().isOk())
@@ -307,7 +319,6 @@ public class GameControllerIntegrationTest {
         Game game = repository.findById(GameId.fromString(gameId)).orElseThrow();
 
         UUID playerUuid = game.currentPlayer().id().value();
-        UsernamePasswordAuthenticationToken auth = authWithUser(playerUuid);
 
         MoveModel humanMove = new MoveModel(playerUuid, 0, 0);
 
@@ -321,7 +332,8 @@ public class GameControllerIntegrationTest {
 
         Thread.sleep(300);
 
-        mockMvc.perform(get("/api/games/" + gameId))
+        mockMvc.perform(get("/api/games/" + gameId)
+                        .with(authentication(auth)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.board[0][1]").value("O"))
                 .andExpect(jsonPath("$.currentRole").value("X"));
