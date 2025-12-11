@@ -1,6 +1,5 @@
 import { useParams } from "react-router";
 import { GameStatus } from "@/models/game-status";
-import { useResetGame } from "@/hooks/use-reset-game";
 import { useMyProfile } from "@/hooks/use-my-profile";
 import { useMakeMove } from "@/hooks/use-make-move";
 import { useGameState } from "@/hooks/use-game-state";
@@ -18,7 +17,6 @@ export default function GamePage() {
     const { profile, isLoading: profileLoading, isError: profileError } = useMyProfile();
 
     const { makeMove } = useMakeMove(id!, profile, gameState?.status);
-    const onReset = useResetGame(id!);
 
     if (isLoading || !gameState || profileLoading || !profile)
         return (
@@ -64,7 +62,6 @@ export default function GamePage() {
                         gameState={gameState}
                         myProfile={profile}
                         isOpen={true}
-                        onReset={onReset}
                     />
                 )}
             </div>
