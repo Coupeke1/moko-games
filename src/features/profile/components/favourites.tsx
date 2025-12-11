@@ -24,9 +24,6 @@ export default function ProfileFavourites() {
                                 image={game.image}
                                 title={game.title}
                                 description={game.description}
-                                date={new Date(
-                                    game.purchasedAt,
-                                ).toLocaleDateString()}
                             />
                         ))}
                     </Column>
