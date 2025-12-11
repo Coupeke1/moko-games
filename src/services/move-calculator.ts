@@ -1,5 +1,6 @@
 import {type GameState} from "@/models/game-state";
 import {KingMovementMode} from "@/models/king-movement-mode";
+import {cellIndexToRowCol} from "@/lib/checkers-board.ts";
 
 export interface ValidMove {
     cells: number[];
@@ -29,8 +30,7 @@ export function calculateValidMoves(
 
 export function getPieceAtCell(board: string[][], cell: number): string | null {
     const boardSize = board.length;
-    const row = Math.floor((cell - 1) / boardSize);
-    const col = (cell - 1) % boardSize;
+    const { row, col } = cellIndexToRowCol(cell, board.length);
 
     if (row < 0 || row >= boardSize || col < 0 || col >= boardSize) {
         return null;
@@ -43,10 +43,13 @@ export function getPieceAtCell(board: string[][], cell: number): string | null {
 }
 
 export function isPieceOwnedByPlayer(piece: string, role: string): boolean {
+    if (!piece) return false;
+
+    const trimmedPiece = piece.trim();
     if (role === "WHITE") {
-        return piece === "w " || piece === "W ";
+        return trimmedPiece === "W" || trimmedPiece === "WK";
     } else {
-        return piece === "b " || piece === "B ";
+        return trimmedPiece === "B" || trimmedPiece === "BK";
     }
 }
 

@@ -27,22 +27,12 @@ export default function GamePage() {
     const isAI = gameState?.aiPlayer === myRole;
     const isMyTurn = gameState?.currentRole === myRole;
 
-    // Calculate valid moves for selected piece
     const validMoves = useMemo<ValidMove[]>(() => {
         if (!selectedCell || !gameState || !profile?.id || !isMyTurn) {
             return [];
         }
         return calculateValidMoves(gameState, selectedCell);
     }, [selectedCell, gameState, profile?.id, isMyTurn]);
-
-    // Get all valid destination cells
-    const validDestinations = useMemo(() => {
-        const destinations = validMoves.map(move => move.cells[move.cells.length - 1]);
-        console.log('Selected cell:', selectedCell);
-        console.log('Valid moves:', validMoves);
-        console.log('Valid destinations:', destinations);
-        return destinations;
-    }, [validMoves, selectedCell]);
 
     const moveMutation = useMutation({
         mutationFn: (cells: number[]) => requestMove(id!, profile!.id, cells),
@@ -95,21 +85,8 @@ export default function GamePage() {
             return;
         }
 
-        if (validDestinations.includes(cellIndex)) {
-            const move = validMoves.find(m => m.cells[m.cells.length - 1] === cellIndex);
-            if (move) {
-                moveMutation.mutate(move.cells);
-            }
-        } else {
-            const piece = getPieceAtCell(gameState!.board, cellIndex);
-            if (piece && isPieceOwnedByPlayer(piece, myRole!)) {
-                setSelectedCell(cellIndex);
-                setMovePath([]);
-            } else {
-                setSelectedCell(null);
-                setMovePath([]);
-            }
-        }
+        // Removed valid move check - always attempt move
+        moveMutation.mutate([selectedCell, cellIndex]);
     };
 
     if (profileLoading || (id && gameLoading)) {
@@ -173,7 +150,7 @@ export default function GamePage() {
                     <GameGrid
                         board={gameState.board}
                         selectedCell={selectedCell}
-                        validMoves={validDestinations}
+                        validMoves={[]} // Removed valid destinations highlighting
                         movePath={movePath}
                         onCellClick={handleCellClick}
                     />
@@ -183,7 +160,7 @@ export default function GamePage() {
                     {!isMyTurn
                         ? "Waiting for opponent..."
                         : selectedCell
-                            ? `Selected cell: ${selectedCell} - Click a highlighted cell to move`
+                            ? `Selected cell: ${selectedCell} - Click any cell to move`
                             : "Click a piece to select it"}
                 </div>
             </main>
