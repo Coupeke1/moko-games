@@ -28,7 +28,7 @@ public class AiMoveEventListener {
     @EventListener
     public void handleAiMoveRequest(AiMoveRequestedEvent event) {
         AiMoveRequest request = new AiMoveRequest(event.gameId(), event.gameName(),
-                event.board(), event.currentPlayer().name(), event.aiPlayer().name()
+                event.board(), event.currentPlayer().role().name(), event.aiPlayer().name()
         );
         AiMoveResponse response = aiRepository.requestMove(request);
 
@@ -36,11 +36,7 @@ public class AiMoveEventListener {
 
         if (response != null) {
             GameId gameId = new GameId(UUID.fromString(event.gameId()));
-            PlayerId aiPlayerId = gameService.getGame(gameId).players().stream()
-                    .filter(p -> p.role() == event.aiPlayer())
-                    .findFirst()
-                    .orElseThrow()
-                    .id();
+            PlayerId aiPlayerId = event.currentPlayer().id();
 
             Move move = new Move(aiPlayerId, response.row(), response.col());
             gameService.requestMove(gameId, aiPlayerId, move);
