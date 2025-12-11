@@ -38,7 +38,7 @@ export default function ProfilePage() {
                             onEdit={() => setSettings(true)}
                         />
 
-                        <AchievementSection enabled={!profile.modules.achievements}/>
+                        <AchievementSection enabled={profile.modules.achievements}/>
 
                         {profile.modules.favourites && (
                             <Section title="Favourites">

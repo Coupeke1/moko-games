@@ -1,16 +1,16 @@
 import Button from "@/components/buttons/button";
 import Dialog from "@/components/dialog/dialog";
 import Column from "@/components/layout/column";
-import { Gap } from "@/components/layout/gap";
+import {Gap} from "@/components/layout/gap";
 import TabContent from "@/components/tabs/buttons/content";
 import TabRow from "@/components/tabs/buttons/row";
 import showToast from "@/components/toast";
-import type { Modules } from "@/features/profile/models/modules.ts";
-import type { Profile } from "@/features/profile/models/profile.ts";
-import { updateProfile } from "@/features/profile/services/profile.ts";
-import { useAuthStore } from "@/stores/auth-store";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import type {Modules} from "@/features/profile/models/modules.ts";
+import type {Profile} from "@/features/profile/models/profile.ts";
+import {updateProfile} from "@/features/profile/services/profile.ts";
+import {useAuthStore} from "@/stores/auth-store";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {useEffect, useState} from "react";
 import AboutTab from "@/features/profile/dialogs/settings-dialog/about-tab";
 import ModulesTab from "@/features/profile/dialogs/settings-dialog/modules-tab";
 import PictureTab from "@/features/profile/dialogs/settings-dialog/picture-tab";
@@ -23,13 +23,13 @@ interface Props {
 }
 
 export default function SettingsDialog({
-    profile,
-    close,
-    open,
-    onChange,
-}: Props) {
+                                           profile,
+                                           close,
+                                           open,
+                                           onChange,
+                                       }: Props) {
     const client = useQueryClient();
-    const { token } = useAuthStore();
+    const {token} = useAuthStore();
 
     const [current, setCurrent] = useState<string>("About");
     const [image, setImage] = useState("");
@@ -42,16 +42,16 @@ export default function SettingsDialog({
         setImage(profile.image);
         setAchievements(profile.modules.achievements ? "displayed" : "hidden");
         setFavourites(profile.modules.favourites ? "displayed" : "hidden");
-    }, [profile, open]);
+    }, [open, profile.description, profile.image, profile.modules.achievements, profile.modules.favourites]);
 
     const save = useMutation({
         mutationFn: async ({
-            profile,
-            description,
-            image,
-            achievements,
-            favourites,
-        }: {
+                               profile,
+                               description,
+                               image,
+                               achievements,
+                               favourites,
+                           }: {
             profile: string;
             description: string;
             image: string;
@@ -64,7 +64,7 @@ export default function SettingsDialog({
             } as Modules);
         },
         onSuccess: async () => {
-            await client.refetchQueries({ queryKey: ["profile", "me", token] });
+            await client.refetchQueries({queryKey: ["profile", "me", token]});
 
             if (profile === undefined) return;
             showToast(profile.username, "Profile was saved!");
@@ -90,7 +90,7 @@ export default function SettingsDialog({
                             description,
                             image,
                             achievements: achievements === "displayed",
-                            favourites: favourites === "undefined",
+                            favourites: favourites === "displayed",
                         })
                     }
                 >
@@ -120,7 +120,7 @@ export default function SettingsDialog({
                         {
                             title: "Picture",
                             element: (
-                                <PictureTab image={image} setImage={setImage} />
+                                <PictureTab image={image} setImage={setImage}/>
                             ),
                         },
                         {
