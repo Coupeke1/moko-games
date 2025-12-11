@@ -408,6 +408,8 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: 'user'
       RABBITMQ_DEFAULT_PASS: 'password'
+    ports:
+      - "6379:6379"
     networks:
       - moko_backend
     volumes:
