@@ -57,6 +57,10 @@ export function shouldStart(lobby: Lobby): boolean {
     return lobby.status === Status.Started;
 }
 
+export function isClosed(lobby: Lobby): boolean {
+    return lobby.status === Status.Closed || lobby.status === Status.Finished;
+}
+
 export function allPlayersReady(lobby: Lobby): boolean {
     return lobby.players.find((player: Player) => !player.ready) === undefined;
 }

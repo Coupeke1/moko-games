@@ -1,7 +1,6 @@
-import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import State from "@/components/state/state";
-import Page from "@/features/lobby/components/page";
+import Page from "@/features/game/components/page";
 import { useSession } from "@/features/lobby/hooks/use-session";
 import { useRef } from "react";
 
@@ -18,14 +17,18 @@ export default function GamePage() {
             />
 
             {profile && lobby && game && (
-                <Column gap={Gap.ExtraLarge}>
+                <section className={`grid sm:grid-cols-12 ${Gap.Medium}`}>
                     <iframe
                         ref={frame}
                         src={`${game.frontendUrl}/${lobby.startedGameId}`}
-                        className="rounded-lg h-88 bg-bg-3 border-3 border-bg-2"
+                        className="col-span-8 w-full rounded-lg h-88 bg-bg-3 border-3 border-bg-2"
                         title={game.title}
                     ></iframe>
-                </Column>
+
+                    <section className="col-span-4 bg-bg-3 rounded-lg flex items-center justify-center">
+                        <p>Chat</p>
+                    </section>
+                </section>
             )}
         </Page>
     );

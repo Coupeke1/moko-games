@@ -29,7 +29,7 @@ function Add() {
         onSuccess: async () => {
             await client.refetchQueries({ queryKey: ["friends"] });
             showToast(username, "Request sent");
-            close();
+            setUsername("");
         },
         onError: (error: Error) => {
             showToast("Friends", error.message);

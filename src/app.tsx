@@ -64,7 +64,7 @@ function Content() {
 
                 <Route path="/lobbies/:id" element={<LobbyPage />} />
                 <Route path="/lobbies/:id/game" element={<GamePage />} />
-                <Route path="/invites" element={<InvitesPage />} />
+                <Route path="/invites/:id" element={<InvitesPage />} />
 
                 <Route path="/profile" element={<ProfilePage />} />
 

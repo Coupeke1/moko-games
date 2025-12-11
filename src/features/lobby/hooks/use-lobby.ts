@@ -1,5 +1,5 @@
 import type { Lobby } from "@/features/lobby/models/lobby.ts";
-import { shouldStart } from "@/features/lobby/services/lobby.ts";
+import { isClosed, shouldStart } from "@/features/lobby/services/lobby.ts";
 import { isPlayerInLobby } from "@/features/lobby/services/players.ts";
 import { watchLobby } from "@/features/lobby/services/socket.ts";
 import { useSocketStore } from "@/stores/socket-store.ts";
@@ -42,8 +42,8 @@ export function useLobby(lobbyId?: string | null, userId?: string | null) {
             next: (lobby) => {
                 queryClient.setQueryData<Lobby>(["lobby", lobbyId], lobby);
 
+                if (isClosed(lobby)) navigate("/library");
                 if (!isPlayerInLobby(userId, lobby)) navigate("/library");
-
                 if (shouldStart(lobby)) navigate(`/lobbies/${lobby.id}/game`);
 
                 if (isFirst) {

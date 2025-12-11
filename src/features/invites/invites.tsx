@@ -5,23 +5,29 @@ import State from "@/components/state/state";
 import { useInvites } from "@/features/invites/hooks/use-invites";
 import type { Lobby } from "@/features/lobby/models/lobby";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link as RouterLink, useNavigate } from "react-router";
-import { acceptInvite } from "../lobby/services/invites";
+import { useNavigate, useParams } from "react-router";
+import { acceptInvite } from "@/features/lobby/services/invites";
 import showToast from "@/components/toast";
-
-const game = "30c50910-7b97-430b-ae6d-8b8a9b40c66f";
+import { useEffect } from "react";
 
 export default function InvitesPage() {
     const client = useQueryClient();
     const navigate = useNavigate();
-    const { invites, loading, error } = useInvites(game);
+    const params = useParams();
+    const id = params.id;
+
+    useEffect(() => {
+        if (!id) navigate("/library");
+    }, [id, navigate]);
+
+    const { invites, loading, error } = useInvites(id!);
 
     const accept = useMutation({
         mutationFn: async ({ invite }: { invite: Lobby }) =>
             await acceptInvite(invite.id),
         onSuccess: async (_data, variables) => {
             await client.invalidateQueries({
-                queryKey: ["lobby", "invites", game],
+                queryKey: ["lobby", "invites", id],
             });
             showToast("Invite", "Accepted");
             navigate(`/lobbies/${variables.invite.id}`);
