@@ -1,6 +1,6 @@
-import {client} from "@/lib/api-client";
-import {environment} from "@/config";
-import type {LibraryItem} from "@/features/profile/models/Library";
+import { client } from "@/lib/api-client";
+import { environment } from "@/config";
+import type { Entry } from "@/features/library/models/entry";
 
 const BASE_URL = environment.libraryService;
 
@@ -9,25 +9,25 @@ interface LibraryParams {
     favourite?: boolean;
 }
 
-export async function findMyLibrary(params?: LibraryParams): Promise<LibraryItem[]> {
+export async function findMyLibrary(params?: LibraryParams): Promise<Entry[]> {
     try {
         const queryParams = new URLSearchParams();
 
         if (params?.query) {
-            queryParams.append('query', params.query);
+            queryParams.append("query", params.query);
         }
 
         if (params?.favourite !== undefined) {
-            queryParams.append('favourite', params.favourite.toString());
+            queryParams.append("favourite", params.favourite.toString());
         }
 
         const url = queryParams.toString()
             ? `${BASE_URL}/me?${queryParams.toString()}`
             : `${BASE_URL}/me`;
 
-        const {data} = await client.get<LibraryItem[]>(url);
+        const { data } = await client.get<Entry[]>(url);
         return data;
-    } catch (err) {
-        throw new Error("Failed to fetch library: " + err);
+    } catch {
+        throw new Error("Could not fetch favourites");
     }
 }
