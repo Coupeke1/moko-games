@@ -47,8 +47,120 @@ Content-Type: application/json
   ]
 }
 
+### Generate Game With Bot Player
+POST localhost:8087/api/games?botPlayer=true
+Content-Type: application/json
+
+{
+  "players": [
+    "642999ad-c546-40b6-876c-1048971c7942",
+    "00000000-0000-0000-0000-000000000000"
+  ],
+  "settings": {
+    "kingMovementMode": "SINGLE"
+  }
+}
+
+> {%
+    client.global.set("game_id", response.body.id);
+%}
+
 ### Reset Game
 POST localhost:8087/api/games/{{game_id}}/reset
 
 ### Health Check
 GET http://localhost:8087/actuator/health
+
+### AI test
+POST http://localhost:3333/ai-player/move
+Content-Type: application/json
+
+{
+  "game_id": "642999ad-c546-40b6-876c-1048971c7942",
+  "game_name": "CHECKERS",
+  "board": [
+    [
+      "  ",
+      "W ",
+      "  ",
+      "W ",
+      "  ",
+      "W ",
+      "  ",
+      "W "
+    ],
+    [
+      "W ",
+      "  ",
+      "W ",
+      "  ",
+      "W ",
+      "  ",
+      "W ",
+      "  "
+    ],
+    [
+      "  ",
+      "W ",
+      "  ",
+      "W ",
+      "  ",
+      "W ",
+      "  ",
+      "W "
+    ],
+    [
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  "
+    ],
+    [
+      "  ",
+      "B ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  "
+    ],
+    [
+      "  ",
+      "  ",
+      "B ",
+      "  ",
+      "B ",
+      "  ",
+      "B ",
+      "  "
+    ],
+    [
+      "  ",
+      "B ",
+      "  ",
+      "B ",
+      "  ",
+      "B ",
+      "  ",
+      "B "
+    ],
+    [
+      "B ",
+      "  ",
+      "B ",
+      "  ",
+      "B ",
+      "  ",
+      "B ",
+      "  "
+    ]
+  ],
+  "current_player": "W",
+  "ai_player": "W",
+  "king_movement_mode": "MULTI"
+}

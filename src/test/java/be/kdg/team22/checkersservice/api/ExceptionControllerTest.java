@@ -107,6 +107,20 @@ public class ExceptionControllerTest {
     }
 
     @Test
+    void handleBotMoveRequestFailedExceptions() {
+        BotMoveRequestFailedException botMoveRequestFailedEx = new BotMoveRequestFailedException("");
+        ResponseEntity<String> response = controller.handleBotMoveRequestFailedException(botMoveRequestFailedEx);
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @Test
+    void handleBotServiceNotReachableException() {
+        BotServiceNotReachableException botServiceNotReachableEx = new BotServiceNotReachableException("");
+        ResponseEntity<String> response = controller.handleBotServiceNotReachableException(botServiceNotReachableEx);
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @Test
     void handleForbiddenActions() {
         PlayerIdentityMismatchException playerIdentityMismatchEx = new PlayerIdentityMismatchException();
         ResponseEntity<String> response = controller.handleForbiddenActionErrors(playerIdentityMismatchEx);

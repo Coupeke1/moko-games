@@ -56,6 +56,16 @@ public class ExceptionController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
+    @ExceptionHandler(BotMoveRequestFailedException.class)
+    public ResponseEntity<String> handleBotMoveRequestFailedException(BotMoveRequestFailedException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(BotServiceNotReachableException.class)
+    public ResponseEntity<String> handleBotServiceNotReachableException(BotServiceNotReachableException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
     @ExceptionHandler(PlayerIdentityMismatchException.class)
     public ResponseEntity<String> handleForbiddenActionErrors(final RuntimeException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.FORBIDDEN);

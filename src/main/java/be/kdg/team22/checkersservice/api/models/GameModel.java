@@ -11,9 +11,9 @@ import java.util.UUID;
 public record GameModel(
         UUID id,
         List<PlayerModel> players,
-        PlayerRole aiPlayer,
+        PlayerRole botPlayer,
         PlayerRole currentRole,
-        String[][] board,
+        List<List<String>> board,
         KingMovementMode kingMovementMode,
         GameStatus status
 ) {
@@ -21,7 +21,7 @@ public record GameModel(
         return new GameModel(
                 game.id().value(),
                 game.players().stream().map(PlayerModel::from).toList(),
-                game.aiPlayer(),
+                game.botPlayer(),
                 game.currentRole(),
                 game.board().state(),
                 game.kingMovementMode(),
