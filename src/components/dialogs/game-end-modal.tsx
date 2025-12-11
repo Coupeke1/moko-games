@@ -7,10 +7,9 @@ interface Props {
     gameState: GameState;
     myProfile: Profile;
     isOpen: boolean;
-    onReset: () => void;
 }
 
-export default function GameEndModal({gameState, myProfile, isOpen, onReset}: Props) {
+export default function GameEndModal({gameState, myProfile, isOpen}: Props) {
     const {winner, players} = gameState;
     const winningPlayer = players.find(player => player.id === winner);
 
@@ -28,15 +27,6 @@ export default function GameEndModal({gameState, myProfile, isOpen, onReset}: Pr
                     ) : (
                         <GameWin myProfile={myProfile} winningPlayer={winningPlayer!}/>
                     )}
-
-                    <div className="flex gap-3">
-                        <button
-                            onClick={onReset}
-                            className="flex-1 bg-x text-white py-3 px-4 rounded-lg font-medium hover:bg-opacity-90 transition-colors"
-                        >
-                            New game
-                        </button>
-                    </div>
                 </div>
             </div>
         </>
