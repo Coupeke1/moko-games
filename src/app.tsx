@@ -11,6 +11,7 @@ import InvitesPage from "@/features/invites/invites";
 import LibraryGamePage from "@/features/library/game";
 import LibraryPage from "@/features/library/library";
 import LobbyPage from "@/features/lobby/lobby";
+import NotFoundPage from "@/features/not-found";
 import { useProfile } from "@/features/profile/hooks/use-profile";
 import ProfilePage from "@/features/profile/profile";
 import StoreGamePage from "@/features/store/game";
@@ -60,19 +61,14 @@ function Content() {
                 <Route path="/" element={<Navigate to="/store" />} />
                 <Route path="/store" element={<StorePage />} />
                 <Route path="/store/:id" element={<StoreGamePage />} />
-
                 <Route path="/store/checkout" element={<CheckoutPage />} />
                 <Route path="/store/checkout/:id" element={<OrderPage />} />
-
                 <Route path="/library" element={<LibraryPage />} />
                 <Route path="/library/:id" element={<LibraryGamePage />} />
-
                 <Route path="/lobbies/:id" element={<LobbyPage />} />
                 <Route path="/lobbies/:id/game" element={<GamePage />} />
                 <Route path="/invites/:id" element={<InvitesPage />} />
-
                 <Route path="/profile" element={<ProfilePage />} />
-
                 <Route path="/friends" element={<FriendsPage />} />
                 <Route
                     path="/friends/requests/incoming"
@@ -82,6 +78,8 @@ function Content() {
                     path="/friends/requests/outgoing"
                     element={<OutgoingRequestsPage />}
                 />
+
+                <Route path="*" element={<NotFoundPage />} />
             </Routes>
 
             <Toaster
