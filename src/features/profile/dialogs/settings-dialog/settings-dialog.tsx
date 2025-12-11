@@ -8,7 +8,6 @@ import showToast from "@/components/toast";
 import type { Modules } from "@/features/profile/models/modules.ts";
 import type { Profile } from "@/features/profile/models/profile.ts";
 import { updateProfile } from "@/features/profile/services/profile.ts";
-import { useAuthStore } from "@/stores/auth-store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import AboutTab from "@/features/profile/dialogs/settings-dialog/about-tab";
@@ -29,7 +28,6 @@ export default function SettingsDialog({
     onChange,
 }: Props) {
     const client = useQueryClient();
-    const { token } = useAuthStore();
 
     const [current, setCurrent] = useState<string>("About");
     const [image, setImage] = useState("");
