@@ -40,6 +40,8 @@ services:
       VITE_SESSION_SERVICE: http://localhost/session-service/api/lobbies
       VITE_GAMES_SERVICE: http://localhost/games-service/api/games
       VITE_STORE_SERVICE: http://localhost/store-service/api/store/games
+      VITE_ORDER_SERVICE: http://localhost/store-service/api/orders
+      VITE_CART_SERVICE: http://localhost/store-service/api/cart
 
       VITE_SESSION_SOCKET: http://localhost/session-service
     expose:
@@ -280,6 +282,10 @@ services:
       SPRING_RABBITMQ_PASSWORD: password
 
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
+      CORS_ALLOWED_ORIGINS: http://localhost
+
+      MOLLIE_API_KEY: test_m7sCMkpbCxQ7hAjqKWc2C3v3pBNfKW
+      FRONTEND_URL: http://localhost
 
       USER_SERVICE_URL: http://service-user:8080
       GAME_SERVICE_URL: http://service-games:8084
