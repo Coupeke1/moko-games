@@ -26,24 +26,28 @@ public class GameController {
     }
 
     @PostMapping({"/", ""})
-    public ResponseEntity<GameModel> createGame(@RequestParam(defaultValue = "false") final boolean aiPlayer, @RequestBody final CreateGameModel model) {
-        Game game = service.startGame(model, aiPlayer);
+    public ResponseEntity<GameModel> createGame(@AuthenticationPrincipal final Jwt token,
+                                                @RequestParam(defaultValue = "false") final boolean aiPlayer,
+                                                @RequestBody final CreateGameModel model) {
+        Game game = service.startGame(model, PlayerId.get(token), aiPlayer);
         GameModel gameModel = GameModel.from(game);
 
         return ResponseEntity.ok(gameModel);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GameModel> getGame(@PathVariable final UUID id) {
-        Game game = service.getGame(new GameId(id));
+    public ResponseEntity<GameModel> getGame(@AuthenticationPrincipal final Jwt token,
+                                             @PathVariable final UUID id) {
+        Game game = service.getGame(new GameId(id), PlayerId.get(token));
         GameModel model = GameModel.from(game);
 
         return ResponseEntity.ok(model);
     }
 
     @PostMapping("/{id}/reset")
-    public ResponseEntity<GameModel> resetGame(@PathVariable final UUID id) {
-        Game game = service.resetGame(new GameId(id));
+    public ResponseEntity<GameModel> resetGame(@AuthenticationPrincipal final Jwt token,
+                                               @PathVariable final UUID id) {
+        Game game = service.resetGame(new GameId(id), PlayerId.get(token));
         GameModel model = GameModel.from(game);
 
         return ResponseEntity.ok(model);

@@ -14,11 +14,11 @@ import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
 import be.kdg.team22.tictactoeservice.domain.game.Move;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
 import be.kdg.team22.tictactoeservice.domain.player.exceptions.PlayerIdentityMismatchException;
+import be.kdg.team22.tictactoeservice.domain.player.exceptions.PlayerNotInThisGameException;
 import be.kdg.team22.tictactoeservice.events.AiMoveRequestedEvent;
 import be.kdg.team22.tictactoeservice.infrastructure.game.GameRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
@@ -30,32 +30,38 @@ public class GameService {
     private final GameRepository repository;
     private final BoardSizeProperties config;
     private final GameEventPublisher publisher;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     private final Logger logger;
 
-    @Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
-
-    public GameService(GameRepository repository, BoardSizeProperties config, GameEventPublisher publisher) {
+    public GameService(GameRepository repository, BoardSizeProperties config, GameEventPublisher publisher, ApplicationEventPublisher applicationEventPublisher) {
         this.repository = repository;
         this.config = config;
         this.publisher = publisher;
+        this.applicationEventPublisher = applicationEventPublisher;
         logger = LoggerFactory.getLogger(GameService.class);
     }
 
-    public Game startGame(final CreateGameModel model, final boolean aiPlayer) {
+    public Game startGame(final CreateGameModel model, final PlayerId playerId, final boolean aiPlayer) {
         List<PlayerId> players = model.players().stream().map(PlayerId::new).toList();
+        if (players.stream().noneMatch(p -> p.equals(playerId))) {
+            throw new PlayerNotInThisGameException();
+        }
         Game game = Game.create(config.minSize(), config.maxSize(), aiPlayer ? 3 : model.settings().boardSize(), players, aiPlayer);
         repository.save(game);
         return game;
     }
 
-    public Game getGame(final GameId id) {
-        return repository.findById(id).orElseThrow(id::notFound);
+    public Game getGame(final GameId id, final PlayerId playerId) {
+        Game game = repository.findById(id).orElseThrow(id::notFound);
+        if (game.players().stream().noneMatch(p -> p.id().equals(playerId))) {
+            throw new PlayerNotInThisGameException();
+        }
+        return game;
     }
 
-    public Game resetGame(final GameId id) {
-        Game game = getGame(id);
+    public Game resetGame(final GameId id, final PlayerId playerId) {
+        Game game = getGame(id, playerId);
         game.reset();
         repository.save(game);
         return game;
@@ -64,7 +70,7 @@ public class GameService {
     public Game requestMove(final GameId id, final PlayerId playerId, final Move move) {
         if (!playerId.equals(move.playerId())) throw new PlayerIdentityMismatchException();
 
-        Game game = getGame(id);
+        Game game = getGame(id, playerId);
         game.requestMove(move);
         repository.save(game);
 
