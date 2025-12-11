@@ -1,10 +1,15 @@
 package be.kdg.team22.userservice.application.achievement;
 
+import be.kdg.team22.userservice.api.achievement.models.AchievementModel;
 import be.kdg.team22.userservice.application.profile.ProfileService;
 import be.kdg.team22.userservice.domain.achievement.*;
+import be.kdg.team22.userservice.domain.library.exceptions.ExternalGameNotFoundException;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
 import be.kdg.team22.userservice.events.AchievementUnlockedEvent;
+import be.kdg.team22.userservice.infrastructure.games.ExternalGamesRepository;
+import be.kdg.team22.userservice.infrastructure.games.GameDetailsResponse;
 import be.kdg.team22.userservice.infrastructure.messaging.AchievementEventPublisher;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,15 +20,16 @@ import java.util.UUID;
 @Service
 @Transactional
 public class AchievementService {
-
     private final AchievementRepository achievements;
     private final AchievementEventPublisher eventPublisher;
     private final ProfileService profileService;
+    private final ExternalGamesRepository gamesRepository;
 
-    public AchievementService(final AchievementRepository achievements, final AchievementEventPublisher eventPublisher, final ProfileService profileService) {
+    public AchievementService(final AchievementRepository achievements, final AchievementEventPublisher eventPublisher, final ProfileService profileService, final ExternalGamesRepository gameRepo) {
         this.achievements = achievements;
         this.eventPublisher = eventPublisher;
         this.profileService = profileService;
+        this.gamesRepository = gameRepo;
     }
 
     public void award(final UUID userId, final String code) {
@@ -62,5 +68,22 @@ public class AchievementService {
 
     public List<Achievement> findByProfile(final ProfileId profileId) {
         return achievements.findByProfile(profileId);
+    }
+
+    public List<AchievementModel> findModelsByProfile(ProfileId profileId, Jwt token) {
+        return achievements.findByProfile(profileId)
+                .stream()
+                .map(a -> {
+                    GameDetailsResponse game = null;
+
+                    try {
+                        game = gamesRepository.getGame(a.gameId(), token);
+                    } catch (ExternalGameNotFoundException ex) {
+                        // Laat game null → geen image of name
+                    }
+
+                    return AchievementModel.from(a, game);
+                })
+                .toList();
     }
 }
