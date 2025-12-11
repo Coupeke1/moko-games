@@ -34,11 +34,13 @@ services:
       VITE_AUTH_CLIENT: platform-frontend
 
       VITE_USER_SERVICE: http://localhost/user-service/api/profiles
+      VITE_ACHIEVEMENT_SERVICE: http://localhost/user-service/api/achievements
       VITE_LIBRARY_SERVICE: http://localhost/user-service/api/library
       VITE_SOCIAL_SERVICE: http://localhost/social-service/api/friends
       VITE_SESSION_SERVICE: http://localhost/session-service/api/lobbies
-      VITE_GAMES_SERVICE: http://localhost/game-service/api/games
+      VITE_GAMES_SERVICE: http://localhost/games-service/api/games
       VITE_STORE_SERVICE: http://localhost/store-service/api/store/games
+
       VITE_SESSION_SOCKET: http://localhost/session-service
     expose:
       - "80"
@@ -131,8 +133,11 @@ services:
 
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
 
+      CORS_ALLOWED_ORIGINS: http://localhost
       USER_SERVICE_URL: http://service-user:8080
+      CHAT_SERVICE_URL: http://service-communication:8082
       SOCIAL_SERVICE_URL: http://service-social:8083
+      GAME_SERVICE_URL: http://service-games:8084
     expose:
       - "8081"
     healthcheck:
@@ -164,7 +169,7 @@ services:
       SPRING_RABBITMQ_USERNAME: user
       SPRING_RABBITMQ_PASSWORD: password
 
-      SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ENDPOINT_JWK_SET_URI: http://idp-keycloak:8080/auht/realms/moko/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
 
       SESSION_SERVICE_URL: http://service-session:8081
       USER_SERVICE_URL: http://service-user:8080
@@ -384,6 +389,8 @@ services:
       POSTGRES_PASSWORD: 'password'
       POSTGRES_DB: 'moko'
       PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5443:5432"
     networks:
       - moko_backend
     volumes:
