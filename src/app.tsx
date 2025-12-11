@@ -2,6 +2,7 @@ import Auth from "@/components/auth";
 import ErrorState from "@/components/state/error";
 import LoadingState from "@/components/state/loading";
 import CheckoutPage from "@/features/checkout/checkout";
+import OrderPage from "@/features/checkout/order";
 import FriendsPage from "@/features/friends/friends";
 import IncomingRequestsPage from "@/features/friends/incoming";
 import OutgoingRequestsPage from "@/features/friends/outgoing";
@@ -18,7 +19,6 @@ import { useAuthStore } from "@/stores/auth-store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { Toaster } from "sonner";
-import OrderPage from "@/features/checkout/order";
 
 const client = new QueryClient();
 

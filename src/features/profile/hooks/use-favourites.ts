@@ -21,6 +21,5 @@ export function useFavourites() {
         retry: 1,
     });
 
-    const favourites = games ? { games } : undefined;
-    return { favourites, loading, error };
+    return { favourites: games, loading, error };
 }
