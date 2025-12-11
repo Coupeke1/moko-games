@@ -43,21 +43,21 @@ public class CartController {
         return cart.entries().stream().map(item -> gameService.getGameWithMetadata(item.gameId())).toList();
     }
 
-    @PostMapping("/entries")
+    @PostMapping()
     public ResponseEntity<Void> addEntry(@AuthenticationPrincipal final Jwt token, @Valid @RequestBody final AddEntryModel request) {
         UserId userId = UserId.get(token);
         cartService.addEntry(userId, GameId.from(request.id()), token.getTokenValue());
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/entries/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Boolean> hasEntry(@AuthenticationPrincipal final Jwt token, @PathVariable final UUID id) {
         UserId userId = UserId.get(token);
         boolean hasEntry = cartService.hasEntry(userId, GameId.from(id));
         return ResponseEntity.ok(hasEntry);
     }
 
-    @DeleteMapping("/entries/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> removeEntry(@AuthenticationPrincipal final Jwt token, @PathVariable final UUID id) {
         UserId userId = UserId.get(token);
         cartService.removeEntry(userId, GameId.from(id));
