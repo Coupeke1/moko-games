@@ -6,7 +6,6 @@ import be.kdg.team22.tictactoeservice.api.models.MoveModel;
 import be.kdg.team22.tictactoeservice.config.TestcontainersConfig;
 import be.kdg.team22.tictactoeservice.domain.game.Game;
 import be.kdg.team22.tictactoeservice.domain.game.GameId;
-import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
 import be.kdg.team22.tictactoeservice.infrastructure.ai.AiMoveResponse;
 import be.kdg.team22.tictactoeservice.infrastructure.ai.ExternalAiRepository;
 import be.kdg.team22.tictactoeservice.infrastructure.game.GameRepository;
@@ -23,7 +22,6 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.UUID;
 
@@ -78,10 +76,8 @@ public class GameControllerIntegrationTest {
                 players,
                 new GameSettingsModel(0)
         );
-        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
 
         mockMvc.perform(post("/api/games")
-                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(defaultModel)))
                 .andExpect(status().isOk())
@@ -96,10 +92,8 @@ public class GameControllerIntegrationTest {
                 players,
                 new GameSettingsModel(5)
         );
-        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
 
         mockMvc.perform(post("/api/games")
-                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(modelSizeFive)))
                 .andExpect(status().isOk())
@@ -114,10 +108,8 @@ public class GameControllerIntegrationTest {
                 List.of(players.getFirst()),
                 new GameSettingsModel(1)
         );
-        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
 
         mockMvc.perform(post("/api/games")
-                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(modelSizeOne)))
                 .andExpect(status().isBadRequest());
@@ -125,9 +117,7 @@ public class GameControllerIntegrationTest {
 
     @Test
     void shouldCreateGameWithCorrectPlayers() throws Exception {
-        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
         mockMvc.perform(post("/api/games")
-                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(model)))
                 .andExpect(status().isOk())
@@ -143,10 +133,7 @@ public class GameControllerIntegrationTest {
                 new GameSettingsModel(3)
         );
 
-        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
-
         mockMvc.perform(post("/api/games")
-                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(onePlayerModel)))
                 .andExpect(status().isBadRequest());
@@ -176,65 +163,8 @@ public class GameControllerIntegrationTest {
                 .andExpect(status().isNotFound());
     }
 
-    @Test
-    void shouldResetFinishedGame() throws Exception {
-        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
-        String createResponse = mockMvc.perform(post("/api/games")
-                        .with(authentication(auth))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(model)))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        String id = extractId(createResponse);
-
-
-        Game game = repository.findById(GameId.fromString(id)).orElseThrow();
-        setGameStatus(game, GameStatus.WON);
-        repository.save(game);
-
-        mockMvc.perform(post("/api/games/" + id + "/reset")
-                        .with(authentication(auth)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(id))
-                .andExpect(jsonPath("$.board.length()").value(3))
-                .andExpect(jsonPath("$.currentRole").value("X"))
-                .andExpect(jsonPath("$.status").value("IN_PROGRESS"));
-    }
-
-    @Test
-    void shouldReturnBadRequestForUnfinishedGame() throws Exception {
-        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
-        String createResponse = mockMvc.perform(post("/api/games")
-                        .with(authentication(auth))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(model)))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        String id = extractId(createResponse);
-
-        mockMvc.perform(post("/api/games/" + id + "/reset")
-                        .with(authentication(auth)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void shouldReturn404WhenResetUnknownGame() throws Exception {
-        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
-        mockMvc.perform(post("/api/games/00000000-0000-0000-0000-000000000000/reset")
-                        .with(authentication(auth)))
-                .andExpect(status().isNotFound());
-    }
-
     private String extractId(String json) {
         return json.split("\"id\":\"")[1].split("\"")[0];
-    }
-
-    private void setGameStatus(Game game, GameStatus status) throws NoSuchFieldException, IllegalAccessException {
-        Field statusField = Game.class.getDeclaredField("status");
-        statusField.setAccessible(true);
-        statusField.set(game, status);
     }
 
     @Test

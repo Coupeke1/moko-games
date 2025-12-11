@@ -14,7 +14,6 @@ public class ExceptionController {
             CellOccupiedException.class,
             GameIdException.class,
             GameNotInProgressException.class,
-            GameResetException.class,
             GameSizeException.class,
             InvalidCellException.class,
             NotPlayersTurnException.class,

@@ -94,18 +94,6 @@ public class Game {
         return new Game(size, players, aiRole);
     }
 
-    public void reset() {
-        if (status == GameStatus.IN_PROGRESS)
-            throw new GameResetException();
-
-        this.status = GameStatus.IN_PROGRESS;
-        this.board = Board.create(this.board.size());
-
-        this.currentRole = players.first().role();
-        this.moveHistory.values().forEach(List::clear);
-        this.winner = null;
-    }
-
     public Player nextPlayer() {
         Player current = currentPlayer();
         List<Player> playerList = new ArrayList<>(players);
