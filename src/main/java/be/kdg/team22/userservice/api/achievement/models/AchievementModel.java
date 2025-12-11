@@ -15,6 +15,7 @@ public record AchievementModel(
         String description,
         int level,
         Instant unlockedAt,
+        String gameName,
         String gameImage
 ) {
     public static AchievementModel from(Achievement a, GameDetailsResponse game) {
@@ -26,6 +27,7 @@ public record AchievementModel(
                 AchievementMetadata.getDescription(a.code().value()),
                 AchievementMetadata.getLevels(a.code().value()),
                 a.unlockedAt(),
+                game != null ? game.name() : null,
                 game != null ? game.image() : null
         );
     }
