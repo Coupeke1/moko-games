@@ -1,8 +1,6 @@
 export const environment = {
     authUrl:
-        window.__APP_CONFIG__?.authUrl
-        ?? import.meta.env.VITE_AUTH_URL
-        ?? "",
+        window.__APP_CONFIG__?.authUrl ?? import.meta.env.VITE_AUTH_URL ?? "",
     authRealm:
         window.__APP_CONFIG__?.authRealm ??
         import.meta.env.VITE_AUTH_REALM ??
@@ -39,6 +37,10 @@ export const environment = {
     storeService:
         window.__APP_CONFIG__?.storeService ??
         import.meta.env.VITE_STORE_SERVICE ??
+        "",
+    orderService:
+        window.__APP_CONFIG__?.orderService ??
+        import.meta.env.VITE_ORDER_SERVICE ??
         "",
     cartService:
         window.__APP_CONFIG__?.cartService ??

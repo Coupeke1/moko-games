@@ -11,6 +11,7 @@ declare global {
             sessionSocket?: string;
             gamesService?: string;
             storeService?: string;
+            orderService?: string;
             cartService?: string;
         };
     }

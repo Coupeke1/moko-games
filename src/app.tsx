@@ -1,6 +1,7 @@
 import Auth from "@/components/auth";
 import ErrorState from "@/components/state/error";
 import LoadingState from "@/components/state/loading";
+import CheckoutPage from "@/features/checkout/checkout";
 import FriendsPage from "@/features/friends/friends";
 import IncomingRequestsPage from "@/features/friends/incoming";
 import OutgoingRequestsPage from "@/features/friends/outgoing";
@@ -17,6 +18,7 @@ import { useAuthStore } from "@/stores/auth-store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { Toaster } from "sonner";
+import OrderPage from "@/features/checkout/order";
 
 const client = new QueryClient();
 
@@ -58,6 +60,9 @@ function Content() {
                 <Route path="/" element={<Navigate to="/store" />} />
                 <Route path="/store" element={<StorePage />} />
                 <Route path="/store/:id" element={<StoreGamePage />} />
+
+                <Route path="/store/checkout" element={<CheckoutPage />} />
+                <Route path="/store/checkout/:id" element={<OrderPage />} />
 
                 <Route path="/library" element={<LibraryPage />} />
                 <Route path="/library/:id" element={<LibraryGamePage />} />

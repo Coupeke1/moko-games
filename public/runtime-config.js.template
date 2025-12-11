@@ -10,5 +10,6 @@ window.__APP_CONFIG__ = {
     sessionSocket: "$VITE_SESSION_SOCKET",
     gamesService: "$VITE_GAMES_SERVICE",
     storeService: "$VITE_STORE_SERVICE",
+    orderService: "$VITE_ORDER_SERVICE",
     cartService: "$VITE_CART_SERVICE"
 }
