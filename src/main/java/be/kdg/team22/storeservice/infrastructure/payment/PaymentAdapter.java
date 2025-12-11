@@ -20,14 +20,8 @@ public class PaymentAdapter implements PaymentProvider {
     private final String redirectBase;
     private final String webhookUrl;
 
-    public PaymentAdapter(
-            @Value("${mollie.api-key}") String apiKey,
-            @Value("${frontend-url}") String redirectBase,
-            @Value("${mollie.webhook-url}") String webhookUrl
-    ) {
-        this.client = Client.builder()
-                .security(Security.builder().apiKey(apiKey).build())
-                .build();
+    public PaymentAdapter(@Value("${mollie.api-key}") String apiKey, @Value("${frontend-url}") String redirectBase, @Value("${mollie.webhook-url}") String webhookUrl) {
+        this.client = Client.builder().security(Security.builder().apiKey(apiKey).build()).build();
 
         this.redirectBase = redirectBase;
         this.webhookUrl = webhookUrl;
@@ -36,26 +30,13 @@ public class PaymentAdapter implements PaymentProvider {
     @Override
     public Payment createPayment(Order order) {
         try {
-            PaymentRequest request = PaymentRequest.builder()
-                    .description("Order " + order.id().value())
-                    .amount(Amount.builder()
-                            .currency("EUR")
-                            .value(order.totalPrice().setScale(2, RoundingMode.HALF_UP).toString())
-                            .build())
-                    .redirectUrl(redirectBase + "/payment/success?orderId=" + order.id().value())
-                    .build();
+            PaymentRequest request = PaymentRequest.builder().description("Order " + order.id().value()).amount(Amount.builder().currency("EUR").value(order.totalPrice().setScale(2, RoundingMode.HALF_UP).toString()).build()).redirectUrl(redirectBase + String.format("/store/checkout/%s", order.id().value())).build();
 
-            CreatePaymentResponse response = client.payments().create()
-                    .paymentRequest(request)
-                    .call();
+            CreatePaymentResponse response = client.payments().create().paymentRequest(request).call();
 
             PaymentResponse paymentRes = response.paymentResponse().orElseThrow(PaymentProviderException::new);
             String paymentId = paymentRes.id().orElseThrow(PaymentProviderException::new);
-            String checkoutUrl = paymentRes.links()
-                    .orElseThrow(PaymentProviderException::new)
-                    .checkout()
-                    .orElseThrow(PaymentProviderException::new)
-                    .href();
+            String checkoutUrl = paymentRes.links().orElseThrow(PaymentProviderException::new).checkout().orElseThrow(PaymentProviderException::new).href();
 
             return new Payment(paymentId, checkoutUrl);
 
@@ -67,9 +48,7 @@ public class PaymentAdapter implements PaymentProvider {
 
     @Override
     public boolean isPaymentPaid(String paymentId) {
-        GetPaymentRequest req = GetPaymentRequest.builder()
-                .paymentId(paymentId)
-                .build();
+        GetPaymentRequest req = GetPaymentRequest.builder().paymentId(paymentId).build();
 
         GetPaymentResponse response = client.payments().get(req);
 
@@ -81,9 +60,7 @@ public class PaymentAdapter implements PaymentProvider {
 
     @Override
     public PaymentStatus getPaymentStatus(String paymentId) {
-        GetPaymentRequest req = GetPaymentRequest.builder()
-                .paymentId(paymentId)
-                .build();
+        GetPaymentRequest req = GetPaymentRequest.builder().paymentId(paymentId).build();
 
         GetPaymentResponse response = client.payments().get(req);
         PaymentResponse payment = response.paymentResponse().orElseThrow();
