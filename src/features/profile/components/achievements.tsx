@@ -12,9 +12,7 @@ interface Props {
 export default function AchievementSection({enabled}: Props) {
     const {achievements, loading, error} = useAchievements();
 
-    console.log("achievements opgehaald:" + achievements);
     if (!enabled) return null;
-    console.log(achievements);
     return (
         <Section title="Achievements">
             <State data={achievements} loading={loading} error={error}/>
