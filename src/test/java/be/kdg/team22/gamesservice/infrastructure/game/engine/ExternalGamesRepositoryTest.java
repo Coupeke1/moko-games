@@ -11,6 +11,7 @@ import be.kdg.team22.gamesservice.domain.game.exceptions.EngineNotReachableExcep
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
@@ -86,7 +87,8 @@ class ExternalGamesRepositoryTest {
 
         UUID result = repo.startExternalGame(
                 sampleGame(),
-                req(new TicTacToeSettingsModel(3))
+                req(new TicTacToeSettingsModel(3)),
+                any(Jwt.class)
         );
 
         assertThat(result).isEqualTo(instanceId);
@@ -99,7 +101,7 @@ class ExternalGamesRepositoryTest {
         doReturn(client).when(repo).createRestClient(anyString());
 
         assertThatThrownBy(() ->
-                repo.startExternalGame(sampleGame(), req(new CheckersSettingsModel(8, true)))
+                repo.startExternalGame(sampleGame(), req(new CheckersSettingsModel(8, true)), any(Jwt.class))
         ).isInstanceOf(EngineGameNotFoundException.class);
     }
 
@@ -111,7 +113,7 @@ class ExternalGamesRepositoryTest {
         doReturn(client).when(repo).createRestClient(anyString());
 
         assertThatThrownBy(() ->
-                repo.startExternalGame(sampleGame(), req(new TicTacToeSettingsModel(3)))
+                repo.startExternalGame(sampleGame(), req(new TicTacToeSettingsModel(3)), any(Jwt.class))
         ).isInstanceOf(HttpClientErrorException.class);
     }
 
@@ -123,7 +125,7 @@ class ExternalGamesRepositoryTest {
         doReturn(client).when(repo).createRestClient(anyString());
 
         assertThatThrownBy(() ->
-                repo.startExternalGame(sampleGame(), req(new CheckersSettingsModel(8, false)))
+                repo.startExternalGame(sampleGame(), req(new CheckersSettingsModel(8, false)), any(Jwt.class))
         ).isInstanceOf(EngineNotReachableException.class)
                 .hasMessageContaining("http://engine-service/start");
     }

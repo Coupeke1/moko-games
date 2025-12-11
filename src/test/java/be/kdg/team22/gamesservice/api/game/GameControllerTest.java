@@ -57,7 +57,7 @@ class GameControllerTest {
     void startGame_returns202AndBody() throws Exception {
         UUID instanceId = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
 
-        when(gameService.startGame(any(StartGameRequest.class)))
+        when(gameService.startGame(any(StartGameRequest.class), any()))
                 .thenReturn(new StartGameResponseModel(instanceId));
 
         String json = """

@@ -19,6 +19,7 @@ import be.kdg.team22.gamesservice.infrastructure.game.health.GameHealthChecker;
 import be.kdg.team22.gamesservice.infrastructure.store.ExternalStoreRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -65,6 +66,15 @@ class GameServiceTest {
         );
     }
 
+    private Jwt tokenFromUuid(UUID id){
+        return Jwt.withTokenValue("token-" + id)
+                .header("alg", "none")
+                .subject(id.toString())
+                .claim("preferred_username", "mathias")
+                .claim("email", "m@a")
+                .build();
+    }
+
     @Test
     @DisplayName("startGame → happy path")
     void startGame_happyPath() {
@@ -76,14 +86,14 @@ class GameServiceTest {
         when(gameRepository.findById(gameId)).thenReturn(Optional.of(game));
 
         UUID instanceId = UUID.fromString("99999999-9999-9999-9999-999999999999");
-        when(engine.startExternalGame(game, request)).thenReturn(instanceId);
+        when(engine.startExternalGame(game, request, tokenFromUuid(request.players().getFirst()))).thenReturn(instanceId);
 
-        StartGameResponseModel response = service.startGame(request);
+        StartGameResponseModel response = service.startGame(request, tokenFromUuid(request.players().getFirst()));
 
         assertThat(response.gameInstanceId()).isEqualTo(instanceId);
 
         verify(gameRepository).findById(gameId);
-        verify(engine).startExternalGame(game, request);
+        verify(engine).startExternalGame(game, request, tokenFromUuid(request.players().getFirst()));
     }
 
     @Test
@@ -97,7 +107,7 @@ class GameServiceTest {
                 false
         );
 
-        assertThatThrownBy(() -> service.startGame(request))
+        assertThatThrownBy(() -> service.startGame(request, tokenFromUuid(request.players().getFirst())))
                 .isInstanceOf(PlayersListEmptyException.class);
 
         verifyNoInteractions(gameRepository, engine);
@@ -114,7 +124,7 @@ class GameServiceTest {
                 false
         );
 
-        assertThatThrownBy(() -> service.startGame(request))
+        assertThatThrownBy(() -> service.startGame(request, tokenFromUuid(request.players().getFirst())))
                 .isInstanceOf(InvalidGameConfigurationException.class)
                 .hasMessageContaining("Game settings cannot be null");
 
@@ -130,7 +140,7 @@ class GameServiceTest {
 
         when(gameRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.startGame(request))
+        assertThatThrownBy(() -> service.startGame(request, tokenFromUuid(request.players().getFirst())))
                 .isInstanceOf(GameNotFoundException.class);
 
         verify(gameRepository).findById(id);

@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -54,7 +55,7 @@ class GameExceptionHandlerTest {
     void gameNotFound_returns404() throws Exception {
         doThrow(new GameNotFoundException(new GameId(UUID.randomUUID())))
                 .when(gameService)
-                .startGame(any(StartGameRequest.class));
+                .startGame(any(StartGameRequest.class), any(Jwt.class));
 
         mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -67,7 +68,7 @@ class GameExceptionHandlerTest {
     void emptyPlayers_returns400() throws Exception {
         doThrow(new PlayersListEmptyException())
                 .when(gameService)
-                .startGame(any(StartGameRequest.class));
+                .startGame(any(StartGameRequest.class), any(Jwt.class));
 
         mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -86,7 +87,7 @@ class GameExceptionHandlerTest {
                         new TestHttpInputMessage()
                 );
 
-        doThrow(ex).when(gameService).startGame(any(StartGameRequest.class));
+        doThrow(ex).when(gameService).startGame(any(StartGameRequest.class), any(Jwt.class));
 
         mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -100,7 +101,7 @@ class GameExceptionHandlerTest {
     void illegalArgument_returns400() throws Exception {
         doThrow(new IllegalArgumentException("Bad input"))
                 .when(gameService)
-                .startGame(any(StartGameRequest.class));
+                .startGame(any(StartGameRequest.class), any(Jwt.class));
 
         mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)

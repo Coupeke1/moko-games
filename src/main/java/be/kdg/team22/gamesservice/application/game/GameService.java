@@ -14,6 +14,7 @@ import be.kdg.team22.gamesservice.infrastructure.store.ExternalStoreRepository;
 import be.kdg.team22.gamesservice.infrastructure.store.NewStoreEntryModel;
 import be.kdg.team22.gamesservice.infrastructure.store.StoreEntryModel;
 import be.kdg.team22.gamesservice.infrastructure.store.UpdateStoreEntryModel;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -34,7 +35,7 @@ public class GameService {
         this.engine = engine;
     }
 
-    public StartGameResponseModel startGame(final StartGameRequest request) {
+    public StartGameResponseModel startGame(final StartGameRequest request, final Jwt token) {
 
         if (request.players() == null || request.players().isEmpty()) {
             throw new PlayersListEmptyException();
@@ -48,7 +49,7 @@ public class GameService {
         Game game = gameRepository.findById(id)
                 .orElseThrow(() -> new GameNotFoundException(id));
 
-        UUID instanceId = engine.startExternalGame(game, request);
+        UUID instanceId = engine.startExternalGame(game, request, token);
 
         return new StartGameResponseModel(instanceId);
     }
