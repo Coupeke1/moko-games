@@ -23,6 +23,7 @@ export function useFavourites() {
     });
 
     const favourites = games ? { games } : undefined;
-
+    console.log("favourites");
+    console.log(favourites);
     return {favourites, loading, error};
 }

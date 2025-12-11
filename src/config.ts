@@ -18,7 +18,7 @@ export const environment = {
         "",
     achievementService:
         window.__APP_CONFIG__?.achievementService ??
-        import.meta.env.VITE_ACHIEVEMENTS_SERVICE ??
+        import.meta.env.VITE_ACHIEVEMENT_SERVICE ??
         "",
     socialService:
         window.__APP_CONFIG__?.socialService ??

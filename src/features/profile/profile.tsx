@@ -6,7 +6,7 @@ import {useProfile} from "@/features/profile/hooks/use-profile.ts";
 import ProfileInformation from "@/features/profile/components/information";
 import SettingsDialog from "@/features/profile/dialogs/settings-dialog/settings-dialog";
 import {useState} from "react";
-import AchievementSection from "./components/achievements";
+import ProfileAchievements from "./components/achievements";
 import FavouritesSection from "./components/favourites";
 
 export default function ProfilePage() {
@@ -37,9 +37,9 @@ export default function ProfilePage() {
                             onEdit={() => setSettings(true)}
                         />
 
-                        <AchievementSection enabled={profile.modules.achievements}/>
+                        {profile.modules.achievements && <ProfileAchievements />}
 
-                        <FavouritesSection enabled={profile.modules.favourites}/>
+                        {profile.modules.favourites && <FavouritesSection />}
 
                     </Column>
                 </>
