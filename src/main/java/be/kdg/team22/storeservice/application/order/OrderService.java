@@ -1,6 +1,5 @@
 package be.kdg.team22.storeservice.application.order;
 
-import be.kdg.team22.storeservice.api.order.models.PaymentResponse;
 import be.kdg.team22.storeservice.application.cart.CartService;
 import be.kdg.team22.storeservice.domain.cart.Cart;
 import be.kdg.team22.storeservice.domain.cart.UserId;
@@ -9,7 +8,6 @@ import be.kdg.team22.storeservice.domain.catalog.EntryRepository;
 import be.kdg.team22.storeservice.domain.catalog.exceptions.GameNotFoundException;
 import be.kdg.team22.storeservice.domain.order.*;
 import be.kdg.team22.storeservice.domain.order.exceptions.OrderEmptyException;
-import be.kdg.team22.storeservice.domain.order.exceptions.OrderNotFoundException;
 import be.kdg.team22.storeservice.domain.order.exceptions.OrderNotOwnedException;
 import be.kdg.team22.storeservice.domain.payment.Payment;
 import be.kdg.team22.storeservice.domain.payment.PaymentProvider;
@@ -33,8 +31,8 @@ public class OrderService {
         this.paymentProvider = paymentProvider;
     }
 
-    public Order createOrder(final UserId userId) {
-        final Cart cart = cartService.get(userId);
+    public Order createOrder(final UserId id) {
+        final Cart cart = cartService.get(id);
 
         if (cart.isEmpty())
             throw new OrderEmptyException();
@@ -44,18 +42,14 @@ public class OrderService {
             return new OrderItem(item.gameId(), entry.price());
         }).toList();
 
-        Order order = new Order(OrderId.create(), items, OrderStatus.PENDING_PAYMENT, userId);
+        Order order = new Order(OrderId.create(), items, OrderStatus.PENDING_PAYMENT, id);
 
         repository.save(order);
         return order;
     }
 
-    public Order getOrder(final OrderId id) {
-        return repository.findById(id.value()).orElseThrow(OrderNotFoundException::new);
-    }
-
-    public PaymentResponse createPaymentForOrder(final OrderId id, final UserId userId) {
-        Order order = repository.findById(id.value()).orElseThrow(OrderNotFoundException::new);
+    public String createPaymentForOrder(final OrderId orderId, final UserId userId) {
+        Order order = repository.findById(orderId.value()).orElseThrow(orderId::notFound);
 
         if (!order.userId().equals(userId))
             throw new OrderNotOwnedException("User does not own this order");
@@ -65,6 +59,10 @@ public class OrderService {
         order.attachPaymentId(payment.id());
         repository.save(order);
 
-        return new PaymentResponse(payment.checkoutUrl());
+        return payment.checkoutUrl();
+    }
+
+    public Order getOrder(final OrderId id) {
+        return repository.findById(id.value()).orElseThrow(id::notFound);
     }
 }

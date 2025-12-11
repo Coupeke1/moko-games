@@ -12,6 +12,7 @@ import be.kdg.team22.storeservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.storeservice.infrastructure.games.GameMetadataResponse;
 import be.kdg.team22.storeservice.infrastructure.user.ExternalUserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -41,10 +42,10 @@ public class CartService {
 
     public boolean hasEntry(final UserId userId, final GameId gameId) {
         Cart cart = getOrCreate(userId);
-        return cart.entries().stream().filter(entry -> entry.gameId().equals(gameId)).findAny().isPresent();
+        return cart.entries().stream().anyMatch(entry -> entry.gameId().equals(gameId));
     }
 
-    public void addEntry(final UserId userId, final GameId gameId, final String token) {
+    public void addEntry(final UserId userId, final GameId gameId, final Jwt token) {
         GameMetadataResponse meta = gamesRepository.fetchMetadata(gameId);
         validateMetadata(meta, gameId);
 

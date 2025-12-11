@@ -3,6 +3,7 @@ package be.kdg.team22.storeservice.infrastructure.user;
 import be.kdg.team22.storeservice.domain.catalog.GameId;
 import be.kdg.team22.storeservice.domain.exceptions.ServiceUnavailableException;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
@@ -15,9 +16,9 @@ public class ExternalUserRepository {
         this.client = client;
     }
 
-    public boolean userOwnsGame(final GameId gameId, final String jwtToken) {
+    public boolean userOwnsGame(final GameId gameId, final Jwt token) {
         try {
-            Boolean ownsGame = client.get().uri("/" + gameId.value()).header("Authorization", "Bearer " + jwtToken).retrieve().body(Boolean.class);
+            Boolean ownsGame = client.get().uri("/" + gameId.value()).header("Authorization", "Bearer " + token.getTokenValue()).retrieve().body(Boolean.class);
             return ownsGame != null && ownsGame;
         } catch (RestClientException e) {
             throw ServiceUnavailableException.UserServiceUnavailable();

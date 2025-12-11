@@ -5,6 +5,7 @@ import be.kdg.team22.storeservice.domain.exceptions.ServiceUnavailableException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
@@ -44,7 +45,7 @@ class ExternalUserRepositoryTest {
     void userOwnsGame_backendReturnsTrue_returnsTrue() {
         when(responseSpec.body(Boolean.class)).thenReturn(true);
 
-        boolean result = repository.userOwnsGame(GameId.from(GAME_ID), JWT);
+        boolean result = repository.userOwnsGame(GameId.from(GAME_ID), Jwt.withTokenValue(JWT).build());
 
         assertThat(result).isTrue();
         verify(client.get()).uri("/" + GAME_ID);
@@ -56,7 +57,7 @@ class ExternalUserRepositoryTest {
     void userOwnsGame_backendReturnsFalse_returnsFalse() {
         when(responseSpec.body(Boolean.class)).thenReturn(false);
 
-        boolean result = repository.userOwnsGame(GameId.from(GAME_ID), JWT);
+        boolean result = repository.userOwnsGame(GameId.from(GAME_ID), Jwt.withTokenValue(JWT).build());
 
         assertThat(result).isFalse();
     }
@@ -66,7 +67,7 @@ class ExternalUserRepositoryTest {
     void userOwnsGame_backendReturnsNull_returnsFalse() {
         when(responseSpec.body(Boolean.class)).thenReturn(null);
 
-        boolean result = repository.userOwnsGame(GameId.from(GAME_ID), JWT);
+        boolean result = repository.userOwnsGame(GameId.from(GAME_ID), Jwt.withTokenValue(JWT).build());
 
         assertThat(result).isFalse();
     }
@@ -76,7 +77,7 @@ class ExternalUserRepositoryTest {
     void userOwnsGame_restClientThrowsException_throwsServiceUnavailable() {
         when(responseSpec.body(Boolean.class)).thenThrow(new RestClientException("Service unavailable"));
 
-        assertThatThrownBy(() -> repository.userOwnsGame(GameId.from(GAME_ID), JWT)).isInstanceOf(ServiceUnavailableException.class).hasMessageContaining("User-Service is currently unavailable");
+        assertThatThrownBy(() -> repository.userOwnsGame(GameId.from(GAME_ID), Jwt.withTokenValue(JWT).build())).isInstanceOf(ServiceUnavailableException.class).hasMessageContaining("User-Service is currently unavailable");
     }
 
     @Test
@@ -84,7 +85,7 @@ class ExternalUserRepositoryTest {
     void userOwnsGame_constructsCorrectUri() {
         when(responseSpec.body(Boolean.class)).thenReturn(true);
 
-        repository.userOwnsGame(GameId.from(GAME_ID), JWT);
+        repository.userOwnsGame(GameId.from(GAME_ID), Jwt.withTokenValue(JWT).build());
 
         verify(requestHeadersUriSpec).uri("/" + GAME_ID);
     }
@@ -94,7 +95,7 @@ class ExternalUserRepositoryTest {
     void userOwnsGame_includesBearerToken() {
         when(responseSpec.body(Boolean.class)).thenReturn(true);
 
-        repository.userOwnsGame(GameId.from(GAME_ID), JWT);
+        repository.userOwnsGame(GameId.from(GAME_ID), Jwt.withTokenValue(JWT).build());
 
         verify(headerSpec).header("Authorization", "Bearer " + JWT);
     }

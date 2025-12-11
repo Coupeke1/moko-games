@@ -27,12 +27,7 @@ public class PaymentService {
     private final StoreService storeService;
     private final OrderEventPublisher eventPublisher;
 
-    public PaymentService(
-            final PaymentProvider paymentProvider,
-            final OrderRepository orderRepo,
-            final CartService cartService,
-            final StoreService storeService,
-            final OrderEventPublisher eventPublisher) {
+    public PaymentService(final PaymentProvider paymentProvider, final OrderRepository orderRepo, final CartService cartService, final StoreService storeService, final OrderEventPublisher eventPublisher) {
         this.paymentProvider = paymentProvider;
         this.orderRepo = orderRepo;
         this.cartService = cartService;
@@ -41,9 +36,7 @@ public class PaymentService {
     }
 
     public void processWebhook(final String paymentId) {
-
-        Order order = orderRepo.findByPaymentId(paymentId)
-                .orElseThrow(() -> new OrderNotFoundException(paymentId));
+        Order order = orderRepo.findByPaymentId(paymentId).orElseThrow(() -> new OrderNotFoundException(paymentId));
 
         PaymentStatus status = paymentProvider.getPaymentStatus(paymentId);
         String s = status.value();
@@ -54,27 +47,22 @@ public class PaymentService {
                 cartService.clear(order.userId());
                 order.items().forEach(item -> storeService.recordPurchase(item.gameId()));
 
-                eventPublisher.publishOrderCompleted(new OrderCompletedEvent(
-                        order.userId().value(),
-                        order.id().value(),
-                        order.totalPrice()
-                ));
+                eventPublisher.publishOrderCompleted(new OrderCompletedEvent(order.userId().value(), order.id().value(), order.totalPrice()));
 
-                eventPublisher.publishGamesPurchased(new GamesPurchasedEvent(
-                        order.userId().value(),
-                        order.items().stream().map(item -> item.gameId().value()).toList()
-                ));
+                eventPublisher.publishGamesPurchased(new GamesPurchasedEvent(order.userId().value(), order.items().stream().map(item -> item.gameId().value()).toList()));
             }
-            case "canceled" -> order.updateStatus(OrderStatus.CANCELED);
-            case "expired" -> order.updateStatus(OrderStatus.EXPIRED);
-            case "failed" -> order.updateStatus(OrderStatus.FAILED);
+            case "canceled" ->
+                    order.updateStatus(OrderStatus.CANCELED);
+            case "expired" ->
+                    order.updateStatus(OrderStatus.EXPIRED);
+            case "failed" ->
+                    order.updateStatus(OrderStatus.FAILED);
         }
         orderRepo.save(order);
     }
 
     public Order verifyPayment(final OrderId orderId) {
-        Order order = orderRepo.findById(orderId.value())
-                .orElseThrow(OrderNotFoundException::new);
+        Order order = orderRepo.findById(orderId.value()).orElseThrow(OrderNotFoundException::new);
 
         String paymentId = order.paymentId();
         PaymentStatus status = paymentProvider.getPaymentStatus(paymentId);
@@ -85,16 +73,9 @@ public class PaymentService {
             order.items().forEach(item -> storeService.recordPurchase(item.gameId()));
             orderRepo.save(order);
 
-            eventPublisher.publishOrderCompleted(new OrderCompletedEvent(
-                    order.userId().value(),
-                    order.id().value(),
-                    order.totalPrice()
-            ));
+            eventPublisher.publishOrderCompleted(new OrderCompletedEvent(order.userId().value(), order.id().value(), order.totalPrice()));
 
-            eventPublisher.publishGamesPurchased(new GamesPurchasedEvent(
-                    order.userId().value(),
-                    order.items().stream().map(item -> item.gameId().value()).toList()
-            ));
+            eventPublisher.publishGamesPurchased(new GamesPurchasedEvent(order.userId().value(), order.items().stream().map(item -> item.gameId().value()).toList()));
 
             return order;
         }

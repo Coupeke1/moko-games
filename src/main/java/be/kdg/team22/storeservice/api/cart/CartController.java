@@ -46,7 +46,7 @@ public class CartController {
     @PostMapping()
     public ResponseEntity<Void> addEntry(@AuthenticationPrincipal final Jwt token, @Valid @RequestBody final AddEntryModel request) {
         UserId userId = UserId.get(token);
-        cartService.addEntry(userId, GameId.from(request.id()), token.getTokenValue());
+        cartService.addEntry(userId, GameId.from(request.id()), token);
         return ResponseEntity.ok().build();
     }
 
