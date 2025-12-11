@@ -5,7 +5,7 @@ import CancelIcon from "@/components/icons/cancel-icon";
 import showToast from "@/components/toast";
 import type { Lobby } from "@/features/lobby/models/lobby.ts";
 import type { Bot } from "@/features/profile/models/bot.ts";
-import { removeBot } from "@/features/lobby/services/lobby.ts";
+import { removeBot } from "@/features/lobby/services/bots.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function BotCard({

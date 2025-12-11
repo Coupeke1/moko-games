@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { type Subscription } from "rxjs";
 import type { Lobby } from "@/features/lobby/models/lobby.ts";
+import { isClosed, shouldStart } from "@/features/lobby/services/lobby.ts";
+import { isPlayerInLobby } from "@/features/lobby/services/players.ts";
 import { watchLobby } from "@/features/lobby/services/socket.ts";
 import { useSocketStore } from "@/stores/socket-store.ts";
-import { isPlayerInLobby } from "@/features/lobby/services/lobby.ts";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
+import { type Subscription } from "rxjs";
 
 export function useLobby(lobbyId?: string | null, userId?: string | null) {
     const queryClient = useQueryClient();
@@ -40,7 +41,10 @@ export function useLobby(lobbyId?: string | null, userId?: string | null) {
         subscription.current = watchLobby(lobbyId).subscribe({
             next: (lobby) => {
                 queryClient.setQueryData<Lobby>(["lobby", lobbyId], lobby);
+
+                if (isClosed(lobby)) navigate("/library");
                 if (!isPlayerInLobby(userId, lobby)) navigate("/library");
+                if (shouldStart(lobby)) navigate(`/lobbies/${lobby.id}/game`);
 
                 if (isFirst) {
                     isFirst = false;

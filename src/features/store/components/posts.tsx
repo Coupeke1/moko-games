@@ -2,15 +2,16 @@ import Card from "@/components/cards/card";
 import NewsIcon from "@/components/icons/news-icon";
 import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
-import { GridSize } from "@/components/layout/grid/size";
 import { Items } from "@/components/layout/items";
 import Row from "@/components/layout/row";
+import Section from "@/components/section";
+import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
+import PostDialog from "@/features/store/dialogs/post-dialog";
 import { usePosts } from "@/features/store/hooks/use-posts.ts";
 import type { Entry } from "@/features/store/models/entry/entry.ts";
 import type { Post } from "@/features/store/models/post/post";
 import { format } from "@/features/store/models/post/type";
-import PostDialog from "@/features/store/dialogs/post-dialog";
 import { useState } from "react";
 
 interface Props {
@@ -28,35 +29,38 @@ export default function Posts({ entry }: Props) {
     };
 
     return (
-        <>
+        <Section title="Posts">
             <State data={posts} loading={loading} error={error} />
 
             {posts && selected && (
                 <PostDialog post={selected} open={post} onChange={setPost} />
             )}
 
-            {posts && (
-                <Grid size={GridSize.Small}>
-                    {posts.map((post: Post) => (
-                        <Card
-                            key={post.id}
-                            title={post.title}
-                            image={post.image}
-                            onClick={() => select(post)}
-                            information={
-                                <Row
-                                    gap={Gap.Small}
-                                    items={Items.Center}
-                                    responsive={false}
-                                >
-                                    <NewsIcon />
-                                    <p>{format(post.type)}</p>
-                                </Row>
-                            }
-                        />
-                    ))}
-                </Grid>
-            )}
-        </>
+            {posts &&
+                (posts.length == 0 ? (
+                    <ErrorState>No posts</ErrorState>
+                ) : (
+                    <Grid>
+                        {posts.map((post: Post) => (
+                            <Card
+                                key={post.id}
+                                title={post.title}
+                                image={post.image}
+                                onClick={() => select(post)}
+                                information={
+                                    <Row
+                                        gap={Gap.Small}
+                                        items={Items.Center}
+                                        responsive={false}
+                                    >
+                                        <NewsIcon />
+                                        <p>{format(post.type)}</p>
+                                    </Row>
+                                }
+                            />
+                        ))}
+                    </Grid>
+                ))}
+        </Section>
     );
 }

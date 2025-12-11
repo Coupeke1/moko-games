@@ -10,7 +10,10 @@ import showToast from "@/components/toast";
 import { useFavourite } from "@/features/library/hooks/use-favourite.ts";
 import { useGame } from "@/features/games/hooks/use-game";
 import type { Game } from "@/features/games/models/game.ts";
-import { favouriteEntry, unFavouriteEntry } from "@/features/library/services/library.ts";
+import {
+    favouriteEntry,
+    unFavouriteEntry,
+} from "@/features/library/services/library.ts";
 import { createLobby } from "@/features/lobby/services/lobby.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -65,7 +68,7 @@ export default function LibraryGamePage() {
     const start = useMutation({
         mutationFn: async ({ game }: { game: Game }) => {
             const lobby = await createLobby(game, 4);
-            navigate(`/lobby/${lobby.id}`);
+            navigate(`/lobbies/${lobby.id}`);
         },
         onSuccess: async (_data, variables) => {
             await client.refetchQueries({ queryKey: ["lobby"] });

@@ -3,16 +3,15 @@ import { Gap } from "@/components/layout/gap";
 import { Justify } from "@/components/layout/justify";
 import Page from "@/components/layout/page";
 import Row from "@/components/layout/row";
-import Section from "@/components/section";
 import State from "@/components/state/state";
 import Statistic from "@/components/statistic";
 import Paragraph from "@/components/text/paragraph";
+import CartButton from "@/features/store/components/cart-button";
 import Posts from "@/features/store/components/posts";
 import { useEntry } from "@/features/store/hooks/use-entry.ts";
 import { format } from "@/features/store/models/entry/category.ts";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
-import CartButton from "@/features/store/components/cart-button";
 
 export default function StoreGamePage() {
     const navigate = useNavigate();
@@ -67,10 +66,7 @@ export default function StoreGamePage() {
                     </Row>
 
                     <Paragraph>{entry.description}</Paragraph>
-
-                    <Section title="Posts">
-                        <Posts entry={entry} />
-                    </Section>
+                    <Posts entry={entry} />
                 </Column>
             )}
         </Page>

@@ -11,13 +11,13 @@ import showToast from "@/components/toast";
 import type { Lobby } from "@/features/lobby/models/lobby.ts";
 import type { Player } from "@/features/lobby/models/player.ts";
 import type { Profile } from "@/features/profile/models/profile.ts";
+import { isUserOwner } from "@/features/lobby/services/lobby.ts";
+import { useMutation } from "@tanstack/react-query";
 import {
-    isUserOwner,
     readyPlayer,
     removePlayer,
     unReadyPlayer,
-} from "@/features/lobby/services/lobby.ts";
-import { useMutation } from "@tanstack/react-query";
+} from "@/features/lobby/services/players";
 
 export default function PlayerCard({
     player,
