@@ -5,6 +5,7 @@ declare global {
             authRealm?: string;
             authClientId?: string;
             userService?: string;
+            userServiceAchievements?: string;
             socialService?: string;
             libraryService?: string;
             sessionService?: string;

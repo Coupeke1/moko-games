@@ -52,8 +52,7 @@ async function updateImage(old: string, model: string) {
 }
 
 async function updateModules(old: Modules, model: Modules) {
-    if (old.achievements === model.achievements) return;
-    if (old.favourites === model.favourites) return;
+    if (old.achievements === model.achievements && old.favourites === model.favourites) return;
     await client.patch(`${BASE_URL}/me/modules`, model);
 }
 

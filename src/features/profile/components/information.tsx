@@ -1,9 +1,9 @@
 import EditIcon from "@/components/icons/edit-icon";
 import Column from "@/components/layout/column";
-import { Gap } from "@/components/layout/gap";
-import { Items } from "@/components/layout/items";
-import { Justify } from "@/components/layout/justify";
-import { Padding } from "@/components/layout/padding";
+import {Gap} from "@/components/layout/gap";
+import {Items} from "@/components/layout/items";
+import {Justify} from "@/components/layout/justify";
+import {Padding} from "@/components/layout/padding";
 import Row from "@/components/layout/row";
 import Statistic from "@/components/statistic";
 import Image from "@/features/profile/components/image";
@@ -19,18 +19,18 @@ interface Props {
 }
 
 export default function ProfileInformation({
-    image,
-    username,
-    email,
-    description,
-    level,
-    playTime,
-    onEdit,
-}: Props) {
+                                               image,
+                                               username,
+                                               email,
+                                               description,
+                                               level,
+                                               playTime,
+                                               onEdit,
+                                           }: Props) {
     return (
         <Row justify={Justify.Between} items={Items.Stretch}>
             <Row gap={Gap.Large} items={Items.Stretch}>
-                <Image src={image} />
+                <Image src={image}/>
 
                 <Column padding={Padding.Small}>
                     <Column gap={Gap.None}>
@@ -41,7 +41,7 @@ export default function ProfileInformation({
                                 onClick={onEdit}
                                 className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75"
                             >
-                                <EditIcon small={true} />
+                                <EditIcon small={true}/>
                             </button>
                         </Row>
 
@@ -60,11 +60,11 @@ export default function ProfileInformation({
                     onClick={onEdit}
                     className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75"
                 >
-                    <EditIcon small={false} />
+                    <EditIcon small={false}/>
                 </button>
 
                 <Row gap={Gap.Large} responsive={false}>
-                    <Statistic title="Level" value={level.toString()} />
+                    <Statistic title="Level" value={level.toString()}/>
 
                     <Statistic
                         title="Time Played"
