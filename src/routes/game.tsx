@@ -1,5 +1,5 @@
 import {useParams} from "react-router";
-import {useMemo, useState} from "react";
+import {useState} from "react";
 import {useMyProfile} from "../hooks/use-my-profile";
 import {useGameState} from "../hooks/use-game-state";
 import {useMyPlayerRole} from "../hooks/use-my-player-role";
@@ -9,7 +9,7 @@ import {MyRoleDisplay} from "../components/my-role-display";
 import {GameStatus} from "../models/game-status";
 import {TurnIndicator} from "../components/turn-indicator";
 import {GameGrid} from "../components/game-grid";
-import {calculateValidMoves, getPieceAtCell, isPieceOwnedByPlayer, type ValidMove} from "../services/move-calculator";
+import {getPieceAtCell, isPieceOwnedByPlayer} from "../services/move-calculator";
 import {requestMove} from "../services/game-service";
 import {toast} from "sonner";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
@@ -27,12 +27,12 @@ export default function GamePage() {
     const isAI = gameState?.aiPlayer === myRole;
     const isMyTurn = gameState?.currentRole === myRole;
 
-    const validMoves = useMemo<ValidMove[]>(() => {
-        if (!selectedCell || !gameState || !profile?.id || !isMyTurn) {
-            return [];
-        }
-        return calculateValidMoves(gameState, selectedCell);
-    }, [selectedCell, gameState, profile?.id, isMyTurn]);
+    //const validMoves = useMemo<ValidMove[]>(() => {
+    //    if (!selectedCell || !gameState || !profile?.id || !isMyTurn) {
+    //        return [];
+    //    }
+    //    return calculateValidMoves(gameState, selectedCell);
+    //}, [selectedCell, gameState, profile?.id, isMyTurn]);
 
     const moveMutation = useMutation({
         mutationFn: (cells: number[]) => requestMove(id!, profile!.id, cells),
