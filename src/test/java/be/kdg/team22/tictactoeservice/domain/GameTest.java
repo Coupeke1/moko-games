@@ -41,25 +41,6 @@ public class GameTest {
     }
 
     @Test
-    void resetShouldThrowIfInProgress() {
-        assertThrows(GameResetException.class, () -> game.reset());
-    }
-
-    @Test
-    void resetShouldWorkIfGameFinished() throws Exception {
-        Field statusField = Game.class.getDeclaredField("status");
-        statusField.setAccessible(true);
-        statusField.set(game, GameStatus.WON);
-
-        game.reset();
-
-        assertEquals(GameStatus.IN_PROGRESS, game.status());
-        assertEquals(PlayerRole.X, game.currentRole());
-        assertEquals(boardSize, game.board().size());
-        assertNotNull(game.board());
-    }
-
-    @Test
     void createShouldThrowWhenTooFewPlayers() {
         PlayerId playerId = PlayerId.create();
         assertThrows(GameSizeException.class, () ->

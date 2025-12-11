@@ -57,13 +57,6 @@ public class GameService {
         return game;
     }
 
-    public Game resetGame(final GameId id, final PlayerId playerId) {
-        Game game = getGame(id, playerId);
-        game.reset();
-        repository.save(game);
-        return game;
-    }
-
     public Game requestMove(final GameId id, final PlayerId playerId, final Move move) {
         if (!playerId.equals(move.playerId())) throw new PlayerIdentityMismatchException();
 
