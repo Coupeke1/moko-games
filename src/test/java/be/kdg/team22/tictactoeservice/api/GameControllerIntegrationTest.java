@@ -78,10 +78,8 @@ public class GameControllerIntegrationTest {
                 players,
                 new GameSettingsModel(0)
         );
-        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
 
         mockMvc.perform(post("/api/games")
-                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(defaultModel)))
                 .andExpect(status().isOk())
@@ -96,10 +94,8 @@ public class GameControllerIntegrationTest {
                 players,
                 new GameSettingsModel(5)
         );
-        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
 
         mockMvc.perform(post("/api/games")
-                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(modelSizeFive)))
                 .andExpect(status().isOk())
@@ -114,10 +110,8 @@ public class GameControllerIntegrationTest {
                 List.of(players.getFirst()),
                 new GameSettingsModel(1)
         );
-        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
 
         mockMvc.perform(post("/api/games")
-                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(modelSizeOne)))
                 .andExpect(status().isBadRequest());
@@ -125,9 +119,7 @@ public class GameControllerIntegrationTest {
 
     @Test
     void shouldCreateGameWithCorrectPlayers() throws Exception {
-        UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
         mockMvc.perform(post("/api/games")
-                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(model)))
                 .andExpect(status().isOk())
@@ -146,7 +138,6 @@ public class GameControllerIntegrationTest {
         UsernamePasswordAuthenticationToken auth = authWithUser(players.getFirst());
 
         mockMvc.perform(post("/api/games")
-                        .with(authentication(auth))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(onePlayerModel)))
                 .andExpect(status().isBadRequest());

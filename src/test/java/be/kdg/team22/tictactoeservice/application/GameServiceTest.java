@@ -69,7 +69,7 @@ public class GameServiceTest {
                 players.stream().map(p -> p.id().value()).toList(),
                 new GameSettingsModel(3));
 
-        Game game = service.startGame(model, playerX.id(), false);
+        Game game = service.startGame(model, false);
 
         assertNotNull(game);
         assertEquals(3, game.board().size());
@@ -84,7 +84,7 @@ public class GameServiceTest {
                 players.stream().map(p -> p.id().value()).toList(),
                 new GameSettingsModel(4));
 
-        Game game = service.startGame(model, playerX.id(), false);
+        Game game = service.startGame(model, false);
 
         assertEquals(4, game.board().size());
         verify(repository).save(any(Game.class));
@@ -96,7 +96,7 @@ public class GameServiceTest {
                 players.stream().map(p -> p.id().value()).toList(),
                 new GameSettingsModel(2));
 
-        assertThrows(BoardSizeException.class, () -> service.startGame(model, playerX.id(), false));
+        assertThrows(BoardSizeException.class, () -> service.startGame(model, false));
     }
 
     @Test

@@ -42,11 +42,8 @@ public class GameService {
         logger = LoggerFactory.getLogger(GameService.class);
     }
 
-    public Game startGame(final CreateGameModel model, final PlayerId playerId, final boolean aiPlayer) {
+    public Game startGame(final CreateGameModel model, final boolean aiPlayer) {
         List<PlayerId> players = model.players().stream().map(PlayerId::new).toList();
-        if (players.stream().noneMatch(p -> p.equals(playerId))) {
-            throw new PlayerNotInThisGameException();
-        }
         Game game = Game.create(config.minSize(), config.maxSize(), aiPlayer ? 3 : model.settings().boardSize(), players, aiPlayer);
         repository.save(game);
         return game;
