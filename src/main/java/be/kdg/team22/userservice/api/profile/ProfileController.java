@@ -1,6 +1,7 @@
 package be.kdg.team22.userservice.api.profile;
 
 import be.kdg.team22.userservice.api.profile.models.EditModulesModel;
+import be.kdg.team22.userservice.api.profile.models.FilteredProfileModel;
 import be.kdg.team22.userservice.api.profile.models.PreferencesModel;
 import be.kdg.team22.userservice.api.profile.models.ProfileModel;
 import be.kdg.team22.userservice.application.profile.ProfileService;
@@ -72,9 +73,12 @@ public class ProfileController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProfileModel> getById(@PathVariable final UUID id) {
-        Profile profile = service.getById(new ProfileId(id));
-        return ResponseEntity.ok(ProfileModel.from(profile));
+    public ResponseEntity<FilteredProfileModel> getById(
+            @PathVariable final UUID id,
+            @AuthenticationPrincipal final Jwt token
+    ) {
+        FilteredProfileModel profile = service.getByIdAndPreferences(new ProfileId(id), token);
+        return ResponseEntity.ok(profile);
     }
 
     @GetMapping("{id}/preferences")

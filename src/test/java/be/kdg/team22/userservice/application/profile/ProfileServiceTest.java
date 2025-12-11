@@ -1,9 +1,12 @@
 package be.kdg.team22.userservice.application.profile;
 
+import be.kdg.team22.userservice.domain.achievement.AchievementRepository;
+import be.kdg.team22.userservice.domain.library.LibraryRepository;
 import be.kdg.team22.userservice.domain.profile.*;
 import be.kdg.team22.userservice.domain.profile.exceptions.CannotUpdateProfileException;
 import be.kdg.team22.userservice.domain.profile.exceptions.ClaimNotFoundException;
 import be.kdg.team22.userservice.domain.profile.exceptions.ProfileNotFoundException;
+import be.kdg.team22.userservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.userservice.infrastructure.image.ExternalImageRepository;
 import be.kdg.team22.userservice.infrastructure.image.ImageResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +25,10 @@ class ProfileServiceTest {
 
     private final ProfileRepository repo = mock(ProfileRepository.class);
     private final ExternalImageRepository imageRepo = mock(ExternalImageRepository.class);
-    private final ProfileService service = new ProfileService(repo, imageRepo);
+    private final AchievementRepository achievementRepo = mock(AchievementRepository.class);
+    private final LibraryRepository libraryRepo = mock(LibraryRepository.class);
+    private final ExternalGamesRepository gameRepo = mock(ExternalGamesRepository.class);
+    private final ProfileService service = new ProfileService(repo, imageRepo, achievementRepo, libraryRepo, gameRepo);
 
     private Jwt token(String sub, String username, String email) {
         return Jwt.withTokenValue("dummy")
