@@ -1,4 +1,4 @@
-export interface AchievementModel {
+export interface Achievement {
     id: string;
     gameId: string;
     code: string;
@@ -8,8 +8,4 @@ export interface AchievementModel {
     unlockedAt: string;
     gameName: string | null;
     gameImage: string | null;
-}
-
-export interface AchievementListModel {
-    achievements: AchievementModel[];
 }
