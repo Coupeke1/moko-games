@@ -31,7 +31,7 @@ scope = openid
 
 ### 2) GET /api/profiles/me
 GET http://localhost:8080/api/profiles/me
-Authorization: Bearer {{access_token}}
+Authorization: Bearer {{kaj_token}}
 
 ### 3) PATCH /api/profiles/me (profiel updaten)
 PATCH http://localhost:8080/api/profiles/me
