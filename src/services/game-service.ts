@@ -36,7 +36,7 @@ export async function getGameState(gameId: string): Promise<GameState> {
     }
 }
 
-export async function requestMove(gameId: string, playerId: string, cells: number[]) {
+export async function requestMove(gameId: string, playerId: string, cells: number[]): Promise<GameState> {
     try {
         const moveRequest = {
             playerId: playerId,
@@ -46,8 +46,8 @@ export async function requestMove(gameId: string, playerId: string, cells: numbe
         const response = await axiosInstance.post<GameState>(`/${gameId}/move`, moveRequest);
         return response.data;
     } catch (error) {
-        if (error instanceof Error) {
-            throw new Error(`Could not make move: ${error.message}`);
+        if (axios.isAxiosError(error)) {
+            throw new Error(`Could not make move: ${error.response?.data?.message || error.message}`);
         }
         throw new Error(`Could not make move: Unknown error`);
     }
