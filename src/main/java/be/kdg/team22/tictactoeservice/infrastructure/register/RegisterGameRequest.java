@@ -1,6 +1,7 @@
 package be.kdg.team22.tictactoeservice.infrastructure.register;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public record RegisterGameRequest(
         String name,
@@ -13,6 +14,7 @@ public record RegisterGameRequest(
         String description,
         String image,
         BigDecimal price,
-        String category
+        String category,
+        List<RegisterAchievementRequest> achievements
 ) {
 }
