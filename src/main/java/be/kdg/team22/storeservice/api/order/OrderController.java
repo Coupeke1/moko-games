@@ -1,7 +1,6 @@
 package be.kdg.team22.storeservice.api.order;
 
 import be.kdg.team22.storeservice.api.order.models.OrderResponseModel;
-import be.kdg.team22.storeservice.api.order.models.PaymentResponse;
 import be.kdg.team22.storeservice.application.order.OrderService;
 import be.kdg.team22.storeservice.application.order.PaymentService;
 import be.kdg.team22.storeservice.domain.cart.UserId;
@@ -17,57 +16,33 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
-
     private final OrderService service;
     private final PaymentService paymentService;
 
-    public OrderController(OrderService service, PaymentService paymentService) {
+    public OrderController(final OrderService service, final PaymentService paymentService) {
         this.service = service;
         this.paymentService = paymentService;
     }
 
     @PostMapping
-    public ResponseEntity<OrderResponseModel> createOrder(
-            @AuthenticationPrincipal final Jwt jwt
-    ) {
-        final UserId userId = UserId.get(jwt);
+    public ResponseEntity<String> createOrder(@AuthenticationPrincipal final Jwt token) {
+        final UserId userId = UserId.get(token);
+
         final Order order = service.createOrder(userId);
+        final String checkout = service.createPaymentForOrder(order.id(), userId);
+
+        return ResponseEntity.ok(checkout);
+    }
+
+    @PostMapping("/{id}/verify")
+    public ResponseEntity<OrderResponseModel> verifyPayment(@PathVariable final UUID id) {
+        Order order = paymentService.verifyPayment(new OrderId(id));
         return ResponseEntity.ok(OrderResponseModel.from(order));
     }
 
-    @GetMapping("/{orderId}")
-    public ResponseEntity<OrderResponseModel> getOrder(
-            @PathVariable final UUID orderId
-    ) {
-        final Order order = service.getOrder(new OrderId(orderId));
+    @GetMapping("/{id}")
+    public ResponseEntity<OrderResponseModel> getOrder(@PathVariable final UUID id) {
+        final Order order = service.getOrder(new OrderId(id));
         return ResponseEntity.ok(OrderResponseModel.from(order));
-    }
-
-    @PostMapping("/{orderId}/payment")
-    public ResponseEntity<PaymentResponse> startPayment(
-            @PathVariable final UUID orderId,
-            @AuthenticationPrincipal final Jwt jwt) {
-
-        PaymentResponse payment = service.createPaymentForOrder(
-                new OrderId(orderId),
-                UserId.get(jwt)
-        );
-        return ResponseEntity.ok(payment);
-    }
-
-    @PostMapping("/{orderId}/verify")
-    public ResponseEntity<OrderResponseModel> verifyPayment(
-            @PathVariable final UUID orderId
-    ) {
-        Order order = paymentService.verifyPayment(new OrderId(orderId));
-        return ResponseEntity.ok(OrderResponseModel.from(order));
-    }
-
-    @PostMapping("/webhook")
-    public ResponseEntity<Void> webhook(
-            @RequestParam("id") final String paymentId
-    ) {
-        paymentService.processWebhook(paymentId);
-        return ResponseEntity.ok().build();
     }
 }

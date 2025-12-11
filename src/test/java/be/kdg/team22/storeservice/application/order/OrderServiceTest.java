@@ -1,6 +1,5 @@
 package be.kdg.team22.storeservice.application.order;
 
-import be.kdg.team22.storeservice.api.order.models.PaymentResponse;
 import be.kdg.team22.storeservice.application.cart.CartService;
 import be.kdg.team22.storeservice.domain.cart.Cart;
 import be.kdg.team22.storeservice.domain.cart.CartId;
@@ -157,9 +156,9 @@ class OrderServiceTest {
             return null;
         }).when(repo).save(any(Order.class));
 
-        PaymentResponse response = service.createPaymentForOrder(new OrderId(orderId), userId);
+        String response = service.createPaymentForOrder(new OrderId(orderId), userId);
 
-        assertThat(response.checkoutUrl()).isEqualTo("https://checkout");
+        assertThat(response).isEqualTo("https://checkout");
 
         verify(paymentProvider, times(1)).createPayment(order);
         verify(repo, times(1)).save(any(Order.class));

@@ -5,6 +5,7 @@ import be.kdg.team22.storeservice.domain.exceptions.ServiceUnavailableException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
@@ -16,8 +17,11 @@ import static org.mockito.Mockito.*;
 
 class ExternalUserRepositoryTest {
     private static final UUID GAME_ID = UUID.randomUUID();
-    private static final String JWT = "token";
-
+    Jwt jwt = Jwt.withTokenValue("test-token")
+            .header("alg", "none")
+            .claim("sub", "test-user")
+            .build();
+    
     private RestClient client;
     private RestClient.RequestHeadersUriSpec requestHeadersUriSpec;
     private RestClient.RequestHeadersSpec headerSpec;
@@ -33,7 +37,7 @@ class ExternalUserRepositoryTest {
 
         when(client.get()).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.uri("/" + GAME_ID)).thenReturn(headerSpec);
-        when(headerSpec.header("Authorization", "Bearer " + JWT)).thenReturn(headerSpec);
+        when(headerSpec.header("Authorization", "Bearer " + jwt.getTokenValue())).thenReturn(headerSpec);
         when(headerSpec.retrieve()).thenReturn(responseSpec);
 
         repository = new ExternalUserRepository(client);
@@ -44,11 +48,11 @@ class ExternalUserRepositoryTest {
     void userOwnsGame_backendReturnsTrue_returnsTrue() {
         when(responseSpec.body(Boolean.class)).thenReturn(true);
 
-        boolean result = repository.userOwnsGame(GameId.from(GAME_ID), JWT);
+        boolean result = repository.userOwnsGame(GameId.from(GAME_ID), jwt);
 
         assertThat(result).isTrue();
         verify(client.get()).uri("/" + GAME_ID);
-        verify(headerSpec).header("Authorization", "Bearer " + JWT);
+        verify(headerSpec).header("Authorization", "Bearer " + jwt.getTokenValue());
     }
 
     @Test
@@ -56,7 +60,7 @@ class ExternalUserRepositoryTest {
     void userOwnsGame_backendReturnsFalse_returnsFalse() {
         when(responseSpec.body(Boolean.class)).thenReturn(false);
 
-        boolean result = repository.userOwnsGame(GameId.from(GAME_ID), JWT);
+        boolean result = repository.userOwnsGame(GameId.from(GAME_ID), jwt);
 
         assertThat(result).isFalse();
     }
@@ -66,7 +70,7 @@ class ExternalUserRepositoryTest {
     void userOwnsGame_backendReturnsNull_returnsFalse() {
         when(responseSpec.body(Boolean.class)).thenReturn(null);
 
-        boolean result = repository.userOwnsGame(GameId.from(GAME_ID), JWT);
+        boolean result = repository.userOwnsGame(GameId.from(GAME_ID), jwt);
 
         assertThat(result).isFalse();
     }
@@ -76,7 +80,7 @@ class ExternalUserRepositoryTest {
     void userOwnsGame_restClientThrowsException_throwsServiceUnavailable() {
         when(responseSpec.body(Boolean.class)).thenThrow(new RestClientException("Service unavailable"));
 
-        assertThatThrownBy(() -> repository.userOwnsGame(GameId.from(GAME_ID), JWT)).isInstanceOf(ServiceUnavailableException.class).hasMessageContaining("User-Service is currently unavailable");
+        assertThatThrownBy(() -> repository.userOwnsGame(GameId.from(GAME_ID), jwt)).isInstanceOf(ServiceUnavailableException.class).hasMessageContaining("User-Service is currently unavailable");
     }
 
     @Test
@@ -84,7 +88,7 @@ class ExternalUserRepositoryTest {
     void userOwnsGame_constructsCorrectUri() {
         when(responseSpec.body(Boolean.class)).thenReturn(true);
 
-        repository.userOwnsGame(GameId.from(GAME_ID), JWT);
+        repository.userOwnsGame(GameId.from(GAME_ID), jwt);
 
         verify(requestHeadersUriSpec).uri("/" + GAME_ID);
     }
@@ -94,8 +98,8 @@ class ExternalUserRepositoryTest {
     void userOwnsGame_includesBearerToken() {
         when(responseSpec.body(Boolean.class)).thenReturn(true);
 
-        repository.userOwnsGame(GameId.from(GAME_ID), JWT);
+        repository.userOwnsGame(GameId.from(GAME_ID), jwt);
 
-        verify(headerSpec).header("Authorization", "Bearer " + JWT);
+        verify(headerSpec).header("Authorization", "Bearer " + jwt.getTokenValue());
     }
 }
