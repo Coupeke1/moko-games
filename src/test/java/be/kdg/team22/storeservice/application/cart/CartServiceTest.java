@@ -29,7 +29,8 @@ class CartServiceTest {
     final UserId userId = new UserId(USER);
     CartService service;
     final UUID GAME = UUID.randomUUID();
-    final String JWT = "jwt-token";
+    Jwt jwt = Jwt.withTokenValue("test-token").header("alg", "none").claim("sub", "test-user").build();
+
     ExternalGamesRepository games;
     ExternalUserRepository users;
     GameMetadataResponse validMetadata;
@@ -95,7 +96,7 @@ class CartServiceTest {
     void addEntry_metadataNull() {
         when(games.fetchMetadata(GameId.from(GAME))).thenReturn(null);
 
-        assertThrows(InvalidMetadataException.class, () -> service.addEntry(userId, GameId.from(GAME), Jwt.withTokenValue(JWT).build()));
+        assertThrows(InvalidMetadataException.class, () -> service.addEntry(userId, GameId.from(GAME), jwt));
     }
 
     @Test
@@ -104,7 +105,7 @@ class CartServiceTest {
         GameMetadataResponse meta = new GameMetadataResponse(GAME, "name", "", "desc", "image", Instant.now(), Instant.now());
         when(games.fetchMetadata(GameId.from(GAME))).thenReturn(meta);
 
-        assertThrows(InvalidMetadataException.class, () -> service.addEntry(userId, GameId.from(GAME), Jwt.withTokenValue(JWT).build()));
+        assertThrows(InvalidMetadataException.class, () -> service.addEntry(userId, GameId.from(GAME), jwt));
     }
 
     @Test
@@ -113,16 +114,16 @@ class CartServiceTest {
         GameMetadataResponse meta = new GameMetadataResponse(GAME, "name", "title", "desc", "", Instant.now(), Instant.now());
         when(games.fetchMetadata(GameId.from(GAME))).thenReturn(meta);
 
-        assertThrows(InvalidMetadataException.class, () -> service.addEntry(userId, GameId.from(GAME), Jwt.withTokenValue(JWT).build()));
+        assertThrows(InvalidMetadataException.class, () -> service.addEntry(userId, GameId.from(GAME), jwt));
     }
 
     @Test
     @DisplayName("addItem → user already owns game")
     void addEntry_userOwnsGame() {
         when(games.fetchMetadata(GameId.from(GAME))).thenReturn(validMetadata);
-        when(users.userOwnsGame(GameId.from(GAME), Jwt.withTokenValue(JWT).build())).thenReturn(true);
+        when(users.userOwnsGame(GameId.from(GAME), jwt)).thenReturn(true);
 
-        assertThrows(GameAlreadyOwnedException.class, () -> service.addEntry(userId, GameId.from(GAME), Jwt.withTokenValue(JWT).build()));
+        assertThrows(GameAlreadyOwnedException.class, () -> service.addEntry(userId, GameId.from(GAME), jwt));
     }
 
     @Test
@@ -130,10 +131,10 @@ class CartServiceTest {
     void addEntry_existingCart() {
         Cart cart = new Cart(CartId.create(), UserId.from(USER));
         when(games.fetchMetadata(GameId.from(GAME))).thenReturn(validMetadata);
-        when(users.userOwnsGame(GameId.from(GAME), Jwt.withTokenValue(JWT).build())).thenReturn(false);
+        when(users.userOwnsGame(GameId.from(GAME), jwt)).thenReturn(false);
         when(repo.findByUserId(USER)).thenReturn(Optional.of(cart));
 
-        service.addEntry(userId, GameId.from(GAME), Jwt.withTokenValue(JWT).build());
+        service.addEntry(userId, GameId.from(GAME), jwt);
 
         assertTrue(cart.entries().stream().anyMatch(i -> i.gameId().value().equals(GAME)));
         verify(repo).save(cart);
@@ -143,10 +144,10 @@ class CartServiceTest {
     @DisplayName("addItem → creates new cart when none exists")
     void addEntry_newCart() {
         when(games.fetchMetadata(GameId.from(GAME))).thenReturn(validMetadata);
-        when(users.userOwnsGame(GameId.from(GAME), Jwt.withTokenValue(JWT).build())).thenReturn(false);
+        when(users.userOwnsGame(GameId.from(GAME), jwt)).thenReturn(false);
         when(repo.findByUserId(USER)).thenReturn(Optional.empty());
 
-        service.addEntry(userId, GameId.from(GAME), Jwt.withTokenValue(JWT).build());
+        service.addEntry(userId, GameId.from(GAME), jwt);
 
         ArgumentCaptor<Cart> captor = ArgumentCaptor.forClass(Cart.class);
         verify(repo, atLeastOnce()).save(captor.capture());
