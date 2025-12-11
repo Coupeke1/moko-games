@@ -1,10 +1,13 @@
 package be.kdg.team22.gamesservice.domain.game;
 
+import be.kdg.team22.gamesservice.api.game.models.RegisterAchievementRequest;
 import be.kdg.team22.gamesservice.api.game.models.RegisterGameRequest;
 import be.kdg.team22.gamesservice.domain.game.exceptions.*;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
 import java.time.Instant;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @AggregateRoot
 public class Game {
@@ -26,6 +29,7 @@ public class Game {
     private String title;
     private String description;
     private String image;
+    private final Set<Achievement> achievements = new HashSet<>();
 
     public Game(
             final GameId id,
@@ -127,6 +131,20 @@ public class Game {
         validate(request.name(), request.backendUrl(), request.frontendUrl(), request.startEndpoint(), request.healthEndpoint(), request.title(), request.description(), request.image());
     }
 
+    public void addAchievement(final Achievement achievement) {
+        boolean added = this.achievements.add(achievement);
+        if (!added) {
+            throw new achievementKeyAlreadyExistisException(achievement.key().key());
+        }
+        this.updatedAt = Instant.now();
+    }
+
+    public void addAchievements(final List<Achievement> achievements) {
+        for (final Achievement achievement : achievements) {
+            addAchievement(achievement);
+        }
+    }
+
     public void rename(final String newName) {
         if (newName == null || newName.isBlank()) throw new GameNameInvalidException();
         this.name = newName;
@@ -175,7 +193,7 @@ public class Game {
     }
 
     public static Game register(RegisterGameRequest request) {
-        return new Game(
+        Game game = new Game(
                 GameId.create(),
                 request.name(),
                 request.backendUrl(),
@@ -186,6 +204,19 @@ public class Game {
                 request.description(),
                 request.image()
         );
+
+        if (request.achievements() == null) return game;
+
+        List<Achievement> achievements = new ArrayList<>();
+        request.achievements().forEach(achievement -> achievements.add(new Achievement(
+                AchievementKey.fromString(achievement.key()),
+                achievement.name(),
+                achievement.description(),
+                achievement.levels()
+        )));
+        game.addAchievements(achievements);
+
+        return game;
     }
 
     public void update(RegisterGameRequest request) {
@@ -198,7 +229,46 @@ public class Game {
         this.title = request.title();
         this.description = request.description();
         this.image = request.image();
+
+        syncAchievement(request);
+
         this.updatedAt = Instant.now();
+    }
+
+    private void syncAchievement(RegisterGameRequest request) {
+        if (request.achievements() == null) {
+            this.achievements.clear();
+            return;
+        }
+
+        Map<AchievementKey, RegisterAchievementRequest> incoming =
+                request.achievements().stream()
+                        .collect(Collectors.toMap(
+                                a -> AchievementKey.fromString(a.key()),
+                                a -> a
+                        ));
+
+        Set<Achievement> toRemove = new HashSet<>();
+
+        for (Achievement existing : this.achievements) {
+            RegisterAchievementRequest match = incoming.get(existing.key());
+            if (match == null) toRemove.add(existing);
+            else {
+                existing.update(match.name(), match.description(), match.levels());
+                incoming.remove(existing.key());
+            }
+        }
+
+        this.achievements.removeAll(toRemove);
+
+        incoming.values().forEach(req ->
+                this.achievements.add(new Achievement(
+                        AchievementKey.fromString(req.key()),
+                        req.name(),
+                        req.description(),
+                        req.levels()
+                ))
+        );
     }
 
     public void updateHealthStatus(boolean isHealthy) {
@@ -212,6 +282,10 @@ public class Game {
 
     public String name() {
         return name;
+    }
+
+    public Set<Achievement> achievements() {
+        return achievements;
     }
 
     public String baseUrl() {

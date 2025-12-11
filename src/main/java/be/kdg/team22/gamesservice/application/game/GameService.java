@@ -3,10 +3,7 @@ package be.kdg.team22.gamesservice.application.game;
 import be.kdg.team22.gamesservice.api.game.models.RegisterGameRequest;
 import be.kdg.team22.gamesservice.api.game.models.StartGameRequest;
 import be.kdg.team22.gamesservice.api.game.models.StartGameResponseModel;
-import be.kdg.team22.gamesservice.domain.game.Game;
-import be.kdg.team22.gamesservice.domain.game.GameCategory;
-import be.kdg.team22.gamesservice.domain.game.GameId;
-import be.kdg.team22.gamesservice.domain.game.GameRepository;
+import be.kdg.team22.gamesservice.domain.game.*;
 import be.kdg.team22.gamesservice.domain.game.exceptions.*;
 import be.kdg.team22.gamesservice.infrastructure.game.engine.ExternalGamesRepository;
 import be.kdg.team22.gamesservice.infrastructure.game.health.GameHealthChecker;
@@ -119,5 +116,15 @@ public class GameService {
                 price,
                 category
         ));
+    }
+
+    public List<Achievement> getAchievements(final GameId id) {
+        Game game = gameRepository.findById(id).orElseThrow(() -> new GameNotFoundException(id));
+        return game.achievements().stream().toList();
+    }
+
+    public Achievement getAchievement(final GameId id, final AchievementKey key) {
+        return gameRepository.findAchievementById(key, id)
+                .orElseThrow(() -> new AchievementNotFoundException(key, id));
     }
 }

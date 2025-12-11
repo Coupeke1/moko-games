@@ -1,9 +1,6 @@
 package be.kdg.team22.gamesservice.api.game;
 
-import be.kdg.team22.gamesservice.domain.game.exceptions.DuplicateGameNameException;
-import be.kdg.team22.gamesservice.domain.game.exceptions.GameNotFoundException;
-import be.kdg.team22.gamesservice.domain.game.exceptions.GameUnhealthyException;
-import be.kdg.team22.gamesservice.domain.game.exceptions.PlayersListEmptyException;
+import be.kdg.team22.gamesservice.domain.game.exceptions.*;
 import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +17,12 @@ public class GameExceptionHandler {
     @ExceptionHandler(GameNotFoundException.class)
     public ResponseEntity<String> handleGameNotFound(final GameNotFoundException ex) {
         log.warn("Game not found: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(AchievementNotFoundException.class)
+    public ResponseEntity<String> handleAchievementNotFound(final AchievementNotFoundException ex) {
+        log.warn("Achievement not found: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 

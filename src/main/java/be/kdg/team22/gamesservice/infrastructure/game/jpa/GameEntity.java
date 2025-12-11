@@ -1,13 +1,12 @@
 package be.kdg.team22.gamesservice.infrastructure.game.jpa;
 
+import be.kdg.team22.gamesservice.domain.game.Achievement;
 import be.kdg.team22.gamesservice.domain.game.Game;
 import be.kdg.team22.gamesservice.domain.game.GameId;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -19,6 +18,9 @@ public class GameEntity {
 
     @Column(nullable = false, unique = true)
     private String name;
+
+    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<AchievementEntity> achievements;
 
     @Column(nullable = false, name = "base_url")
     private String baseUrl;
@@ -86,7 +88,7 @@ public class GameEntity {
     }
 
     public static GameEntity fromDomain(Game game) {
-        return new GameEntity(
+        GameEntity gameEntity = new GameEntity(
                 game.id().value(),
                 game.name(),
                 game.baseUrl(),
@@ -101,10 +103,16 @@ public class GameEntity {
                 game.createdAt(),
                 game.updatedAt()
         );
+
+        gameEntity.achievements = game.achievements().stream()
+                .map(achievement -> AchievementEntity.fromDomain(achievement, gameEntity))
+                .toList();
+
+        return gameEntity;
     }
 
     public Game toDomain() {
-        return new Game(
+        Game game = new Game(
                 GameId.from(id),
                 name,
                 baseUrl,
@@ -119,6 +127,13 @@ public class GameEntity {
                 createdAt,
                 updatedAt
         );
+
+        List<Achievement> achievements = this.achievements.stream()
+                .map(AchievementEntity::toDomain)
+                .toList();
+        game.addAchievements(achievements);
+
+        return game;
     }
 
     public UUID id() {
