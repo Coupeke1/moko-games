@@ -6,6 +6,7 @@ import be.kdg.team22.userservice.api.profile.models.FilteredProfileModel;
 import be.kdg.team22.userservice.domain.achievement.AchievementRepository;
 import be.kdg.team22.userservice.domain.library.LibraryEntry;
 import be.kdg.team22.userservice.domain.library.LibraryRepository;
+import be.kdg.team22.userservice.domain.library.exceptions.ExternalGameNotFoundException;
 import be.kdg.team22.userservice.domain.profile.*;
 import be.kdg.team22.userservice.domain.profile.exceptions.CannotUpdateProfileException;
 import be.kdg.team22.userservice.domain.profile.exceptions.ClaimNotFoundException;
@@ -67,7 +68,17 @@ public class ProfileService {
         if (modules.achievements()) {
             achievements = achievementRepository.findByProfile(profileId)
                     .stream()
-                    .map(AchievementModel::from)
+                    .map(a -> {
+                        GameDetailsResponse game = null;
+
+                        try {
+                            game = gamesRepository.getGame(a.gameId(), token);
+                        } catch (ExternalGameNotFoundException e) {
+                            // ignore, game stays null
+                        }
+
+                        return AchievementModel.from(a, game);
+                    })
                     .toList();
         }
 
