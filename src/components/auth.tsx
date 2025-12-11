@@ -1,6 +1,6 @@
-import { useEffect } from "react";
-import { useAuthStore } from "@/stores/auth-store";
 import { environment } from "@/config";
+import { useAuthStore } from "@/stores/auth-store";
+import { useEffect } from "react";
 
 export default function Auth() {
     const initAuth = useAuthStore((state) => state.init);

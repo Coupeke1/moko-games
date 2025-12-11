@@ -2,18 +2,17 @@ import Card from "@/components/cards/card";
 import NewsIcon from "@/components/icons/news-icon";
 import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
-import { GridSize } from "@/components/layout/grid/size";
 import { Items } from "@/components/layout/items";
 import Row from "@/components/layout/row";
+import Section from "@/components/section";
+import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
+import PostDialog from "@/features/store/dialogs/post-dialog";
 import { usePosts } from "@/features/store/hooks/use-posts.ts";
 import type { Entry } from "@/features/store/models/entry/entry.ts";
 import type { Post } from "@/features/store/models/post/post";
 import { format } from "@/features/store/models/post/type";
-import PostDialog from "@/features/store/dialogs/post-dialog";
 import { useState } from "react";
-import ErrorState from "@/components/state/error";
-import Section from "@/components/section";
 
 interface Props {
     entry: Entry;
