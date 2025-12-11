@@ -1,0 +1,10 @@
+﻿### Create blackbox game
+POST http://localhost:8080/api/games/cc5353f0-5c25-41a4-866d-0191a312efaf
+Content-Type: application/json
+
+{
+  "whitePlayerId": "4d7d1d22-be8d-42c3-b169-b94acb24fe31",
+  "whitePlayerName": "Player 1",
+  "blackPlayerId": "45d2a558-9fb0-4625-84be-db2122697671",
+  "blackPlayerName": "Player 2"
+}
