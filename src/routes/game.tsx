@@ -9,7 +9,7 @@ import {MyRoleDisplay} from "../components/my-role-display";
 import {GameStatus} from "../models/game-status";
 import {TurnIndicator} from "../components/turn-indicator";
 import {GameGrid} from "../components/game-grid";
-import {calculateValidMoves, type ValidMove} from "../services/move-calculator";
+import {calculateValidMoves, getPieceAtCell, isPieceOwnedByPlayer, type ValidMove} from "../services/move-calculator";
 import {requestMove} from "../services/game-service";
 import {toast} from "sonner";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
@@ -27,6 +27,7 @@ export default function GamePage() {
     const isAI = gameState?.aiPlayer === myRole;
     const isMyTurn = gameState?.currentRole === myRole;
 
+    // Calculate valid moves for selected piece
     const validMoves = useMemo<ValidMove[]>(() => {
         if (!selectedCell || !gameState || !profile?.id || !isMyTurn) {
             return [];
@@ -34,17 +35,22 @@ export default function GamePage() {
         return calculateValidMoves(gameState, selectedCell);
     }, [selectedCell, gameState, profile?.id, isMyTurn]);
 
+    // Get all valid destination cells
     const validDestinations = useMemo(() => {
-        return validMoves.map(move => move.cells[move.cells.length - 1]);
-    }, [validMoves]);
+        const destinations = validMoves.map(move => move.cells[move.cells.length - 1]);
+        console.log('Selected cell:', selectedCell);
+        console.log('Valid moves:', validMoves);
+        console.log('Valid destinations:', destinations);
+        return destinations;
+    }, [validMoves, selectedCell]);
 
     const moveMutation = useMutation({
         mutationFn: (cells: number[]) => requestMove(id!, profile!.id, cells),
         onSuccess: () => {
             setSelectedCell(null);
             setMovePath([]);
-            queryClient.invalidateQueries({queryKey: ['gameState', id]})
-                .then(() => toast.success("Move successful!"));
+            queryClient.invalidateQueries({queryKey: ['gameState', id]});
+            toast.success("Move successful!");
         },
         onError: (error: Error) => {
             toast.error(`Move failed: ${error.message}`);
@@ -52,12 +58,21 @@ export default function GamePage() {
     });
 
     const handleCellClick = (cellIndex: number) => {
-        console.log(`Cell ${cellIndex} clicked by ${myRole}`);
+        console.log('click', {
+            cellIndex,
+            myRole,
+            currentRole: gameState?.currentRole,
+            isMyTurn,
+            isAI,
+            status: gameState?.status,
+        });
+
         if (!isMyTurn || isAI || gameState?.status !== GameStatus.RUNNING) {
-            console.log("Not my turn or AI, ignoring click");
+            console.log('blocked by guard');
             return;
         }
 
+        // If clicking the same cell, deselect
         if (selectedCell === cellIndex) {
             setSelectedCell(null);
             setMovePath([]);
@@ -66,7 +81,14 @@ export default function GamePage() {
 
         if (!selectedCell) {
             const piece = getPieceAtCell(gameState!.board, cellIndex);
-            if (piece && isPieceOwnedByCurrentPlayer(piece, myRole!)) {
+            console.log('selection phase', {
+                cellIndex,
+                piece,
+                myRole,
+                owned: piece ? isPieceOwnedByPlayer(piece, myRole!) : null,
+            });
+
+            if (piece && isPieceOwnedByPlayer(piece, myRole!)) {
                 setSelectedCell(cellIndex);
                 setMovePath([]);
             }
@@ -74,14 +96,13 @@ export default function GamePage() {
         }
 
         if (validDestinations.includes(cellIndex)) {
-
             const move = validMoves.find(m => m.cells[m.cells.length - 1] === cellIndex);
             if (move) {
                 moveMutation.mutate(move.cells);
             }
         } else {
             const piece = getPieceAtCell(gameState!.board, cellIndex);
-            if (piece && isPieceOwnedByCurrentPlayer(piece, myRole!)) {
+            if (piece && isPieceOwnedByPlayer(piece, myRole!)) {
                 setSelectedCell(cellIndex);
                 setMovePath([]);
             } else {
@@ -169,19 +190,4 @@ export default function GamePage() {
 
         </div>
     );
-}
-
-function getPieceAtCell(board: string[][], cell: number): string | null {
-    const boardSize = board.length;
-    const row = Math.floor((cell - 1) / boardSize);
-    const col = (cell - 1) % boardSize;
-    return board[row][col] === "" ? null : board[row][col];
-}
-
-function isPieceOwnedByCurrentPlayer(piece: string, role: string): boolean {
-    if (role === "WHITE") {
-        return piece === "w" || piece === "W";
-    } else {
-        return piece === "b" || piece === "B";
-    }
 }

@@ -27,7 +27,7 @@ export function calculateValidMoves(
     return calculateRegularMoves(board, fromCell, piece, isKing, kingMovementMode, boardSize);
 }
 
-function getPieceAtCell(board: string[][], cell: number): string | null {
+export function getPieceAtCell(board: string[][], cell: number): string | null {
     const boardSize = board.length;
     const row = Math.floor((cell - 1) / boardSize);
     const col = (cell - 1) % boardSize;
@@ -36,19 +36,21 @@ function getPieceAtCell(board: string[][], cell: number): string | null {
         return null;
     }
 
-    const piece = board[row][col];
+    const raw = board[row][col];
+    const piece = raw.trim();
+
     return piece === "" ? null : piece;
 }
 
-function isPieceOwnedByPlayer(piece: string, role: string): boolean {
+export function isPieceOwnedByPlayer(piece: string, role: string): boolean {
     if (role === "WHITE") {
-        return piece === "w" || piece === "W";
+        return piece === "w " || piece === "W ";
     } else {
-        return piece === "b" || piece === "B";
+        return piece === "b " || piece === "B ";
     }
 }
 
-function calculateCaptureMoves(
+export function calculateCaptureMoves(
     board: string[][],
     fromCell: number,
     piece: string,
@@ -70,7 +72,7 @@ function calculateCaptureMoves(
     return captures;
 }
 
-function calculateRegularMoves(
+export function calculateRegularMoves(
     board: string[][],
     fromCell: number,
     piece: string,
@@ -102,7 +104,7 @@ function calculateRegularMoves(
     return moves;
 }
 
-function calculateJumpCaptures(
+export function calculateJumpCaptures(
     board: string[][],
     fromCell: number,
     piece: string,
@@ -144,7 +146,7 @@ function calculateJumpCaptures(
     return captures;
 }
 
-function calculateFlyingMoves(
+export function calculateFlyingMoves(
     board: string[][],
     fromCell: number,
     dRow: number,
@@ -168,7 +170,7 @@ function calculateFlyingMoves(
     return moves;
 }
 
-function calculateFlyingCaptures(
+export function calculateFlyingCaptures(
     board: string[][],
     fromCell: number,
     piece: string,
@@ -205,7 +207,7 @@ function calculateFlyingCaptures(
     return captures;
 }
 
-function findMultiCaptures(
+export function findMultiCaptures(
     board: string[][],
     fromCell: number,
     piece: string,
@@ -256,7 +258,7 @@ function findMultiCaptures(
     return multiCaptures;
 }
 
-function getDirections(piece: string, isKing: boolean): [number, number][] {
+export function getDirections(piece: string, isKing: boolean): [number, number][] {
     if (isKing) {
         return [[1, 1], [1, -1], [-1, 1], [-1, -1]];
     }
@@ -268,12 +270,12 @@ function getDirections(piece: string, isKing: boolean): [number, number][] {
     }
 }
 
-function isOpponentPiece(piece: string, isWhite: boolean): boolean {
+export function isOpponentPiece(piece: string, isWhite: boolean): boolean {
     const pieceIsWhite = piece.toLowerCase() === 'w';
     return pieceIsWhite !== isWhite;
 }
 
-function getAdjacentCell(cell: number, dRow: number, dCol: number, boardSize: number): number | null {
+export function getAdjacentCell(cell: number, dRow: number, dCol: number, boardSize: number): number | null {
     const row = Math.floor((cell - 1) / boardSize);
     const col = (cell - 1) % boardSize;
 
