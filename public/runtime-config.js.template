@@ -4,7 +4,7 @@ window.__APP_CONFIG__ = {
     authClientId: "$VITE_AUTH_CLIENT",
 
     userService: "$VITE_USER_SERVICE",
-    userServiceAchievements: "$VITE_USER_SERVICE_ACHIEVEMENTS",
+    achievementsService: "$VITE_ACHIEVEMENTS_SERVICE",
     socialService: "$VITE_SOCIAL_SERVICE",
     libraryService: "$VITE_LIBRARY_SERVICE",
     sessionService: "$VITE_SESSION_SERVICE",

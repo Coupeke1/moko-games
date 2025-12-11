@@ -14,23 +14,27 @@ export default function AchievementSection({enabled}: Props) {
 
     if (!enabled) return null;
     return (
-        <Section title="Achievements">
+        <Section title="achievements">
             <State data={achievements} loading={loading} error={error}/>
 
             {achievements && (
                 <Column gap={Gap.Large}>
-                    {achievements.achievements.map((a) => (
+                    {achievements.map((achievement) => (
                         <AchievementCard
-                            key={a.id}
-                            image={a.gameImage ?? ""}
-                            title={a.name}
-                            description={a.description}
-                            date={new Date(a.unlockedAt).toLocaleDateString()}
-                            game={a.gameName ?? ""}
+                            key={achievement.id}
+                            image={achievement.gameImage ?? ""}
+                            title={achievement.name}
+                            description={achievement.description}
+                            date={new Date(achievement.unlockedAt).toLocaleDateString()}
+                            game={achievement.gameName ?? ""}
                         />
+
                     ))}
                 </Column>
+
             )}
         </Section>
     );
 }
+
+
