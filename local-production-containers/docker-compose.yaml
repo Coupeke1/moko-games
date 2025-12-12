@@ -25,7 +25,7 @@ services:
 
   # Frontend
   frontend-platform:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/platform-frontend:main-latest
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/platform-frontend:latest
     restart: always
     pull_policy: always
     environment:
@@ -50,7 +50,7 @@ services:
       - moko_frontend
 
   frontend-tic-tac-toe:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/tic-tac-toe-frontend:main-latest
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/tic-tac-toe-frontend:latest
     restart: always
     pull_policy: always
     environment:
@@ -83,7 +83,7 @@ services:
 
   # Backend Services
   service-user:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/user-service:main-latest
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/user-service:latest
     restart: always
     pull_policy: always
     environment:
@@ -119,7 +119,7 @@ services:
       - idp-keycloak
 
   service-session:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/session-service:main-latest
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/session-service:latest
     restart: always
     pull_policy: always
     environment:
@@ -157,7 +157,7 @@ services:
       - idp-keycloak
 
   service-communication:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/communication-service:main-latest
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/communication-service:latest
     restart: always
     pull_policy: always
     environment:
@@ -198,7 +198,7 @@ services:
       - idp-keycloak
 
   service-social:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/social-service:main-latest
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/social-service:latest
     restart: always
     pull_policy: always
     environment:
@@ -233,7 +233,7 @@ services:
       - idp-keycloak
 
   service-games:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/games-service:main-latest
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/games-service:latest
     restart: always
     pull_policy: always
     environment:
@@ -267,7 +267,7 @@ services:
       - idp-keycloak
 
   service-store:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/store-service:main-latest
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/store-service:latest
     restart: always
     pull_policy: always
     environment:
@@ -307,7 +307,7 @@ services:
       - idp-keycloak
 
   service-tic-tac-toe:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/tic-tac-toe-service:main-latest
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/tic-tac-toe-service:latest
     restart: always
     pull_policy: always
     environment:
@@ -345,9 +345,11 @@ services:
       - app-rabbitmq
       - app-redis
       - idp-keycloak
+      - service-games
+      - service-store
 
   service-checkers:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/checkers-service:main-latest
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/checkers-service:latest
     restart: always
     pull_policy: always
     environment:
@@ -385,6 +387,8 @@ services:
       - app-rabbitmq
       - app-redis
       - idp-keycloak
+      - service-games
+      - service-store
 
   # Backend apps
   app-postgres:
