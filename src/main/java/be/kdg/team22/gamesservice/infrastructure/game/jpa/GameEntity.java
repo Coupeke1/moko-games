@@ -34,8 +34,9 @@ public class GameEntity {
     @Column(name = "last_health_check")
     private Instant lastHealthCheck;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "healthy")
     private boolean healthy;
+
 
     @Column(nullable = false)
     private String title;
@@ -122,9 +123,13 @@ public class GameEntity {
                 frontendUrl,
                 startEndpoint,
                 healthEndpoint,
+                lastHealthCheck,
+                healthy,
                 title,
                 description,
                 image,
+                createdAt,
+                updatedAt,
                 settingsDefinition
         );
     }
@@ -139,10 +144,6 @@ public class GameEntity {
 
     public String baseUrl() {
         return baseUrl;
-    }
-
-    public String frontendUrl() {
-        return frontendUrl;
     }
 
     public String startEndpoint() {
