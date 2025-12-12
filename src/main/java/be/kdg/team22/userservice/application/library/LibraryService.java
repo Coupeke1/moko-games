@@ -38,13 +38,18 @@ public class LibraryService {
         List<LibraryGameModel> games = entries.stream().map(entry -> {
             GameDetailsResponse game = gamesRepository.getGame(entry.gameId().value(), token);
 
-            return new LibraryGameModel(game.id(), game.title(), game.description(), game.price(), game.image(), entry.purchasedAt(), entry.favourite());
+            return new LibraryGameModel(game.id(), game.title(), game.description(), game.price(), game.image(), entry.purchasedAt(), entry.favourite(), game.healthy());
         }).sorted(Comparator.comparing(LibraryGameModel::title)).toList();
 
         if (filter.query.isPresent() && !filter.query.get().isBlank()) {
             String query = filter.query.get();
 
             games = games.stream().filter(game -> (game.title() != null && game.title().toLowerCase().contains(query.toLowerCase())) || (game.description() != null && game.description().toLowerCase().contains(query.toLowerCase()))).toList();
+        }
+
+        if (filter.favourite.isPresent()) {
+            boolean favouriteFilter = filter.favourite.get();
+            games = games.stream().filter(game -> game.favourite() == favouriteFilter).toList();
         }
 
         return new LibraryGamesModel(games);

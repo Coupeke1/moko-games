@@ -34,7 +34,7 @@ class LibraryServiceTest {
     }
 
     private GameDetailsResponse game(UUID id, String title) {
-        return new GameDetailsResponse(id, "EngineName", title, "Fun game", BigDecimal.TEN, "img.png");
+        return new GameDetailsResponse(id, "EngineName", title, "Fun game", BigDecimal.TEN, "img.png", true);
     }
 
     private LibraryEntry entry(UUID id, UUID userId, UUID gameId, boolean favourite) {

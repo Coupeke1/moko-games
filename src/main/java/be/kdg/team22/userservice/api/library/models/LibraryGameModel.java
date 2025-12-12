@@ -11,6 +11,7 @@ public record LibraryGameModel(
         BigDecimal price,
         String image,
         Instant purchasedAt,
-        boolean favourite
+        boolean favourite,
+        boolean healthy
 ) {
 }
