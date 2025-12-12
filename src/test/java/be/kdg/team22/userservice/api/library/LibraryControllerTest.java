@@ -65,7 +65,7 @@ class LibraryControllerTest {
         UsernamePasswordAuthenticationToken auth = authWithUser(userId);
         Jwt jwt = extractJwt(auth);
 
-        LibraryGameModel gameModel = new LibraryGameModel(UUID.randomUUID(), "Tic Tac Toe", "desc", BigDecimal.TEN, "img.png", Instant.parse("2024-01-01T10:00:00Z"), true);
+        LibraryGameModel gameModel = new LibraryGameModel(UUID.randomUUID(), "Tic Tac Toe", "desc", BigDecimal.TEN, "img.png", Instant.parse("2024-01-01T10:00:00Z"), true, true);
 
         LibraryGamesModel response = new LibraryGamesModel(List.of(gameModel));
 
