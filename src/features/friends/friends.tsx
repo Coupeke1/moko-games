@@ -1,7 +1,6 @@
 import Button from "@/components/buttons/button";
 import UserCard from "@/components/cards/user-card";
 import CancelIcon from "@/components/icons/cancel-icon";
-import Input from "@/components/inputs/input";
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
@@ -10,46 +9,13 @@ import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
 import TabRow from "@/components/tabs/links/row";
 import showToast from "@/components/toast";
+import Add from "@/features/friends/components/add";
+import { getTabs } from "@/features/friends/components/tabs";
 import { useFriends } from "@/features/friends/hooks/use-friends.ts";
 import type { Friend } from "@/features/friends/models/friend.ts";
-import type { Profile } from "@/features/profile/models/profile.ts";
-import { getTabs } from "@/features/friends/components/tabs";
 import { removeFriend } from "@/features/friends/services/friends.ts";
-import { sendRequest } from "@/features/friends/services/requests.ts";
+import type { Profile } from "@/features/profile/models/profile.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-
-function Add() {
-    const client = useQueryClient();
-    const [username, setUsername] = useState("");
-
-    const add = useMutation({
-        mutationFn: async ({ username }: { username: string }) =>
-            await sendRequest(username),
-        onSuccess: async () => {
-            await client.refetchQueries({ queryKey: ["friends"] });
-            showToast(username, "Request sent");
-            setUsername("");
-        },
-        onError: (error: Error) => {
-            showToast("Friends", error.message);
-        },
-    });
-
-    return (
-        <section className={`grid sm:grid-cols-4 ${Gap.Medium}`}>
-            <section className="sm:col-span-3">
-                <Input
-                    placeholder="Search Username..."
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                />
-            </section>
-
-            <Button onClick={() => add.mutate({ username })}>Add</Button>
-        </section>
-    );
-}
 
 function Friend({ friend }: { friend: Profile }) {
     const client = useQueryClient();

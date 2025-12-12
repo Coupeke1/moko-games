@@ -5,7 +5,6 @@ import Grid from "@/components/layout/grid/grid";
 import { Items } from "@/components/layout/items";
 import Row from "@/components/layout/row";
 import Section from "@/components/section";
-import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
 import PostDialog from "@/features/store/dialogs/post-dialog";
 import { usePosts } from "@/features/store/hooks/use-posts.ts";
@@ -29,17 +28,15 @@ export default function Posts({ entry }: Props) {
     };
 
     return (
-        <Section title="Posts">
+        <>
             <State data={posts} loading={loading} error={error} />
 
             {posts && selected && (
                 <PostDialog post={selected} open={post} onChange={setPost} />
             )}
 
-            {posts &&
-                (posts.length == 0 ? (
-                    <ErrorState>No posts</ErrorState>
-                ) : (
+            {posts && posts.length > 0 && (
+                <Section title="Posts">
                     <Grid>
                         {posts.map((post: Post) => (
                             <Card
@@ -60,7 +57,8 @@ export default function Posts({ entry }: Props) {
                             />
                         ))}
                     </Grid>
-                ))}
-        </Section>
+                </Section>
+            )}
+        </>
     );
 }

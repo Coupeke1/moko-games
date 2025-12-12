@@ -1,14 +1,14 @@
 import Button from "@/components/buttons/button";
+import Form from "@/components/inputs/form";
 import Input from "@/components/inputs/input";
 import Select from "@/components/inputs/select";
-import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
 import { GridSize } from "@/components/layout/grid/size";
 import showToast from "@/components/toast";
 import { Category, format } from "@/features/store/models/entry/category.ts";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router";
 
 interface Props {
@@ -43,12 +43,16 @@ export default function SearchBar({ onSearch }: Props) {
             setParams(params);
             onSearch(query, sorting, category);
         },
-        onSuccess: async () => showToast("Store", "Searching..."),
         onError: (error: Error) => showToast("Store", error.message),
     });
 
+    const handleSearch = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        search.mutate();
+    };
+
     return (
-        <Column>
+        <Form submit={handleSearch}>
             <section className={`grid sm:grid-cols-4 ${Gap.Medium}`}>
                 <section className="sm:col-span-3">
                     <Input
@@ -59,12 +63,9 @@ export default function SearchBar({ onSearch }: Props) {
                 </section>
 
                 <section className="hidden sm:block">
-                    <Button onClick={() => search.mutate()} fullWidth={true}>
-                        Search
-                    </Button>
+                    <Button fullWidth={true}>Search</Button>
                 </section>
             </section>
-
             <Grid size={GridSize.ExtraSmall}>
                 <Select
                     placeholder="Sorting"
@@ -86,12 +87,9 @@ export default function SearchBar({ onSearch }: Props) {
                     onChange={(e) => setCategory(e.target.value)}
                 />
             </Grid>
-
             <section className="sm:hidden">
-                <Button onClick={() => search.mutate()} fullWidth={true}>
-                    Search
-                </Button>
+                <Button fullWidth={true}>Search</Button>
             </section>
-        </Column>
+        </Form>
     );
 }
