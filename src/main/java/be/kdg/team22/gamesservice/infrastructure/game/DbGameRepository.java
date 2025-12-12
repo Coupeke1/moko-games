@@ -40,6 +40,16 @@ public class DbGameRepository implements GameRepository {
 
     @Override
     public void save(Game game) {
-        jpa.save(GameEntity.fromDomain(game));
+        Optional<GameEntity> existing = jpa.findById(game.id().value());
+
+        if (existing.isEmpty()) {
+            jpa.save(GameEntity.fromDomain(game));
+            return;
+        }
+
+        GameEntity entity = existing.get();
+        entity.fromDomainUpdate(game);
+
+        jpa.save(entity);
     }
 }

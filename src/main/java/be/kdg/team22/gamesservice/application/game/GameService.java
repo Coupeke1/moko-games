@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -64,7 +65,7 @@ public class GameService {
         return gameRepository.findAll();
     }
 
-    public Game register(final RegisterGameRequest request) {
+    public Game create(final RegisterGameRequest request) {
         if (gameRepository.findByName(request.name()).isPresent()) {
             throw new DuplicateGameNameException(request.name());
         }
@@ -83,10 +84,11 @@ public class GameService {
         return game;
     }
 
-    public Game update(final GameId id, final RegisterGameRequest request) {
-        Game game = gameRepository.findById(id)
-                .orElseThrow(() -> new GameNotFoundException(id));
+    public Game register(final String name, final RegisterGameRequest request) {
+        Optional<Game> optionalGame = gameRepository.findByName(name);
+        if (optionalGame.isEmpty()) return create(request);
 
+        Game game = optionalGame.get();
         if (!game.name().equals(request.name()) && gameRepository.findByName(request.name()).isPresent()) {
             throw new DuplicateGameNameException(request.name());
         }

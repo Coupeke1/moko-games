@@ -180,7 +180,7 @@ class GameServiceTest {
 
     @Test
     @DisplayName("register → happy path → creates and saves game")
-    void register_happyPath() {
+    void create_happyPath() {
         RegisterGameRequest request = new RegisterGameRequest(
                 "Checkers",
                 "http://localhost:8087",
@@ -197,7 +197,7 @@ class GameServiceTest {
         when(gameRepository.findByName("Checkers")).thenReturn(Optional.empty());
         when(gameHealthChecker.isHealthy(request)).thenReturn(true);
 
-        Game result = service.register(request);
+        Game result = service.create(request);
 
         assertThat(result).isNotNull();
         assertThat(result.name()).isEqualTo("Checkers");
@@ -217,7 +217,7 @@ class GameServiceTest {
 
     @Test
     @DisplayName("register → duplicate game name → throws DuplicateGameNameException")
-    void register_duplicateGameName() {
+    void create_duplicateGameName() {
         RegisterGameRequest request = new RegisterGameRequest(
                 "Checkers",
                 "http://localhost:8087",
@@ -236,7 +236,7 @@ class GameServiceTest {
 
         when(gameRepository.findByName("Checkers")).thenReturn(Optional.of(existingGame));
 
-        assertThatThrownBy(() -> service.register(request))
+        assertThatThrownBy(() -> service.create(request))
                 .isInstanceOf(DuplicateGameNameException.class);
 
         verify(gameRepository).findByName("Checkers");
@@ -246,7 +246,7 @@ class GameServiceTest {
 
     @Test
     @DisplayName("register → unhealthy game → throws GameUnhealthyException")
-    void register_unhealthyGame() {
+    void create_unhealthyGame() {
         RegisterGameRequest request = new RegisterGameRequest(
                 "Checkers",
                 "http://localhost:8087",
@@ -263,7 +263,7 @@ class GameServiceTest {
         when(gameRepository.findByName("Checkers")).thenReturn(Optional.empty());
         when(gameHealthChecker.isHealthy(request)).thenReturn(false);
 
-        assertThatThrownBy(() -> service.register(request))
+        assertThatThrownBy(() -> service.create(request))
                 .isInstanceOf(GameUnhealthyException.class);
 
         verify(gameRepository).findByName("Checkers");
@@ -273,7 +273,7 @@ class GameServiceTest {
 
     @Test
     @DisplayName("register → health check throws exception → propagates exception")
-    void register_healthCheckException() {
+    void create_healthCheckException() {
         RegisterGameRequest request = new RegisterGameRequest(
                 "Checkers",
                 "http://localhost:8087",
@@ -290,7 +290,7 @@ class GameServiceTest {
         when(gameRepository.findByName("Checkers")).thenReturn(Optional.empty());
         when(gameHealthChecker.isHealthy(request)).thenThrow(new RuntimeException("Connection timeout"));
 
-        assertThatThrownBy(() -> service.register(request))
+        assertThatThrownBy(() -> service.create(request))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Connection timeout");
 
@@ -301,7 +301,7 @@ class GameServiceTest {
 
     @Test
     @DisplayName("register → multiple games with same name → handles correctly")
-    void register_multipleGamesCheckUniqueness() {
+    void create_multipleGamesCheckUniqueness() {
         RegisterGameRequest request1 = new RegisterGameRequest(
                 "TicTacToe",
                 "http://localhost:8088",
@@ -318,7 +318,7 @@ class GameServiceTest {
         when(gameRepository.findByName("TicTacToe")).thenReturn(Optional.empty());
         when(gameHealthChecker.isHealthy(request1)).thenReturn(true);
 
-        Game registeredGame = service.register(request1);
+        Game registeredGame = service.create(request1);
 
         assertThat(registeredGame.name()).isEqualTo("TicTacToe");
 
@@ -337,7 +337,7 @@ class GameServiceTest {
 
         when(gameRepository.findByName("TicTacToe")).thenReturn(Optional.of(registeredGame));
 
-        assertThatThrownBy(() -> service.register(request2))
+        assertThatThrownBy(() -> service.create(request2))
                 .isInstanceOf(DuplicateGameNameException.class);
 
         verify(gameRepository, times(2)).findByName("TicTacToe");
@@ -345,7 +345,7 @@ class GameServiceTest {
 
     @Test
     @DisplayName("update → happy path → updates game")
-    void update_happyPath() {
+    void register_happyPath() {
         GameId id = GameId.from(UUID.randomUUID());
         Game existingGame = sampleGame(id);
 
@@ -366,7 +366,7 @@ class GameServiceTest {
         when(gameRepository.findByName("UpdatedCheckers")).thenReturn(Optional.empty());
         when(gameHealthChecker.isHealthy(request)).thenReturn(true);
 
-        Game result = service.update(id, request);
+        Game result = service.register(id, request);
 
         assertThat(result).isNotNull();
         assertThat(result.name()).isEqualTo("UpdatedCheckers");
@@ -387,7 +387,7 @@ class GameServiceTest {
 
     @Test
     @DisplayName("update → game not found → throws GameNotFoundException")
-    void update_gameNotFound() {
+    void register_gameNotFound() {
         GameId id = GameId.from(UUID.randomUUID());
 
         RegisterGameRequest request = new RegisterGameRequest(
@@ -405,7 +405,7 @@ class GameServiceTest {
 
         when(gameRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.update(id, request))
+        assertThatThrownBy(() -> service.register(id, request))
                 .isInstanceOf(GameNotFoundException.class);
 
         verify(gameRepository).findById(id);
@@ -415,7 +415,7 @@ class GameServiceTest {
 
     @Test
     @DisplayName("update → duplicate name (different from current) → throws DuplicateGameNameException")
-    void update_duplicateGameName() {
+    void register_duplicateGameName() {
         GameId id = GameId.from(UUID.randomUUID());
         Game existingGame = sampleGame(id);
 
@@ -438,7 +438,7 @@ class GameServiceTest {
         when(gameRepository.findById(id)).thenReturn(Optional.of(existingGame));
         when(gameRepository.findByName("DifferentName")).thenReturn(Optional.of(otherGameWithName));
 
-        assertThatThrownBy(() -> service.update(id, request))
+        assertThatThrownBy(() -> service.register(id, request))
                 .isInstanceOf(DuplicateGameNameException.class);
 
         verify(gameRepository).findById(id);
@@ -449,7 +449,7 @@ class GameServiceTest {
 
     @Test
     @DisplayName("update → unhealthy game → throws GameUnhealthyException")
-    void update_unhealthyGame() {
+    void register_unhealthyGame() {
         GameId id = GameId.from(UUID.randomUUID());
         Game existingGame = sampleGame(id);
 
@@ -470,7 +470,7 @@ class GameServiceTest {
         when(gameRepository.findByName("UpdatedCheckers")).thenReturn(Optional.empty());
         when(gameHealthChecker.isHealthy(request)).thenReturn(false);
 
-        assertThatThrownBy(() -> service.update(id, request))
+        assertThatThrownBy(() -> service.register(id, request))
                 .isInstanceOf(GameUnhealthyException.class);
 
         verify(gameRepository).findById(id);
@@ -481,7 +481,7 @@ class GameServiceTest {
 
     @Test
     @DisplayName("update → same name as current → allows update")
-    void update_sameNameAsCurrentGame() {
+    void register_sameNameAsCurrentGame() {
         GameId id = GameId.from(UUID.randomUUID());
         Game existingGame = sampleGame(id);
 
@@ -501,7 +501,7 @@ class GameServiceTest {
         when(gameRepository.findById(id)).thenReturn(Optional.of(existingGame));
         when(gameHealthChecker.isHealthy(request)).thenReturn(true);
 
-        Game result = service.update(id, request);
+        Game result = service.register(id, request);
 
         assertThat(result).isNotNull();
         assertThat(result.name()).isEqualTo("checkers");

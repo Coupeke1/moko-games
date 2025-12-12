@@ -52,4 +52,30 @@ public class AchievementEntity {
                 this.levels
         );
     }
+
+    public void fromDomainUpdate(Achievement achievement) {
+        this.name = achievement.name();
+        this.description = achievement.description();
+        this.levels = achievement.levels();
+    }
+
+    public AchievementId id() {
+        return id;
+    }
+
+    public GameEntity game() {
+        return game;
+    }
+
+    public String name() {
+        return name;
+    }
+
+    public String description() {
+        return description;
+    }
+
+    public int levels() {
+        return levels;
+    }
 }

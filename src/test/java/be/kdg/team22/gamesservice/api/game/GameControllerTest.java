@@ -144,7 +144,7 @@ class GameControllerTest {
 
     @Test
     @DisplayName("PUT /api/games/{id} → updates game")
-    void updateGame_returns200AndUpdatedGame() throws Exception {
+    void registerGame_returns200AndUpdatedGame() throws Exception {
         UUID id = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
         GameId gid = GameId.from(id);
         Game updatedGame = sampleGame(id);
@@ -162,7 +162,7 @@ class GameControllerTest {
                 GameCategory.STRATEGY
         );
 
-        when(gameService.update(gid, request)).thenReturn(updatedGame);
+        when(gameService.register(gid, request)).thenReturn(updatedGame);
 
         String json = """
                 {
@@ -187,7 +187,7 @@ class GameControllerTest {
                 .andExpect(jsonPath("$.title").value("Tic Tac Toe"));
 
         ArgumentCaptor<RegisterGameRequest> captor = ArgumentCaptor.forClass(RegisterGameRequest.class);
-        verify(gameService).update(any(GameId.class), captor.capture());
+        verify(gameService).register(any(GameId.class), captor.capture());
 
         RegisterGameRequest capturedRequest = captor.getValue();
         assertThat(capturedRequest.name()).isEqualTo("tic-tac-toe");
@@ -195,11 +195,11 @@ class GameControllerTest {
 
     @Test
     @DisplayName("POST /api/games/register → registers new game")
-    void registerGame_returns200AndNewGame() throws Exception {
+    void createGame_returns200AndNewGame() throws Exception {
         UUID id = UUID.fromString("bbbbbbbb-cccc-dddd-eeee-ffffffffffff");
         Game newGame = sampleGame(id);
 
-        when(gameService.register(any(RegisterGameRequest.class))).thenReturn(newGame);
+        when(gameService.create(any(RegisterGameRequest.class))).thenReturn(newGame);
 
         String json = """
                 {
@@ -224,7 +224,7 @@ class GameControllerTest {
                 .andExpect(jsonPath("$.name").value("tic-tac-toe"));
 
         ArgumentCaptor<RegisterGameRequest> captor = ArgumentCaptor.forClass(RegisterGameRequest.class);
-        verify(gameService).register(captor.capture());
+        verify(gameService).create(captor.capture());
 
         RegisterGameRequest capturedRequest = captor.getValue();
         assertThat(capturedRequest.name()).isEqualTo("tic-tac-toe");

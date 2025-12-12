@@ -56,15 +56,15 @@ public class GameController {
         return ResponseEntity.ok(GameDetailsModel.from(game));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<GameDetailsModel> updateGame(final @PathVariable UUID id, final @RequestBody RegisterGameRequest request) {
-        Game game = service.update(GameId.from(id), request);
+    @PutMapping("/{name}")
+    public ResponseEntity<GameDetailsModel> registerGame(final @PathVariable String name, final @RequestBody RegisterGameRequest request) {
+        Game game = service.register(name, request);
         return ResponseEntity.ok(GameDetailsModel.from(game));
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<GameDetailsModel> registerGame(final @RequestBody RegisterGameRequest request) {
-        Game game = service.register(request);
+    @PostMapping({"/", ""})
+    public ResponseEntity<GameDetailsModel> createGame(final @RequestBody RegisterGameRequest request) {
+        Game game = service.create(request);
         return ResponseEntity.ok(GameDetailsModel.from(game));
     }
 

@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Entity
@@ -19,7 +20,7 @@ public class GameEntity {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AchievementEntity> achievements;
 
     @Column(nullable = false, name = "base_url")
@@ -109,6 +110,37 @@ public class GameEntity {
                 .toList();
 
         return gameEntity;
+    }
+
+    public void fromDomainUpdate(Game game) {
+        this.id = game.id().value();
+        this.name = game.name();
+        this.baseUrl = game.baseUrl();
+        this.frontendUrl = game.frontendUrl();
+        this.startEndpoint = game.startEndpoint();
+        this.healthEndpoint = game.healthEndpoint();
+        this.lastHealthCheck = game.lastHealthCheck();
+        this.healthy = game.healthy();
+        this.title = game.title();
+        this.description = game.description();
+        this.image = game.image();
+        this.createdAt = game.createdAt();
+        this.updatedAt = game.updatedAt();
+
+        this.achievements.removeIf(a ->
+                game.achievements().stream().noneMatch(d -> d.key().key().equals(a.id().key())));
+
+        for (Achievement ach : game.achievements()) {
+            Optional<AchievementEntity> existingAch = this.achievements.stream()
+                    .filter(a -> a.id().key().equals(ach.key().key()))
+                    .findFirst();
+
+            if (existingAch.isEmpty()) {
+                this.achievements.add(AchievementEntity.fromDomain(ach, this));
+            } else {
+                existingAch.get().fromDomainUpdate(ach);
+            }
+        }
     }
 
     public Game toDomain() {
