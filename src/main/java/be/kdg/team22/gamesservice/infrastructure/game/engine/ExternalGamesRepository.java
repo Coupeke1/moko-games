@@ -22,7 +22,7 @@ public class ExternalGamesRepository {
 
         EngineCreateGameRequest engineReq = new EngineCreateGameRequest(
                 request.players(),
-                mapSettings(request.settings()),
+                request.settings(),
                 request.aiPlayer()
         );
 
@@ -56,12 +56,5 @@ public class ExternalGamesRepository {
         return RestClient.builder()
                 .baseUrl(baseUrl)
                 .build();
-    }
-
-    private Object mapSettings(GameSettingsModel model) {
-        return switch (model) {
-            case TicTacToeSettingsModel t -> new EngineTicTacToeSettings(t.boardSize());
-            case CheckersSettingsModel c -> new EngineCheckersSettings(c.boardSize(), c.flyingKings());
-        };
     }
 }

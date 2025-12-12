@@ -1,17 +1,8 @@
 package be.kdg.team22.gamesservice.api.game.models;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import java.util.Map;
 
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.PROPERTY,
-        property = "type"
-)
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = CheckersSettingsModel.class,   name = "checkers"),
-        @JsonSubTypes.Type(value = TicTacToeSettingsModel.class, name = "tic_tac_toe")
-})
-public sealed interface GameSettingsModel
-        permits CheckersSettingsModel, TicTacToeSettingsModel {
+public record GameSettingsModel(
+        Map<String, Object> settings
+) {
 }

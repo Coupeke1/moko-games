@@ -1,6 +1,7 @@
 package be.kdg.team22.gamesservice.api.game.models;
 
 import be.kdg.team22.gamesservice.domain.game.GameCategory;
+import be.kdg.team22.gamesservice.domain.game.settings.GameSettingsDefinition;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
@@ -17,6 +18,7 @@ public record RegisterGameRequest(
         @NotNull String description,
         @NotNull String image,
         @NotNull @Positive BigDecimal price,
-        @NotNull GameCategory category
-        ) {
+        @NotNull GameCategory category,
+        @NotNull GameSettingsDefinition settingsDefinition
+) {
 }

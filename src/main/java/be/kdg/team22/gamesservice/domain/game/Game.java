@@ -3,9 +3,11 @@ package be.kdg.team22.gamesservice.domain.game;
 import be.kdg.team22.gamesservice.api.game.models.RegisterGameRequest;
 import be.kdg.team22.gamesservice.domain.game.exceptions.*;
 import be.kdg.team22.gamesservice.domain.game.settings.GameSettingsDefinition;
+import be.kdg.team22.gamesservice.domain.game.settings.GameSettingsValidator;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
 import java.time.Instant;
+import java.util.Map;
 
 @AggregateRoot
 public class Game {
@@ -36,9 +38,13 @@ public class Game {
             final String frontendUrl,
             final String startEndpoint,
             final String healthEndpoint,
+            final Instant lastHealthCheck,
+            final boolean healthy,
             final String title,
             final String description,
             final String image,
+            final Instant createdAt,
+            final Instant updatedAt,
             final GameSettingsDefinition settingsDefinition
     ) {
         validate(id, name, baseUrl, frontendUrl, startEndpoint, healthEndpoint, title, description, image);
@@ -49,15 +55,16 @@ public class Game {
         this.frontendUrl = frontendUrl;
         this.startEndpoint = startEndpoint;
         this.healthEndpoint = healthEndpoint;
-        this.healthy = false;
+        this.lastHealthCheck = lastHealthCheck;
+        this.healthy = healthy;
 
         this.title = title;
         this.description = description;
         this.image = image;
         this.settingsDefinition = settingsDefinition;
 
-        this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public Game(
@@ -87,20 +94,6 @@ public class Game {
 
         this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
-    }
-
-    public static Game register(RegisterGameRequest request) {
-        return new Game(
-                GameId.create(),
-                request.name(),
-                request.backendUrl(),
-                request.frontendUrl(),
-                request.startEndpoint(),
-                request.healthEndpoint(),
-                request.title(),
-                request.description(),
-                request.image()
-        );
     }
 
     private void validate(
@@ -187,6 +180,20 @@ public class Game {
         }
     }
 
+    public static Game register(RegisterGameRequest request) {
+        return new Game(
+                GameId.create(),
+                request.name(),
+                request.backendUrl(),
+                request.frontendUrl(),
+                request.startEndpoint(),
+                request.healthEndpoint(),
+                request.title(),
+                request.description(),
+                request.image()
+        );
+    }
+
     public void update(RegisterGameRequest request) {
         validate(request);
         this.name = request.name();
@@ -259,5 +266,9 @@ public class Game {
 
     public boolean healthy() {
         return healthy;
+    }
+
+    public void validateSettings(Map<String, Object> settings) {
+        GameSettingsValidator.validate(settingsDefinition, settings);
     }
 }

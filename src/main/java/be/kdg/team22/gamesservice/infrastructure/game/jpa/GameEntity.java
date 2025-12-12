@@ -2,10 +2,9 @@ package be.kdg.team22.gamesservice.infrastructure.game.jpa;
 
 import be.kdg.team22.gamesservice.domain.game.Game;
 import be.kdg.team22.gamesservice.domain.game.GameId;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import be.kdg.team22.gamesservice.domain.game.settings.GameSettingsDefinition;
+import be.kdg.team22.gamesservice.infrastructure.game.jpa.converter.GameSettingsDefinitionJsonConverter;
+import jakarta.persistence.*;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -28,13 +27,14 @@ public class GameEntity {
 
     @Column(nullable = false, name = "start_endpoint")
     private String startEndpoint;
+
     @Column(nullable = false, name = "health_endpoint")
     private String healthEndpoint;
 
     @Column(name = "last_health_check")
     private Instant lastHealthCheck;
 
-    @Column(nullable = false, name = "healthy")
+    @Column(nullable = false)
     private boolean healthy;
 
     @Column(nullable = false)
@@ -52,6 +52,14 @@ public class GameEntity {
     @Column(nullable = false, name = "updated_at")
     private Instant updatedAt;
 
+    @Column(
+            name = "settings_definition",
+            nullable = false,
+            columnDefinition = "jsonb"
+    )
+    @Convert(converter = GameSettingsDefinitionJsonConverter.class)
+    private GameSettingsDefinition settingsDefinition;
+
     protected GameEntity() {
     }
 
@@ -67,6 +75,7 @@ public class GameEntity {
             String title,
             String description,
             String image,
+            GameSettingsDefinition settingsDefinition,
             Instant createdAt,
             Instant updatedAt
     ) {
@@ -81,6 +90,7 @@ public class GameEntity {
         this.title = title;
         this.description = description;
         this.image = image;
+        this.settingsDefinition = settingsDefinition;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -98,6 +108,7 @@ public class GameEntity {
                 game.title(),
                 game.description(),
                 game.image(),
+                game.settingsDefinition(),
                 game.createdAt(),
                 game.updatedAt()
         );
@@ -111,13 +122,10 @@ public class GameEntity {
                 frontendUrl,
                 startEndpoint,
                 healthEndpoint,
-                lastHealthCheck,
-                healthy,
                 title,
                 description,
                 image,
-                createdAt,
-                updatedAt
+                settingsDefinition
         );
     }
 
@@ -131,6 +139,10 @@ public class GameEntity {
 
     public String baseUrl() {
         return baseUrl;
+    }
+
+    public String frontendUrl() {
+        return frontendUrl;
     }
 
     public String startEndpoint() {
@@ -167,5 +179,9 @@ public class GameEntity {
 
     public Instant updatedAt() {
         return updatedAt;
+    }
+
+    public GameSettingsDefinition settingsDefinition() {
+        return settingsDefinition;
     }
 }

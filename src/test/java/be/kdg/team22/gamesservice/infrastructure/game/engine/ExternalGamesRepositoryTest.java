@@ -1,9 +1,6 @@
 package be.kdg.team22.gamesservice.infrastructure.game.engine;
 
-import be.kdg.team22.gamesservice.api.game.models.CheckersSettingsModel;
-import be.kdg.team22.gamesservice.api.game.models.GameSettingsModel;
 import be.kdg.team22.gamesservice.api.game.models.StartGameRequest;
-import be.kdg.team22.gamesservice.api.game.models.TicTacToeSettingsModel;
 import be.kdg.team22.gamesservice.domain.game.Game;
 import be.kdg.team22.gamesservice.domain.game.GameId;
 import be.kdg.team22.gamesservice.domain.game.exceptions.EngineGameNotFoundException;

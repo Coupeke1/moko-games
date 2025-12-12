@@ -48,6 +48,8 @@ public class GameService {
         Game game = gameRepository.findById(id)
                 .orElseThrow(() -> new GameNotFoundException(id));
 
+        game.validateSettings(request.settings());
+
         UUID instanceId = engine.startExternalGame(game, request);
 
         return new StartGameResponseModel(instanceId);

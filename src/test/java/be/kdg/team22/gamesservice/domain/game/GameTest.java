@@ -1,9 +1,13 @@
 package be.kdg.team22.gamesservice.domain.game;
 
 import be.kdg.team22.gamesservice.domain.game.exceptions.*;
+import be.kdg.team22.gamesservice.domain.game.settings.GameSettingsDefinition;
+import be.kdg.team22.gamesservice.domain.game.settings.SettingDefinition;
+import be.kdg.team22.gamesservice.domain.game.settings.SettingType;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,12 +24,29 @@ class GameTest {
                 gid(),
                 "engine-name",
                 "http://localhost",
-                "/start",
+                "http://frontend",
                 "/start",
                 "/health",
                 "Title",
                 "Description",
-                "http://img");
+                "http://img",
+                defaultSettings()
+        );
+    }
+
+    private GameSettingsDefinition defaultSettings() {
+        return new GameSettingsDefinition(
+                List.of(
+                        new SettingDefinition(
+                                "dummy",
+                                SettingType.STRING,
+                                false,
+                                null,
+                                null,
+                                null
+                        )
+                )
+        );
     }
 
     @Test
@@ -62,26 +83,22 @@ class GameTest {
         GameId id = gid();
         Instant created = Instant.parse("2024-01-01T10:00:00Z");
         Instant updated = Instant.parse("2024-01-02T10:00:00Z");
-        Instant lastHealth = Instant.parse("2024-01-03T10:00:00Z");
 
         Game game = new Game(
                 id,
                 "engine",
                 "http://x",
-                "/start",
+                "http://frontend",
                 "/start",
                 "/health",
-                lastHealth,
-                true,
                 "Title",
                 "Desc",
                 "http://img",
-                created,
-                updated
+                defaultSettings()
         );
 
+
         assertThat(game.healthy()).isEqualTo(true);
-        assertThat(game.lastHealthCheck()).isEqualTo(lastHealth);
         assertThat(game.createdAt()).isEqualTo(created);
         assertThat(game.updatedAt()).isEqualTo(updated);
     }

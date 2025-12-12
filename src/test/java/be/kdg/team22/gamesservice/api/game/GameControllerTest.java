@@ -159,7 +159,8 @@ class GameControllerTest {
                 "desc",
                 "http://img",
                 BigDecimal.valueOf(29.99),
-                GameCategory.STRATEGY
+                GameCategory.STRATEGY,
+                null
         );
 
         when(gameService.update(gid, request)).thenReturn(updatedGame);
