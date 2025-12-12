@@ -26,6 +26,10 @@ public class GameRegistrationStartup {
 
     @EventListener(ApplicationReadyEvent.class)
     public void registerGameOnStartup() {
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException ignored) {}
+
         List<RegisterAchievementRequest> achievementRequests = gameInfo.achievements().stream().map(achievement -> new RegisterAchievementRequest(
                 achievement.key(),
                 achievement.name(),
@@ -46,12 +50,6 @@ public class GameRegistrationStartup {
                 gameInfo.category(),
                 achievementRequests
         );
-
-        GameResponse existingGame = externalRegisterRepository.getGame(gameInfo.name());
-        if (existingGame != null) {
-            externalRegisterRepository.updateGame(GameRegisterId.fromUuid(existingGame.id()), request);
-            return;
-        }
 
         boolean created = externalRegisterRepository.registerGame(request);
         if (!created) throw new GameNotRegisteredException();

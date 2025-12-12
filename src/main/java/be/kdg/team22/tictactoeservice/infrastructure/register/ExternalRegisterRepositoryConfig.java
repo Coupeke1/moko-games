@@ -14,8 +14,8 @@ public class ExternalRegisterRepositoryConfig {
     @Bean("registerRepository")
     RestClient registerRestClient(@Value("${business.game-service.url}") final String baseUrl) {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(5000);
-        requestFactory.setReadTimeout(5000);
+        requestFactory.setConnectTimeout(30000);
+        requestFactory.setReadTimeout(30000);
 
         return RestClient.builder()
                 .baseUrl(baseUrl + "/api/games")

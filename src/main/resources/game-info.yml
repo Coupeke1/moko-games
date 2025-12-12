@@ -12,9 +12,9 @@
   achievements:
     - key: WIN
       name: Victory Royale
-      description: Win your first TicTacToe game!
+      description: Win your first Tic Tac Toe game!
       levels: 3
     - key: DRAW
       name: Stalemate Master
-      description: Draw a TicTacToe game!
+      description: Draw a Tic Tac Toe game!
       levels: 2
