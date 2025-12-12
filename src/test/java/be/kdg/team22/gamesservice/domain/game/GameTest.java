@@ -29,8 +29,7 @@ class GameTest {
                 "/health",
                 "Title",
                 "Description",
-                "http://img",
-                defaultSettings()
+                "http://img"
         );
     }
 
@@ -83,22 +82,27 @@ class GameTest {
         GameId id = gid();
         Instant created = Instant.parse("2024-01-01T10:00:00Z");
         Instant updated = Instant.parse("2024-01-02T10:00:00Z");
+        Instant lastHealth = Instant.parse("2024-01-03T10:00:00Z");
 
         Game game = new Game(
                 id,
                 "engine",
                 "http://x",
-                "http://frontend",
+                "/start",
                 "/start",
                 "/health",
+                lastHealth,
+                true,
                 "Title",
                 "Desc",
                 "http://img",
+                created,
+                updated,
                 defaultSettings()
         );
 
-
         assertThat(game.healthy()).isEqualTo(true);
+        assertThat(game.lastHealthCheck()).isEqualTo(lastHealth);
         assertThat(game.createdAt()).isEqualTo(created);
         assertThat(game.updatedAt()).isEqualTo(updated);
     }

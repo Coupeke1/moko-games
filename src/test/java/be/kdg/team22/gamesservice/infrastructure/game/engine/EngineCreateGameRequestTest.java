@@ -1,20 +1,27 @@
 package be.kdg.team22.gamesservice.infrastructure.game.engine;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class EngineCreateGameRequestTest {
+class EngineCreateGameRequestTest {
+
     @Test
-    public void recordStoresValues() {
+    void recordStoresValues() {
         var players = List.of(UUID.randomUUID());
-        var req = new EngineCreateGameRequest(players, "settings", true);
+        var settings = Map.<String, Object>of(
+                "boardSize", 3,
+                "flyingKings", true
+        );
+
+        var req = new EngineCreateGameRequest(players, settings, true);
 
         assertThat(req.players()).isEqualTo(players);
-        assertThat(req.settings()).isEqualTo("settings");
+        assertThat(req.settings()).isEqualTo(settings);
         assertThat(req.aiPlayer()).isTrue();
     }
 }

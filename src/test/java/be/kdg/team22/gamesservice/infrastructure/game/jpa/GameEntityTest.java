@@ -2,14 +2,32 @@ package be.kdg.team22.gamesservice.infrastructure.game.jpa;
 
 import be.kdg.team22.gamesservice.domain.game.Game;
 import be.kdg.team22.gamesservice.domain.game.GameId;
+import be.kdg.team22.gamesservice.domain.game.settings.GameSettingsDefinition;
+import be.kdg.team22.gamesservice.domain.game.settings.SettingDefinition;
+import be.kdg.team22.gamesservice.domain.game.settings.SettingType;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class GameEntityTest {
+    private GameSettingsDefinition defaultSettings() {
+        return new GameSettingsDefinition(
+                List.of(
+                        new SettingDefinition(
+                                "dummy",
+                                SettingType.STRING,
+                                false,
+                                null,
+                                null,
+                                null
+                        )
+                )
+        );
+    }
 
     private Game domainGame() {
         return new Game(
@@ -25,7 +43,8 @@ class GameEntityTest {
                 "Strategy board game",
                 "http://image",
                 Instant.parse("2024-01-01T00:00:00Z"),
-                Instant.parse("2024-01-02T00:00:00Z")
+                Instant.parse("2024-01-02T00:00:00Z"),
+                defaultSettings()
         );
     }
 
@@ -65,6 +84,7 @@ class GameEntityTest {
                 "Tic Tac Toe",
                 "Classic game",
                 "http://image",
+                defaultSettings(),
                 created,
                 updated
         );

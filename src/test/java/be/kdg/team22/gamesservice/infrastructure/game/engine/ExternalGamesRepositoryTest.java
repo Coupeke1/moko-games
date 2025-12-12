@@ -5,6 +5,9 @@ import be.kdg.team22.gamesservice.domain.game.Game;
 import be.kdg.team22.gamesservice.domain.game.GameId;
 import be.kdg.team22.gamesservice.domain.game.exceptions.EngineGameNotFoundException;
 import be.kdg.team22.gamesservice.domain.game.exceptions.EngineNotReachableException;
+import be.kdg.team22.gamesservice.domain.game.settings.GameSettingsDefinition;
+import be.kdg.team22.gamesservice.domain.game.settings.SettingDefinition;
+import be.kdg.team22.gamesservice.domain.game.settings.SettingType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -12,7 +15,9 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -24,20 +29,44 @@ class ExternalGamesRepositoryTest {
 
     private final ExternalGamesRepository repo = spy(new ExternalGamesRepository());
 
+    private GameSettingsDefinition defaultSettings() {
+        return new GameSettingsDefinition(
+                List.of(
+                        new SettingDefinition(
+                                "dummy",
+                                SettingType.STRING,
+                                false,
+                                null,
+                                null,
+                                null
+                        )
+                )
+        );
+    }
+
     private Game sampleGame() {
+        Instant created = Instant.parse("2024-01-01T10:00:00Z");
+        Instant updated = Instant.parse("2024-01-02T10:00:00Z");
+        Instant lastHealth = Instant.parse("2024-01-03T10:00:00Z");
         return new Game(
                 GameId.from(UUID.fromString("00000000-0000-0000-0000-000000000111")),
                 "tic-tac-toe",
                 "http://engine-service",
-                "/start",
+                "http://frontend",
                 "/start",
                 "/health",
+                lastHealth,
+                true,
                 "Tic Tac Toe",
                 "desc",
-                "img");
+                "img",
+                created,
+                updated,
+                defaultSettings()
+        );
     }
 
-    private StartGameRequest req(GameSettingsModel settings) {
+    private StartGameRequest req(Map<String, Object> settings) {
         return new StartGameRequest(
                 UUID.randomUUID(),
                 UUID.fromString("00000000-0000-0000-0000-000000000333"),
@@ -83,7 +112,7 @@ class ExternalGamesRepositoryTest {
 
         UUID result = repo.startExternalGame(
                 sampleGame(),
-                req(new TicTacToeSettingsModel(3))
+                req(Map.of("boardSize", 3))
         );
 
         assertThat(result).isEqualTo(instanceId);
@@ -96,8 +125,11 @@ class ExternalGamesRepositoryTest {
         doReturn(client).when(repo).createRestClient(anyString());
 
         assertThatThrownBy(() ->
-                repo.startExternalGame(sampleGame(), req(new CheckersSettingsModel(8, true)))
-        ).isInstanceOf(EngineGameNotFoundException.class);
+                repo.startExternalGame(sampleGame(), req(Map.of(
+                        "boardSize", 8,
+                        "flyingKings", true
+                ))))
+                .isInstanceOf(EngineGameNotFoundException.class);
     }
 
     @Test
@@ -108,7 +140,7 @@ class ExternalGamesRepositoryTest {
         doReturn(client).when(repo).createRestClient(anyString());
 
         assertThatThrownBy(() ->
-                repo.startExternalGame(sampleGame(), req(new TicTacToeSettingsModel(3)))
+                repo.startExternalGame(sampleGame(), req(Map.of("boardSize", 3)))
         ).isInstanceOf(HttpClientErrorException.class);
     }
 
@@ -120,7 +152,10 @@ class ExternalGamesRepositoryTest {
         doReturn(client).when(repo).createRestClient(anyString());
 
         assertThatThrownBy(() ->
-                repo.startExternalGame(sampleGame(), req(new CheckersSettingsModel(8, false)))
+                repo.startExternalGame(sampleGame(), req(Map.of(
+                        "boardSize", 8,
+                        "flyingKings", false
+                )))
         ).isInstanceOf(EngineNotReachableException.class)
                 .hasMessageContaining("http://engine-service/start");
     }
