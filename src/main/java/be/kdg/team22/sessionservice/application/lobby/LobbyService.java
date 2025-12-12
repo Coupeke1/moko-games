@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -121,12 +122,14 @@ public class LobbyService {
         int resolvedMaxPlayers = maxPlayers != null ? maxPlayers : 4;
 
         GameSettings gameSettings = switch (model) {
-            case TicTacToeSettingsModel t ->
-                    new TicTacToeSettings(t.boardSize());
-            case CheckersSettingsModel c ->
-                    new CheckersSettings(c.boardSize(), c.flyingKings());
+            case TicTacToeSettingsModel t -> new TicTacToeSettings(t.boardSize());
+            case CheckersSettingsModel c -> new CheckersSettings(c.boardSize(), c.flyingKings());
         };
 
         return new LobbySettings(gameSettings, resolvedMaxPlayers);
+    }
+
+    public Optional<Lobby> findByStartedGameId(GameId gameId) {
+        return repository.findByStartedGameId(gameId);
     }
 }
