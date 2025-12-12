@@ -5,7 +5,6 @@ import Grid from "@/components/layout/grid/grid";
 import { Items } from "@/components/layout/items";
 import Row from "@/components/layout/row";
 import Section from "@/components/section";
-import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
 import PostDialog from "@/features/store/dialogs/post-dialog";
 import { usePosts } from "@/features/store/hooks/use-posts.ts";
