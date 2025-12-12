@@ -2,10 +2,10 @@ import Grid from "@/components/layout/grid/grid";
 import Page from "@/components/layout/page";
 import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
-import { useLibrary } from "@/features/library/hooks/use-library.ts";
-import type { Entry } from "@/features/library/models/entry.ts";
 import LibraryCard from "@/features/library/components/library-card";
 import SearchBar from "@/features/library/components/search-bar";
+import { useLibrary } from "@/features/library/hooks/use-library.ts";
+import type { Entry } from "@/features/library/models/entry.ts";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function LibraryPage() {

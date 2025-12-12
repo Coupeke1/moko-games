@@ -2,10 +2,12 @@ import Page from "@/components/layout/page";
 import State from "@/components/state/state";
 import showToast from "@/components/toast";
 import { useVerify } from "@/features/checkout/hooks/use-verify";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 
 export default function OrderPage() {
+    const client = useQueryClient();
     const navigate = useNavigate();
     const params = useParams();
     const id = params.id;
@@ -20,10 +22,11 @@ export default function OrderPage() {
         if (error) showToast("Order", "Could not verify order");
 
         if (order) {
-            showToast("Order", "Placed");
+            showToast("Order", "Sucessful");
+            client.invalidateQueries({ queryKey: ["library"] });
             navigate("/library");
         }
-    }, [order, error, navigate]);
+    }, [order, error, client, navigate]);
 
     return (
         <Page>

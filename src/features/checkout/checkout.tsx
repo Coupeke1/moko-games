@@ -28,10 +28,10 @@ export default function CheckoutPage() {
 
     const checkout = useMutation({
         mutationFn: async () => {
+            showToast("Checkout", "Redirecting to payment");
             return await placeOrder();
         },
         onSuccess: async (data) => {
-            showToast("Checkout", "Redirecting");
             window.location.replace(data);
         },
         onError: (error: Error) => showToast("Checkout", error.message),

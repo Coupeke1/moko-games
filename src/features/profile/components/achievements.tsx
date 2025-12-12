@@ -21,12 +21,15 @@ export default function ProfileAchievements() {
                         {achievements.map((achievement) => (
                             <AchievementCard
                                 key={achievement.id}
-                                image={achievement.gameImage ?? ""}
+                                image={
+                                    achievement.gameImage ??
+                                    "https://cdn2.thecatapi.com/images/28j.jpg"
+                                }
                                 title={achievement.name}
                                 date={new Date(
                                     achievement.unlockedAt,
                                 ).toLocaleDateString()}
-                                game={achievement.gameName ?? ""}
+                                game={achievement.gameName ?? "Unknown"}
                             />
                         ))}
                     </Column>
