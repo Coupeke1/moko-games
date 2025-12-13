@@ -29,11 +29,7 @@ public class ProfileService {
     private final LibraryRepository libraryRepository;
     private final ExternalGamesRepository gamesRepository;
 
-    public ProfileService(final ProfileRepository profileRepository,
-                          final ExternalImageRepository imageRepository,
-                          final AchievementRepository achievementRepository,
-                          final LibraryRepository libraryRepository,
-                          final ExternalGamesRepository gamesRepository) {
+    public ProfileService(final ProfileRepository profileRepository, final ExternalImageRepository imageRepository, final AchievementRepository achievementRepository, final LibraryRepository libraryRepository, final ExternalGamesRepository gamesRepository) {
         this.profileRepository = profileRepository;
         this.imageRepository = imageRepository;
         this.achievementRepository = achievementRepository;
@@ -66,50 +62,31 @@ public class ProfileService {
 
         List<AchievementModel> achievements = null;
         if (modules.achievements()) {
-            achievements = achievementRepository.findByProfile(profileId)
-                    .stream()
-                    .map(a -> {
-                        GameDetailsResponse game = null;
+            achievements = achievementRepository.findByProfile(profileId).stream().map(a -> {
+                GameDetailsResponse game = null;
 
-                        try {
-                            game = gamesRepository.getGame(a.gameId(), token);
-                        } catch (ExternalGameNotFoundException e) {
-                            // ignore, game stays null
-                        }
+                try {
+                    game = gamesRepository.getGame(a.gameId(), token);
+                } catch (
+                        ExternalGameNotFoundException e) {
+                    // ignore, game stays null
+                }
 
-                        return AchievementModel.from(a, game);
-                    })
-                    .toList();
+                return AchievementModel.from(a, game);
+            }).toList();
         }
 
         List<FavouriteGameModel> favouriteGames = null;
         if (modules.favourites()) {
             List<LibraryEntry> entries = libraryRepository.findByUserId(profileId.value());
 
-            favouriteGames = entries.stream()
-                    .filter(LibraryEntry::favourite)
-                    .map(entry -> {
-                        GameDetailsResponse game = gamesRepository.getGame(entry.gameId().value(), token);
-                        return new FavouriteGameModel(
-                                game.id(),
-                                game.title(),
-                                game.description(),
-                                game.image()
-                        );
-                    })
-                    .toList();
+            favouriteGames = entries.stream().filter(LibraryEntry::favourite).map(entry -> {
+                GameDetailsResponse game = gamesRepository.getGame(entry.gameId().value(), token);
+                return new FavouriteGameModel(game.id(), game.title(), game.description(), game.image());
+            }).toList();
         }
 
-        return new FilteredProfileModel(
-                profile.id().value(),
-                profile.username().value(),
-                profile.description(),
-                profile.image(),
-                stats.level(),
-                stats.playTime(),
-                achievements,
-                favouriteGames
-        );
+        return new FilteredProfileModel(profile.id().value(), profile.username().value(), profile.description(), profile.image(), stats.level(), stats.playTime(), achievements, favouriteGames);
     }
 
     public Profile getByUsername(final ProfileName username) {
@@ -146,6 +123,16 @@ public class ProfileService {
         return profile.modules();
     }
 
+    public Notifications changeNotifications(final Profile profile, final Notifications notifications) {
+        if (notifications.equals(profile.notifications()))
+            throw CannotUpdateProfileException.notifications(profile.id());
+
+        profile.updateNotifications(notifications);
+        profileRepository.save(profile);
+
+        return profile.notifications();
+    }
+
     private ProfileName getUsername(final Jwt token) {
         if (token.hasClaim("preferred_username"))
             return new ProfileName(token.getClaimAsString("preferred_username"));
@@ -161,17 +148,6 @@ public class ProfileService {
             return new ProfileEmail(token.getClaimAsString("email"));
 
         throw ClaimNotFoundException.email();
-    }
-
-    public NotificationPreferences changePreferences(final Profile profile,
-                                                     final NotificationPreferences prefs) {
-        if (prefs.equals(profile.preferences()))
-            throw CannotUpdateProfileException.preferences(profile.id());
-
-        profile.updatePreferences(prefs);
-        profileRepository.save(profile);
-
-        return profile.preferences();
     }
 
     public Profile createBotProfile() {

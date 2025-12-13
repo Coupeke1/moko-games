@@ -29,7 +29,7 @@ class AchievementMetadataTest {
     }
 
     @Test
-    @DisplayName("getLevels returns default 1 for unknown achievement code")
+    @DisplayName("getLevels returns default 1 for unknown achievements code")
     void getLevels_unknownCode_returnsDefault1() {
         int levels = AchievementMetadata.getLevels("UNKNOWN_ACHIEVEMENT");
         assertThat(levels).isEqualTo(1);

@@ -5,10 +5,10 @@ import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class ModulesEmbed {
-    @Column(name = "achievements", nullable = false)
+    @Column(name = "achievements_module", nullable = false)
     private boolean achievements;
 
-    @Column(name = "favourites", nullable = false)
+    @Column(name = "favourites_module", nullable = false)
     private boolean favourites;
 
     protected ModulesEmbed() {}

@@ -23,7 +23,7 @@ class AchievementTest {
     private final Instant unlockedAt = Instant.parse("2024-01-01T10:00:00Z");
 
     @Test
-    @DisplayName("Valid achievement → created successfully")
+    @DisplayName("Valid achievements → created successfully")
     void validAchievement() {
         Achievement a = new Achievement(id, profileId, gameId, code, unlockedAt);
 

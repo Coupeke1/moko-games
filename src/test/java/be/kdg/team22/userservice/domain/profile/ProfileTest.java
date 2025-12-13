@@ -43,13 +43,7 @@ class ProfileTest {
     @DisplayName("addLevels preserves playTime")
     void addLevels_preservesPlayTime() {
         Statistics initialStats = new Statistics(0, 100);
-        Profile profile = new Profile(
-                id, username, email, description, image,
-                initialStats,
-                new Modules(false, false),
-                java.time.Instant.now(),
-                new NotificationPreferences(true, true, true, true, true)
-        );
+        Profile profile = new Profile(id, username, email, description, image, initialStats, new Modules(false, false), new Notifications(true, true, true, true, true), java.time.Instant.now());
 
         profile.addLevels(5);
 
