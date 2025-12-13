@@ -2,9 +2,7 @@ package be.kdg.team22.tictactoeservice.application;
 
 import be.kdg.team22.tictactoeservice.config.GameInfoProperties;
 import be.kdg.team22.tictactoeservice.domain.register.exceptions.GameNotRegisteredException;
-import be.kdg.team22.tictactoeservice.domain.register.GameRegisterId;
 import be.kdg.team22.tictactoeservice.infrastructure.register.ExternalRegisterRepository;
-import be.kdg.team22.tictactoeservice.infrastructure.register.GameResponse;
 import be.kdg.team22.tictactoeservice.infrastructure.register.RegisterGameRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +12,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -52,14 +49,12 @@ public class GameRegistrationStartupTest {
 
     @Test
     void shouldRegisterGameWhenGameDoesNotExist() {
-        when(externalRegisterRepository.getGame("tic-tac-toe")).thenReturn(null);
         when(externalRegisterRepository.registerGame(any())).thenReturn(true);
 
         gameRegistrationStartup.registerGameOnStartup();
 
         ArgumentCaptor<RegisterGameRequest> captor = ArgumentCaptor.forClass(RegisterGameRequest.class);
         verify(externalRegisterRepository).registerGame(captor.capture());
-        verify(externalRegisterRepository, never()).updateGame(any(), any());
 
         RegisterGameRequest request = captor.getValue();
         assertEquals("tic-tac-toe", request.name());
@@ -68,32 +63,13 @@ public class GameRegistrationStartupTest {
     }
 
     @Test
-    void shouldUpdateGameWhenGameAlreadyExists() {
-        UUID gameId = UUID.randomUUID();
-        GameResponse existingGame = new GameResponse(
-                gameId,
-                "tic-tac-toe",
-                "Tic Tac Toe",
-                "A classic game",
-                "http://image.url",
-                "http://localhost:5174",
-                "/api/games",
-                true,
-                null,
-                null,
-                null
-        );
-        
-        when(externalRegisterRepository.getGame("tic-tac-toe")).thenReturn(existingGame);
+    void shouldRegisterGameSuccessfully() {
+        when(externalRegisterRepository.registerGame(any())).thenReturn(true);
 
         gameRegistrationStartup.registerGameOnStartup();
 
         ArgumentCaptor<RegisterGameRequest> captor = ArgumentCaptor.forClass(RegisterGameRequest.class);
-        verify(externalRegisterRepository).updateGame(
-                eq(GameRegisterId.fromUuid(gameId)),
-                captor.capture()
-        );
-        verify(externalRegisterRepository, never()).registerGame(any());
+        verify(externalRegisterRepository).registerGame(captor.capture());
 
         RegisterGameRequest request = captor.getValue();
         assertEquals("tic-tac-toe", request.name());
@@ -101,7 +77,6 @@ public class GameRegistrationStartupTest {
 
     @Test
     void shouldThrowGameNotRegisteredExceptionWhenRegistrationFails() {
-        when(externalRegisterRepository.getGame("tic-tac-toe")).thenReturn(null);
         when(externalRegisterRepository.registerGame(any())).thenReturn(false);
 
         assertThrows(GameNotRegisteredException.class, 
@@ -110,13 +85,10 @@ public class GameRegistrationStartupTest {
 
     @Test
     void shouldPropagateGameServiceNotReachableException() {
-        when(externalRegisterRepository.getGame("tic-tac-toe"))
+        when(externalRegisterRepository.registerGame(any()))
                 .thenThrow(new RuntimeException("Service unavailable"));
 
         assertThrows(RuntimeException.class,
             () -> gameRegistrationStartup.registerGameOnStartup());
-
-        verify(externalRegisterRepository, never()).registerGame(any());
-        verify(externalRegisterRepository, never()).updateGame(any(), any());
     }
 }
