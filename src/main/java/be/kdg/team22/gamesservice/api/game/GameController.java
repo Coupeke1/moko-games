@@ -62,7 +62,7 @@ public class GameController {
         return ResponseEntity.ok(GameDetailsModel.from(game));
     }
 
-    @PostMapping({"/", ""})
+    @PostMapping("/register")
     public ResponseEntity<GameDetailsModel> createGame(final @RequestBody RegisterGameRequest request) {
         Game game = service.create(request);
         return ResponseEntity.ok(GameDetailsModel.from(game));

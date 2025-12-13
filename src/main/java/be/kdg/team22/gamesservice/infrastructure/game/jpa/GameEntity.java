@@ -127,6 +127,10 @@ public class GameEntity {
         this.createdAt = game.createdAt();
         this.updatedAt = game.updatedAt();
 
+        if (this.achievements == null) {
+            this.achievements = new java.util.ArrayList<>();
+        }
+
         this.achievements.removeIf(a ->
                 game.achievements().stream().noneMatch(d -> d.key().key().equals(a.id().key())));
 
@@ -160,10 +164,12 @@ public class GameEntity {
                 updatedAt
         );
 
-        List<Achievement> achievements = this.achievements.stream()
-                .map(AchievementEntity::toDomain)
-                .toList();
-        game.addAchievements(achievements);
+        if (this.achievements != null) {
+            List<Achievement> achievements = this.achievements.stream()
+                    .map(AchievementEntity::toDomain)
+                    .toList();
+            game.addAchievements(achievements);
+        }
 
         return game;
     }
