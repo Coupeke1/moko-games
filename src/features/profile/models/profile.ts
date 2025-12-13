@@ -1,4 +1,5 @@
 import type { Modules } from "@/features/profile/models/modules.ts";
+import type { Notifications } from "@/features/profile/models/notifications";
 import type { Statistics } from "@/features/profile/models/statistics.ts";
 
 export interface Profile {
@@ -9,4 +10,5 @@ export interface Profile {
     image: string;
     statistics: Statistics;
     modules: Modules;
+    notifications: Notifications;
 }
