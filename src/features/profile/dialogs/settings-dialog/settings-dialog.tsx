@@ -17,13 +17,10 @@ import NotificationsTab, {
 import PictureTab, {
     type PictureData,
 } from "@/features/profile/dialogs/settings-dialog/picture-tab";
-import type { Modules } from "@/features/profile/models/modules.ts";
 import type { Profile } from "@/features/profile/models/profile.ts";
 import { updateProfile } from "@/features/profile/services/profile.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
-import { afterEach } from "vitest";
-import type { Notifications } from "../../models/notifications";
+import { useRef, useState } from "react";
 
 interface Props {
     profile: Profile;
