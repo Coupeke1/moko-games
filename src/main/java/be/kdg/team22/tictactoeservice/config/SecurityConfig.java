@@ -33,9 +33,7 @@ public class SecurityConfig {
                 .sessionManagement(mgmt ->
                         mgmt.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/games", "/api/games/")
-                                .permitAll()
-                                .requestMatchers("/api/games/**")
+                        auth.requestMatchers("/api/games/**")
                                 .authenticated().anyRequest().permitAll())
                 .oauth2ResourceServer(rs ->
                         rs.jwt(jwt ->
