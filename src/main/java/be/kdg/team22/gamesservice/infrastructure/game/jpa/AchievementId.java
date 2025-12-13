@@ -15,7 +15,7 @@ public class AchievementId {
 
     protected AchievementId() {}
 
-    public AchievementId(String key, UUID gameId) {
+    public AchievementId(final String key, final UUID gameId) {
         this.key = key;
         this.gameId = gameId;
     }

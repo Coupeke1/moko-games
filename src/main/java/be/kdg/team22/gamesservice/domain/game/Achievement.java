@@ -14,7 +14,7 @@ public class Achievement {
     private String description;
     private int levels;
 
-    public Achievement(AchievementKey key, String name, String description, int levels) {
+    public Achievement(final AchievementKey key, final String name, final String description, final int levels) {
         validate(name, description, levels);
         this.key = key;
         this.name = name;
@@ -22,13 +22,13 @@ public class Achievement {
         this.levels = levels;
     }
 
-    private void validate(String name, String description, int levels) {
+    private void validate(final String name, final String description, final int levels) {
         if (name == null || name.isEmpty()) throw new AchievementNameInvalidException();
         if (description == null || description.isEmpty()) throw new AchievementDescriptionInvalidException();
         if (levels < 0) throw new AchievementLevelsInvalidException();
     }
 
-    public void update(String name, String description, int levels) {
+    public void update(final String name, final String description, final int levels) {
         validate(name, description, levels);
         this.name = name;
         this.description = description;

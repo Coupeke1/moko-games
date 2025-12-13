@@ -14,7 +14,7 @@ public record AchievementKey(String key) {
         key = key.toUpperCase();
     }
 
-    public static AchievementKey fromString(String key) {
+    public static AchievementKey fromString(final String key) {
         return new AchievementKey(key);
     }
 }

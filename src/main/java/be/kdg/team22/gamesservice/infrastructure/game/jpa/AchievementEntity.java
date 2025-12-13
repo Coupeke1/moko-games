@@ -26,7 +26,7 @@ public class AchievementEntity {
     protected AchievementEntity() {
     }
 
-    public AchievementEntity(String key, GameEntity game, String name, String description, int levels) {
+    public AchievementEntity(final String key, final GameEntity game, final String name, final String description, final int levels) {
         this.id = new AchievementId(key, game.id());
         this.game = game;
         this.name = name;
@@ -34,7 +34,7 @@ public class AchievementEntity {
         this.levels = levels;
     }
 
-    public static AchievementEntity fromDomain(Achievement achievement, GameEntity gameEntity) {
+    public static AchievementEntity fromDomain(final Achievement achievement, final GameEntity gameEntity) {
         return new AchievementEntity(
                 achievement.key().key(),
                 gameEntity,
@@ -53,7 +53,7 @@ public class AchievementEntity {
         );
     }
 
-    public void fromDomainUpdate(Achievement achievement) {
+    public void fromDomainUpdate(final Achievement achievement) {
         this.name = achievement.name();
         this.description = achievement.description();
         this.levels = achievement.levels();

@@ -192,7 +192,7 @@ public class Game {
         }
     }
 
-    public static Game register(RegisterGameRequest request) {
+    public static Game register(final RegisterGameRequest request) {
         Game game = new Game(
                 GameId.create(),
                 request.name(),
@@ -219,7 +219,7 @@ public class Game {
         return game;
     }
 
-    public void update(RegisterGameRequest request) {
+    public void update(final RegisterGameRequest request) {
         validate(request);
         this.name = request.name();
         this.baseUrl = request.backendUrl();
@@ -235,7 +235,7 @@ public class Game {
         this.updatedAt = Instant.now();
     }
 
-    private void syncAchievement(RegisterGameRequest request) {
+    private void syncAchievement(final RegisterGameRequest request) {
         if (request.achievements() == null) {
             this.achievements.clear();
             return;
@@ -271,7 +271,7 @@ public class Game {
         );
     }
 
-    public void updateHealthStatus(boolean isHealthy) {
+    public void updateHealthStatus(final boolean isHealthy) {
         this.healthy = isHealthy;
         this.lastHealthCheck = Instant.now();
     }

@@ -88,7 +88,7 @@ public class GameEntity {
         this.updatedAt = updatedAt;
     }
 
-    public static GameEntity fromDomain(Game game) {
+    public static GameEntity fromDomain(final Game game) {
         GameEntity gameEntity = new GameEntity(
                 game.id().value(),
                 game.name(),
@@ -112,7 +112,7 @@ public class GameEntity {
         return gameEntity;
     }
 
-    public void fromDomainUpdate(Game game) {
+    public void fromDomainUpdate(final Game game) {
         this.id = game.id().value();
         this.name = game.name();
         this.baseUrl = game.baseUrl();
