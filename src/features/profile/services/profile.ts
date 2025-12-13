@@ -1,11 +1,17 @@
 import { client } from "@/lib/api-client.ts";
-
 import { environment } from "@/config.ts";
 import { validIdCheck } from "@/lib/id.ts";
-import type { Modules } from "@/features/profile/models/modules.ts";
+import {
+    match as modulesEquals,
+    type Modules,
+} from "@/features/profile/models/modules.ts";
 import type { Profile } from "@/features/profile/models/profile.ts";
 import type { KeycloakTokenParsed } from "keycloak-js";
 import Keycloak from "keycloak-js";
+import {
+    match as notificationsMatch,
+    type Notifications,
+} from "@/features/profile/models/notifications";
 
 const BASE_URL = environment.userService;
 
@@ -26,38 +32,45 @@ export async function updateProfile(
     description: string,
     image: string,
     modules: Modules,
+    notifications: Notifications,
 ) {
     try {
         const profile: Profile = await findProfile(id);
-        await updateDescription(profile.description, description);
-        await updateImage(profile.image, image);
-        await updateModules(profile.modules, modules);
-    } catch {
+
+        await Promise.all([
+            updateDescription(profile.description, description),
+            updateImage(profile.image, image),
+            updateModules(profile.modules, modules),
+            updateNotifications(profile.notifications, notifications),
+        ]);
+    } catch (error) {
+        console.error("Profile update failed:", error);
         throw new Error("Profile could not be updated");
     }
 }
 
 async function updateDescription(old: string, model: string) {
     if (old === model) return;
-    await client.patch(`${BASE_URL}/me/description`, model, {
+    await client.patch(`${BASE_URL}/me/preferences/description`, model, {
         headers: { "Content-Type": "text/plain" },
     });
 }
 
 async function updateImage(old: string, model: string) {
     if (old === model) return;
-    await client.patch(`${BASE_URL}/me/image`, model, {
+    await client.patch(`${BASE_URL}/me/preferences/image`, model, {
         headers: { "Content-Type": "text/plain" },
     });
 }
 
 async function updateModules(old: Modules, model: Modules) {
-    if (
-        old.achievements === model.achievements &&
-        old.favourites === model.favourites
-    )
-        return;
-    await client.patch(`${BASE_URL}/me/modules`, model);
+    if (modulesEquals(old, model)) return;
+    await client.patch(`${BASE_URL}/me/preferences/modules`, model);
+}
+
+async function updateNotifications(old: Notifications, model: Notifications) {
+    if (notificationsMatch(old, model)) return;
+    await client.patch(`${BASE_URL}/me/preferences/notifications`, model);
 }
 
 export async function parseProfile(

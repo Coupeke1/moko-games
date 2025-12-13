@@ -5,14 +5,22 @@ import { Gap } from "@/components/layout/gap";
 import TabContent from "@/components/tabs/buttons/content";
 import TabRow from "@/components/tabs/buttons/row";
 import showToast from "@/components/toast";
-import type { Modules } from "@/features/profile/models/modules.ts";
+import AboutTab, {
+    type AboutData,
+} from "@/features/profile/dialogs/settings-dialog/about-tab";
+import ModulesTab, {
+    type ModulesData,
+} from "@/features/profile/dialogs/settings-dialog/modules-tab";
+import NotificationsTab, {
+    type NotificationsData,
+} from "@/features/profile/dialogs/settings-dialog/notifications-tab";
+import PictureTab, {
+    type PictureData,
+} from "@/features/profile/dialogs/settings-dialog/picture-tab";
 import type { Profile } from "@/features/profile/models/profile.ts";
 import { updateProfile } from "@/features/profile/services/profile.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import AboutTab from "@/features/profile/dialogs/settings-dialog/about-tab";
-import ModulesTab from "@/features/profile/dialogs/settings-dialog/modules-tab";
-import PictureTab from "@/features/profile/dialogs/settings-dialog/picture-tab";
+import { useRef, useState } from "react";
 
 interface Props {
     profile: Profile;
@@ -30,48 +38,27 @@ export default function SettingsDialog({
     const client = useQueryClient();
 
     const [current, setCurrent] = useState<string>("About");
-    const [image, setImage] = useState("");
-    const [description, setDescription] = useState("");
-    const [achievements, setAchievements] = useState("hidden");
-    const [favourites, setFavourites] = useState("hidden");
-
-    useEffect(() => {
-        setDescription(profile.description);
-        setImage(profile.image);
-        setAchievements(profile.modules.achievements ? "displayed" : "hidden");
-        setFavourites(profile.modules.favourites ? "displayed" : "hidden");
-    }, [
-        open,
-        profile.description,
-        profile.image,
-        profile.modules.achievements,
-        profile.modules.favourites,
-    ]);
+    const aboutTab = useRef<AboutData>(null);
+    const pictureTab = useRef<PictureData>(null);
+    const modulesTab = useRef<ModulesData>(null);
+    const notificationsTab = useRef<NotificationsData>(null);
 
     const save = useMutation({
-        mutationFn: async ({
-            profile,
-            description,
-            image,
-            achievements,
-            favourites,
-        }: {
-            profile: string;
-            description: string;
-            image: string;
-            achievements: boolean;
-            favourites: boolean;
-        }) => {
-            await updateProfile(profile, description, image, {
-                achievements,
-                favourites,
-            } as Modules);
+        mutationFn: async () => {
+            await updateProfile(
+                profile.id,
+                aboutTab.current?.data().description ?? profile.description,
+                pictureTab.current?.data().picture ?? profile.image,
+                modulesTab.current?.data() ?? profile.modules,
+                notificationsTab.current?.data() ?? profile.notifications,
+            );
         },
         onSuccess: async () => {
             await client.refetchQueries({ queryKey: ["profile", "me"] });
 
             if (profile === undefined) return;
             showToast(profile.username, "Profile was saved!");
+            setCurrent("About");
             close();
         },
         onError: (error: Error) => {
@@ -86,25 +73,11 @@ export default function SettingsDialog({
             onClose={() => setCurrent("About")}
             open={open}
             onChange={onChange}
-            footer={
-                <Button
-                    onClick={() =>
-                        save.mutate({
-                            profile: profile.id,
-                            description,
-                            image,
-                            achievements: achievements === "displayed",
-                            favourites: favourites === "displayed",
-                        })
-                    }
-                >
-                    Save
-                </Button>
-            }
+            footer={<Button onClick={() => save.mutate()}>Save</Button>}
         >
             <Column gap={Gap.Large}>
                 <TabRow
-                    tabs={["About", "Picture", "Modules"]}
+                    tabs={["About", "Picture", "Modules", "Notifications"]}
                     current={current}
                     setCurrent={setCurrent}
                 />
@@ -116,25 +89,35 @@ export default function SettingsDialog({
                             title: "About",
                             element: (
                                 <AboutTab
-                                    description={description}
-                                    setDescription={setDescription}
+                                    ref={aboutTab}
+                                    initial={profile.description}
                                 />
                             ),
                         },
                         {
                             title: "Picture",
                             element: (
-                                <PictureTab image={image} setImage={setImage} />
+                                <PictureTab
+                                    ref={pictureTab}
+                                    initial={profile.image}
+                                />
                             ),
                         },
                         {
                             title: "Modules",
                             element: (
                                 <ModulesTab
-                                    achievements={achievements}
-                                    setAchievements={setAchievements}
-                                    favourites={favourites}
-                                    setFavourites={setFavourites}
+                                    ref={modulesTab}
+                                    initial={profile.modules}
+                                />
+                            ),
+                        },
+                        {
+                            title: "Notifications",
+                            element: (
+                                <NotificationsTab
+                                    ref={notificationsTab}
+                                    initial={profile.notifications}
                                 />
                             ),
                         },
