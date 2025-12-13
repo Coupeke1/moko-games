@@ -23,7 +23,7 @@ public class RabbitMQTopology {
     Binding gameplayBinding() {
         return BindingBuilder.bind(userGameplayQueue())
                 .to(new TopicExchange(EXCHANGE_GAMEPLAY))
-                .with("game.#.achievements");
+                .with("game.#.achievement");
     }
 
     @Bean
