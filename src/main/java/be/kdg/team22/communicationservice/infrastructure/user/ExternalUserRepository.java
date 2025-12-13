@@ -20,38 +20,30 @@ public class ExternalUserRepository {
         this.client = client;
     }
 
-    public PreferencesResponse getPreferences(final String jwtToken) {
+    public NotificationsResponse getNotifications(final String token) {
         try {
-            return client.get()
-                    .uri("/profiles/me/preferences")
-                    .header("Authorization", "Bearer " + jwtToken)
-                    .retrieve()
-                    .body(PreferencesResponse.class);
-
+            return client.get().uri("/profiles/me/preferences/notifications").header("Authorization", "Bearer " + token).retrieve().body(NotificationsResponse.class);
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                return PreferencesResponse.defaultPreferences();
+                return NotificationsResponse.defaultPreferences();
             }
             throw e;
         }
     }
 
-    public ProfileResponse getProfile(final UUID userId) {
+    public ProfileResponse getProfile(final UUID id) {
         try {
-            ProfileResponse response = client.get()
-                    .uri("/api/profiles/{id}", userId)
-                    .retrieve()
-                    .body(ProfileResponse.class);
+            ProfileResponse response = client.get().uri("/api/profiles/{id}", id).retrieve().body(ProfileResponse.class);
 
             if (response == null) {
-                throw new UserProfileNotFoundException(userId);
+                throw new UserProfileNotFoundException(id);
             }
 
             return response;
 
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                throw new UserProfileNotFoundException(userId);
+                throw new UserProfileNotFoundException(id);
             }
             throw e;
         } catch (RestClientException e) {
@@ -59,22 +51,18 @@ public class ExternalUserRepository {
         }
     }
 
-    public PreferencesResponse getPreferencesByUserId(final UUID userId) {
+    public NotificationsResponse getNotificationsByUser(final UUID id) {
         try {
-            PreferencesResponse response = client.get()
-                    .uri("/api/profiles/{id}/preferences", userId)
-                    .retrieve()
-                    .body(PreferencesResponse.class);
+            NotificationsResponse response = client.get().uri("/api/profiles/{id}/preferences/notifications", id).retrieve().body(NotificationsResponse.class);
 
-            if (response == null) {
-                throw new UserPreferencesNotFoundException(userId);
-            }
+            if (response == null)
+                throw new UserPreferencesNotFoundException(id);
 
             return response;
 
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                throw new UserPreferencesNotFoundException(userId);
+                throw new UserPreferencesNotFoundException(id);
             }
             throw e;
         } catch (RestClientException e) {
