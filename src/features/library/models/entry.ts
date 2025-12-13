@@ -4,4 +4,5 @@ export interface Entry {
     description: string;
     image: string;
     favourite: boolean;
+    healthy: boolean;
 }
