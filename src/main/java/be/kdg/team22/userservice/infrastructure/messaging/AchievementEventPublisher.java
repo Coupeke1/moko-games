@@ -16,7 +16,7 @@ public class AchievementEventPublisher {
     public void publishAchievementUnlocked(AchievementUnlockedEvent event) {
         rabbitTemplate.convertAndSend(
                 RabbitMQTopology.EXCHANGE_ACHIEVEMENTS,
-                "achievements.unlocked",
+                "achievement.unlocked",
                 event
         );
     }
