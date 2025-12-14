@@ -7,6 +7,16 @@ export type NotificationType =
     | "ORDER_COMPLETED"
     | "DIRECT_MESSAGE";
 
+export const NOTIFICATION_TYPES = [
+    "FRIEND_REQUEST_RECEIVED",
+    "FRIEND_REQUEST_ACCEPTED",
+    "LOBBY_INVITE",
+    "PLAYER_JOINED_LOBBY",
+    "ACHIEVEMENT_UNLOCKED",
+    "ORDER_COMPLETED",
+    "DIRECT_MESSAGE",
+] as const satisfies readonly NotificationType[];
+
 export interface NotificationItem {
     id: string;
     type: NotificationType;
