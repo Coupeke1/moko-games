@@ -1,4 +1,5 @@
 import { findEntry } from "@/features/store/services/store.ts";
+import { POLLING_INTERVAL } from "@/lib/polling";
 import { useQuery } from "@tanstack/react-query";
 
 export function useEntry(id: string | undefined) {
@@ -10,6 +11,7 @@ export function useEntry(id: string | undefined) {
         queryKey: ["store", id],
         queryFn: () => findEntry(id!),
         enabled: !!id,
+        refetchInterval: POLLING_INTERVAL,
     });
 
     return { loading, error, entry: data };

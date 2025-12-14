@@ -1,4 +1,5 @@
 import { findFriends } from "@/features/friends/services/friends.ts";
+import { POLLING_INTERVAL } from "@/lib/polling";
 import { useQuery } from "@tanstack/react-query";
 
 export function useFriends() {
@@ -9,6 +10,7 @@ export function useFriends() {
     } = useQuery({
         queryKey: ["friends"],
         queryFn: () => findFriends(),
+        refetchInterval: POLLING_INTERVAL,
     });
 
     return { loading, error, friends: data };

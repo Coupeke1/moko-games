@@ -2,6 +2,7 @@ import {
     findIncomingRequests,
     findOutgoingRequests,
 } from "@/features/friends/services/requests.ts";
+import { POLLING_INTERVAL } from "@/lib/polling";
 import { useQuery } from "@tanstack/react-query";
 
 export function useIncomingRequests() {
@@ -12,6 +13,7 @@ export function useIncomingRequests() {
     } = useQuery({
         queryKey: ["friends", "incoming"],
         queryFn: () => findIncomingRequests(),
+        refetchInterval: POLLING_INTERVAL,
     });
 
     return { loading, error, requests: data };

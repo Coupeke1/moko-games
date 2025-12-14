@@ -51,11 +51,7 @@ export default function Select({
                     onChange={onChange}
                     className="rounded-lg bg-bg-2 w-full h-10 px-3 appearance-none pl-10 text-fg-2"
                 >
-                    {placeholder && (
-                        <option disabled selected>
-                            {placeholder}
-                        </option>
-                    )}
+                    {placeholder && <option disabled>{placeholder}</option>}
 
                     {options.map((option) => (
                         <option
