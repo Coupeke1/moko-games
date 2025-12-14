@@ -138,3 +138,7 @@ Authorization: Bearer {{kaj_Token}}
 ### get unread notifications
 GET http://localhost:8082/api/notifications/unread
 Authorization: Bearer {{chat_token}}
+
+### testing
+POST http://localhost:8082/api/notifications/test
+Authorization: Bearer {{chat_token}}
