@@ -1,6 +1,7 @@
 package be.kdg.team22.communicationservice.application.notification;
 
 import be.kdg.team22.communicationservice.application.queries.NotificationReadFilter;
+import be.kdg.team22.communicationservice.application.queries.PageResult;
 import be.kdg.team22.communicationservice.application.queries.Pagination;
 import be.kdg.team22.communicationservice.domain.notification.*;
 import be.kdg.team22.communicationservice.domain.notification.exceptions.NotificationNotFoundException;
@@ -61,7 +62,7 @@ public class NotificationService {
         }
     }
 
-    public List<Notification> findAllByConstraints(
+    public PageResult<Notification> findAllByConstraints(
             final PlayerId playerId,
             final NotificationReadFilter type,
             final NotificationType origin,
