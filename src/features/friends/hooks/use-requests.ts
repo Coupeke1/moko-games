@@ -16,7 +16,7 @@ export function useIncomingRequests() {
         refetchInterval: POLLING_INTERVAL,
     });
 
-    return { loading, error, requests: data };
+    return { loading, error, requests: data ?? [] };
 }
 
 export function useOutgoingRequests() {
@@ -29,5 +29,5 @@ export function useOutgoingRequests() {
         queryFn: () => findOutgoingRequests(),
     });
 
-    return { loading, error, requests: data };
+    return { loading, error, requests: data ?? [] };
 }

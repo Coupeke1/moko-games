@@ -1,4 +1,5 @@
 import Page from "@/components/layout/page";
+import Message from "@/components/state/message";
 import State from "@/components/state/state";
 import showToast from "@/components/toast";
 import { useVerify } from "@/features/checkout/hooks/use-verify";
@@ -31,10 +32,12 @@ export default function OrderPage() {
     return (
         <Page>
             <State
-                data={order}
                 loading={loading || loading}
                 error={error || error}
-            />
+                message="No order"
+            >
+                <Message>Redirecting</Message>
+            </State>
         </Page>
     );
 }

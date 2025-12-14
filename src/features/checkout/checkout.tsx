@@ -39,48 +39,54 @@ export default function CheckoutPage() {
 
     return (
         <Page>
-            <State data={entries} loading={loading} error={error} />
-            <Column>
-                <Row
-                    items={Items.Stretch}
-                    justify={Justify.Between}
-                    responsive={false}
-                >
-                    <section className="w-36">
-                        <Button
-                            onClick={() => checkout.mutate()}
-                            fullWidth={true}
-                        >
-                            Checkout
-                        </Button>
-                    </section>
+            <State
+                loading={loading}
+                error={error}
+                empty={entries.length === 0}
+                message="No games"
+            >
+                <Column>
+                    <Row
+                        items={Items.Stretch}
+                        justify={Justify.Between}
+                        responsive={false}
+                    >
+                        <section className="w-36">
+                            <Button
+                                onClick={() => checkout.mutate()}
+                                fullWidth={true}
+                            >
+                                Checkout
+                            </Button>
+                        </section>
 
-                    {entries && (
-                        <Row gap={Gap.Large} responsive={false}>
-                            <Statistic
-                                title="Amount"
-                                value={entries.length.toString()}
-                            />
+                        {entries && (
+                            <Row gap={Gap.Large} responsive={false}>
+                                <Statistic
+                                    title="Amount"
+                                    value={entries.length.toString()}
+                                />
 
-                            <Statistic
-                                title="Total Price"
-                                value={`€${getTotalPrice(entries!)}`}
-                            />
-                        </Row>
-                    )}
-                </Row>
+                                <Statistic
+                                    title="Total Price"
+                                    value={`€${getTotalPrice(entries!)}`}
+                                />
+                            </Row>
+                        )}
+                    </Row>
 
-                {entries &&
-                    (entries.length == 0 ? (
-                        <ErrorState>No games in cart</ErrorState>
-                    ) : (
-                        <Column>
-                            {entries.map((entry: Entry) => (
-                                <EntryLine key={entry.id} entry={entry} />
-                            ))}
-                        </Column>
-                    ))}
-            </Column>
+                    {entries &&
+                        (entries.length == 0 ? (
+                            <ErrorState>No games in cart</ErrorState>
+                        ) : (
+                            <Column>
+                                {entries.map((entry: Entry) => (
+                                    <EntryLine key={entry.id} entry={entry} />
+                                ))}
+                            </Column>
+                        ))}
+                </Column>
+            </State>
         </Page>
     );
 }

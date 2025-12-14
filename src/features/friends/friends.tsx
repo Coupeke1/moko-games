@@ -5,7 +5,6 @@ import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
 import Page from "@/components/layout/page";
-import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
 import TabRow from "@/components/tabs/links/row";
 import showToast from "@/components/toast";
@@ -56,18 +55,20 @@ export default function FriendsPage() {
                 <TabRow tabs={getTabs()} />
                 <Add />
 
-                <State data={friends} loading={loading} error={error} />
-
-                {friends &&
-                    (friends.length == 0 ? (
-                        <ErrorState>No friends</ErrorState>
-                    ) : (
+                <State
+                    loading={loading}
+                    error={error}
+                    empty={friends.length === 0}
+                    message="No friends"
+                >
+                    {friends && (
                         <Grid>
                             {friends.map((friend: Profile) => (
                                 <Friend key={friend.id} friend={friend} />
                             ))}
                         </Grid>
-                    ))}
+                    )}
+                </State>
             </Column>
         </Page>
     );

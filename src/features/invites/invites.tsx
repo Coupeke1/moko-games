@@ -39,20 +39,27 @@ export default function InvitesPage() {
 
     return (
         <Page>
-            <State data={invites} loading={loading} error={error} />
-
-            {invites &&
-                (invites.length == 0 ? (
-                    <ErrorState>No invites</ErrorState>
-                ) : (
-                    <Column>
-                        {invites.map((invite: Lobby) => (
-                            <button onClick={() => accept.mutate({ invite })}>
-                                {invite.id}
-                            </button>
-                        ))}
-                    </Column>
-                ))}
+            <State
+                loading={loading}
+                error={error}
+                empty={invites.length === 0}
+                message="No games"
+            >
+                {invites &&
+                    (invites.length == 0 ? (
+                        <ErrorState>No invites</ErrorState>
+                    ) : (
+                        <Column>
+                            {invites.map((invite: Lobby) => (
+                                <button
+                                    onClick={() => accept.mutate({ invite })}
+                                >
+                                    {invite.id}
+                                </button>
+                            ))}
+                        </Column>
+                    ))}
+            </State>
         </Page>
     );
 }

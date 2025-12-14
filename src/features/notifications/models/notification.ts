@@ -1,4 +1,4 @@
-import type { Origin } from "@/features/notifications/models/type";
+import type { Origin } from "@/features/notifications/models/origin";
 
 export interface Notification {
     id: string;

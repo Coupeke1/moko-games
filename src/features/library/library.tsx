@@ -1,6 +1,5 @@
 import Grid from "@/components/layout/grid/grid";
 import Page from "@/components/layout/page";
-import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
 import LibraryCard from "@/features/library/components/library-card";
 import SearchBar from "@/features/library/components/search-bar";
@@ -21,18 +20,18 @@ export default function LibraryPage() {
         <Page>
             <SearchBar onSearch={(query) => search(query)} />
 
-            <State data={entries} loading={loading} error={error} />
-
-            {entries &&
-                (entries.length == 0 ? (
-                    <ErrorState>No games</ErrorState>
-                ) : (
-                    <Grid>
-                        {entries.map((entry: Entry) => (
-                            <LibraryCard key={entry.id} entry={entry} />
-                        ))}
-                    </Grid>
-                ))}
+            <State
+                loading={loading}
+                error={error}
+                empty={entries.length === 0}
+                message="No games"
+            >
+                <Grid>
+                    {entries.map((entry: Entry) => (
+                        <LibraryCard key={entry.id} entry={entry} />
+                    ))}
+                </Grid>
+            </State>
         </Page>
     );
 }

@@ -3,5 +3,5 @@ export function format(value: string) {
 }
 
 export function slug(value: string) {
-    return value.toLowerCase().replace("_", "-");
+    return value.toLowerCase().replaceAll("_", "-");
 }

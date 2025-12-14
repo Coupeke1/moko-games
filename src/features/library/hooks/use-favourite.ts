@@ -13,5 +13,5 @@ export function useFavourite(id: string) {
         refetchInterval: POLLING_INTERVAL,
     });
 
-    return { loading, error, favourited: data };
+    return { loading, error, favourited: data ?? null };
 }

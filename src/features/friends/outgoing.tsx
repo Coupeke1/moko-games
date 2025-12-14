@@ -5,14 +5,13 @@ import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
 import Page from "@/components/layout/page";
-import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
 import TabRow from "@/components/tabs/links/row";
 import showToast from "@/components/toast";
-import { useOutgoingRequests } from "@/features/friends/hooks/use-requests.ts";
-import type { Profile } from "@/features/profile/models/profile.ts";
 import { getTabs } from "@/features/friends/components/tabs";
+import { useOutgoingRequests } from "@/features/friends/hooks/use-requests.ts";
 import { cancelRequest } from "@/features/friends/services/requests.ts";
+import type { Profile } from "@/features/profile/models/profile.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function OutgoingRequestsPage() {
@@ -37,12 +36,14 @@ export default function OutgoingRequestsPage() {
         <Page>
             <Column gap={Gap.Large}>
                 <TabRow tabs={getTabs()} />
-                <State data={requests} loading={loading} error={error} />
 
-                {requests &&
-                    (requests.length == 0 ? (
-                        <ErrorState>No outgoing requests</ErrorState>
-                    ) : (
+                <State
+                    loading={loading}
+                    error={error}
+                    empty={requests.length === 0}
+                    message="No outgoing requests"
+                >
+                    {requests && (
                         <Grid>
                             {requests.map((request: Profile) => (
                                 <UserCard
@@ -60,7 +61,8 @@ export default function OutgoingRequestsPage() {
                                 />
                             ))}
                         </Grid>
-                    ))}
+                    )}
+                </State>
             </Column>
         </Page>
     );

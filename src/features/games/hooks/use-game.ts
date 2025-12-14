@@ -12,5 +12,5 @@ export function useGame(id: string | undefined) {
         enabled: !!id,
     });
 
-    return { loading, error, game: data };
+    return { loading, error, game: data ?? null };
 }

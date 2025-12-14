@@ -13,5 +13,5 @@ export function useInvites(game: string) {
         refetchInterval: POLLING_INTERVAL,
     });
 
-    return { loading, error, invites: data };
+    return { loading, error, invites: data ?? [] };
 }

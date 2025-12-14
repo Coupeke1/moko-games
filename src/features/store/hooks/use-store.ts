@@ -27,5 +27,5 @@ export function useStore() {
         refetchInterval: POLLING_INTERVAL,
     });
 
-    return { loading, error, entries: data };
+    return { loading, error, entries: data?.items ?? [] };
 }

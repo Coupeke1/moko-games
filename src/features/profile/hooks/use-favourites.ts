@@ -7,7 +7,7 @@ export function useFavourites() {
     const { authenticated, keycloak, token } = useAuthStore();
 
     const {
-        data: games,
+        data,
         isLoading: loading,
         isError: error,
     } = useQuery({
@@ -23,5 +23,5 @@ export function useFavourites() {
         refetchInterval: POLLING_INTERVAL,
     });
 
-    return { favourites: games, loading, error };
+    return { favourites: data ?? [], loading, error };
 }

@@ -29,19 +29,24 @@ export default function CartDialog({ open, onChange }: Props) {
                 )
             }
         >
-            <State data={entries} loading={loading} error={error} />
-
-            {open &&
-                entries &&
-                (entries.length == 0 ? (
-                    <ErrorState>No games in cart</ErrorState>
-                ) : (
-                    <Grid>
-                        {entries.map((entry: Entry) => (
-                            <EntryCard key={entry.id} entry={entry} />
-                        ))}
-                    </Grid>
-                ))}
+            <State
+                loading={loading}
+                error={error}
+                empty={entries.length === 0}
+                message="No games"
+            >
+                {open &&
+                    entries &&
+                    (entries.length == 0 ? (
+                        <ErrorState>No games in cart</ErrorState>
+                    ) : (
+                        <Grid>
+                            {entries.map((entry: Entry) => (
+                                <EntryCard key={entry.id} entry={entry} />
+                            ))}
+                        </Grid>
+                    ))}
+            </State>
         </Dialog>
     );
 }

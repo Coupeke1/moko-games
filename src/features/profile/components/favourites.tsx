@@ -4,7 +4,6 @@ import Column from "@/components/layout/column";
 import { useFavourites } from "@/features/profile/hooks/use-favourites";
 import FavouriteCard from "@/features/profile/components/favourite-card";
 import { Gap } from "@/components/layout/gap";
-import ErrorState from "@/components/state/error";
 import type { Entry } from "@/features/library/models/entry";
 
 export default function ProfileFavourites() {
@@ -12,12 +11,13 @@ export default function ProfileFavourites() {
 
     return (
         <Section title="Favourites">
-            <State data={favourites} loading={loading} error={error} />
-
-            {favourites &&
-                (favourites.length === 0 ? (
-                    <ErrorState>No favourites</ErrorState>
-                ) : (
+            <State
+                loading={loading}
+                error={error}
+                empty={favourites.length === 0}
+                message="No achievements"
+            >
+                {favourites && (
                     <Column gap={Gap.Large}>
                         {favourites.map((entry: Entry) => (
                             <FavouriteCard
@@ -28,7 +28,8 @@ export default function ProfileFavourites() {
                             />
                         ))}
                     </Column>
-                ))}
+                )}
+            </State>
         </Section>
     );
 }
