@@ -3,8 +3,7 @@ import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import { Items } from "@/components/layout/items";
 import { Justify } from "@/components/layout/justify";
-import type { NotificationItem } from "@/features/notifications/models/notification.ts";
-import { NOTIFICATION_TYPE_LABEL } from "@/features/notifications/models/notification.ts";
+import type { Notification } from "@/features/notifications/models/notification.ts";
 
 function formatDate(iso: string) {
     const d = new Date(iso);
@@ -13,13 +12,11 @@ function formatDate(iso: string) {
 }
 
 interface Props {
-    notification: NotificationItem;
+    notification: Notification;
     onMarkRead: (id: string) => void;
 }
 
 export default function NotificationCard({ notification, onMarkRead }: Props) {
-    const label = NOTIFICATION_TYPE_LABEL[notification.type] ?? notification.type;
-
     return (
         <button
             onClick={() => {
@@ -34,7 +31,11 @@ export default function NotificationCard({ notification, onMarkRead }: Props) {
         >
             <Row justify={Justify.Between} items={Items.Start} gap={Gap.Large}>
                 <Column gap={Gap.Small}>
-                    <Row items={Items.Center} gap={Gap.Small} responsive={false}>
+                    <Row
+                        items={Items.Center}
+                        gap={Gap.Small}
+                        responsive={false}
+                    >
                         <span
                             className={[
                                 "text-xs px-2 py-1 rounded-full border",
@@ -47,11 +48,13 @@ export default function NotificationCard({ notification, onMarkRead }: Props) {
                         </span>
 
                         <span className="text-xs px-2 py-1 rounded-full border border-bg-3 text-fg-2">
-                            {label}
+                            Label
                         </span>
                     </Row>
 
-                    <h3 className="text-lg font-semibold">{notification.title}</h3>
+                    <h3 className="text-lg font-semibold">
+                        {notification.title}
+                    </h3>
                     <p className="text-fg-2">{notification.message}</p>
                 </Column>
 

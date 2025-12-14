@@ -1,57 +1,49 @@
-import Row from "@/components/layout/row";
-import Column from "@/components/layout/column";
-import {Gap} from "@/components/layout/gap";
-import {Items} from "@/components/layout/items";
-import {Justify} from "@/components/layout/justify";
-import type {NotificationType, ReadFilter,} from "@/features/notifications/models/notification.ts";
-import {NOTIFICATION_TYPE_LABEL, NOTIFICATION_TYPES,} from "@/features/notifications/models/notification.ts";
+import Select from "@/components/inputs/select";
+import Grid from "@/components/layout/grid/grid";
+import { GridSize } from "@/components/layout/grid/size";
+import type { ReadFilter } from "@/features/notifications/models/notification.ts";
+import { format, Origin } from "@/features/notifications/models/type";
 
 interface Props {
-    read: ReadFilter;
-    onReadChange: (v: ReadFilter) => void;
-    type: NotificationType | "all";
-    onTypeChange: (v: NotificationType | "all") => void;
+    status: ReadFilter;
+    onStatusChange: (status: ReadFilter) => void;
+    type: Origin | "all";
+    onTypeChange: (type: Origin | "all") => void;
 }
 
 export default function NotificationFilters({
-                                                read,
-                                                onReadChange,
-                                                type,
-                                                onTypeChange,
-                                            }: Props) {
+    status: type,
+    onStatusChange: onTypeChange,
+    type: origin,
+    onTypeChange: onOriginChange,
+}: Props) {
     return (
-        <Row justify={Justify.Between} items={Items.Center} gap={Gap.Large}>
-            <Column gap={Gap.Small}>
-                <label className="text-fg-2 text-sm">Read status</label>
-                <select
-                    value={read}
-                    onChange={(e) => onReadChange(e.target.value as ReadFilter)}
-                    className="bg-bg-2 border border-bg-3 rounded-xl px-3 py-2"
-                >
-                    <option value="all">All</option>
-                    <option value="unread">Unread</option>
-                    <option value="read">Read</option>
-                </select>
-            </Column>
+        <Grid size={GridSize.ExtraSmall}>
+            <Select
+                placeholder="Type"
+                options={[
+                    { label: "All Types", value: "all" },
+                    { label: "Unread", value: "unread" },
+                    { label: "Read", value: "read" },
+                ]}
+                value={type}
+                onChange={(e) => onTypeChange(e.target.value as ReadFilter)}
+            />
 
-            <Column gap={Gap.Small}>
-                <label className="text-fg-2 text-sm">Type</label>
-                <select
-                    value={type}
-                    onChange={(e) =>
-                        onTypeChange(e.target.value as NotificationType | "all")
-                    }
-                    className="bg-bg-2 border border-bg-3 rounded-xl px-3 py-2"
-                >
-                    <option value="all">All types</option>
-
-                    {NOTIFICATION_TYPES.map((t) => (
-                        <option key={t} value={t}>
-                            {NOTIFICATION_TYPE_LABEL[t] ?? t}
-                        </option>
-                    ))}
-                </select>
-            </Column>
-        </Row>
+            <Select
+                placeholder="Origin"
+                options={[
+                    { label: "All Origins", value: "all" },
+                    ...Object.values(Origin).map((origin: string) => ({
+                        label: format(origin),
+                        value: origin,
+                    })),
+                ]}
+                value={origin}
+                onChange={(e) =>
+                    onOriginChange(e.target.value as Origin | "all")
+                }
+            />
+        </Grid>
     );
 }

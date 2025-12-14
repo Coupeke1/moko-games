@@ -66,6 +66,7 @@ export default function SearchBar({ onSearch }: Props) {
                     <Button fullWidth={true}>Search</Button>
                 </section>
             </section>
+
             <Grid size={GridSize.ExtraSmall}>
                 <Select
                     placeholder="Sorting"
@@ -87,6 +88,7 @@ export default function SearchBar({ onSearch }: Props) {
                     onChange={(e) => setCategory(e.target.value)}
                 />
             </Grid>
+
             <section className="sm:hidden">
                 <Button fullWidth={true}>Search</Button>
             </section>

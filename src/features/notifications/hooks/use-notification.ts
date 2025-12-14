@@ -1,18 +1,22 @@
-import {useAuthStore} from "@/stores/auth-store.ts";
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import { useAuthStore } from "@/stores/auth-store.ts";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
     getMyNotifications,
     getNotificationsByType,
     getUnreadNotifications,
     markNotificationAsRead,
 } from "@/features/notifications/services/notifications.ts";
-import type {NotificationItem, NotificationType, ReadFilter,} from "@/features/notifications/models/notification.ts";
+import type {
+    Notification,
+    Type,
+    ReadFilter,
+} from "@/features/notifications/models/notification.ts";
 
 export function useNotifications(filters: {
-    read: ReadFilter;
-    type: NotificationType | "all";
+    status: ReadFilter;
+    type: Type | "all";
 }) {
-    const {authenticated, keycloak, token} = useAuthStore();
+    const { authenticated, keycloak, token } = useAuthStore();
     const queryClient = useQueryClient();
 
     const {
@@ -21,10 +25,10 @@ export function useNotifications(filters: {
         isError: error,
     } = useQuery({
         queryKey: ["notifications", "me", filters],
-        queryFn: async (): Promise<NotificationItem[]> => {
-            let data: NotificationItem[];
+        queryFn: async (): Promise<Notification[]> => {
+            let data: Notification[];
 
-            if (filters.read === "unread") {
+            if (filters.status === "unread") {
                 data = await getUnreadNotifications();
 
                 if (filters.type !== "all") {
@@ -36,7 +40,7 @@ export function useNotifications(filters: {
             if (filters.type !== "all") {
                 data = await getNotificationsByType(filters.type);
 
-                if (filters.read === "read") {
+                if (filters.status === "read") {
                     data = data.filter((n) => n.read);
                 }
                 return data;
@@ -44,7 +48,7 @@ export function useNotifications(filters: {
 
             data = await getMyNotifications();
 
-            if (filters.read === "read") return data.filter((n) => n.read);
+            if (filters.status === "read") return data.filter((n) => n.read);
             return data;
         },
         enabled: authenticated && !!keycloak && !!token,
@@ -55,7 +59,9 @@ export function useNotifications(filters: {
     const markAsReadMutation = useMutation({
         mutationFn: async (id: string) => markNotificationAsRead(id),
         onSuccess: async () => {
-            await queryClient.invalidateQueries({queryKey: ["notifications"]});
+            await queryClient.invalidateQueries({
+                queryKey: ["notifications"],
+            });
         },
     });
 
