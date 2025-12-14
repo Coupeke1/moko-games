@@ -1,7 +1,10 @@
 package be.kdg.team22.communicationservice.api.notification;
 
 import be.kdg.team22.communicationservice.api.notification.models.NotificationModel;
+import be.kdg.team22.communicationservice.application.queries.NotificationReadFilter;
+import be.kdg.team22.communicationservice.api.notification.models.PagedResponse;
 import be.kdg.team22.communicationservice.application.notification.NotificationService;
+import be.kdg.team22.communicationservice.application.queries.Pagination;
 import be.kdg.team22.communicationservice.domain.notification.NotificationId;
 import be.kdg.team22.communicationservice.domain.notification.NotificationType;
 import be.kdg.team22.communicationservice.domain.notification.PlayerId;
@@ -33,6 +36,27 @@ public class NotificationController {
                 .toList();
 
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping
+    public ResponseEntity<PagedResponse<NotificationModel>> getNotifications(
+            @AuthenticationPrincipal final Jwt jwt,
+            @RequestParam(required = false) final NotificationReadFilter type,
+            @RequestParam(required = false) final NotificationType origin,
+            @RequestParam(defaultValue = "0") final int page,
+            @RequestParam(defaultValue = "10") final int size
+    ) {
+        PlayerId playerId = PlayerId.get(jwt);
+
+        Pagination pagination = new Pagination(page, size);
+
+        List<NotificationModel> models = service.findAllByConstraints(playerId, type, origin, pagination)
+                .stream()
+                .map(NotificationModel::from)
+                .toList();
+
+        boolean last = models.size() < size;
+        return ResponseEntity.ok(new PagedResponse<>(models, page, size, last));
     }
 
     @GetMapping("/unread")
