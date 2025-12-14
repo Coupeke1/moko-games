@@ -1,4 +1,5 @@
 import { findEntries } from "@/features/store/services/store.ts";
+import { POLLING_INTERVAL } from "@/lib/polling";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useStore() {
@@ -23,6 +24,7 @@ export function useStore() {
                 params?.category,
             );
         },
+        refetchInterval: POLLING_INTERVAL,
     });
 
     return { loading, error, entries: data };

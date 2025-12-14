@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/auth-store";
 import { findMyLibrary } from "@/features/profile/services/favourites";
+import { POLLING_INTERVAL } from "@/lib/polling";
 
 export function useFavourites() {
     const { authenticated, keycloak, token } = useAuthStore();
@@ -19,6 +20,7 @@ export function useFavourites() {
         enabled: authenticated && !!keycloak && !!token,
         staleTime: 5 * 60 * 1000,
         retry: 1,
+        refetchInterval: POLLING_INTERVAL,
     });
 
     return { favourites: games, loading, error };
