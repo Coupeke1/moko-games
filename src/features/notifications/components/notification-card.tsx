@@ -13,15 +13,10 @@ function formatDate(iso: string) {
 
 interface Props {
     notification: Notification;
-    onMarkRead: (id: string) => void;
 }
-
-export default function NotificationCard({ notification, onMarkRead }: Props) {
+export default function NotificationCard({ notification }: Props) {
     return (
         <button
-            onClick={() => {
-                if (!notification.read) onMarkRead(notification.id);
-            }}
             className={[
                 "w-full text-left rounded-2xl border px-4 py-3 transition-colors",
                 notification.read
