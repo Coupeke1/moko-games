@@ -48,6 +48,19 @@ public class NotificationController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/read")
+    public ResponseEntity<List<NotificationModel>> getRead(
+            @AuthenticationPrincipal final Jwt jwt) {
+        PlayerId playerId = PlayerId.get(jwt);
+
+        List<NotificationModel> result = service.getReadNotifications(playerId)
+                .stream()
+                .map(NotificationModel::from)
+                .toList();
+
+        return ResponseEntity.ok(result);
+    }
+
     @GetMapping("/{type}")
     public ResponseEntity<List<NotificationModel>> getByType(
             @AuthenticationPrincipal final Jwt jwt,
