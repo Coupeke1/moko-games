@@ -1,10 +1,15 @@
 package be.kdg.team22.communicationservice.infrastructure.notification;
 
 import be.kdg.team22.communicationservice.application.queries.NotificationReadFilter;
+import be.kdg.team22.communicationservice.application.queries.PageResult;
 import be.kdg.team22.communicationservice.application.queries.Pagination;
 import be.kdg.team22.communicationservice.domain.notification.*;
 import be.kdg.team22.communicationservice.infrastructure.notification.jpa.NotificationEntity;
 import be.kdg.team22.communicationservice.infrastructure.notification.jpa.NotificationJpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -46,21 +51,30 @@ public class DbNotificationRepository implements NotificationRepository {
     }
 
     @Override
-    public List<Notification> findAllByConstraints(
+    public PageResult<Notification> findAllByConstraints(
             final PlayerId playerId,
             final NotificationReadFilter type,
             final NotificationType origin,
             final Pagination pagination
     ) {
-        return jpa.findByRecipientIdOrderByCreatedAtDesc(playerId.value())
+        Boolean read = null;
+        if (type != null) {
+            read = (type == NotificationReadFilter.READ);
+        }
+
+        Pageable pageable = PageRequest.of(
+                pagination.page(),
+                pagination.size(),
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+
+        Page<NotificationEntity> page = jpa.findAllFiltered(playerId.value(), read, origin, pageable);
+
+        List<Notification> items = page.getContent()
                 .stream()
                 .map(NotificationEntity::to)
-                .filter(n -> type == null
-                        || (type == NotificationReadFilter.READ && n.isRead())
-                        || (type == NotificationReadFilter.UNREAD && !n.isRead()))
-                .filter(n -> origin == null || n.type() == origin)
-                .skip((long) pagination.page() * pagination.size())
-                .limit(pagination.size())
                 .toList();
+
+        return new PageResult<>(items, page.isLast());
     }
 }

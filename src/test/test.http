@@ -142,3 +142,38 @@ Authorization: Bearer {{chat_token}}
 ### testing
 POST http://localhost:8082/api/notifications/test
 Authorization: Bearer {{chat_token}}
+
+###
+# 2) Paginated: alles (page 0)
+GET http://localhost:8082/api/notifications?page=0&size=10
+Authorization: Bearer {{chat_token}}
+
+###
+# 3) Paginated: alles (page 1)
+GET http://localhost:8082/api/notifications?page=2&size=2
+Authorization: Bearer {{chat_token}}
+
+###
+# 4) Enkel unread (type = unread)
+GET http://localhost:8082/api/notifications?type=unread&page=0&size=10
+Authorization: Bearer {{chat_token}}
+
+###
+# 5) Enkel read (type = read)
+GET http://localhost:8082/api/notifications?type=read&page=0&size=10
+Authorization: Bearer {{chat_token}}
+
+###
+# 6) Enkel origin filter (bv friend_accepted)
+GET http://localhost:8082/api/notifications?origin=friend-request-accepted&page=0&size=10
+Authorization: Bearer {{chat_token}}
+
+###
+# 7) Combineer filters: unread + origin
+GET http://localhost:8082/api/notifications?type=unread&origin=friend_request_received&page=0&size=10
+Authorization: Bearer {{chat_token}}
+
+###
+# 8) Origin met kebab-case (werkt als je converter '-' -> '_' doet)
+GET http://localhost:8082/api/notifications?type=read&origin=friend-request-accepted&page=0&size=10
+Authorization: Bearer {{chat_token}}

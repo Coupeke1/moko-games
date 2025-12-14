@@ -1,7 +1,11 @@
 package be.kdg.team22.communicationservice.infrastructure.notification.jpa;
 
 import be.kdg.team22.communicationservice.domain.notification.NotificationType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.UUID;
@@ -11,7 +15,16 @@ public interface NotificationJpaRepository extends JpaRepository<NotificationEnt
 
     List<NotificationEntity> findByRecipientIdAndReadFalseOrderByCreatedAtDesc(UUID recipientId);
 
-    List<NotificationEntity> findByRecipientIdAndReadTrueOrderByCreatedAtDesc(UUID recipientId);
-
-    List<NotificationEntity> findByRecipientIdAndTypeOrderByCreatedAtDesc(UUID recipientId, NotificationType type);
+    @Query("""
+            select n from NotificationEntity n
+            where n.recipientId = :recipientId
+              and (:read is null or n.read = :read)
+              and (:type is null or n.type = :type)
+            """)
+    Page<NotificationEntity> findAllFiltered(
+            @Param("recipientId") UUID recipientId,
+            @Param("read") Boolean read,
+            @Param("type") NotificationType type,
+            Pageable pageable
+    );
 }
