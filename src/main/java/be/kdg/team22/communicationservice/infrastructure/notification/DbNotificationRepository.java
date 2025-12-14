@@ -1,5 +1,7 @@
 package be.kdg.team22.communicationservice.infrastructure.notification;
 
+import be.kdg.team22.communicationservice.application.queries.NotificationReadFilter;
+import be.kdg.team22.communicationservice.application.queries.Pagination;
 import be.kdg.team22.communicationservice.domain.notification.*;
 import be.kdg.team22.communicationservice.infrastructure.notification.jpa.NotificationEntity;
 import be.kdg.team22.communicationservice.infrastructure.notification.jpa.NotificationJpaRepository;
@@ -44,18 +46,21 @@ public class DbNotificationRepository implements NotificationRepository {
     }
 
     @Override
-    public List<Notification> findReadByRecipientId(PlayerId playerId) {
-        return jpa.findByRecipientIdAndReadTrueOrderByCreatedAtDesc(playerId.value())
+    public List<Notification> findAllByConstraints(
+            final PlayerId playerId,
+            final NotificationReadFilter type,
+            final NotificationType origin,
+            final Pagination pagination
+    ) {
+        return jpa.findByRecipientIdOrderByCreatedAtDesc(playerId.value())
                 .stream()
                 .map(NotificationEntity::to)
-                .toList();
-    }
-
-    @Override
-    public List<Notification> findByRecipientIdAndType(final PlayerId playerId, final NotificationType type) {
-        return jpa.findByRecipientIdAndTypeOrderByCreatedAtDesc(playerId.value(), type)
-                .stream()
-                .map(NotificationEntity::to)
+                .filter(n -> type == null
+                        || (type == NotificationReadFilter.READ && n.isRead())
+                        || (type == NotificationReadFilter.UNREAD && !n.isRead()))
+                .filter(n -> origin == null || n.type() == origin)
+                .skip((long) pagination.page() * pagination.size())
+                .limit(pagination.size())
                 .toList();
     }
 }

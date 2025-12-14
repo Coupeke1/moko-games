@@ -1,5 +1,7 @@
 package be.kdg.team22.communicationservice.application.notification;
 
+import be.kdg.team22.communicationservice.application.queries.NotificationReadFilter;
+import be.kdg.team22.communicationservice.application.queries.Pagination;
 import be.kdg.team22.communicationservice.domain.notification.*;
 import be.kdg.team22.communicationservice.domain.notification.exceptions.NotificationNotFoundException;
 import be.kdg.team22.communicationservice.infrastructure.email.EmailService;
@@ -9,7 +11,6 @@ import be.kdg.team22.communicationservice.infrastructure.user.ProfileResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,11 +28,6 @@ public class NotificationService {
         this.repository = repository;
         this.userRepository = userRepository;
         this.emailService = emailService;
-    }
-
-    private NotificationPreferences getPreferences(String jwtToken) {
-        NotificationsResponse response = userRepository.getNotifications(jwtToken);
-        return response.to();
     }
 
     public Notification create(final PlayerId recipient,
@@ -65,6 +61,15 @@ public class NotificationService {
         }
     }
 
+    public List<Notification> findAllByConstraints(
+            final PlayerId playerId,
+            final NotificationReadFilter type,
+            final NotificationType origin,
+            final Pagination pagination
+    ) {
+        return repository.findAllByConstraints(playerId, type, origin, pagination);
+    }
+
     public List<Notification> getNotifications(final PlayerId playerId) {
         return repository.findByRecipientId(playerId);
     }
@@ -73,19 +78,11 @@ public class NotificationService {
         return repository.findUnreadByRecipientId(playerId);
     }
 
-    public List<Notification> getNotificationsByType(final PlayerId playerId, final NotificationType type) {
-        return repository.findByRecipientIdAndType(playerId, type);
-    }
-
     public void markAsRead(final NotificationId id) {
         Notification notification =
                 repository.findById(id).orElseThrow(() -> new NotificationNotFoundException(id));
 
         notification.markAsRead();
         repository.save(notification);
-    }
-
-    public List<Notification> getReadNotifications(PlayerId playerId) {
-        return repository.findReadByRecipientId(playerId);
     }
 }
