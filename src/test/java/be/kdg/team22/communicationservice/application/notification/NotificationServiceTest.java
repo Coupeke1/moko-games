@@ -4,7 +4,7 @@ import be.kdg.team22.communicationservice.domain.notification.*;
 import be.kdg.team22.communicationservice.domain.notification.exceptions.NotificationNotFoundException;
 import be.kdg.team22.communicationservice.infrastructure.email.EmailService;
 import be.kdg.team22.communicationservice.infrastructure.user.ExternalUserRepository;
-import be.kdg.team22.communicationservice.infrastructure.user.PreferencesResponse;
+import be.kdg.team22.communicationservice.infrastructure.user.NotificationsResponse;
 import be.kdg.team22.communicationservice.infrastructure.user.ProfileResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,11 +52,11 @@ public class NotificationServiceTest {
 
     @Test
     void create_shouldGenerateNotificationAndSaveToRepository() {
-        PreferencesResponse prefs = new PreferencesResponse(false, true, true, true, true);
+        NotificationsResponse prefs = new NotificationsResponse(false, true, true, true, true);
                 ProfileResponse profile = new ProfileResponse(recipient.value(), "testuser", "test@example.com", "testImg", "profileDescription");
 
         when(userRepo.getProfile(recipient.value())).thenReturn(profile);
-        when(userRepo.getPreferencesByUserId(recipient.value())).thenReturn(prefs);
+        when(userRepo.getNotificationsByUser(recipient.value())).thenReturn(prefs);
         when(repository.save(any(Notification.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -69,7 +69,7 @@ public class NotificationServiceTest {
 
         verify(repository).save(any(Notification.class));
         verify(userRepo).getProfile(recipient.value());
-        verify(userRepo).getPreferencesByUserId(recipient.value());
+        verify(userRepo).getNotificationsByUser(recipient.value());
         verify(emailService, never()).sendNotificationEmail(anyString(), anyString(), any());
 
         assertThat(created.id()).isNotNull();
@@ -81,11 +81,11 @@ public class NotificationServiceTest {
 
     @Test
     void create_shouldSendEmailWhenPreferencesAllow() {
-        PreferencesResponse prefs = new PreferencesResponse(true, true, true, true, true);
+        NotificationsResponse prefs = new NotificationsResponse(true, true, true, true, true);
         ProfileResponse profile = new ProfileResponse(recipient.value(), "testuser", "test@example.com","testImg","profileDescription");
 
         when(userRepo.getProfile(recipient.value())).thenReturn(profile);
-        when(userRepo.getPreferencesByUserId(recipient.value())).thenReturn(prefs);
+        when(userRepo.getNotificationsByUser(recipient.value())).thenReturn(prefs);
         when(repository.save(any(Notification.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -108,11 +108,11 @@ public class NotificationServiceTest {
 
     @Test
     void create_shouldNotSendEmailWhenTypeDisabled() {
-        PreferencesResponse prefs = new PreferencesResponse(true, false, true, true, true);
+        NotificationsResponse prefs = new NotificationsResponse(true, false, true, true, true);
         ProfileResponse profile = new ProfileResponse(recipient.value(), "testuser", "test@example.com","testImg","profileDescription");
 
         when(userRepo.getProfile(recipient.value())).thenReturn(profile);
-        when(userRepo.getPreferencesByUserId(recipient.value())).thenReturn(prefs);
+        when(userRepo.getNotificationsByUser(recipient.value())).thenReturn(prefs);
         when(repository.save(any(Notification.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 

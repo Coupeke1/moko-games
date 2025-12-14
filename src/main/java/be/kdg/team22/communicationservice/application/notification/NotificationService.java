@@ -4,7 +4,7 @@ import be.kdg.team22.communicationservice.domain.notification.*;
 import be.kdg.team22.communicationservice.domain.notification.exceptions.NotificationNotFoundException;
 import be.kdg.team22.communicationservice.infrastructure.email.EmailService;
 import be.kdg.team22.communicationservice.infrastructure.user.ExternalUserRepository;
-import be.kdg.team22.communicationservice.infrastructure.user.PreferencesResponse;
+import be.kdg.team22.communicationservice.infrastructure.user.NotificationsResponse;
 import be.kdg.team22.communicationservice.infrastructure.user.ProfileResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +29,7 @@ public class NotificationService {
     }
 
     private NotificationPreferences getPreferences(String jwtToken) {
-        PreferencesResponse response = userRepository.getPreferences(jwtToken);
+        NotificationsResponse response = userRepository.getNotifications(jwtToken);
         return response.to();
     }
 
@@ -52,7 +52,7 @@ public class NotificationService {
     private void sendEmailIfAllowed(UUID recipientId, Notification notification) {
         ProfileResponse profile = userRepository.getProfile(recipientId);
 
-        PreferencesResponse prefsResponse = userRepository.getPreferencesByUserId(recipientId);
+        NotificationsResponse prefsResponse = userRepository.getNotificationsByUser(recipientId);
         NotificationPreferences prefs = prefsResponse.to();
 
         if (prefs.allowsEmail(notification)) {
