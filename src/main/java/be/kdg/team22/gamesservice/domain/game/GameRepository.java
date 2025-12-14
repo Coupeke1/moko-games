@@ -13,5 +13,7 @@ public interface GameRepository {
 
     Optional<Game> findByName(String name);
 
+    Optional<Achievement> findAchievementById(AchievementKey key, GameId id);
+
     void save(Game game);
 }

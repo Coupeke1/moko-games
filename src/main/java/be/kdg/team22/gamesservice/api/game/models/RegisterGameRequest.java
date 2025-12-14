@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public record RegisterGameRequest(
         @NotNull String name,
@@ -17,6 +18,7 @@ public record RegisterGameRequest(
         @NotNull String description,
         @NotNull String image,
         @NotNull @Positive BigDecimal price,
-        @NotNull GameCategory category
+        @NotNull GameCategory category,
+        List<RegisterAchievementRequest> achievements
         ) {
 }

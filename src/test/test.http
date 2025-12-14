@@ -13,8 +13,24 @@ Content-Type: application/json
   "healthEndpoint": "/actuator/health",
   "title": "Tic Tac Toe",
   "description": "Tic tac toe is played on a 3x3 grid",
-  "image": "test"
+  "image": "test",
+  "price": 25,
+  "category": "PARTY",
+  "achievements": [
+    {
+      "key": "WIN",
+      "name": "Victory Royale",
+      "description": "Win your first TicTacToe game!",
+      "levels": 3
+    }
+  ]
 }
+
+### Get Achievements
+GET http://localhost:8084/api/games/f525cacf-1882-4773-976d-3430c6b88a86/achievements
+
+### Get Achievemnt
+GET http://localhost:8084/api/games/30793a77-a0ec-4acd-baa9-d4c612f30668/achievements/win
 
 ### Health check
 GET http://localhost:8084/actuator/health

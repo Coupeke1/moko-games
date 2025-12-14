@@ -4,6 +4,8 @@ import be.kdg.team22.gamesservice.api.game.models.RegisterGameRequest;
 import be.kdg.team22.gamesservice.api.game.models.StartGameRequest;
 import be.kdg.team22.gamesservice.api.game.models.StartGameResponseModel;
 import be.kdg.team22.gamesservice.application.game.GameService;
+import be.kdg.team22.gamesservice.domain.game.Achievement;
+import be.kdg.team22.gamesservice.domain.game.AchievementKey;
 import be.kdg.team22.gamesservice.domain.game.Game;
 import be.kdg.team22.gamesservice.domain.game.GameCategory;
 import be.kdg.team22.gamesservice.domain.game.GameId;
@@ -143,43 +145,45 @@ class GameControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /api/games/{id} → updates game")
-    void updateGame_returns200AndUpdatedGame() throws Exception {
+    @DisplayName("PUT /api/games/{name} → updates game")
+    void registerGame_returns200AndUpdatedGame() throws Exception {
+        String name = "tic-tac-toe";
         UUID id = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
-        GameId gid = GameId.from(id);
         Game updatedGame = sampleGame(id);
 
         RegisterGameRequest request = new RegisterGameRequest(
                 "tic-tac-toe",
                 "http://engine",
-                "/play",
+                "http://frontend",
                 "/start",
                 "/health",
                 "Tic Tac Toe",
                 "desc",
                 "http://img",
                 BigDecimal.valueOf(29.99),
-                GameCategory.STRATEGY
+                GameCategory.STRATEGY,
+                List.of()
         );
 
-        when(gameService.update(gid, request)).thenReturn(updatedGame);
+        when(gameService.register(name, request)).thenReturn(updatedGame);
 
         String json = """
                 {
                   "name": "tic-tac-toe",
                   "backendUrl": "http://engine",
-                  "frontendUrl": "/play",
+                  "frontendUrl": "http://frontend",
                   "startEndpoint": "/start",
                   "healthEndpoint": "/health",
                   "title": "Tic Tac Toe",
                   "description": "desc",
                   "image": "http://img",
                   "price": 29.99,
-                  "category": "STRATEGY"
+                  "category": "STRATEGY",
+                  "achievements": []
                 }
                 """;
 
-        mockMvc.perform(put("/api/games/{id}", id)
+        mockMvc.perform(put("/api/games/{name}", name)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isOk())
@@ -187,7 +191,7 @@ class GameControllerTest {
                 .andExpect(jsonPath("$.title").value("Tic Tac Toe"));
 
         ArgumentCaptor<RegisterGameRequest> captor = ArgumentCaptor.forClass(RegisterGameRequest.class);
-        verify(gameService).update(any(GameId.class), captor.capture());
+        verify(gameService).register(any(String.class), captor.capture());
 
         RegisterGameRequest capturedRequest = captor.getValue();
         assertThat(capturedRequest.name()).isEqualTo("tic-tac-toe");
@@ -195,24 +199,25 @@ class GameControllerTest {
 
     @Test
     @DisplayName("POST /api/games/register → registers new game")
-    void registerGame_returns200AndNewGame() throws Exception {
+    void createGame_returns200AndNewGame() throws Exception {
         UUID id = UUID.fromString("bbbbbbbb-cccc-dddd-eeee-ffffffffffff");
         Game newGame = sampleGame(id);
 
-        when(gameService.register(any(RegisterGameRequest.class))).thenReturn(newGame);
+        when(gameService.create(any(RegisterGameRequest.class))).thenReturn(newGame);
 
         String json = """
                 {
                   "name": "tic-tac-toe",
                   "backendUrl": "http://engine",
-                  "frontendUrl": "/play",
+                  "frontendUrl": "http://frontend",
                   "startEndpoint": "/start",
                   "healthEndpoint": "/health",
                   "title": "Tic Tac Toe",
                   "description": "desc",
                   "image": "http://img",
                   "price": 19.99,
-                  "category": "PARTY"
+                  "category": "PARTY",
+                  "achievements": []
                 }
                 """;
 
@@ -224,9 +229,48 @@ class GameControllerTest {
                 .andExpect(jsonPath("$.name").value("tic-tac-toe"));
 
         ArgumentCaptor<RegisterGameRequest> captor = ArgumentCaptor.forClass(RegisterGameRequest.class);
-        verify(gameService).register(captor.capture());
+        verify(gameService).create(captor.capture());
 
         RegisterGameRequest capturedRequest = captor.getValue();
         assertThat(capturedRequest.name()).isEqualTo("tic-tac-toe");
+    }
+
+    @Test
+    @DisplayName("GET /api/games/{id}/achievements → returns list of achievements")
+    void getAchievements_returnsList() throws Exception {
+        UUID id = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+        GameId gameId = GameId.from(id);
+        Achievement achievement1 = new Achievement(new AchievementKey("key1"), "Achievement 1", "Description 1", 5);
+        Achievement achievement2 = new Achievement(new AchievementKey("key2"), "Achievement 2", "Description 2", 3);
+
+        when(gameService.getAchievements(gameId)).thenReturn(List.of(achievement1, achievement2));
+
+        mockMvc.perform(get("/api/games/{id}/achievements", id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.achievements.length()").value(2))
+                .andExpect(jsonPath("$.achievements[0].name").value("Achievement 1"))
+                .andExpect(jsonPath("$.achievements[1].name").value("Achievement 2"));
+
+        verify(gameService).getAchievements(gameId);
+    }
+
+    @Test
+    @DisplayName("GET /api/games/{id}/achievements/{key} → returns single achievement")
+    void getAchievement_returnsOne() throws Exception {
+        UUID id = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+        GameId gameId = GameId.from(id);
+        AchievementKey key = new AchievementKey("key1");
+        Achievement achievement = new Achievement(key, "Achievement 1", "Description 1", 5);
+
+        when(gameService.getAchievement(gameId, key)).thenReturn(achievement);
+
+        mockMvc.perform(get("/api/games/{id}/achievements/{key}", id, "key1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Achievement 1"))
+                .andExpect(jsonPath("$.key").value("KEY1"))
+                .andExpect(jsonPath("$.description").value("Description 1"))
+                .andExpect(jsonPath("$.levels").value(5));
+
+        verify(gameService).getAchievement(gameId, key);
     }
 }

@@ -2,6 +2,8 @@ package be.kdg.team22.gamesservice.api.game;
 
 import be.kdg.team22.gamesservice.api.game.models.*;
 import be.kdg.team22.gamesservice.application.game.GameService;
+import be.kdg.team22.gamesservice.domain.game.Achievement;
+import be.kdg.team22.gamesservice.domain.game.AchievementKey;
 import be.kdg.team22.gamesservice.domain.game.Game;
 import be.kdg.team22.gamesservice.domain.game.GameId;
 import org.slf4j.Logger;
@@ -54,15 +56,29 @@ public class GameController {
         return ResponseEntity.ok(GameDetailsModel.from(game));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<GameDetailsModel> updateGame(final @PathVariable UUID id, final @RequestBody RegisterGameRequest request) {
-        Game game = service.update(GameId.from(id), request);
+    @PutMapping("/{name}")
+    public ResponseEntity<GameDetailsModel> registerGame(final @PathVariable String name, final @RequestBody RegisterGameRequest request) {
+        Game game = service.register(name, request);
         return ResponseEntity.ok(GameDetailsModel.from(game));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<GameDetailsModel> registerGame(final @RequestBody RegisterGameRequest request) {
-        Game game = service.register(request);
+    public ResponseEntity<GameDetailsModel> createGame(final @RequestBody RegisterGameRequest request) {
+        Game game = service.create(request);
         return ResponseEntity.ok(GameDetailsModel.from(game));
+    }
+
+    @GetMapping("/{id}/achievements")
+    public ResponseEntity<AchievementListModel> getAchievements(final @PathVariable UUID id) {
+        List<Achievement> achievements = service.getAchievements(GameId.from(id));
+        List<AchievementDetailsModel> detailsModels = achievements.stream().map(AchievementDetailsModel::from).toList();
+
+        return ResponseEntity.ok(new AchievementListModel(detailsModels));
+    }
+
+    @GetMapping("/{id}/achievements/{key}")
+    public ResponseEntity<AchievementDetailsModel> getAchievement(final @PathVariable UUID id, final @PathVariable String key) {
+        Achievement achievement = service.getAchievement(GameId.from(id), AchievementKey.fromString(key));
+        return ResponseEntity.ok(AchievementDetailsModel.from(achievement));
     }
 }

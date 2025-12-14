@@ -1,13 +1,13 @@
 package be.kdg.team22.gamesservice.infrastructure.game.jpa;
 
+import be.kdg.team22.gamesservice.domain.game.Achievement;
 import be.kdg.team22.gamesservice.domain.game.Game;
 import be.kdg.team22.gamesservice.domain.game.GameId;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Entity
@@ -19,6 +19,9 @@ public class GameEntity {
 
     @Column(nullable = false, unique = true)
     private String name;
+
+    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AchievementEntity> achievements;
 
     @Column(nullable = false, name = "base_url")
     private String baseUrl;
@@ -85,8 +88,8 @@ public class GameEntity {
         this.updatedAt = updatedAt;
     }
 
-    public static GameEntity fromDomain(Game game) {
-        return new GameEntity(
+    public static GameEntity fromDomain(final Game game) {
+        GameEntity gameEntity = new GameEntity(
                 game.id().value(),
                 game.name(),
                 game.baseUrl(),
@@ -101,10 +104,51 @@ public class GameEntity {
                 game.createdAt(),
                 game.updatedAt()
         );
+
+        gameEntity.achievements = game.achievements().stream()
+                .map(achievement -> AchievementEntity.fromDomain(achievement, gameEntity))
+                .toList();
+
+        return gameEntity;
+    }
+
+    public void fromDomainUpdate(final Game game) {
+        this.id = game.id().value();
+        this.name = game.name();
+        this.baseUrl = game.baseUrl();
+        this.frontendUrl = game.frontendUrl();
+        this.startEndpoint = game.startEndpoint();
+        this.healthEndpoint = game.healthEndpoint();
+        this.lastHealthCheck = game.lastHealthCheck();
+        this.healthy = game.healthy();
+        this.title = game.title();
+        this.description = game.description();
+        this.image = game.image();
+        this.createdAt = game.createdAt();
+        this.updatedAt = game.updatedAt();
+
+        if (this.achievements == null) {
+            this.achievements = new java.util.ArrayList<>();
+        }
+
+        this.achievements.removeIf(a ->
+                game.achievements().stream().noneMatch(d -> d.key().key().equals(a.id().key())));
+
+        for (Achievement ach : game.achievements()) {
+            Optional<AchievementEntity> existingAch = this.achievements.stream()
+                    .filter(a -> a.id().key().equals(ach.key().key()))
+                    .findFirst();
+
+            if (existingAch.isEmpty()) {
+                this.achievements.add(AchievementEntity.fromDomain(ach, this));
+            } else {
+                existingAch.get().fromDomainUpdate(ach);
+            }
+        }
     }
 
     public Game toDomain() {
-        return new Game(
+        Game game = new Game(
                 GameId.from(id),
                 name,
                 baseUrl,
@@ -119,6 +163,15 @@ public class GameEntity {
                 createdAt,
                 updatedAt
         );
+
+        if (this.achievements != null) {
+            List<Achievement> achievements = this.achievements.stream()
+                    .map(AchievementEntity::toDomain)
+                    .toList();
+            game.addAchievements(achievements);
+        }
+
+        return game;
     }
 
     public UUID id() {
