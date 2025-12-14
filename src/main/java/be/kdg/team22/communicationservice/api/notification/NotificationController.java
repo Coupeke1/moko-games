@@ -4,7 +4,9 @@ import be.kdg.team22.communicationservice.api.notification.models.NotificationMo
 import be.kdg.team22.communicationservice.api.notification.models.PagedResponse;
 import be.kdg.team22.communicationservice.application.notification.NotificationService;
 import be.kdg.team22.communicationservice.application.queries.NotificationReadFilter;
+import be.kdg.team22.communicationservice.application.queries.PageResult;
 import be.kdg.team22.communicationservice.application.queries.Pagination;
+import be.kdg.team22.communicationservice.domain.notification.Notification;
 import be.kdg.team22.communicationservice.domain.notification.NotificationId;
 import be.kdg.team22.communicationservice.domain.notification.NotificationType;
 import be.kdg.team22.communicationservice.domain.notification.PlayerId;
@@ -36,7 +38,7 @@ public class NotificationController {
         PlayerId playerId = PlayerId.get(jwt);
         Pagination pagination = new Pagination(page, size);
 
-        var result = service.findAllByConstraints(playerId, type, origin, pagination);
+        PageResult<Notification> result = service.findAllByConstraints(playerId, type, origin, pagination);
 
         List<NotificationModel> models = result.items().stream()
                 .map(NotificationModel::from)
