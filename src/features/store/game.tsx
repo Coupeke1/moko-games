@@ -45,9 +45,8 @@ export default function StoreGamePage() {
                                     justify={Justify.Between}
                                     responsive={false}
                                 >
-                                    <h3 className="font-bold text-2xl">
-                                        {entry.title.substring(0, 15)}
-                                        {entry.title.length > 15 ? "..." : ""}
+                                    <h3 className="font-bold text-2xl truncate">
+                                        {entry.title}
                                     </h3>
 
                                     <Row gap={Gap.Small} responsive={false}>

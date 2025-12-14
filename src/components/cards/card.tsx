@@ -1,15 +1,15 @@
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
+import { Items } from "@/components/layout/items";
 import { Justify } from "@/components/layout/justify";
 import Row from "@/components/layout/row";
 import { Height } from "@/components/layout/size";
+import Stack from "@/components/layout/stack";
 import type { ReactNode } from "react";
 import { Link as RouterLink } from "react-router";
-import Stack from "@/components/layout/stack";
-import { Items } from "@/components/layout/items";
 
 interface Props {
-    image: string;
+    image?: string;
     title: string;
     information?: ReactNode;
     options?: ReactNode;
@@ -33,10 +33,12 @@ function Content({
     return (
         <Column>
             <article
-                className={`flex flex-col ${(href || onClick) && "group cursor-pointer"} relative overflow-hidden select-none justify-end bg-cover bg-center px-4 py-2 rounded-lg ${height}`}
+                className={`flex flex-col ${(href || onClick) && `group cursor-pointer select-none ${image && "hover:bg-bg-3 transition-colors duration-75"}`} relative overflow-hidden justify-end ${image ? " bg-cover bg-center" : "bg-bg-2"} px-4 py-2 rounded-lg ${height}`}
                 style={{ backgroundImage: `url("${image}")` }}
             >
-                <section className="absolute inset-0 bg-linear-to-b from-black/10 via-black/20 to-black/80 from-0% via-45% to-100% group-hover:bg-black/20 transition-colors duration-200 rounded-lg" />
+                {image && (
+                    <section className="absolute inset-0 bg-linear-to-b from-black/10 via-black/20 to-black/80 from-0% via-45% to-100% group-hover:bg-black/20 transition-colors duration-200 rounded-lg" />
+                )}
 
                 <section className="relative z-10">
                     <Row

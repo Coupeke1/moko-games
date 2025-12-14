@@ -60,9 +60,8 @@ export default function LibraryGamePage() {
                                     justify={Justify.Between}
                                     responsive={false}
                                 >
-                                    <h3 className="font-bold text-2xl">
-                                        {game.title.substring(0, 15)}
-                                        {game.title.length > 15 ? "..." : ""}
+                                    <h3 className="font-bold text-2xl truncate">
+                                        {game.title}
                                     </h3>
 
                                     <Row gap={Gap.Small} responsive={false}>
