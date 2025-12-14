@@ -107,7 +107,7 @@ class GameServiceTest {
                 false
         );
 
-        assertThatThrownBy(() -> service.startGame(request, tokenFromUuid(request.players().getFirst())))
+        assertThatThrownBy(() -> service.startGame(request, null))
                 .isInstanceOf(PlayersListEmptyException.class);
 
         verifyNoInteractions(gameRepository, engine);

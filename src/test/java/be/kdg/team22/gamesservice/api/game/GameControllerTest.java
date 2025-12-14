@@ -84,7 +84,7 @@ class GameControllerTest {
                 .andExpect(jsonPath("$.gameInstanceId").value(instanceId.toString()));
 
         ArgumentCaptor<StartGameRequest> captor = ArgumentCaptor.forClass(StartGameRequest.class);
-        verify(gameService).startGame(captor.capture());
+        verify(gameService).startGame(captor.capture(), any());
 
         StartGameRequest req = captor.getValue();
         assertThat(req.lobbyId().toString()).isEqualTo("00000000-0000-0000-0000-000000000001");
