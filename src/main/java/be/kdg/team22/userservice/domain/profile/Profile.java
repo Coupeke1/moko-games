@@ -11,13 +11,13 @@ public class Profile {
     private final ProfileName username;
     private final ProfileEmail email;
     private Statistics statistics;
-    private final Instant createdAt;
-    private NotificationPreferences preferences;
     private String description;
     private String image;
     private Modules modules;
+    private Notifications notifications;
+    private final Instant createdAt;
 
-    public Profile(final ProfileId id, final ProfileName username, final ProfileEmail email, final String description, final String image, final Statistics statistics, final Modules modules, final Instant createdAt, final NotificationPreferences preferences) {
+    public Profile(final ProfileId id, final ProfileName username, final ProfileEmail email, final String description, final String image, final Statistics statistics, final Modules modules, final Notifications notifications, final Instant createdAt) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -26,11 +26,11 @@ public class Profile {
         this.statistics = statistics;
         this.modules = modules;
         this.createdAt = createdAt;
-        this.preferences = preferences;
+        this.notifications = notifications;
     }
 
     public Profile(final ProfileId id, final ProfileName username, final ProfileEmail email, final String description, final String image) {
-        this(id, username, email, description, image, new Statistics(0, 0), new Modules(false, false), Instant.now(), new NotificationPreferences(true, true, true, true, true));
+        this(id, username, email, description, image, new Statistics(0, 0), new Modules(true, true), new Notifications(true, true, true, true, true), Instant.now());
     }
 
     public void updateDescription(final String description) {
@@ -54,11 +54,11 @@ public class Profile {
         this.modules = modules;
     }
 
-    public void updatePreferences(final NotificationPreferences prefs) {
-        if (this.preferences.equals(prefs))
-            throw CannotUpdateProfileException.preferences(id);
+    public void updateNotifications(final Notifications notifications) {
+        if (this.notifications.equals(notifications))
+            throw CannotUpdateProfileException.notifications(id);
 
-        this.preferences = prefs;
+        this.notifications = notifications;
     }
 
     public void addLevels(final int amount) {
@@ -66,10 +66,6 @@ public class Profile {
             throw CannotUpdateProfileException.levels(id);
         }
         this.statistics = new Statistics(this.statistics.level() + amount, this.statistics.playTime());
-    }
-
-    public NotificationPreferences preferences() {
-        return preferences;
     }
 
     public ProfileId id() {
@@ -98,6 +94,10 @@ public class Profile {
 
     public Modules modules() {
         return modules;
+    }
+
+    public Notifications notifications() {
+        return notifications;
     }
 
     public Instant createdAt() {

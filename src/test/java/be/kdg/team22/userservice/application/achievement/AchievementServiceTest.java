@@ -26,7 +26,7 @@ class AchievementServiceTest {
     private final AchievementService service = new AchievementService(repo, achievementEventPublisher, profileService, externalGamesRepository);
 
     @Test
-    @DisplayName("award(userId, code) → creëert nieuw achievement wanneer niet bestaat")
+    @DisplayName("award(userId, code) → creëert nieuw achievements wanneer niet bestaat")
     void award_createsAchievement() {
         UUID userId = UUID.randomUUID();
         String code = "win_first_game";
@@ -48,7 +48,7 @@ class AchievementServiceTest {
     }
 
     @Test
-    @DisplayName("award(userId, gameId, code) → creëert achievement met gameId")
+    @DisplayName("award(userId, gameId, code) → creëert achievements met gameId")
     void award_createsAchievementWithGameId() {
         UUID userId = UUID.randomUUID();
         UUID gameId = UUID.randomUUID();
@@ -71,7 +71,7 @@ class AchievementServiceTest {
     }
 
     @Test
-    @DisplayName("award(...): bestaat achievement al → geen save()")
+    @DisplayName("award(...): bestaat achievements al → geen save()")
     void award_doesNotCreateDuplicate() {
         UUID userId = UUID.randomUUID();
         String code = "duplicate_code";
@@ -109,7 +109,7 @@ class AchievementServiceTest {
     }
 
     @Test
-    @DisplayName("award(userId, code) → adds levels to profile based on achievement code")
+    @DisplayName("award(userId, code) → adds levels to profile based on achievements code")
     void award_addsLevelsToProfile() {
         UUID userId = UUID.randomUUID();
         String code = "TICTACTOE_WIN";
@@ -127,7 +127,7 @@ class AchievementServiceTest {
     }
 
     @Test
-    @DisplayName("award(...): bestaat achievement al → geen levels toegevoegd")
+    @DisplayName("award(...): bestaat achievements al → geen levels toegevoegd")
     void award_doesNotAddLevelsWhenDuplicate() {
         UUID userId = UUID.randomUUID();
         String code = "TICTACTOE_WIN";

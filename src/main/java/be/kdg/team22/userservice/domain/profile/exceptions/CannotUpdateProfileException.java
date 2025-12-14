@@ -19,8 +19,8 @@ public class CannotUpdateProfileException extends RuntimeException {
         return new CannotUpdateProfileException(id, "modules");
     }
 
-    public static CannotUpdateProfileException preferences(ProfileId id) {
-        return new CannotUpdateProfileException(id, "preferences");
+    public static CannotUpdateProfileException notifications(ProfileId id) {
+        return new CannotUpdateProfileException(id, "notifications");
     }
 
     public static CannotUpdateProfileException levels(ProfileId id) {

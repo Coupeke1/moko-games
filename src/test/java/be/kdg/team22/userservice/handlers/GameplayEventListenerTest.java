@@ -16,7 +16,7 @@ class GameplayEventListenerTest {
     private final GameplayEventListener listener = new GameplayEventListener(achievementService);
 
     @Test
-    @DisplayName("onGameWon → awards win achievement to winner")
+    @DisplayName("onGameWon → awards win achievements to winner")
     void onGameWon_awardsWinner() {
         UUID winnerId = UUID.randomUUID();
         GameAchievementEvent event = new GameAchievementEvent("TICTACTOE_WIN", UUID.randomUUID(), winnerId, Instant.now());
@@ -27,7 +27,7 @@ class GameplayEventListenerTest {
     }
 
     @Test
-    @DisplayName("onGameDraw → awards draw achievement to player")
+    @DisplayName("onGameDraw → awards draw achievements to player")
     void onGameDraw_awardsPlayer() {
         UUID playerId = UUID.randomUUID();
         GameAchievementEvent event = new GameAchievementEvent("TICTACTOE_DRAW", UUID.randomUUID(), playerId, Instant.now());

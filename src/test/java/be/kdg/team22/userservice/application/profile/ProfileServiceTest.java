@@ -17,8 +17,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class ProfileServiceTest {
@@ -222,13 +221,13 @@ class ProfileServiceTest {
     @Test
     @DisplayName("changeModules → throws when same")
     void changeModules_sameThrows() {
-        Modules m = new Modules(true, true);
-        NotificationPreferences preferences = new NotificationPreferences(false, true, false, true, true);
+        Modules modules = new Modules(true, true);
+        Notifications notifications = new Notifications(false, true, false, true, true);
         Profile p = new Profile(new ProfileId(UUID.randomUUID()),
                 new ProfileName("u"), new ProfileEmail("e@mail"), "d", "i",
-                new Statistics(0, 0), m, null, preferences);
+                new Statistics(0, 0), modules, notifications, null);
 
-        assertThatThrownBy(() -> service.changeModules(p, m))
+        assertThatThrownBy(() -> service.changeModules(p, modules))
                 .isInstanceOf(CannotUpdateProfileException.class);
     }
 

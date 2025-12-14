@@ -1,9 +1,9 @@
 package be.kdg.team22.userservice.domain.profile;
 
-public record NotificationPreferences(
+public record Notifications(
         boolean receiveEmail,
         boolean social,
-        boolean achievement,
+        boolean achievements,
         boolean commerce,
         boolean chat
 ) {
