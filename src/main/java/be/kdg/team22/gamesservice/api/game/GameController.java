@@ -9,6 +9,8 @@ import be.kdg.team22.gamesservice.domain.game.GameId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,10 +27,11 @@ public class GameController {
     }
 
     @PostMapping
-    public ResponseEntity<StartGameResponseModel> startGame(@RequestBody final StartGameRequest request) {
+    public ResponseEntity<StartGameResponseModel> startGame(@AuthenticationPrincipal final Jwt token,
+                                                            @RequestBody final StartGameRequest request) {
         log.info("Received start-game request for lobby {} and game {}", request.lobbyId(), request.gameId());
 
-        StartGameResponseModel response = service.startGame(request);
+        StartGameResponseModel response = service.startGame(request, token);
 
         return ResponseEntity.accepted().body(response);
     }
@@ -50,7 +53,8 @@ public class GameController {
             GameId id = GameId.from(value);
             Game game = service.findById(id);
             return ResponseEntity.ok(GameDetailsModel.from(game));
-        } catch (IllegalArgumentException ignored) {}
+        } catch (IllegalArgumentException ignored) {
+        }
 
         Game game = service.findByName(value);
         return ResponseEntity.ok(GameDetailsModel.from(game));

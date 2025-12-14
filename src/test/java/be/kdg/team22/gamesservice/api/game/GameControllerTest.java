@@ -59,7 +59,7 @@ class GameControllerTest {
     void startGame_returns202AndBody() throws Exception {
         UUID instanceId = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
 
-        when(gameService.startGame(any(StartGameRequest.class)))
+        when(gameService.startGame(any(StartGameRequest.class), any()))
                 .thenReturn(new StartGameResponseModel(instanceId));
 
         String json = """
@@ -86,7 +86,7 @@ class GameControllerTest {
                 .andExpect(jsonPath("$.gameInstanceId").value(instanceId.toString()));
 
         ArgumentCaptor<StartGameRequest> captor = ArgumentCaptor.forClass(StartGameRequest.class);
-        verify(gameService).startGame(captor.capture());
+        verify(gameService).startGame(captor.capture(), any());
 
         StartGameRequest req = captor.getValue();
         assertThat(req.lobbyId().toString()).isEqualTo("00000000-0000-0000-0000-000000000001");
