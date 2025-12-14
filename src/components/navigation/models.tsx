@@ -17,7 +17,8 @@ export interface Link {
 export interface Button {
     title: string;
     icon: ReactNode;
-    onClick: () => void;
+    onClick?: () => void;
+    path?: string;
 }
 
 export function getLinks(): Link[] {
@@ -34,7 +35,7 @@ export function getButtons(onCart: () => void): Button[] {
         {
             title: "Notifications",
             icon: <NotificationsIcon />,
-            onClick: () => {},
+            path: "/notifications",
         },
         { title: "Chat", icon: <ChatIcon />, onClick: () => {} },
         { title: "Cart", icon: <CartIcon />, onClick: onCart },
