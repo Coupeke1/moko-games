@@ -34,6 +34,10 @@ export const environment = {
         window.__APP_CONFIG__?.sessionSocket ??
         import.meta.env.VITE_SESSION_SOCKET ??
         "",
+    communicationService:
+        window.__APP_CONFIG__?.communicationService ??
+        import.meta.env.VITE_COMMUNICATION_SERVICE ??
+        "",
     gamesService:
         window.__APP_CONFIG__?.gamesService ??
         import.meta.env.VITE_GAMES_SERVICE ??

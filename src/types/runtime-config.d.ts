@@ -10,6 +10,7 @@ declare global {
             socialService?: string;
             sessionService?: string;
             sessionSocket?: string;
+            communicationService?: string;
             gamesService?: string;
             storeService?: string;
             orderService?: string;
