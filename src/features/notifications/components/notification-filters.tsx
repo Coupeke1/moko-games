@@ -4,7 +4,7 @@ import {Gap} from "@/components/layout/gap";
 import {Items} from "@/components/layout/items";
 import {Justify} from "@/components/layout/justify";
 import type {NotificationType, ReadFilter,} from "@/features/notifications/models/notification.ts";
-import {NOTIFICATION_TYPES} from "@/features/notifications/models/notification.ts";
+import {NOTIFICATION_TYPE_LABEL, NOTIFICATION_TYPES,} from "@/features/notifications/models/notification.ts";
 
 interface Props {
     read: ReadFilter;
@@ -44,9 +44,10 @@ export default function NotificationFilters({
                     className="bg-bg-2 border border-bg-3 rounded-xl px-3 py-2"
                 >
                     <option value="all">All types</option>
+
                     {NOTIFICATION_TYPES.map((t) => (
                         <option key={t} value={t}>
-                            {t}
+                            {NOTIFICATION_TYPE_LABEL[t] ?? t}
                         </option>
                     ))}
                 </select>

@@ -22,7 +22,7 @@ export default function NotificationPage() {
             <State data={notifications} loading={loading} error={error}/>
 
             {notifications && (
-                <Column gap={Gap.ExtraLarge}>
+                <Column gap={Gap.Large}>
                     <NotificationFilters
                         read={read}
                         onReadChange={setRead}
@@ -30,7 +30,7 @@ export default function NotificationPage() {
                         onTypeChange={setType}
                     />
 
-                    <Column gap={Gap.Medium}>
+                    <Column>
                         {notifications.length === 0 && (
                             <p className="text-fg-2">No notifications.</p>
                         )}
