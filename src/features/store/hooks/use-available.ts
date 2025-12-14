@@ -1,5 +1,6 @@
 import { hasEntry as hasEntryInCart } from "@/features/cart/services/cart";
 import { hasEntry as hasEntryInLibrary } from "@/features/library/services/library";
+import { POLLING_INTERVAL } from "@/lib/polling";
 import { useQuery } from "@tanstack/react-query";
 
 export function useAvailable(id: string | undefined) {
@@ -11,6 +12,7 @@ export function useAvailable(id: string | undefined) {
         queryKey: ["cart", id],
         queryFn: () => hasEntryInCart(id!),
         enabled: !!id,
+        refetchInterval: POLLING_INTERVAL,
     });
 
     const {
@@ -21,6 +23,7 @@ export function useAvailable(id: string | undefined) {
         queryKey: ["library", id, "owns"],
         queryFn: () => hasEntryInLibrary(id!),
         enabled: !!id,
+        refetchInterval: POLLING_INTERVAL,
     });
 
     return {

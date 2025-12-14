@@ -1,5 +1,6 @@
 import type { Profile } from "@/features/profile/models/profile.ts";
 import { parseProfile } from "@/features/profile/services/profile.ts";
+import { POLLING_INTERVAL } from "@/lib/polling";
 import { useAuthStore } from "@/stores/auth-store.ts";
 import { useQuery } from "@tanstack/react-query";
 
@@ -28,6 +29,7 @@ export function useProfile() {
         enabled: authenticated && !!keycloak && !!token,
         staleTime: 5 * 60 * 1000,
         retry: 1,
+        refetchInterval: POLLING_INTERVAL,
     });
 
     return { loading, error, profile };
