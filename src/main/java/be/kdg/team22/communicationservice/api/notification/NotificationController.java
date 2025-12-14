@@ -25,19 +25,6 @@ public class NotificationController {
         this.service = service;
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<List<NotificationModel>> getMyNotifications(
-            @AuthenticationPrincipal final Jwt jwt) {
-        PlayerId playerId = PlayerId.get(jwt);
-
-        List<NotificationModel> result = service.getNotifications(playerId)
-                .stream()
-                .map(NotificationModel::from)
-                .toList();
-
-        return ResponseEntity.ok(result);
-    }
-
     @GetMapping
     public ResponseEntity<PagedResponse<NotificationModel>> getNotifications(
             @AuthenticationPrincipal final Jwt jwt,
@@ -57,46 +44,6 @@ public class NotificationController {
 
         boolean last = models.size() < size;
         return ResponseEntity.ok(new PagedResponse<>(models, page, size, last));
-    }
-
-    @GetMapping("/unread")
-    public ResponseEntity<List<NotificationModel>> getUnread(
-            @AuthenticationPrincipal final Jwt jwt) {
-        PlayerId playerId = PlayerId.get(jwt);
-
-        List<NotificationModel> result = service.getUnreadNotifications(playerId)
-                .stream()
-                .map(NotificationModel::from)
-                .toList();
-
-        return ResponseEntity.ok(result);
-    }
-
-    @GetMapping("/read")
-    public ResponseEntity<List<NotificationModel>> getRead(
-            @AuthenticationPrincipal final Jwt jwt) {
-        PlayerId playerId = PlayerId.get(jwt);
-
-        List<NotificationModel> result = service.getReadNotifications(playerId)
-                .stream()
-                .map(NotificationModel::from)
-                .toList();
-
-        return ResponseEntity.ok(result);
-    }
-
-    @GetMapping("/{type}")
-    public ResponseEntity<List<NotificationModel>> getByType(
-            @AuthenticationPrincipal final Jwt jwt,
-            @PathVariable final NotificationType type) {
-        PlayerId playerId = PlayerId.get(jwt);
-
-        List<NotificationModel> result = service.getNotificationsByType(playerId, type)
-                .stream()
-                .map(NotificationModel::from)
-                .toList();
-
-        return ResponseEntity.ok(result);
     }
 
     @PatchMapping("/{id}/read")

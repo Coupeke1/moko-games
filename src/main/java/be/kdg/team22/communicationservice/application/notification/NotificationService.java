@@ -30,11 +30,6 @@ public class NotificationService {
         this.emailService = emailService;
     }
 
-    private NotificationPreferences getPreferences(String jwtToken) {
-        NotificationsResponse response = userRepository.getNotifications(jwtToken);
-        return response.to();
-    }
-
     public Notification create(final PlayerId recipient,
                                final NotificationType type,
                                final String title,
@@ -83,19 +78,11 @@ public class NotificationService {
         return repository.findUnreadByRecipientId(playerId);
     }
 
-    public List<Notification> getNotificationsByType(final PlayerId playerId, final NotificationType type) {
-        return repository.findByRecipientIdAndType(playerId, type);
-    }
-
     public void markAsRead(final NotificationId id) {
         Notification notification =
                 repository.findById(id).orElseThrow(() -> new NotificationNotFoundException(id));
 
         notification.markAsRead();
         repository.save(notification);
-    }
-
-    public List<Notification> getReadNotifications(PlayerId playerId) {
-        return repository.findReadByRecipientId(playerId);
     }
 }

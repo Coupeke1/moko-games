@@ -15,9 +15,5 @@ public interface NotificationRepository {
 
     List<Notification> findUnreadByRecipientId(PlayerId recipientId);
 
-    List<Notification> findByRecipientIdAndType(PlayerId recipientId, NotificationType type);
-
-    List<Notification> findReadByRecipientId(PlayerId playerId);
-
     List<Notification> findAllByConstraints(PlayerId playerId, NotificationReadFilter type, NotificationType origin, Pagination pagination);
 }

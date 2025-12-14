@@ -46,22 +46,6 @@ public class DbNotificationRepository implements NotificationRepository {
     }
 
     @Override
-    public List<Notification> findReadByRecipientId(PlayerId playerId) {
-        return jpa.findByRecipientIdAndReadTrueOrderByCreatedAtDesc(playerId.value())
-                .stream()
-                .map(NotificationEntity::to)
-                .toList();
-    }
-
-    @Override
-    public List<Notification> findByRecipientIdAndType(final PlayerId playerId, final NotificationType type) {
-        return jpa.findByRecipientIdAndTypeOrderByCreatedAtDesc(playerId.value(), type)
-                .stream()
-                .map(NotificationEntity::to)
-                .toList();
-    }
-
-    @Override
     public List<Notification> findAllByConstraints(
             final PlayerId playerId,
             final NotificationReadFilter type,
