@@ -1,4 +1,5 @@
 import { environment } from "@/config.ts";
+import type { Notification } from "@/features/notifications/models/notification";
 import { client } from "@/lib/api-client.ts";
 import { slug } from "@/lib/format";
 import type { PagedResponse } from "@/types/paged-response";

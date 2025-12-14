@@ -4,7 +4,6 @@ import State from "@/components/state/state";
 import Filters from "@/features/notifications/components/filters";
 import NotificationCard from "@/features/notifications/components/notification-card";
 import { useNotifications } from "@/features/notifications/hooks/use-notifications";
-import { useEffect, useRef } from "react";
 
 export default function NotificationsPage() {
     const {
@@ -15,25 +14,6 @@ export default function NotificationsPage() {
         fetchNextPage,
         hasNextPage,
     } = useNotifications();
-
-    const observerTarget = useRef<HTMLElement>(null);
-
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (!entry.isIntersecting || !hasNextPage || fetching) return;
-                fetchNextPage();
-            },
-            { rootMargin: "200px", threshold: 0 },
-        );
-
-        const currentTarget = observerTarget.current;
-        if (currentTarget) observer.observe(currentTarget);
-
-        return () => {
-            if (currentTarget) observer.unobserve(currentTarget);
-        };
-    }, [fetchNextPage, hasNextPage, fetching]);
 
     return (
         <Page>
@@ -49,12 +29,20 @@ export default function NotificationsPage() {
                     <Column>
                         {notifications.map((notification) => (
                             <NotificationCard
-                                key={notification.data.id}
-                                notification={notification.data}
+                                key={notification.id}
+                                notification={notification}
                             />
                         ))}
 
-                        <section ref={observerTarget} className="h-4" />
+                        {hasNextPage && (
+                            <button
+                                onClick={() => fetchNextPage()}
+                                disabled={fetching}
+                                className="mt-4 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                            >
+                                {fetching ? "Loading..." : "Load More"}
+                            </button>
+                        )}
                     </Column>
                 )}
             </State>
