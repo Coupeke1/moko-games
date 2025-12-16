@@ -31,19 +31,11 @@ public class Notification {
         this.read = read;
     }
 
-    public static Notification create(final PlayerId recipientId,
-                                      final NotificationOrigin type,
-                                      final String title,
-                                      final String message) {
-        return new Notification(
-                NotificationId.newId(),
-                recipientId,
-                type,
-                title,
-                message,
-                Instant.now(),
-                false
-        );
+    public Notification(final PlayerId recipientId,
+                        final NotificationOrigin origin,
+                        final String title,
+                        final String message) {
+        this(NotificationId.create(), recipientId, origin, title, message, Instant.now(), false);
     }
 
     public NotificationId id() {

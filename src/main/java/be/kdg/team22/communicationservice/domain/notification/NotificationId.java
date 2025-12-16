@@ -10,7 +10,7 @@ public record NotificationId(UUID value) {
         this.value = value;
     }
 
-    public static NotificationId newId() {
+    public static NotificationId create() {
         return new NotificationId(UUID.randomUUID());
     }
 
