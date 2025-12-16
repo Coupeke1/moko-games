@@ -1,9 +1,10 @@
 package be.kdg.team22.communicationservice.domain.notification;
 
-import be.kdg.team22.communicationservice.application.queries.NotificationReadFilter;
+import be.kdg.team22.communicationservice.application.queries.NotificationFilter;
 import be.kdg.team22.communicationservice.application.queries.PageResult;
 import be.kdg.team22.communicationservice.application.queries.Pagination;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,8 +19,10 @@ public interface NotificationRepository {
 
     PageResult<Notification> findAllByConstraints(
             PlayerId playerId,
-            NotificationReadFilter type,
+            NotificationFilter type,
             NotificationOrigin origin,
             Pagination pagination
     );
+
+    List<Notification> findUnreadSince(PlayerId recipientId, Instant since);
 }
