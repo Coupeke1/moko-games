@@ -20,22 +20,29 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-security")
+    // Spring
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-amqp")
-    implementation("org.springframework.boot:spring-boot-starter-data-redis")
-    testImplementation("org.springframework.amqp:spring-rabbit-test")
-    implementation("org.springframework.boot:spring-boot-starter-security")
+
+    // Security
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("org.springframework.boot:spring-boot-starter-security")
     testImplementation("org.springframework.security:spring-security-test")
+
+    // Messaging
+    implementation("org.springframework.boot:spring-boot-starter-amqp")
+    testImplementation("org.springframework.amqp:spring-rabbit-test")
+
+    // JMolecules
     implementation("org.jmolecules.integrations:jmolecules-starter-ddd:0.29.0")
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
+
+    // Testing
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    implementation("org.jmolecules.integrations:jmolecules-starter-ddd:0.29.0")
 }
 
 tasks.withType<Test> {

@@ -62,14 +62,14 @@ public class GameServiceTest {
     }
 
     @Test
-    void shouldStartGameWithSize3x3() {
+    void shouldCreateWithSize3X3() {
         doNothing().when(repository).save(any());
 
         CreateGameModel model = new CreateGameModel(
                 players.stream().map(p -> p.id().value()).toList(),
                 new GameSettingsModel(3));
 
-        Game game = service.startGame(model, false);
+        Game game = service.create(players.getFirst().id(), model, false);
 
         assertNotNull(game);
         assertEquals(3, game.board().size());
@@ -77,14 +77,14 @@ public class GameServiceTest {
     }
 
     @Test
-    void shouldStartGameWithSize4x4() {
+    void shouldCreateWithSize4X4() {
         doNothing().when(repository).save(any());
 
         CreateGameModel model = new CreateGameModel(
                 players.stream().map(p -> p.id().value()).toList(),
                 new GameSettingsModel(4));
 
-        Game game = service.startGame(model, false);
+        Game game = service.create(players.getFirst().id(), model, false);
 
         assertEquals(4, game.board().size());
         verify(repository).save(any(Game.class));
@@ -96,7 +96,7 @@ public class GameServiceTest {
                 players.stream().map(p -> p.id().value()).toList(),
                 new GameSettingsModel(2));
 
-        assertThrows(BoardSizeException.class, () -> service.startGame(model, false));
+        assertThrows(BoardSizeException.class, () -> service.create(players.getFirst().id(), model, false));
     }
 
     @Test
@@ -104,7 +104,7 @@ public class GameServiceTest {
         Game stored = Game.create(3, 10, 3, players.stream().map(Player::id).toList(), false);
         when(repository.findById(stored.id())).thenReturn(Optional.of(stored));
 
-        Game result = service.getGame(stored.id(), playerX.id());
+        Game result = service.getById(stored.id());
 
         assertEquals(stored, result);
     }
