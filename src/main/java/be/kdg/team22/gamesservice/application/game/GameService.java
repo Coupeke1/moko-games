@@ -5,6 +5,7 @@ import be.kdg.team22.gamesservice.api.game.models.StartGameRequest;
 import be.kdg.team22.gamesservice.api.game.models.StartGameResponseModel;
 import be.kdg.team22.gamesservice.domain.game.*;
 import be.kdg.team22.gamesservice.domain.game.exceptions.*;
+import be.kdg.team22.gamesservice.domain.game.settings.GameSettingsValidator;
 import be.kdg.team22.gamesservice.infrastructure.game.engine.ExternalGamesRepository;
 import be.kdg.team22.gamesservice.infrastructure.game.health.GameHealthChecker;
 import be.kdg.team22.gamesservice.infrastructure.store.ExternalStoreRepository;
@@ -82,10 +83,9 @@ public class GameService {
             throw new DuplicateGameNameException(request.name());
         }
 
-        boolean isHealthy = gameHealthChecker.isHealthy(request);
-        if (!isHealthy) {
-            throw new GameUnhealthyException(request.name());
-        }
+        GameSettingsValidator.validateDefinition(request.settingsDefinition());
+
+        if (!gameHealthChecker.isHealthy(request)) throw new GameUnhealthyException(request.name());
 
         Game game = Game.register(request);
         game.updateHealthStatus(true);

@@ -3,13 +3,41 @@ package be.kdg.team22.gamesservice.domain.game.settings;
 import be.kdg.team22.gamesservice.domain.game.exceptions.InvalidGameSettingsException;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public final class GameSettingsValidator {
 
-    private GameSettingsValidator() {
+    private GameSettingsValidator() {}
+
+    public static void validateDefinition(GameSettingsDefinition definition) {
+        if (definition == null) throw InvalidGameSettingsException.missingDefinition();
+        if (definition.settings() == null || definition.settings().isEmpty()) {
+            throw InvalidGameSettingsException.invalidSettings("Settings definition cannot be empty");
+        }
+
+        Set<String> names = new HashSet<>();
+
+        for (SettingDefinition def : definition.settings()) {
+            if (def == null) {
+                throw InvalidGameSettingsException.invalidSettings("Setting definition entry cannot be null");
+            }
+            if (def.name() == null || def.name().isBlank()) {
+                throw InvalidGameSettingsException.invalidSettings("Setting name is required");
+            }
+            if (def.type() == null) {
+                throw InvalidGameSettingsException.invalidSettings("Setting type is required for " + def.name());
+            }
+            if (!names.add(def.name())) {
+                throw InvalidGameSettingsException.invalidSettings("Duplicate setting name: " + def.name());
+            }
+
+            validateMinMax(def);
+            validateEnumDefinition(def);
+            validateDefaultValue(def);
+        }
     }
 
     public static Map<String, Object> resolveAndValidate(
@@ -19,6 +47,8 @@ public final class GameSettingsValidator {
         if (definition == null) throw InvalidGameSettingsException.missingDefinition();
         if (input == null) throw InvalidGameSettingsException.missingSettings();
 
+        validateDefinition(definition);
+
         Map<String, Object> resolved = new HashMap<>(input);
 
         for (SettingDefinition def : definition.settings()) {
@@ -27,12 +57,62 @@ public final class GameSettingsValidator {
             }
         }
 
-        validateInternal(definition, resolved);
+        validateValuesInternal(definition, resolved);
 
         return Map.copyOf(resolved);
     }
 
-    private static void validateInternal(
+    private static void validateMinMax(SettingDefinition def) {
+        if (def.min() != null && def.max() != null && def.min() > def.max()) {
+            throw InvalidGameSettingsException.invalidMinMax("min > max for " + def.name());
+        }
+    }
+
+    private static void validateEnumDefinition(SettingDefinition def) {
+        if (def.type() == SettingType.ENUM) {
+            if (def.allowedValues() == null || def.allowedValues().isEmpty()) {
+                throw InvalidGameSettingsException.invalidEnum(
+                        "ENUM " + def.name() + " must define allowedValues"
+                );
+            }
+        }
+    }
+
+    private static void validateDefaultValue(SettingDefinition def) {
+        if (def.defaultValue() == null) return;
+
+        switch (def.type()) {
+            case STRING -> {
+                if (!(def.defaultValue() instanceof String)) {
+                    throw InvalidGameSettingsException.wrongType(def.name(), "a string default");
+                }
+            }
+            case BOOLEAN -> {
+                if (!(def.defaultValue() instanceof Boolean)) {
+                    throw InvalidGameSettingsException.wrongType(def.name(), "a boolean default");
+                }
+            }
+            case INTEGER -> {
+                int dv = coerceToInt(def.name(), def.defaultValue());
+                if (def.min() != null && dv < def.min()) {
+                    throw InvalidGameSettingsException.belowMin(def.name(), def.min());
+                }
+                if (def.max() != null && dv > def.max()) {
+                    throw InvalidGameSettingsException.aboveMax(def.name(), def.max());
+                }
+            }
+            case ENUM -> {
+                if (!(def.defaultValue() instanceof String s)) {
+                    throw InvalidGameSettingsException.wrongType(def.name(), "a string enum default");
+                }
+                if (!def.allowedValues().contains(s)) {
+                    throw InvalidGameSettingsException.invalidEnum(def.name(), def.allowedValues());
+                }
+            }
+        }
+    }
+
+    private static void validateValuesInternal(
             GameSettingsDefinition definition,
             Map<String, Object> settings
     ) {
@@ -59,18 +139,15 @@ public final class GameSettingsValidator {
                     if (!(value instanceof String s)) {
                         throw InvalidGameSettingsException.wrongType(def.name(), "a string");
                     }
-
                     if (def.required() && s.isBlank()) {
                         throw InvalidGameSettingsException.wrongType(def.name(), "a non-blank string");
                     }
                 }
-
                 case BOOLEAN -> {
                     if (!(value instanceof Boolean)) {
                         throw InvalidGameSettingsException.wrongType(def.name(), "a boolean");
                     }
                 }
-
                 case INTEGER -> {
                     Integer i = coerceToInt(def.name(), value);
                     settings.put(def.name(), i);
@@ -82,13 +159,10 @@ public final class GameSettingsValidator {
                         throw InvalidGameSettingsException.aboveMax(def.name(), def.max());
                     }
                 }
-
                 case ENUM -> {
+                    // enum definition sanity is guaranteed by validateDefinition(definition)
                     if (!(value instanceof String s)) {
                         throw InvalidGameSettingsException.wrongType(def.name(), "a string enum");
-                    }
-                    if (def.allowedValues() == null || def.allowedValues().isEmpty()) {
-                        throw InvalidGameSettingsException.invalidEnum(def.name(), def.allowedValues());
                     }
                     if (!def.allowedValues().contains(s)) {
                         throw InvalidGameSettingsException.invalidEnum(def.name(), def.allowedValues());

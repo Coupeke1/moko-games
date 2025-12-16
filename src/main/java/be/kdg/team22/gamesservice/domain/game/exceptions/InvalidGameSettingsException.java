@@ -20,6 +20,18 @@ public class InvalidGameSettingsException extends RuntimeException {
         );
     }
 
+    public static InvalidGameSettingsException invalidSettings(String error) {
+        return new InvalidGameSettingsException(error);
+    }
+
+    public static InvalidGameSettingsException invalidMinMax(String error) {
+        return new InvalidGameSettingsException(error);
+    }
+
+    public static InvalidGameSettingsException invalidEnum(String error) {
+        return new InvalidGameSettingsException(error);
+    }
+
     public static InvalidGameSettingsException unknownSetting(String name) {
         return new InvalidGameSettingsException(
                 "Unknown setting: " + name
