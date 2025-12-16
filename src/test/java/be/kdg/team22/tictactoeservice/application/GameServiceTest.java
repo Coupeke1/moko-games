@@ -4,6 +4,7 @@ import be.kdg.team22.tictactoeservice.api.models.CreateGameModel;
 import be.kdg.team22.tictactoeservice.api.models.GameSettingsModel;
 import be.kdg.team22.tictactoeservice.application.events.GameEventPublisher;
 import be.kdg.team22.tictactoeservice.config.BoardSizeProperties;
+import be.kdg.team22.tictactoeservice.config.GameInfoProperties;
 import be.kdg.team22.tictactoeservice.domain.events.AchievementCode;
 import be.kdg.team22.tictactoeservice.domain.events.GameAchievementEvent;
 import be.kdg.team22.tictactoeservice.domain.events.GameEndedEvent;
@@ -22,6 +23,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.Comparator;
 import java.util.List;
@@ -42,6 +44,12 @@ public class GameServiceTest {
     @Mock
     private GameEventPublisher publisher;
 
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
+
+    @Mock
+    private GameInfoProperties gameInfo;
+
     @InjectMocks
     private GameService service;
 
@@ -55,6 +63,7 @@ public class GameServiceTest {
 
         when(config.minSize()).thenReturn(3);
         when(config.maxSize()).thenReturn(10);
+        when(gameInfo.name()).thenReturn("Tic Tac Toe");
 
         playerX = new Player(PlayerId.create(), PlayerRole.X, false);
         playerO = new Player(PlayerId.create(), PlayerRole.O, false);
@@ -151,7 +160,7 @@ public class GameServiceTest {
         GameAchievementEvent event = captor.getValue();
         assertEquals(id.value(), event.gameId());
         assertEquals(playerId.value(), event.playerId());
-        assertEquals(AchievementCode.TICTACTOE_WIN.name(), event.achievementCode());
+        assertEquals(AchievementCode.WIN.name(), event.achievementCode());
     }
 
     @Test
@@ -184,7 +193,7 @@ public class GameServiceTest {
                 .orElseThrow(() -> new AssertionError("Draw event not found"));
         assertEquals(id.value(), playerXDrawEvent.gameId());
         assertEquals(playerX.id().value(), playerXDrawEvent.playerId());
-        assertEquals(AchievementCode.TICTACTOE_DRAW.name(), playerXDrawEvent.achievementCode());
+        assertEquals(AchievementCode.DRAW.name(), playerXDrawEvent.achievementCode());
 
         GameAchievementEvent playerODrawEvent = allValues.stream()
                 .filter(event -> event.playerId().equals(playerO.id().value()))
@@ -192,7 +201,7 @@ public class GameServiceTest {
                 .orElseThrow(() -> new AssertionError("Draw event not found"));
         assertEquals(id.value(), playerODrawEvent.gameId());
         assertEquals(playerO.id().value(), playerODrawEvent.playerId());
-        assertEquals(AchievementCode.TICTACTOE_DRAW.name(), playerODrawEvent.achievementCode());
+        assertEquals(AchievementCode.DRAW.name(), playerODrawEvent.achievementCode());
 
         ArgumentCaptor<GameEndedEvent> endedCaptor = ArgumentCaptor.forClass(GameEndedEvent.class);
         verify(publisher).publishGameEnded(endedCaptor.capture());

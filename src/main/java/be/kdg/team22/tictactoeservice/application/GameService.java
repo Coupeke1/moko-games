@@ -3,6 +3,7 @@ package be.kdg.team22.tictactoeservice.application;
 import be.kdg.team22.tictactoeservice.api.models.CreateGameModel;
 import be.kdg.team22.tictactoeservice.application.events.GameEventPublisher;
 import be.kdg.team22.tictactoeservice.config.BoardSizeProperties;
+import be.kdg.team22.tictactoeservice.config.GameInfoProperties;
 import be.kdg.team22.tictactoeservice.domain.events.AchievementCode;
 import be.kdg.team22.tictactoeservice.domain.events.GameAchievementEvent;
 import be.kdg.team22.tictactoeservice.domain.events.GameEndedEvent;
@@ -31,14 +32,16 @@ public class GameService {
     private final BoardSizeProperties config;
     private final GameEventPublisher publisher;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final GameInfoProperties gameInfo;
 
     private final Logger logger;
 
-    public GameService(GameRepository repository, BoardSizeProperties config, GameEventPublisher publisher, ApplicationEventPublisher applicationEventPublisher) {
+    public GameService(GameRepository repository, BoardSizeProperties config, GameEventPublisher publisher, ApplicationEventPublisher applicationEventPublisher, GameInfoProperties gameInfo) {
         this.repository = repository;
         this.config = config;
         this.publisher = publisher;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.gameInfo = gameInfo;
         logger = LoggerFactory.getLogger(GameService.class);
     }
 
@@ -69,12 +72,14 @@ public class GameService {
         game.requestMove(move);
         repository.save(game);
 
+        String gameName = gameInfo.name();
         try {
             if (game.status() == GameStatus.TIE) {
                 game.players().forEach(player ->
                         publisher.publishAchievement(
                                 new GameAchievementEvent(
-                                        AchievementCode.TICTACTOE_DRAW.name(),
+                                        AchievementCode.DRAW.name(),
+                                        gameName,
                                         game.id().value(),
                                         player.id().value(),
                                         Instant.now()
@@ -85,7 +90,8 @@ public class GameService {
             if (game.status() == GameStatus.WON) {
                 publisher.publishAchievement(
                         new GameAchievementEvent(
-                                AchievementCode.TICTACTOE_WIN.name(),
+                                AchievementCode.WIN.name(),
+                                gameName,
                                 game.id().value(),
                                 game.winner().value(),
                                 Instant.now()
