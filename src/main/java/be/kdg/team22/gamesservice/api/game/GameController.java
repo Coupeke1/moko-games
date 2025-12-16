@@ -85,4 +85,11 @@ public class GameController {
         Achievement achievement = service.getAchievement(GameId.from(id), AchievementKey.fromString(key));
         return ResponseEntity.ok(AchievementDetailsModel.from(achievement));
     }
+
+    @GetMapping("/{id}/settings")
+    public ResponseEntity<GameSettingsSchemaModel> getGameSettingsSchema(@PathVariable UUID id) {
+        Game game = service.findById(GameId.from(id));
+
+        return ResponseEntity.ok(GameSettingsSchemaModel.from(game.settingsDefinition()));
+    }
 }

@@ -342,7 +342,7 @@ public class Game {
         return healthy;
     }
 
-    public void validateSettings(Map<String, Object> settings) {
-        GameSettingsValidator.validate(settingsDefinition, settings);
+    public Map<String, Object> validateSettings(Map<String, Object> settings) {
+        return GameSettingsValidator.resolveAndValidate(settingsDefinition, settings);
     }
 }

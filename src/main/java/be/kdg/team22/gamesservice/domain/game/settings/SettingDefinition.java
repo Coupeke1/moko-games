@@ -8,6 +8,7 @@ public record SettingDefinition(
         boolean required,
         Integer min,
         Integer max,
-        List<String> allowedValues
+        List<String> allowedValues,
+        Object defaultValue
 ) {
 }

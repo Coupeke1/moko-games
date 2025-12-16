@@ -47,7 +47,8 @@ class GameServiceTest {
                         true,
                         3,
                         20,
-                        null
+                        null,
+                        8
                 ),
                 new SettingDefinition(
                         "flyingKings",
@@ -55,7 +56,8 @@ class GameServiceTest {
                         false,
                         null,
                         null,
-                        null
+                        null,
+                        false
                 )
         ));
     }
@@ -158,7 +160,7 @@ class GameServiceTest {
         );
 
         assertThatThrownBy(() -> service.startGame(request, tokenFromUuid(request.players().getFirst())))
-                .isInstanceOf(InvalidGameSettingsException.class);
+                .isInstanceOf(InvalidGameConfigurationException.class);
 
         verifyNoInteractions(gameRepository, engine);
     }
@@ -169,7 +171,6 @@ class GameServiceTest {
         GameId gameId = GameId.from(UUID.fromString("22222222-2222-2222-2222-222222222222"));
         Game game = sampleGame(gameId);
 
-        // boardSize is required in definition
         StartGameRequest request = createRequest(Map.of("flyingKings", true), false);
 
         when(gameRepository.findById(gameId)).thenReturn(Optional.of(game));

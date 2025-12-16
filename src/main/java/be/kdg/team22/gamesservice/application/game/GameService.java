@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -40,16 +41,24 @@ public class GameService {
         }
 
         if (request.settings() == null) {
-            throw new InvalidGameConfigurationException("Game settings cannot be null");
+            throw InvalidGameSettingsException.missingSettings();
         }
 
         GameId id = GameId.from(request.gameId());
         Game game = gameRepository.findById(id)
                 .orElseThrow(() -> new GameNotFoundException(id));
 
-        game.validateSettings(request.settings());
+        Map<String, Object> resolvedSettings = game.validateSettings(request.settings());
 
-        UUID instanceId = engine.startExternalGame(game, request, token);
+        StartGameRequest resolvedRequest = new StartGameRequest(
+                request.lobbyId(),
+                request.gameId(),
+                request.players(),
+                resolvedSettings,
+                request.aiPlayer()
+        );
+
+        UUID instanceId = engine.startExternalGame(game, resolvedRequest, token);
 
         return new StartGameResponseModel(instanceId);
     }
