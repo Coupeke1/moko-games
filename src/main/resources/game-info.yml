@@ -9,6 +9,16 @@
   health-endpoint: ${GAME_HEALTH_ENDPOINT:/actuator/health}
   price: 25
   category: PARTY
+
+  settings-definition:
+    settings:
+      - name: boardSize
+        type: INTEGER
+        required: true
+        min: ${TIC_TAC_TOE_BOARD_MIN_SIZE:3}
+        max: ${TIC_TAC_TOE_BOARD_MAX_SIZE:10}
+        defaultValue: 3
+
   achievements:
     - key: WIN
       name: Victory Royale
