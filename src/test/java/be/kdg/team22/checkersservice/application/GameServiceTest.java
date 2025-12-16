@@ -1,6 +1,7 @@
 package be.kdg.team22.checkersservice.application;
 
 import be.kdg.team22.checkersservice.application.events.GameEventPublisher;
+import be.kdg.team22.checkersservice.config.GameInfoProperties;
 import be.kdg.team22.checkersservice.domain.events.*;
 import be.kdg.team22.checkersservice.domain.game.Game;
 import be.kdg.team22.checkersservice.domain.game.GameId;
@@ -15,9 +16,9 @@ import be.kdg.team22.checkersservice.infrastructure.game.GameRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +37,12 @@ public class GameServiceTest {
     @Mock
     private GameEventPublisher publisher;
 
-    @InjectMocks
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
+
+    @Mock
+    private GameInfoProperties gameInfo;
+
     private GameService service;
 
     private Player playerBlack;
@@ -46,6 +52,9 @@ public class GameServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        when(gameInfo.name()).thenReturn("Test Game");
+        service = new GameService(repository, publisher, applicationEventPublisher, gameInfo);
 
         playerBlack = new Player(PlayerId.create(), PlayerRole.BLACK, false);
         playerWhite = new Player(PlayerId.create(), PlayerRole.WHITE, false);
