@@ -3,6 +3,8 @@ package be.kdg.team22.gamesservice.infrastructure.game.jpa;
 import be.kdg.team22.gamesservice.domain.game.Achievement;
 import be.kdg.team22.gamesservice.domain.game.Game;
 import be.kdg.team22.gamesservice.domain.game.GameId;
+import be.kdg.team22.gamesservice.domain.game.settings.GameSettingsDefinition;
+import be.kdg.team22.gamesservice.infrastructure.game.jpa.converter.GameSettingsDefinitionJsonConverter;
 import jakarta.persistence.*;
 
 import java.time.Instant;

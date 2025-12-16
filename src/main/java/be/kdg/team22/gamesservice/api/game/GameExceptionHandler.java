@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GameExceptionHandler {
+
     private static final Logger log = LoggerFactory.getLogger(GameExceptionHandler.class);
 
     @ExceptionHandler(GameNotFoundException.class)
@@ -24,6 +25,12 @@ public class GameExceptionHandler {
     public ResponseEntity<String> handleAchievementNotFound(final AchievementNotFoundException ex) {
         log.warn("Achievement not found: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidGameSettingsException.class)
+    public ResponseEntity<String> handleInvalidGameSettings(final InvalidGameSettingsException ex) {
+        log.warn("Invalid game settings: {}", ex.getMessage());
+        return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
     @ExceptionHandler(PlayersListEmptyException.class)
@@ -51,15 +58,13 @@ public class GameExceptionHandler {
     }
 
     @ExceptionHandler(DuplicateGameNameException.class)
-    public ResponseEntity<String> handleDuplicateGameName(final DuplicateGameNameException ex)
-    {
+    public ResponseEntity<String> handleDuplicateGameName(final DuplicateGameNameException ex) {
         log.warn("Duplicate game: {}", ex.getMessage());
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
     @ExceptionHandler(GameUnhealthyException.class)
-    public ResponseEntity<String> handleUnhealthyGameName(final GameUnhealthyException ex)
-    {
+    public ResponseEntity<String> handleUnhealthyGameName(final GameUnhealthyException ex) {
         log.warn("Unhealthy game: {}", ex.getMessage());
         return ResponseEntity.badRequest().body(ex.getMessage());
     }

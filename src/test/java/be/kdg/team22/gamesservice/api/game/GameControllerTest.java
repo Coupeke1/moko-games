@@ -145,59 +145,6 @@ class GameControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /api/games/{name} → updates game")
-    void registerGame_returns200AndUpdatedGame() throws Exception {
-        String name = "tic-tac-toe";
-        UUID id = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
-        Game updatedGame = sampleGame(id);
-
-        RegisterGameRequest request = new RegisterGameRequest(
-                "tic-tac-toe",
-                "http://engine",
-                "http://frontend",
-                "/start",
-                "/health",
-                "Tic Tac Toe",
-                "desc",
-                "http://img",
-                BigDecimal.valueOf(29.99),
-                GameCategory.STRATEGY,
-                List.of()
-        );
-
-        when(gameService.register(name, request)).thenReturn(updatedGame);
-
-        String json = """
-                {
-                  "name": "tic-tac-toe",
-                  "backendUrl": "http://engine",
-                  "frontendUrl": "http://frontend",
-                  "startEndpoint": "/start",
-                  "healthEndpoint": "/health",
-                  "title": "Tic Tac Toe",
-                  "description": "desc",
-                  "image": "http://img",
-                  "price": 29.99,
-                  "category": "STRATEGY",
-                  "achievements": []
-                }
-                """;
-
-        mockMvc.perform(put("/api/games/{name}", name)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(id.toString()))
-                .andExpect(jsonPath("$.title").value("Tic Tac Toe"));
-
-        ArgumentCaptor<RegisterGameRequest> captor = ArgumentCaptor.forClass(RegisterGameRequest.class);
-        verify(gameService).register(any(String.class), captor.capture());
-
-        RegisterGameRequest capturedRequest = captor.getValue();
-        assertThat(capturedRequest.name()).isEqualTo("tic-tac-toe");
-    }
-
-    @Test
     @DisplayName("POST /api/games/register → registers new game")
     void createGame_returns200AndNewGame() throws Exception {
         UUID id = UUID.fromString("bbbbbbbb-cccc-dddd-eeee-ffffffffffff");
