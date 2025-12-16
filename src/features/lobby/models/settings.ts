@@ -1,4 +1,4 @@
-export type GameSettingType = "INTEGER" | "BOOLEAN" | "STRING" | "ENUM";
+export type GameSettingType = "STRING" | "INTEGER" | "BOOLEAN" | "ENUM";
 
 export interface GameSettingDefinition {
     name: string;

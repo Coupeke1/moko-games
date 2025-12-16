@@ -17,6 +17,18 @@ export async function findLobby(id: string): Promise<Lobby> {
     }
 }
 
+export async function findLobbyGameSettings(lobbyId: string): Promise<Record<string, unknown>> {
+    try {
+        validIdCheck(lobbyId);
+        const {data} = await client.get<Record<string, unknown>>(
+            `${BASE_URL}/${lobbyId}/settings`,
+        );
+        return data ?? {};
+    } catch {
+        throw new Error("Could not fetch lobby game settings");
+    }
+}
+
 export async function createLobby(game: Game, size: number): Promise<Lobby> {
     try {
         const {data} = await client.post<Lobby>(BASE_URL, {
@@ -76,14 +88,14 @@ export async function closeLobby(lobby: string) {
 export async function updateSettings(
     lobby: string,
     size: number,
-    settings: Record<string, unknown>,
+    settings?: Record<string, unknown>,
 ) {
     try {
         validIdCheck(lobby);
 
         await client.put(`${BASE_URL}/${lobby}/settings`, {
             maxPlayers: size,
-            settings,
+            ...(settings ? {settings} : {}),
         });
     } catch {
         throw new Error("Could not update settings");

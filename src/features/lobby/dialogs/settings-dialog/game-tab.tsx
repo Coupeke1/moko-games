@@ -13,8 +13,7 @@ interface Props {
 
 export default function GameTab({schema, loading, isOwner, values, setValue}: Props) {
     if (loading) return <p>Loading game settings…</p>;
-    if (!schema || !schema.settings || schema.settings.length === 0)
-        return <p>No game settings available.</p>;
+    if (!schema || schema.settings.length === 0) return <p>No game settings available.</p>;
 
     return (
         <Column gap={Gap.Medium}>
@@ -28,7 +27,7 @@ export default function GameTab({schema, loading, isOwner, values, setValue}: Pr
                             label={s.name}
                             disabled={!isOwner}
                             type="number"
-                            value={String(current ?? s.defaultValue ?? "")}
+                            value={String(current ?? "")}
                             onChange={(e) => setValue(s.name, Number(e.target.value))}
                         />
                     );
@@ -40,10 +39,32 @@ export default function GameTab({schema, loading, isOwner, values, setValue}: Pr
                             <input
                                 type="checkbox"
                                 disabled={!isOwner}
-                                checked={Boolean(current ?? s.defaultValue ?? false)}
+                                checked={Boolean(current ?? false)}
                                 onChange={(e) => setValue(s.name, e.target.checked)}
                             />
                             <span>{s.name}</span>
+                        </label>
+                    );
+                }
+
+                if (s.type === "ENUM") {
+                    const options = (s.allowedValues ?? []).map(String);
+                    const value = String(current ?? options[0] ?? "");
+                    return (
+                        <label key={s.name} className="flex flex-col gap-1">
+                            <span className="text-sm">{s.name}</span>
+                            <select
+                                disabled={!isOwner}
+                                value={value}
+                                onChange={(e) => setValue(s.name, e.target.value)}
+                                className="px-3 py-2 rounded-md bg-bg border border-border"
+                            >
+                                {options.map((opt) => (
+                                    <option key={opt} value={opt}>
+                                        {opt}
+                                    </option>
+                                ))}
+                            </select>
                         </label>
                     );
                 }
@@ -54,7 +75,7 @@ export default function GameTab({schema, loading, isOwner, values, setValue}: Pr
                         label={s.name}
                         disabled={!isOwner}
                         type="text"
-                        value={String(current ?? s.defaultValue ?? "")}
+                        value={String(current ?? "")}
                         onChange={(e) => setValue(s.name, e.target.value)}
                     />
                 );

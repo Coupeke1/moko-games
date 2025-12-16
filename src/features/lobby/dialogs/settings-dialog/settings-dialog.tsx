@@ -1,3 +1,6 @@
+import {useEffect, useState} from "react";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+
 import Button from "@/components/buttons/button";
 import Dialog from "@/components/dialog/dialog";
 import Column from "@/components/layout/column";
@@ -7,13 +10,12 @@ import TabRow from "@/components/tabs/buttons/row";
 import showToast from "@/components/toast";
 import type {Game} from "@/features/games/models/game.ts";
 import type {Lobby} from "@/features/lobby/models/lobby.ts";
-import GameTab from "@/features/lobby/dialogs/settings-dialog/game-tab";
 import LobbyTab from "@/features/lobby/dialogs/settings-dialog/lobby-tab";
-import {updateSettings} from "@/features/lobby/services/lobby.ts";
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import {useEffect, useState} from "react";
+import GameTab from "@/features/lobby/dialogs/settings-dialog/game-tab";
+import {findLobbyGameSettings, updateSettings} from "@/features/lobby/services/lobby.ts";
 import type {GameSettingsSchema} from "@/features/lobby/models/settings.ts";
 import {findGameSettingsSchema} from "@/features/lobby/services/settings.ts";
+
 
 interface Props {
     lobby: Lobby;
@@ -30,23 +32,20 @@ function defaultsFromSchema(schema: GameSettingsSchema): Record<string, unknown>
     return out;
 }
 
-export default function SettingsDialog({
-                                           lobby,
-                                           game,
-                                           isOwner,
-                                           close,
-                                           open,
-                                           onChange,
-                                       }: Props) {
-    const client = useQueryClient();
-    const [current, setCurrent] = useState<string>("Lobby");
+export default function SettingsDialog({lobby, game, isOwner, close, open, onChange}: Props) {
+    const qc = useQueryClient();
+    const [current, setCurrent] = useState("Lobby");
     const [size, setSize] = useState<number>(4);
-
     const [gameSettings, setGameSettings] = useState<Record<string, unknown>>({});
+    const [initialized, setInitialized] = useState(false);
 
     useEffect(() => {
-        setSize(lobby ? lobby.maxPlayers : 4);
-    }, [lobby, open]);
+        if (!open) {
+            setInitialized(false);
+            return;
+        }
+        setSize(lobby.maxPlayers);
+    }, [open, lobby]);
 
     const schemaQuery = useQuery({
         queryKey: ["game-settings-schema", game.id],
@@ -55,27 +54,39 @@ export default function SettingsDialog({
         staleTime: Infinity,
     });
 
-    useEffect(() => {
-        if (!open) return;
-        if (!schemaQuery.data) return;
-        setGameSettings(defaultsFromSchema(schemaQuery.data));
-    }, [open, schemaQuery.data]);
+    const lobbySettingsQuery = useQuery({
+        queryKey: ["lobby-game-settings", lobby.id],
+        enabled: open && !!lobby?.id,
+        queryFn: () => findLobbyGameSettings(lobby.id),
+        staleTime: 0,
+    });
 
-    const setValue = (name: string, value: unknown) => {
+    useEffect(() => {
+        if (!open || initialized) return;
+        if (!lobbySettingsQuery.data) return;
+
+        const fromLobby = lobbySettingsQuery.data ?? {};
+        const merged =
+            schemaQuery.data
+                ? {...defaultsFromSchema(schemaQuery.data), ...fromLobby}
+                : fromLobby;
+
+        setGameSettings(merged);
+        setInitialized(true);
+    }, [open, initialized, lobbySettingsQuery.data, schemaQuery.data]);
+
+    const setValue = (name: string, value: unknown) =>
         setGameSettings((prev) => ({...prev, [name]: value}));
-    };
 
     const save = useMutation({
-        mutationFn: async ({lobby}: { lobby: string }) =>
-            await updateSettings(lobby, size, gameSettings),
-        onSuccess: async (_data, variables) => {
-            await client.invalidateQueries({queryKey: ["lobby", variables.lobby]});
+        mutationFn: async () => updateSettings(lobby.id, size, gameSettings),
+        onSuccess: async () => {
+            await qc.invalidateQueries({queryKey: ["lobby", lobby.id]});
+            await qc.invalidateQueries({queryKey: ["lobby-game-settings", lobby.id]});
             showToast("Lobby", "Saved");
             close();
         },
-        onError: (error: Error) => {
-            showToast("Lobby", error.message);
-        },
+        onError: (error: Error) => showToast("Lobby", error.message),
     });
 
     return (
@@ -85,20 +96,13 @@ export default function SettingsDialog({
             open={open}
             onChange={onChange}
             footer={
-                <Button
-                    fullWidth={true}
-                    onClick={() => save.mutate({lobby: lobby.id})}
-                >
+                <Button fullWidth onClick={() => save.mutate()}>
                     Save
                 </Button>
             }
         >
             <Column gap={Gap.Large}>
-                <TabRow
-                    tabs={["Lobby", "Game"]}
-                    current={current}
-                    setCurrent={setCurrent}
-                />
+                <TabRow tabs={["Lobby", "Game"]} current={current} setCurrent={setCurrent}/>
 
                 <TabContent
                     current={current}
@@ -119,7 +123,7 @@ export default function SettingsDialog({
                             element: (
                                 <GameTab
                                     schema={schemaQuery.data ?? null}
-                                    loading={schemaQuery.isLoading}
+                                    loading={schemaQuery.isLoading || lobbySettingsQuery.isLoading}
                                     isOwner={isOwner}
                                     values={gameSettings}
                                     setValue={setValue}
