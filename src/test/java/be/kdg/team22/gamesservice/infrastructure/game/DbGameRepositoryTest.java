@@ -39,7 +39,8 @@ class DbGameRepositoryTest {
                                 false,
                                 null,
                                 null,
-                                null
+                                null,
+                                "dummy"
                         )
                 )
         );
