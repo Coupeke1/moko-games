@@ -37,20 +37,20 @@ public class ExceptionController {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
+    public ResponseEntity<String> handleIllegalArgumentException(final IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<String> handleIllegalStateException(IllegalStateException ex) {
+    public ResponseEntity<String> handleIllegalStateException(final IllegalStateException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
     @ExceptionHandler({
-            AiMoveRequestFailedException.class,
-            AiServiceNotReachableException.class
+            BotMoveRequestFailedException.class,
+            BotServiceNotReachableException.class
     })
-    public ResponseEntity<String> handleBotExceptions(AiMoveRequestFailedException ex) {
+    public ResponseEntity<String> handleBotExceptions(final RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
@@ -58,7 +58,7 @@ public class ExceptionController {
             PlayerIdentityMismatchException.class,
             PlayerNotInThisGameException.class
     })
-    public ResponseEntity<String> handlePlayerAuthExceptions(RuntimeException ex) {
+    public ResponseEntity<String> handlePlayerAuthExceptions(final RuntimeException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
     }
 }

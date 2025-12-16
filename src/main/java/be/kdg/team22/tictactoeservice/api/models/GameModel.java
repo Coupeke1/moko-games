@@ -17,7 +17,7 @@ public record GameModel(
         Map<UUID, List<MoveModel>> moveHistory,
         PlayerRole currentRole,
         UUID winner,
-        PlayerRole aiPlayer
+        PlayerRole botPlayer
 ) {
     public static GameModel from(Game game) {
         return new GameModel(
@@ -33,7 +33,7 @@ public record GameModel(
                         )),
                 game.currentRole(),
                 game.winner() == null ? null : game.winner().value(),
-                game.aiPlayer()
+                game.botPlayer()
         );
     }
 }
