@@ -27,17 +27,19 @@ public class GameController {
     }
 
     @PostMapping({"/", ""})
-    public ResponseEntity<GameModel> create(@RequestParam(defaultValue = "false") final boolean aiPlayer,
+    public ResponseEntity<GameModel> create(@AuthenticationPrincipal final Jwt token,
+                                            @RequestParam(defaultValue = "false") final boolean aiPlayer,
                                             @Valid @RequestBody final CreateGameModel model) {
-        Game game = service.create(model, aiPlayer);
+        Game game = service.create(PlayerId.get(token), model, aiPlayer);
         GameModel gameModel = GameModel.from(game);
 
         return ResponseEntity.ok(gameModel);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GameModel> get(@PathVariable final UUID id) {
-        Game game = service.getById(new GameId(id));
+    public ResponseEntity<GameModel> get(@AuthenticationPrincipal final Jwt token,
+            @PathVariable final UUID id) {
+        Game game = service.requestState(new GameId(id), PlayerId.get(token));
         GameModel model = GameModel.from(game);
 
         return ResponseEntity.ok(model);
@@ -48,14 +50,6 @@ public class GameController {
                                                  @PathVariable final UUID id,
                                                  @Valid @RequestBody final MoveModel moveModel) {
         Game game = service.requestMove(new GameId(id), PlayerId.get(token), moveModel.to());
-        GameModel model = GameModel.from(game);
-
-        return ResponseEntity.ok(model);
-    }
-
-    @PostMapping("/{id}/reset")
-    public ResponseEntity<GameModel> resetGame(@PathVariable final UUID id) {
-        Game game = service.reset(new GameId(id));
         GameModel model = GameModel.from(game);
 
         return ResponseEntity.ok(model);
