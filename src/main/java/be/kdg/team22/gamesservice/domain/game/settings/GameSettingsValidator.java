@@ -10,7 +10,8 @@ import java.util.stream.Collectors;
 
 public final class GameSettingsValidator {
 
-    private GameSettingsValidator() {}
+    private GameSettingsValidator() {
+    }
 
     public static void validateDefinition(GameSettingsDefinition definition) {
         if (definition == null) throw InvalidGameSettingsException.missingDefinition();
@@ -32,6 +33,11 @@ public final class GameSettingsValidator {
             }
             if (!names.add(def.name())) {
                 throw InvalidGameSettingsException.invalidSettings("Duplicate setting name: " + def.name());
+            }
+            if (def.required() && def.defaultValue() == null) {
+                throw InvalidGameSettingsException.invalidSettings(
+                        "Required setting must define a defaultValue: " + def.name()
+                );
             }
 
             validateMinMax(def);
