@@ -17,6 +17,7 @@ public class NotificationSocketPublisher {
     public void publishToPlayer(final PlayerId playerId, final Notification notification) {
         String userId = playerId.value().toString();
         NotificationModel model = NotificationModel.from(notification);
+        System.out.println("                Sending to " + playerId.value() + " (" + notification.message() + ")");
         template.convertAndSendToUser(userId, "/queue/notifications", model);
     }
 }
