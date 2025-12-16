@@ -8,7 +8,6 @@ import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyRepository;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.LobbyNotFoundException;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
-import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.domain.player.PlayerName;
@@ -22,6 +21,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -37,6 +37,10 @@ class LobbyPlayerServiceTest {
     private final LobbyEventPublisher eventPublisher = mock(LobbyEventPublisher.class);
     private final LobbyPublisherService publisherService = new LobbyPublisherService(repo, socket);
     LobbyPlayerService service = new LobbyPlayerService(repo, friendsService, playerService, publisherService, eventPublisher);
+    private final LobbySettings settings = new LobbySettings(
+            2,
+            Map.of("boardSize", 3)
+    );
 
     private Jwt jwtFor(PlayerId pid) {
         return Jwt.withTokenValue("TOKEN-" + pid.value()).header("alg", "none").claim("sub", pid.value().toString()).claim("preferred_username", "testuser").issuedAt(Instant.now()).expiresAt(Instant.now().plusSeconds(3600)).build();
@@ -44,7 +48,6 @@ class LobbyPlayerServiceTest {
 
     private Lobby newLobby(LobbyId id, PlayerId owner) {
         Player ownerPlayer = new Player(owner, new PlayerName("owner"), "");
-        LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
         return new Lobby(new GameId(UUID.randomUUID()), ownerPlayer, settings);
     }
 

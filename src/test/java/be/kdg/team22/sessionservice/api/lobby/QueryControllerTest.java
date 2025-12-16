@@ -10,7 +10,6 @@ import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyStatus;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
-import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.domain.player.PlayerName;
@@ -26,6 +25,7 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -41,10 +41,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class QueryControllerTest {
 
     private static final UUID GAME_ID = UUID.fromString("00000000-0000-0000-0000-000000000005");
-
+    private final LobbySettings settings = new LobbySettings(
+            2,
+            Map.of("boardSize", 3)
+    );
     @Autowired
     private MockMvc mockMvc;
-
     @MockitoBean
     private LobbyService lobbyService;
     @MockitoBean
@@ -65,7 +67,6 @@ class QueryControllerTest {
     }
 
     private Lobby sampleLobby(UUID lobbyId, UUID ownerId) {
-        LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
         Player owner = new Player(PlayerId.from(ownerId), new PlayerName("owner"), "");
 
         return new Lobby(
@@ -102,7 +103,6 @@ class QueryControllerTest {
         UUID ownerId = UUID.randomUUID();
         UUID invitedId = UUID.randomUUID();
 
-        LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
         Player owner = new Player(PlayerId.from(ownerId), new PlayerName("owner"), "");
 
         Lobby lobby = new Lobby(

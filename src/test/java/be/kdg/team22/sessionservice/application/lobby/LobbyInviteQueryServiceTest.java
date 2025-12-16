@@ -2,7 +2,6 @@ package be.kdg.team22.sessionservice.application.lobby;
 
 import be.kdg.team22.sessionservice.domain.lobby.*;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
-import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.domain.player.PlayerName;
@@ -13,10 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -24,9 +20,12 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class LobbyInviteQueryServiceTest {
 
+    private final LobbySettings settings = new LobbySettings(
+            2,
+            Map.of("boardSize", 3)
+    );
     LobbyRepository lobbyRepo = mock(LobbyRepository.class);
     ExternalPlayersRepository userRepo = mock(ExternalPlayersRepository.class);
-
     InviteQueryService service = new InviteQueryService(lobbyRepo);
 
     @Test
@@ -49,14 +48,12 @@ class LobbyInviteQueryServiceTest {
         Player owner = new Player(ownerId, new PlayerName("ownerUser"), "");
 
         Player p1 = new Player(PlayerId.create(), new PlayerName("p1"), "");
-        Player p2 = new Player(PlayerId.create(), new PlayerName("p2"), "");
+
 
         PlayerId invited1 = new PlayerId(UUID.randomUUID());
 
-        List<Player> players = List.of(owner, p1, p2);
+        List<Player> players = List.of(owner, p1);
         Set<PlayerId> invited = Set.of(invited1, invitedUser);
-
-        LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
         Lobby lobby = new Lobby(
                 LobbyId.create(),
@@ -76,8 +73,6 @@ class LobbyInviteQueryServiceTest {
                 .thenReturn(Optional.of(new PlayerResponse(ownerId.value(), "ownerUser", "")));
         when(userRepo.getById(p1.id().value(), token))
                 .thenReturn(Optional.of(new PlayerResponse(p1.id().value(), "p1", "")));
-        when(userRepo.getById(p2.id().value(), token))
-                .thenReturn(Optional.of(new PlayerResponse(p2.id().value(), "p2", "")));
         when(userRepo.getById(invited1.value(), token))
                 .thenReturn(Optional.of(new PlayerResponse(invited1.value(), "inv1", "")));
         when(userRepo.getById(invitedUser.value(), token))

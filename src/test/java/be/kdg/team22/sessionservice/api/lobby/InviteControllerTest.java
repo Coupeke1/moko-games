@@ -10,7 +10,6 @@ import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyStatus;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
-import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.domain.player.PlayerName;
@@ -27,6 +26,7 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -64,6 +64,11 @@ class InviteControllerTest {
             builder.claim("email", email);
         });
     }
+
+    private final LobbySettings settings = new LobbySettings(
+            2,
+            Map.of("boardSize", 3)
+    );
 
     @Test
     @DisplayName("POST /api/lobbies/{id}/invite/{playerId} – calls lobbyPlayerService.invitePlayer")
@@ -153,7 +158,6 @@ class InviteControllerTest {
 
         PlayerId ownerPid = PlayerId.from(ownerId);
 
-        var settings = new LobbySettings(new TicTacToeSettings(3), 2);
 
         Lobby lobby = new Lobby(
                 LobbyId.from(lobbyId),
