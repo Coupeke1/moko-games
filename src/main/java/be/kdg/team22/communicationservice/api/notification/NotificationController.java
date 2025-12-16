@@ -3,7 +3,7 @@ package be.kdg.team22.communicationservice.api.notification;
 import be.kdg.team22.communicationservice.api.notification.models.NotificationModel;
 import be.kdg.team22.communicationservice.api.notification.models.PagedResponse;
 import be.kdg.team22.communicationservice.application.notification.NotificationService;
-import be.kdg.team22.communicationservice.application.queries.NotificationReadFilter;
+import be.kdg.team22.communicationservice.application.queries.NotificationFilter;
 import be.kdg.team22.communicationservice.application.queries.PageResult;
 import be.kdg.team22.communicationservice.application.queries.Pagination;
 import be.kdg.team22.communicationservice.domain.notification.Notification;
@@ -30,7 +30,7 @@ public class NotificationController {
     }
 
     @GetMapping
-    public ResponseEntity<PagedResponse<NotificationModel>> getNotifications(@AuthenticationPrincipal final Jwt token, @RequestParam(required = false) final NotificationReadFilter type, @RequestParam(required = false) final NotificationOrigin origin, @RequestParam(defaultValue = "0") final int page, @RequestParam(defaultValue = "10") final int size) {
+    public ResponseEntity<PagedResponse<NotificationModel>> getNotifications(@AuthenticationPrincipal final Jwt token, @RequestParam(required = false) final NotificationFilter type, @RequestParam(required = false) final NotificationOrigin origin, @RequestParam(defaultValue = "0") final int page, @RequestParam(defaultValue = "10") final int size) {
         PlayerId playerId = PlayerId.get(token);
         Pagination pagination = new Pagination(page, size);
 

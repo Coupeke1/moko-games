@@ -1,6 +1,6 @@
 package be.kdg.team22.communicationservice.infrastructure.notification;
 
-import be.kdg.team22.communicationservice.application.queries.NotificationReadFilter;
+import be.kdg.team22.communicationservice.application.queries.NotificationFilter;
 import be.kdg.team22.communicationservice.application.queries.PageResult;
 import be.kdg.team22.communicationservice.application.queries.Pagination;
 import be.kdg.team22.communicationservice.domain.notification.*;
@@ -13,7 +13,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,23 +46,19 @@ public class DbNotificationRepository implements NotificationRepository {
     }
 
     @Override
-    public PageResult<Notification> findAllByConstraints(final PlayerId playerId, final NotificationReadFilter type, final NotificationOrigin origin, final Pagination pagination) {
-        Boolean read = null;
-        if (type != null) {
-            read = (type == NotificationReadFilter.READ);
-        }
+    public PageResult<Notification> findAllByConstraints(final PlayerId playerId, final NotificationFilter type, final NotificationOrigin origin, final Pagination pagination) {
+        Boolean read = type == null ? null : (type == NotificationFilter.READ);
 
         Pageable pageable = PageRequest.of(pagination.page(), pagination.size(), Sort.by(Sort.Direction.DESC, "createdAt"));
-
         Page<NotificationEntity> page = repository.findAllFiltered(playerId.value(), read, origin, pageable);
 
-        List<Notification> items = page.getContent().stream().map(NotificationEntity::to).toList();
-
-        return new PageResult<>(items, page.isLast());
+        List<Notification> notifications = page.getContent().stream().map(NotificationEntity::to).toList();
+        return new PageResult<>(notifications, page.isLast());
     }
 
     @Override
     public List<Notification> findUnreadSince(final PlayerId recipientId, final Instant since) {
-        return repository.findUnreadSince(recipientId.value(), since);
+        List<NotificationEntity> notifications = repository.findUnreadSince(recipientId.value(), since);
+        return notifications.stream().map(NotificationEntity::to).toList();
     }
 }

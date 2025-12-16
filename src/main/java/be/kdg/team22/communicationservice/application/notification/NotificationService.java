@@ -1,6 +1,6 @@
 package be.kdg.team22.communicationservice.application.notification;
 
-import be.kdg.team22.communicationservice.application.queries.NotificationReadFilter;
+import be.kdg.team22.communicationservice.application.queries.NotificationFilter;
 import be.kdg.team22.communicationservice.application.queries.PageResult;
 import be.kdg.team22.communicationservice.application.queries.Pagination;
 import be.kdg.team22.communicationservice.domain.notification.*;
@@ -52,12 +52,12 @@ public class NotificationService {
         }
     }
 
-    public PageResult<Notification> findAllByConstraints(final PlayerId playerId, final NotificationReadFilter type, final NotificationOrigin origin, final Pagination pagination) {
+    public PageResult<Notification> findAllByConstraints(final PlayerId playerId, final NotificationFilter type, final NotificationOrigin origin, final Pagination pagination) {
         return repository.findAllByConstraints(playerId, type, origin, pagination);
     }
 
     public List<Notification> getNotificationsSince(final PlayerId playerId, final Instant since) {
-        return repository.findUnreadSince(playerId, since);
+        return repository.findUnreadSince(playerId, since).stream().limit(100).toList();
     }
 
     public List<Notification> getNotifications(final PlayerId playerId) {

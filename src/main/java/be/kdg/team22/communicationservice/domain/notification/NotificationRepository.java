@@ -1,6 +1,6 @@
 package be.kdg.team22.communicationservice.domain.notification;
 
-import be.kdg.team22.communicationservice.application.queries.NotificationReadFilter;
+import be.kdg.team22.communicationservice.application.queries.NotificationFilter;
 import be.kdg.team22.communicationservice.application.queries.PageResult;
 import be.kdg.team22.communicationservice.application.queries.Pagination;
 
@@ -19,7 +19,7 @@ public interface NotificationRepository {
 
     PageResult<Notification> findAllByConstraints(
             PlayerId playerId,
-            NotificationReadFilter type,
+            NotificationFilter type,
             NotificationOrigin origin,
             Pagination pagination
     );
