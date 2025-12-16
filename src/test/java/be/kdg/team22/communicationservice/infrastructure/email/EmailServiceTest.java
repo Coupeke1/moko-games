@@ -2,7 +2,7 @@ package be.kdg.team22.communicationservice.infrastructure.email;
 
 import be.kdg.team22.communicationservice.domain.notification.Notification;
 import be.kdg.team22.communicationservice.domain.notification.NotificationId;
-import be.kdg.team22.communicationservice.domain.notification.NotificationType;
+import be.kdg.team22.communicationservice.domain.notification.NotificationOrigin;
 import be.kdg.team22.communicationservice.domain.notification.PlayerId;
 import be.kdg.team22.communicationservice.domain.notification.exceptions.EmailSendingException;
 import be.kdg.team22.communicationservice.domain.notification.exceptions.EmailTemplateException;
@@ -44,7 +44,7 @@ class EmailServiceTest {
         when(templateEngine.process(eq("email/notification"), any(Context.class)))
                 .thenReturn("<html>Test Email</html>");
 
-        Notification notification = createNotification(NotificationType.FRIEND_REQUEST_RECEIVED);
+        Notification notification = createNotification(NotificationOrigin.FRIEND_REQUEST_RECEIVED);
 
         // When
         emailService.sendNotificationEmail("test@example.com", "Test User", notification);
@@ -67,7 +67,7 @@ class EmailServiceTest {
         Notification notification = new Notification(
                 NotificationId.from(UUID.randomUUID()),
                 PlayerId.from(UUID.randomUUID()),
-                NotificationType.ACHIEVEMENT_UNLOCKED,
+                NotificationOrigin.ACHIEVEMENT_UNLOCKED,
                 "Achievement Unlocked!",
                 "You earned the 'First Win' achievement",
                 Instant.now(),
@@ -98,7 +98,7 @@ class EmailServiceTest {
         doThrow(jakarta.mail.MessagingException.class)
                 .when(mimeMessage).setFrom((Address) any());
 
-        Notification notification = createNotification(NotificationType.DIRECT_MESSAGE);
+        Notification notification = createNotification(NotificationOrigin.DIRECT_MESSAGE);
 
         // When / Then
         assertThatThrownBy(() ->
@@ -117,7 +117,7 @@ class EmailServiceTest {
         when(templateEngine.process(anyString(), any(Context.class)))
                 .thenThrow(new RuntimeException("Template not found"));
 
-        Notification notification = createNotification(NotificationType.ORDER_COMPLETED);
+        Notification notification = createNotification(NotificationOrigin.ORDER_COMPLETED);
 
         // When / Then
         assertThatThrownBy(() ->
@@ -129,32 +129,32 @@ class EmailServiceTest {
 
     @Test
     void getColorForType_shouldReturnCorrectColorForFriendRequest() {
-        testColorForType(NotificationType.FRIEND_REQUEST_RECEIVED, "#4F46E5");
-        testColorForType(NotificationType.FRIEND_REQUEST_ACCEPTED, "#4F46E5");
+        testColorForType(NotificationOrigin.FRIEND_REQUEST_RECEIVED, "#4F46E5");
+        testColorForType(NotificationOrigin.FRIEND_REQUEST_ACCEPTED, "#4F46E5");
     }
 
     @Test
     void getColorForType_shouldReturnCorrectColorForLobby() {
-        testColorForType(NotificationType.LOBBY_INVITE, "#7C3AED");
-        testColorForType(NotificationType.PLAYER_JOINED_LOBBY, "#7C3AED");
+        testColorForType(NotificationOrigin.LOBBY_INVITE, "#7C3AED");
+        testColorForType(NotificationOrigin.PLAYER_JOINED_LOBBY, "#7C3AED");
     }
 
     @Test
     void getColorForType_shouldReturnCorrectColorForAchievement() {
-        testColorForType(NotificationType.ACHIEVEMENT_UNLOCKED, "#F59E0B");
+        testColorForType(NotificationOrigin.ACHIEVEMENT_UNLOCKED, "#F59E0B");
     }
 
     @Test
     void getColorForType_shouldReturnCorrectColorForOrder() {
-        testColorForType(NotificationType.ORDER_COMPLETED, "#10B981");
+        testColorForType(NotificationOrigin.ORDER_COMPLETED, "#10B981");
     }
 
     @Test
     void getColorForType_shouldReturnCorrectColorForMessage() {
-        testColorForType(NotificationType.DIRECT_MESSAGE, "#3B82F6");
+        testColorForType(NotificationOrigin.DIRECT_MESSAGE, "#3B82F6");
     }
 
-    private void testColorForType(NotificationType type, String expectedColor) {
+    private void testColorForType(NotificationOrigin type, String expectedColor) {
         MimeMessage mimeMessage = mock(MimeMessage.class);
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
 
@@ -170,7 +170,7 @@ class EmailServiceTest {
         assertThat(context.getVariable("color")).isEqualTo(expectedColor);
     }
 
-    private Notification createNotification(NotificationType type) {
+    private Notification createNotification(NotificationOrigin type) {
         return new Notification(
                 NotificationId.from(UUID.randomUUID()),
                 PlayerId.from(UUID.randomUUID()),

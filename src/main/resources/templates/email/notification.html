@@ -76,7 +76,7 @@
             margin: 0;
         }
 
-        .notification-type {
+        .notification-origin {
             display: inline-block;
             padding: 6px 12px;
             background-color: rgba(0, 0, 0, 0.05);
@@ -154,7 +154,7 @@
             <p class="notification-message" th:text="${message}">
                 This is your notification message.
             </p>
-            <span class="notification-type" th:text="${#strings.replace(notificationType, '_', ' ')}">
+            <span class="notification-origin" th:text="${#strings.replace(notificationType, '_', ' ')}">
                 Notification Type
             </span>
         </div>

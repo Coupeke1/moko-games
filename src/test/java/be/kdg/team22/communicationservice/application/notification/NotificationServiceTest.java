@@ -42,7 +42,7 @@ public class NotificationServiceTest {
         sampleNotification = new Notification(
                 NotificationId.from(UUID.randomUUID()),
                 recipient,
-                NotificationType.FRIEND_REQUEST_RECEIVED,
+                NotificationOrigin.FRIEND_REQUEST_RECEIVED,
                 "Test title",
                 "Test message",
                 Instant.now(),
@@ -62,7 +62,7 @@ public class NotificationServiceTest {
 
         Notification created = service.create(
                 recipient,
-                NotificationType.FRIEND_REQUEST_RECEIVED,
+                NotificationOrigin.FRIEND_REQUEST_RECEIVED,
                 "Hello",
                 "Message"
         );
@@ -74,7 +74,7 @@ public class NotificationServiceTest {
 
         assertThat(created.id()).isNotNull();
         assertThat(created.recipientId()).isEqualTo(recipient);
-        assertThat(created.type()).isEqualTo(NotificationType.FRIEND_REQUEST_RECEIVED);
+        assertThat(created.origin()).isEqualTo(NotificationOrigin.FRIEND_REQUEST_RECEIVED);
         assertThat(created.title()).isEqualTo("Hello");
         assertThat(created.message()).isEqualTo("Message");
     }
@@ -91,7 +91,7 @@ public class NotificationServiceTest {
 
         Notification created = service.create(
                 recipient,
-                NotificationType.FRIEND_REQUEST_RECEIVED,
+                NotificationOrigin.FRIEND_REQUEST_RECEIVED,
                 "Hello",
                 "Message"
         );
@@ -103,11 +103,11 @@ public class NotificationServiceTest {
                 notifCaptor.capture()
         );
 
-        assertThat(notifCaptor.getValue().type()).isEqualTo(NotificationType.FRIEND_REQUEST_RECEIVED);
+        assertThat(notifCaptor.getValue().origin()).isEqualTo(NotificationOrigin.FRIEND_REQUEST_RECEIVED);
     }
 
     @Test
-    void create_shouldNotSendEmailWhenTypeDisabled() {
+    void create_shouldNotSendEmailWhenOriginDisabled() {
         NotificationsResponse prefs = new NotificationsResponse(true, false, true, true, true);
         ProfileResponse profile = new ProfileResponse(recipient.value(), "testuser", "test@example.com","testImg","profileDescription");
 
@@ -117,7 +117,7 @@ public class NotificationServiceTest {
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         // When
-        service.create(recipient, NotificationType.FRIEND_REQUEST_RECEIVED, "Hello", "Message");
+        service.create(recipient, NotificationOrigin.FRIEND_REQUEST_RECEIVED, "Hello", "Message");
 
         // Then - geen email verzonden
         verify(emailService, never()).sendNotificationEmail(anyString(), anyString(), any());
@@ -140,7 +140,7 @@ public class NotificationServiceTest {
         Notification readNotif = new Notification(
                 NotificationId.from(UUID.randomUUID()),
                 recipient,
-                sampleNotification.type(),
+                sampleNotification.origin(),
                 sampleNotification.title(),
                 sampleNotification.message(),
                 sampleNotification.createdAt(),

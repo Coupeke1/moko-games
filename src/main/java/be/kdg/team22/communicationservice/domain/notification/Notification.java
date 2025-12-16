@@ -8,7 +8,7 @@ import java.time.Instant;
 public class Notification {
     private final NotificationId id;
     private final PlayerId recipientId;
-    private final NotificationType type;
+    private final NotificationOrigin origin;
     private final String title;
     private final String message;
     private final Instant createdAt;
@@ -16,7 +16,7 @@ public class Notification {
 
     public Notification(final NotificationId id,
                         final PlayerId recipientId,
-                        final NotificationType type,
+                        final NotificationOrigin origin,
                         final String title,
                         final String message,
                         final Instant createdAt,
@@ -24,7 +24,7 @@ public class Notification {
 
         this.id = id;
         this.recipientId = recipientId;
-        this.type = type;
+        this.origin = origin;
         this.title = title;
         this.message = message;
         this.createdAt = createdAt;
@@ -32,7 +32,7 @@ public class Notification {
     }
 
     public static Notification create(final PlayerId recipientId,
-                                      final NotificationType type,
+                                      final NotificationOrigin type,
                                       final String title,
                                       final String message) {
         return new Notification(
@@ -54,8 +54,8 @@ public class Notification {
         return recipientId;
     }
 
-    public NotificationType type() {
-        return type;
+    public NotificationOrigin origin() {
+        return origin;
     }
 
     public String title() {

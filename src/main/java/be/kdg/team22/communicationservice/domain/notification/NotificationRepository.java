@@ -19,7 +19,7 @@ public interface NotificationRepository {
     PageResult<Notification> findAllByConstraints(
             PlayerId playerId,
             NotificationReadFilter type,
-            NotificationType origin,
+            NotificationOrigin origin,
             Pagination pagination
     );
 }

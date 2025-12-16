@@ -4,6 +4,6 @@ import be.kdg.team22.communicationservice.domain.chat.ChatChannelType;
 
 public class ChatChannelNotFoundException extends RuntimeException {
     public ChatChannelNotFoundException(ChatChannelType type, String referenceId) {
-        super("Cant find chat channel with type: " + type + " and referenceId: " + referenceId);
+        super("Cant find chat channel with origin: " + type + " and referenceId: " + referenceId);
     }
 }

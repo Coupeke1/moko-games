@@ -54,7 +54,7 @@ public class DbNotificationRepository implements NotificationRepository {
     public PageResult<Notification> findAllByConstraints(
             final PlayerId playerId,
             final NotificationReadFilter type,
-            final NotificationType origin,
+            final NotificationOrigin origin,
             final Pagination pagination
     ) {
         Boolean read = null;

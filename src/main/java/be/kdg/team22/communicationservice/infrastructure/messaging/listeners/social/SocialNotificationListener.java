@@ -2,7 +2,7 @@ package be.kdg.team22.communicationservice.infrastructure.messaging.listeners.so
 
 import be.kdg.team22.communicationservice.application.notification.NotificationService;
 import be.kdg.team22.communicationservice.config.RabbitMQTopology;
-import be.kdg.team22.communicationservice.domain.notification.NotificationType;
+import be.kdg.team22.communicationservice.domain.notification.NotificationOrigin;
 import be.kdg.team22.communicationservice.domain.notification.PlayerId;
 import be.kdg.team22.communicationservice.infrastructure.messaging.events.social.FriendRequestAcceptedEvent;
 import be.kdg.team22.communicationservice.infrastructure.messaging.events.social.FriendRequestReceivedEvent;
@@ -21,23 +21,13 @@ public class SocialNotificationListener {
     public void handle(final FriendRequestReceivedEvent event) {
         PlayerId recipient = PlayerId.from(event.targetUserId());
 
-        notifications.create(
-                recipient,
-                NotificationType.FRIEND_REQUEST_RECEIVED,
-                "New friend request",
-                event.senderName() + " has sent you a friend request."
-        );
+        notifications.create(recipient, NotificationOrigin.FRIEND_REQUEST_RECEIVED, "New friend request", String.format("\"%s\" has sent you a friend request!", event.senderName()));
     }
 
     @RabbitListener(queues = RabbitMQTopology.Q_FRIEND_REQUEST_ACCEPTED)
     public void handle(final FriendRequestAcceptedEvent event) {
         PlayerId recipient = PlayerId.from(event.targetUserId());
 
-        notifications.create(
-                recipient,
-                NotificationType.FRIEND_REQUEST_ACCEPTED,
-                "Friend request accepted",
-                event.senderName() + " has accepted your friend request."
-        );
+        notifications.create(recipient, NotificationOrigin.FRIEND_REQUEST_ACCEPTED, "Friend request accepted", String.format("\"%s\" has accepted your friend request!", event.senderName()));
     }
 }

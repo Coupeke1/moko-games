@@ -1,7 +1,7 @@
 package be.kdg.team22.communicationservice.infrastructure.messaging.listeners.achievements;
 
 import be.kdg.team22.communicationservice.application.notification.NotificationService;
-import be.kdg.team22.communicationservice.domain.notification.NotificationType;
+import be.kdg.team22.communicationservice.domain.notification.NotificationOrigin;
 import be.kdg.team22.communicationservice.domain.notification.PlayerId;
 import be.kdg.team22.communicationservice.infrastructure.messaging.events.achievements.AchievementUnlockedEvent;
 import org.junit.jupiter.api.Test;
@@ -40,13 +40,12 @@ class AchievementNotificationListenerTest {
 
         verify(service).create(
                 playerCaptor.capture(),
-                org.mockito.ArgumentMatchers.eq(NotificationType.ACHIEVEMENT_UNLOCKED),
+                org.mockito.ArgumentMatchers.eq(NotificationOrigin.ACHIEVEMENT_UNLOCKED),
                 titleCaptor.capture(),
                 messageCaptor.capture()
         );
 
         assertThat(playerCaptor.getValue().value()).isEqualTo(playerId);
-        assertThat(titleCaptor.getValue()).isEqualTo("Achievement acquired!");
-        assertThat(messageCaptor.getValue()).isEqualTo("You acquired: Winner");
+        assertThat(titleCaptor.getValue()).isEqualTo("Achievement unlocked");
     }
 }

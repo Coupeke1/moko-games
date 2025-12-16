@@ -1,7 +1,7 @@
 package be.kdg.team22.communicationservice.infrastructure.messaging.listeners.session;
 
 import be.kdg.team22.communicationservice.application.notification.NotificationService;
-import be.kdg.team22.communicationservice.domain.notification.NotificationType;
+import be.kdg.team22.communicationservice.domain.notification.NotificationOrigin;
 import be.kdg.team22.communicationservice.domain.notification.PlayerId;
 import be.kdg.team22.communicationservice.infrastructure.messaging.events.session.LobbyInviteEvent;
 import be.kdg.team22.communicationservice.infrastructure.messaging.events.session.PlayerJoinedLobbyEvent;
@@ -42,13 +42,13 @@ class SessionNotificationListenerTest {
 
         verify(service).create(
                 player.capture(),
-                org.mockito.ArgumentMatchers.eq(NotificationType.LOBBY_INVITE),
+                org.mockito.ArgumentMatchers.eq(NotificationOrigin.LOBBY_INVITE),
                 title.capture(),
                 org.mockito.ArgumentMatchers.anyString()
         );
 
         assertThat(player.getValue().value()).isEqualTo(targetUserId);
-        assertThat(title.getValue()).isEqualTo("Invited for lobby");
+        assertThat(title.getValue()).isEqualTo("Invited to lobby");
     }
 
     @Test
@@ -67,12 +67,12 @@ class SessionNotificationListenerTest {
 
         verify(service).create(
                 player.capture(),
-                org.mockito.ArgumentMatchers.eq(NotificationType.PLAYER_JOINED_LOBBY),
+                org.mockito.ArgumentMatchers.eq(NotificationOrigin.PLAYER_JOINED_LOBBY),
                 title.capture(),
                 org.mockito.ArgumentMatchers.anyString()
         );
 
         assertThat(player.getValue().value()).isEqualTo(hostUserId);
-        assertThat(title.getValue()).isEqualTo("New player joined");
+        assertThat(title.getValue()).isEqualTo("Player joined");
     }
 }

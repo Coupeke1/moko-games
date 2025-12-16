@@ -1,7 +1,7 @@
 package be.kdg.team22.communicationservice.infrastructure.messaging.listeners.chat;
 
 import be.kdg.team22.communicationservice.application.notification.NotificationService;
-import be.kdg.team22.communicationservice.domain.notification.NotificationType;
+import be.kdg.team22.communicationservice.domain.notification.NotificationOrigin;
 import be.kdg.team22.communicationservice.domain.notification.PlayerId;
 import be.kdg.team22.communicationservice.infrastructure.messaging.events.chat.DirectMessageReceivedEvent;
 import org.junit.jupiter.api.Test;
@@ -41,13 +41,13 @@ class ChatNotificationListenerTest {
 
         verify(service).create(
                 player.capture(),
-                org.mockito.ArgumentMatchers.eq(NotificationType.DIRECT_MESSAGE),
+                org.mockito.ArgumentMatchers.eq(NotificationOrigin.DIRECT_MESSAGE),
                 title.capture(),
                 message.capture()
         );
 
         assertThat(player.getValue().value()).isEqualTo(recipientId);
-        assertThat(title.getValue()).isEqualTo("New private message from Alice");
+        assertThat(title.getValue()).isEqualTo("Message from \"Alice\"");
         assertThat(message.getValue()).isEqualTo("Hi!");
     }
 }
