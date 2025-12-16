@@ -29,7 +29,8 @@ class GameTest {
                 "/health",
                 "Title",
                 "Description",
-                "http://img"
+                "http://img",
+                defaultSettings()
         );
     }
 
@@ -42,7 +43,8 @@ class GameTest {
                                 false,
                                 null,
                                 null,
-                                null
+                                null,
+                                "dummy"
                         )
                 )
         );
@@ -61,7 +63,8 @@ class GameTest {
                 "/health",
                 "Title",
                 "Desc",
-                "http://img"
+                "http://img",
+                defaultSettings()
         );
 
         assertThat(game.id()).isEqualTo(id);
@@ -119,7 +122,8 @@ class GameTest {
                         "/health",
                         "Title",
                         "Desc",
-                        "http://img")
+                        "http://img",
+                        defaultSettings())
         ).isInstanceOf(GameIdNullException.class);
     }
 
@@ -135,7 +139,8 @@ class GameTest {
                         "/health",
                         "Title",
                         "Desc",
-                        "http://img"
+                        "http://img",
+                        defaultSettings()
                 )
         ).isInstanceOf(GameNameInvalidException.class);
     }
@@ -152,7 +157,8 @@ class GameTest {
                         "/health",
                         "Title",
                         "Desc",
-                        "http://img"
+                        "http://img",
+                        defaultSettings()
                 )
         ).isInstanceOf(GameBaseUrlInvalidException.class);
     }
@@ -169,7 +175,8 @@ class GameTest {
                         "/health",
                         "Title",
                         "Desc",
-                        "http://img"
+                        "http://img",
+                        defaultSettings()
                 )
         ).isInstanceOf(GameStartEndpointInvalidException.class);
     }
@@ -186,7 +193,8 @@ class GameTest {
                         " ",
                         "Title",
                         "Desc",
-                        "http://img"
+                        "http://img",
+                        defaultSettings()
                 )
         ).isInstanceOf(GameHealthEndpointInvalidException.class);
     }
@@ -203,7 +211,8 @@ class GameTest {
                         "/health",
                         "",
                         "Desc",
-                        "http://img"
+                        "http://img",
+                        defaultSettings()
                 )
         ).isInstanceOf(GameMetadataException.class);
     }

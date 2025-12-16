@@ -23,7 +23,8 @@ class GameEntityTest {
                                 false,
                                 null,
                                 null,
-                                null
+                                null,
+                                "dummy"
                         )
                 )
         );

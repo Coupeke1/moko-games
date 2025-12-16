@@ -3,6 +3,9 @@ package be.kdg.team22.gamesservice.application.game;
 import be.kdg.team22.gamesservice.domain.game.Game;
 import be.kdg.team22.gamesservice.domain.game.GameId;
 import be.kdg.team22.gamesservice.domain.game.GameRepository;
+import be.kdg.team22.gamesservice.domain.game.settings.GameSettingsDefinition;
+import be.kdg.team22.gamesservice.domain.game.settings.SettingDefinition;
+import be.kdg.team22.gamesservice.domain.game.settings.SettingType;
 import be.kdg.team22.gamesservice.infrastructure.game.health.GameHealthChecker;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,8 +31,32 @@ class GameHealthCheckServiceTest {
                 "/health",
                 "Checkers",
                 "A fun board game",
-                "http://img"
+                "http://img",
+                checkersSettingsDefinition()
         );
+    }
+
+    private GameSettingsDefinition checkersSettingsDefinition() {
+        return new GameSettingsDefinition(List.of(
+                new SettingDefinition(
+                        "boardSize",
+                        SettingType.INTEGER,
+                        true,
+                        3,
+                        20,
+                        null,
+                        8
+                ),
+                new SettingDefinition(
+                        "flyingKings",
+                        SettingType.BOOLEAN,
+                        false,
+                        null,
+                        null,
+                        null,
+                        false
+                )
+        ));
     }
 
     @Test
