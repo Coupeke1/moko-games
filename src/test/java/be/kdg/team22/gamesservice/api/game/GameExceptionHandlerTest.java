@@ -5,20 +5,19 @@ import be.kdg.team22.gamesservice.application.game.GameService;
 import be.kdg.team22.gamesservice.domain.game.GameId;
 import be.kdg.team22.gamesservice.domain.game.exceptions.GameNotFoundException;
 import be.kdg.team22.gamesservice.domain.game.exceptions.PlayersListEmptyException;
-import be.kdg.team22.gamesservice.testUtils.TestHttpInputMessage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -54,7 +53,7 @@ class GameExceptionHandlerTest {
     void gameNotFound_returns404() throws Exception {
         doThrow(new GameNotFoundException(new GameId(UUID.randomUUID())))
                 .when(gameService)
-                .startGame(any(StartGameRequest.class));
+                .startGame(any(StartGameRequest.class), isNull());
 
         mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -67,7 +66,7 @@ class GameExceptionHandlerTest {
     void emptyPlayers_returns400() throws Exception {
         doThrow(new PlayersListEmptyException())
                 .when(gameService)
-                .startGame(any(StartGameRequest.class));
+                .startGame(any(StartGameRequest.class), isNull());
 
         mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -79,20 +78,17 @@ class GameExceptionHandlerTest {
     @DisplayName("Malformed JSON → HTTP 400")
     void malformedJson_returns400() throws Exception {
 
-        HttpMessageNotReadableException ex =
-                new HttpMessageNotReadableException(
-                        "Malformed JSON",
-                        null,
-                        new TestHttpInputMessage()
-                );
-
-        doThrow(ex).when(gameService).startGame(any(StartGameRequest.class));
+        String malformedJson = """
+                {
+                  "lobbyId": "00000000-0000-0000-0000-000000000001",
+                  "gameId":
+                }
+                """;
 
         mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(validJson()))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Malformed JSON request"));
+                        .content(malformedJson))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -100,7 +96,7 @@ class GameExceptionHandlerTest {
     void illegalArgument_returns400() throws Exception {
         doThrow(new IllegalArgumentException("Bad input"))
                 .when(gameService)
-                .startGame(any(StartGameRequest.class));
+                .startGame(any(StartGameRequest.class), isNull());
 
         mockMvc.perform(post("/api/games")
                         .contentType(MediaType.APPLICATION_JSON)

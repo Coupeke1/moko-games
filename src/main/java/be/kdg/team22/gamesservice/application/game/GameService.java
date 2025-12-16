@@ -3,10 +3,7 @@ package be.kdg.team22.gamesservice.application.game;
 import be.kdg.team22.gamesservice.api.game.models.RegisterGameRequest;
 import be.kdg.team22.gamesservice.api.game.models.StartGameRequest;
 import be.kdg.team22.gamesservice.api.game.models.StartGameResponseModel;
-import be.kdg.team22.gamesservice.domain.game.Game;
-import be.kdg.team22.gamesservice.domain.game.GameCategory;
-import be.kdg.team22.gamesservice.domain.game.GameId;
-import be.kdg.team22.gamesservice.domain.game.GameRepository;
+import be.kdg.team22.gamesservice.domain.game.*;
 import be.kdg.team22.gamesservice.domain.game.exceptions.*;
 import be.kdg.team22.gamesservice.infrastructure.game.engine.ExternalGamesRepository;
 import be.kdg.team22.gamesservice.infrastructure.game.health.GameHealthChecker;
@@ -14,10 +11,12 @@ import be.kdg.team22.gamesservice.infrastructure.store.ExternalStoreRepository;
 import be.kdg.team22.gamesservice.infrastructure.store.NewStoreEntryModel;
 import be.kdg.team22.gamesservice.infrastructure.store.StoreEntryModel;
 import be.kdg.team22.gamesservice.infrastructure.store.UpdateStoreEntryModel;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -34,7 +33,7 @@ public class GameService {
         this.engine = engine;
     }
 
-    public StartGameResponseModel startGame(final StartGameRequest request) {
+    public StartGameResponseModel startGame(final StartGameRequest request, final Jwt token) {
 
         if (request.players() == null || request.players().isEmpty()) {
             throw new PlayersListEmptyException();
@@ -50,7 +49,7 @@ public class GameService {
 
         game.validateSettings(request.settings());
 
-        UUID instanceId = engine.startExternalGame(game, request);
+        UUID instanceId = engine.startExternalGame(game, request, token);
 
         return new StartGameResponseModel(instanceId);
     }
@@ -69,7 +68,7 @@ public class GameService {
         return gameRepository.findAll();
     }
 
-    public Game register(final RegisterGameRequest request) {
+    public Game create(final RegisterGameRequest request) {
         if (gameRepository.findByName(request.name()).isPresent()) {
             throw new DuplicateGameNameException(request.name());
         }
@@ -88,10 +87,11 @@ public class GameService {
         return game;
     }
 
-    public Game update(final GameId id, final RegisterGameRequest request) {
-        Game game = gameRepository.findById(id)
-                .orElseThrow(() -> new GameNotFoundException(id));
+    public Game register(final String name, final RegisterGameRequest request) {
+        Optional<Game> optionalGame = gameRepository.findByName(name);
+        if (optionalGame.isEmpty()) return create(request);
 
+        Game game = optionalGame.get();
         if (!game.name().equals(request.name()) && gameRepository.findByName(request.name()).isPresent()) {
             throw new DuplicateGameNameException(request.name());
         }
@@ -121,5 +121,15 @@ public class GameService {
                 price,
                 category
         ));
+    }
+
+    public List<Achievement> getAchievements(final GameId id) {
+        Game game = gameRepository.findById(id).orElseThrow(() -> new GameNotFoundException(id));
+        return game.achievements().stream().toList();
+    }
+
+    public Achievement getAchievement(final GameId id, final AchievementKey key) {
+        return gameRepository.findAchievementById(key, id)
+                .orElseThrow(() -> new AchievementNotFoundException(key, id));
     }
 }

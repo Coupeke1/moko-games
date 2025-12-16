@@ -5,6 +5,7 @@ import be.kdg.team22.gamesservice.domain.game.Game;
 import be.kdg.team22.gamesservice.domain.game.exceptions.EngineGameNotFoundException;
 import be.kdg.team22.gamesservice.domain.game.exceptions.EngineNotReachableException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
@@ -16,7 +17,7 @@ import java.util.UUID;
 @Component
 public class ExternalGamesRepository {
 
-    public UUID startExternalGame(Game game, StartGameRequest request) {
+    public UUID startExternalGame(Game game, StartGameRequest request, final Jwt token) {
 
         String engineUrl = game.baseUrl() + game.startEndpoint();
 
@@ -34,6 +35,7 @@ public class ExternalGamesRepository {
                             .queryParam("aiPlayer", request.aiPlayer())
                             .build()
                     )
+                    .header("Authorization", "Bearer " + token.getTokenValue())
                     .body(engineReq)
                     .retrieve()
                     .body(EngineGameResponse.class);
