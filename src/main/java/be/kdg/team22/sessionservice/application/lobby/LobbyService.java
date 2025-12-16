@@ -45,15 +45,12 @@ public class LobbyService {
     public Lobby createLobby(final GameId gameId, final PlayerId ownerId, final CreateLobbyModel model, final Jwt token) {
         Player owner = playerService.findPlayer(ownerId, token);
 
-        Map<String, Object> defaults = gamesRepository.getDefaultSettings(gameId, token);
-
-        Map<String, Object> merged = new java.util.HashMap<>(defaults);
-        if (model.settings() != null) merged.putAll(model.settings());
+        Map<String, Object> input = (model.settings() == null) ? Map.of() : model.settings();
+        Map<String, Object> resolved = gamesRepository.validateAndResolveSettings(gameId, input, token);
 
         int maxPlayers = (model.maxPlayers() == null) ? 2 : model.maxPlayers();
 
-        LobbySettings settings = new LobbySettings(maxPlayers, merged);
-        Lobby lobby = new Lobby(gameId, owner, settings);
+        Lobby lobby = new Lobby(gameId, owner, new LobbySettings(maxPlayers, resolved));
 
         publisher.saveAndPublish(lobby);
         chatRepository.createLobbyChat(lobby.id(), token);
@@ -76,15 +73,17 @@ public class LobbyService {
         return lobby;
     }
 
-    public Lobby updateSettings(final LobbyId lobbyId, final PlayerId ownerId, final UpdateLobbySettingsModel model) {
+    public Lobby updateSettings(final LobbyId lobbyId, final PlayerId ownerId, final UpdateLobbySettingsModel model, final Jwt token) {
         Lobby lobby = findLobby(lobbyId);
 
         int newMaxPlayers = model.maxPlayers() != null ? model.maxPlayers() : lobby.settings().maxPlayers();
 
-        Map<String, Object> merged = new java.util.HashMap<>(lobby.settings().gameSettings());
+        Map<String, Object> merged = new HashMap<>(lobby.settings().gameSettings());
         if (model.settings() != null) merged.putAll(model.settings());
 
-        lobby.changeSettings(ownerId, new LobbySettings(newMaxPlayers, merged));
+        Map<String, Object> resolved = gamesRepository.validateAndResolveSettings(lobby.gameId(), merged, token);
+
+        lobby.changeSettings(ownerId, new LobbySettings(newMaxPlayers, resolved));
         publisher.saveAndPublish(lobby);
         return lobby;
     }

@@ -58,21 +58,19 @@ public class ExternalGamesRepository implements GameRepository {
         }
     }
 
-    public Map<String, Object> getDefaultSettings(GameId gameId, Jwt token) {
+    public Map<String, Object> validateAndResolveSettings(GameId gameId, Map<String, Object> settings, Jwt token) {
         try {
-            GameSettingsSchemaResponse resp = client.get()
-                    .uri("/" + gameId.value() + "/settings")
+            ValidateGameSettingsResponse resp = client.post()
+                    .uri("/" + gameId.value() + "/settings/validate")
                     .header("Authorization", "Bearer " + token.getTokenValue())
+                    .body(new ValidateGameSettingsRequest(settings))
                     .retrieve()
-                    .body(GameSettingsSchemaResponse.class);
+                    .body(ValidateGameSettingsResponse.class);
 
             if (resp == null) throw new GameNotFoundException(gameId.value());
-
-            return resp.defaults() == null ? Map.of() : resp.defaults();
+            return resp.resolvedSettings() == null ? Map.of() : resp.resolvedSettings();
         } catch (HttpClientErrorException ex) {
-            if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
-                throw new GameNotFoundException(gameId.value());
-            }
+            if (ex.getStatusCode() == HttpStatus.NOT_FOUND) throw new GameNotFoundException(gameId.value());
             throw ex;
         } catch (RestClientException ex) {
             throw new GameServiceNotReachableException();

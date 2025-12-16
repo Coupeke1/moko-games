@@ -49,7 +49,7 @@ public class LobbyController {
 
     @PutMapping("/{id}/settings")
     public ResponseEntity<LobbyModel> updateSettings(@PathVariable final UUID id, @RequestBody final UpdateLobbySettingsModel model, @AuthenticationPrincipal final Jwt token) {
-        Lobby lobby = service.updateSettings(LobbyId.from(id), PlayerId.get(token), model);
+        Lobby lobby = service.updateSettings(LobbyId.from(id), PlayerId.get(token), model, token);
         return ResponseEntity.ok(LobbyModel.from(lobby));
     }
 

@@ -36,12 +36,8 @@ Authorization: Bearer {{owner_token}}
 Content-Type: application/json
 
 {
-  "gameId": "9903f087-15d3-445f-b602-94bf8814c9b9",
-  "maxPlayers": 4,
-  "settings": {
-    "type": "ticTacToe",
-    "boardSize": 3
-  }
+  "gameId": "8eb57981-9058-4f50-b379-7baa33d85b04",
+  "maxPlayers": 4
 }
 
 > {%
@@ -63,11 +59,9 @@ Authorization: Bearer {{owner_token}}
 Content-Type: application/json
 
 {
-  "maxPlayers": 5,
+  "maxPlayers": 2,
   "settings": {
-    "type": "checkers",
-    "boardSize": 12,
-    "flyingKings": true
+    "boardSize": 5
   }
 }
 
