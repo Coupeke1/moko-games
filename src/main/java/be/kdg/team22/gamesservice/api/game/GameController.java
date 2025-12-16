@@ -88,7 +88,7 @@ public class GameController {
     }
 
     @GetMapping("/{id}/settings")
-    public ResponseEntity<GameSettingsSchemaModel> getGameSettingsSchema(@PathVariable UUID id) {
+    public ResponseEntity<GameSettingsSchemaModel> getGameSettingsSchema(@PathVariable final UUID id) {
         Game game = service.findById(GameId.from(id));
 
         return ResponseEntity.ok(GameSettingsSchemaModel.from(game.settingsDefinition()));
@@ -96,8 +96,8 @@ public class GameController {
 
     @PostMapping("/{id}/settings/validate")
     public ResponseEntity<ValidateGameSettingsResponse> validateSettings(
-            @PathVariable UUID id,
-            @RequestBody(required = false) ValidateGameSettingsRequest request
+            @PathVariable final UUID id,
+            @RequestBody(required = false) final ValidateGameSettingsRequest request
     ) {
         Game game = service.findById(GameId.from(id));
 

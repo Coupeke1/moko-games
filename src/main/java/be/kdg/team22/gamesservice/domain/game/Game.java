@@ -168,7 +168,7 @@ public class Game {
     public void addAchievement(final Achievement achievement) {
         boolean added = this.achievements.add(achievement);
         if (!added) {
-            throw new achievementKeyAlreadyExistsException(achievement.key().key());
+            throw new AchievementKeyAlreadyExistsException(achievement.key().key());
         }
         this.updatedAt = Instant.now();
     }
