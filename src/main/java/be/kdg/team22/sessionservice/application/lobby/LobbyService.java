@@ -19,9 +19,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Transactional
@@ -45,15 +43,20 @@ public class LobbyService {
     }
 
     public Lobby createLobby(final GameId gameId, final PlayerId ownerId, final CreateLobbyModel model, final Jwt token) {
-
         Player owner = playerService.findPlayer(ownerId, token);
-        LobbySettings settings = mapToDomainSettings(model.settings(), model.maxPlayers());
+
+        Map<String, Object> defaults = gamesRepository.getDefaultSettings(gameId, token);
+
+        Map<String, Object> merged = new java.util.HashMap<>(defaults);
+        if (model.settings() != null) merged.putAll(model.settings());
+
+        int maxPlayers = (model.maxPlayers() == null) ? 2 : model.maxPlayers();
+
+        LobbySettings settings = new LobbySettings(maxPlayers, merged);
         Lobby lobby = new Lobby(gameId, owner, settings);
 
         publisher.saveAndPublish(lobby);
-
         chatRepository.createLobbyChat(lobby.id(), token);
-
         return lobby;
     }
 
@@ -75,9 +78,13 @@ public class LobbyService {
 
     public Lobby updateSettings(final LobbyId lobbyId, final PlayerId ownerId, final UpdateLobbySettingsModel model) {
         Lobby lobby = findLobby(lobbyId);
-        LobbySettings newSettings = mapToDomainSettings(model.settings(), model.maxPlayers());
-        lobby.changeSettings(ownerId, newSettings);
 
+        int newMaxPlayers = model.maxPlayers() != null ? model.maxPlayers() : lobby.settings().maxPlayers();
+
+        Map<String, Object> merged = new java.util.HashMap<>(lobby.settings().gameSettings());
+        if (model.settings() != null) merged.putAll(model.settings());
+
+        lobby.changeSettings(ownerId, new LobbySettings(newMaxPlayers, merged));
         publisher.saveAndPublish(lobby);
         return lobby;
     }
@@ -113,5 +120,9 @@ public class LobbyService {
 
     public List<Lobby> getInvitesFromPlayer(PlayerId id, GameId game) {
         return repository.findInvitesFromPlayerId(id, game);
+    }
+
+    public Optional<Lobby> findByStartedGameId(GameId gameId) {
+        return repository.findByStartedGameId(gameId);
     }
 }
