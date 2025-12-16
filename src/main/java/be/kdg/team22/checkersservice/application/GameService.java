@@ -2,6 +2,7 @@ package be.kdg.team22.checkersservice.application;
 
 import be.kdg.team22.checkersservice.api.models.CreateGameModel;
 import be.kdg.team22.checkersservice.application.events.GameEventPublisher;
+import be.kdg.team22.checkersservice.config.GameInfoProperties;
 import be.kdg.team22.checkersservice.domain.events.*;
 import be.kdg.team22.checkersservice.domain.events.exceptions.PublishAchievementException;
 import be.kdg.team22.checkersservice.domain.events.exceptions.RabbitNotReachableException;
@@ -28,13 +29,15 @@ public class GameService {
     private final GameRepository repository;
     private final GameEventPublisher publisher;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final GameInfoProperties gameInfo;
 
     private final Logger logger;
 
-    public GameService(final GameRepository repository, final GameEventPublisher publisher, final ApplicationEventPublisher applicationEventPublisher) {
+    public GameService(final GameRepository repository, final GameEventPublisher publisher, final ApplicationEventPublisher applicationEventPublisher, final GameInfoProperties gameInfo) {
         this.repository = repository;
         this.publisher = publisher;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.gameInfo = gameInfo;
         logger = LoggerFactory.getLogger(GameService.class);
     }
 
@@ -56,12 +59,14 @@ public class GameService {
         MoveResult result = game.requestMove(move);
         repository.save(game);
 
+        String gameName = gameInfo.name();
         try {
             switch (game.status()) {
                 case GameStatus.DRAW -> game.players().forEach(player ->
                         publisher.publishAchievement(
                                 new GameAchievementEvent(
-                                        AchievementCode.CHECKERS_DRAW.name(),
+                                        AchievementCode.DRAW.name(),
+                                        gameName,
                                         game.id().value(),
                                         player.id().value(),
                                         Instant.now()
@@ -70,7 +75,8 @@ public class GameService {
                 case GameStatus.BLACK_WIN -> {
                     publisher.publishAchievement(
                             new GameAchievementEvent(
-                                    AchievementCode.CHECKERS_WIN.name(),
+                                    AchievementCode.WIN.name(),
+                                    gameName,
                                     game.id().value(),
                                     game.playerWithRole(PlayerRole.BLACK).id().value(),
                                     Instant.now()
@@ -78,7 +84,8 @@ public class GameService {
                     );
                     publisher.publishAchievement(
                             new GameAchievementEvent(
-                                    AchievementCode.CHECKERS_LOSS.name(),
+                                    AchievementCode.LOSS.name(),
+                                    gameName,
                                     game.id().value(),
                                     game.playerWithRole(PlayerRole.WHITE).id().value(),
                                     Instant.now())
@@ -87,7 +94,8 @@ public class GameService {
                 case GameStatus.WHITE_WIN -> {
                     publisher.publishAchievement(
                             new GameAchievementEvent(
-                                    AchievementCode.CHECKERS_WIN.name(),
+                                    AchievementCode.WIN.name(),
+                                    gameName,
                                     game.id().value(),
                                     game.playerWithRole(PlayerRole.WHITE).id().value(),
                                     Instant.now()
@@ -95,7 +103,8 @@ public class GameService {
                     );
                     publisher.publishAchievement(
                             new GameAchievementEvent(
-                                    AchievementCode.CHECKERS_LOSS.name(),
+                                    AchievementCode.LOSS.name(),
+                                    gameName,
                                     game.id().value(),
                                     game.playerWithRole(PlayerRole.BLACK).id().value(),
                                     Instant.now())
@@ -106,7 +115,8 @@ public class GameService {
             if (result.promotion()) {
                 publisher.publishAchievement(
                         new GameAchievementEvent(
-                                AchievementCode.CHECKERS_PROMOTION.name(),
+                                AchievementCode.PROMOTION.name(),
+                                gameName,
                                 game.id().value(),
                                 move.playerId().value(),
                                 Instant.now()
@@ -117,7 +127,8 @@ public class GameService {
             if (result.multiCapture()) {
                 publisher.publishAchievement(
                         new GameAchievementEvent(
-                                AchievementCode.CHECKERS_MULTICAPTURE.name(),
+                                AchievementCode.MULTICAPTURE.name(),
+                                gameName,
                                 game.id().value(),
                                 move.playerId().value(),
                                 Instant.now()
@@ -128,7 +139,8 @@ public class GameService {
             if (result.kingCount() >= 3) {
                 publisher.publishAchievement(
                         new GameAchievementEvent(
-                                AchievementCode.CHECKERS_THREE_KINGS.name(),
+                                AchievementCode.THREE_KINGS.name(),
+                                gameName,
                                 game.id().value(),
                                 move.playerId().value(),
                                 Instant.now()
