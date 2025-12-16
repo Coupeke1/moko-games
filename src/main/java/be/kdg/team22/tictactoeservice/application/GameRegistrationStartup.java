@@ -2,16 +2,13 @@ package be.kdg.team22.tictactoeservice.application;
 
 import be.kdg.team22.tictactoeservice.config.GameInfoProperties;
 import be.kdg.team22.tictactoeservice.domain.register.exceptions.GameNotRegisteredException;
-import be.kdg.team22.tictactoeservice.domain.register.GameRegisterId;
 import be.kdg.team22.tictactoeservice.infrastructure.register.ExternalRegisterRepository;
-import be.kdg.team22.tictactoeservice.infrastructure.register.GameResponse;
 import be.kdg.team22.tictactoeservice.infrastructure.register.RegisterAchievementRequest;
 import be.kdg.team22.tictactoeservice.infrastructure.register.RegisterGameRequest;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component

@@ -42,25 +42,30 @@ public class GameService {
         logger = LoggerFactory.getLogger(GameService.class);
     }
 
-    public Game startGame(final CreateGameModel model, final boolean aiPlayer) {
+    public Game create(final PlayerId playerId, final CreateGameModel model, final boolean aiPlayer) {
         List<PlayerId> players = model.players().stream().map(PlayerId::new).toList();
+        if (players.stream().noneMatch(p -> p.equals(playerId)))
+            throw new PlayerNotInThisGameException();
         Game game = Game.create(config.minSize(), config.maxSize(), aiPlayer ? 3 : model.settings().boardSize(), players, aiPlayer);
         repository.save(game);
         return game;
     }
 
-    public Game getGame(final GameId id, final PlayerId playerId) {
-        Game game = repository.findById(id).orElseThrow(id::notFound);
-        if (game.players().stream().noneMatch(p -> p.id().equals(playerId))) {
+    public Game getById(final GameId id) {
+        return repository.findById(id).orElseThrow(id::notFound);
+    }
+
+    public Game requestState(final GameId id, final PlayerId playerId) {
+        Game game = getById(id);
+        if (game.players().stream().noneMatch(p -> p.id().equals(playerId)))
             throw new PlayerNotInThisGameException();
-        }
         return game;
     }
 
     public Game requestMove(final GameId id, final PlayerId playerId, final Move move) {
         if (!playerId.equals(move.playerId())) throw new PlayerIdentityMismatchException();
 
-        Game game = getGame(id, playerId);
+        Game game = getById(id);
         game.requestMove(move);
         repository.save(game);
 
