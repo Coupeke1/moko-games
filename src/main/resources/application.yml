@@ -1,6 +1,10 @@
-﻿spring:
+﻿server.port: 8087
+
+spring:
   application:
     name: checkers-service
+  config:
+    import: classpath:game-info.yml
   data:
     redis:
       host: ${SPRING_DATA_REDIS_HOST:localhost}
@@ -17,9 +21,6 @@
       resourceserver:
         jwt:
           jwk-set-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI:http://localhost:8180/realms/moko/protocol/openid-connect/certs}
-
-server:
-  port: 8087
 
 management:
   endpoints:
@@ -42,15 +43,3 @@ business:
     url: ${BUSINESS_AI_URL:http://localhost:3333} #for deployment https://team3.techtitans.be
 
 cors.allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5175,http://localhost:8084}
-
-game-info:
-  name: ${GAME_NAME:checkers}
-  title: ${GAME_TITLE:Checkers}
-  description: ${GAME_DESCRIPTION:Checkers is played by two opponents on opposite sides of the game board.}
-  image: ${GAME_IMAGE:https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.etsystatic.com%2F9295891%2Fr%2Fil%2Ffe59d4%2F1941663431%2Fil_fullxfull.1941663431_27n8.jpg&f=1&nofb=1&ipt=19a33fabc9ec064ede9375f4c348d4e071701043299d452fd9650d057ea22329}
-  backend-url: ${GAME_BACKEND_URL:http://host.docker.internal:8087}
-  frontend-url: ${GAME_FRONTEND_URL:http://localhost:5175/checkers/game}
-  start-endpoint: ${GAME_START_ENDPOINT:/api/games}
-  health-endpoint: ${GAME_HEALTH_ENDPOINT:/actuator/health}
-  price: 45
-  category: PARTY

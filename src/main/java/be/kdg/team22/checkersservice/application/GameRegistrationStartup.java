@@ -1,14 +1,15 @@
 package be.kdg.team22.checkersservice.application;
 
 import be.kdg.team22.checkersservice.config.GameInfoProperties;
-import be.kdg.team22.checkersservice.domain.register.GameRegisterId;
 import be.kdg.team22.checkersservice.domain.register.exceptions.GameNotRegisteredException;
 import be.kdg.team22.checkersservice.infrastructure.register.ExternalRegisterRepository;
-import be.kdg.team22.checkersservice.infrastructure.register.GameResponse;
+import be.kdg.team22.checkersservice.infrastructure.register.RegisterAchievementRequest;
 import be.kdg.team22.checkersservice.infrastructure.register.RegisterGameRequest;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class GameRegistrationStartup {
@@ -22,6 +23,17 @@ public class GameRegistrationStartup {
 
     @EventListener(ApplicationReadyEvent.class)
     public void registerGameOnStartup() {
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException ignored) {}
+
+        List<RegisterAchievementRequest> achievementRequests = gameInfo.achievements().stream().map(achievement -> new RegisterAchievementRequest(
+                achievement.key(),
+                achievement.name(),
+                achievement.description(),
+                achievement.levels()
+        )).toList();
+
         RegisterGameRequest request = new RegisterGameRequest(
                 gameInfo.name(),
                 gameInfo.backendUrl(),
@@ -32,14 +44,9 @@ public class GameRegistrationStartup {
                 gameInfo.description(),
                 gameInfo.image(),
                 gameInfo.price(),
-                gameInfo.category()
+                gameInfo.category(),
+                achievementRequests
         );
-
-        GameResponse existingGame = externalRegisterRepository.getGame(gameInfo.name());
-        if (existingGame != null) {
-            externalRegisterRepository.updateGame(GameRegisterId.fromUuid(existingGame.id()), request);
-            return;
-        }
 
         boolean created = externalRegisterRepository.registerGame(request);
         if (!created) throw new GameNotRegisteredException();

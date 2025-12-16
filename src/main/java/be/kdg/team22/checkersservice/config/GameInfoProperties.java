@@ -4,6 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Component
 @ConfigurationProperties(prefix = "game-info")
@@ -18,6 +19,46 @@ public class GameInfoProperties {
     private String healthEndpoint;
     private BigDecimal price;
     private String category;
+    private List<Achievement> achievements;
+
+    public static class Achievement {
+        private String key;
+        private String name;
+        private String description;
+        private int levels;
+
+        public String key() {
+            return key;
+        }
+
+        public void setKey(String key) {
+            this.key = key;
+        }
+
+        public String name() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String description() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public int levels() {
+            return levels;
+        }
+
+        public void setLevels(int levels) {
+            this.levels = levels;
+        }
+    }
 
     public String name() {
         return name;
@@ -97,5 +138,13 @@ public class GameInfoProperties {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public List<Achievement> achievements() {
+        return achievements;
+    }
+
+    public void setAchievements(List<Achievement> achievements) {
+        this.achievements = achievements;
     }
 }
