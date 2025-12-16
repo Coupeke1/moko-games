@@ -3,28 +3,25 @@ import CancelIcon from "@/components/icons/cancel-icon";
 import PlayIcon from "@/components/icons/play-icon";
 import Input from "@/components/inputs/input";
 import Column from "@/components/layout/column";
-import { Gap } from "@/components/layout/gap";
+import {Gap} from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
-import { GridSize } from "@/components/layout/grid/size";
+import {GridSize} from "@/components/layout/grid/size";
 import ErrorState from "@/components/state/error";
 import LoadingState from "@/components/state/loading";
 import TabRow from "@/components/tabs/links/row";
 import Page from "@/features/lobby/components/page";
-import { getTabs } from "@/features/lobby/components/tabs";
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
-import { useSession } from "@/features/lobby/hooks/use-session";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {getTabs} from "@/features/lobby/components/tabs";
+import {useEffect, useState} from "react";
+import {useNavigate, useParams} from "react-router";
+import {useSession} from "@/features/lobby/hooks/use-session";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
 import showToast from "@/components/toast";
-import {
-    allPlayersReady,
-    updateSettings,
-} from "@/features/lobby/services/lobby.ts";
+import {allPlayersReady, updateSettings,} from "@/features/lobby/services/lobby.ts";
 
 export default function LobbySettingsPage() {
     const client = useQueryClient();
     const navigate = useNavigate();
-    const { id } = useParams();
+    const {id} = useParams();
 
     useEffect(() => {
         if (!id || id.length <= 0) navigate("/library");
@@ -42,8 +39,8 @@ export default function LobbySettingsPage() {
     } = useSession();
 
     const save = useMutation({
-        mutationFn: async ({ lobby, game }: { lobby: string; game: string }) =>
-            await updateSettings(lobby, game, size),
+        mutationFn: async ({lobby}: { lobby: string; game: string }) =>
+            await updateSettings(lobby, size),
         onSuccess: async (_data, variables) => {
             await client.invalidateQueries({
                 queryKey: ["lobby", variables.lobby],
@@ -63,14 +60,14 @@ export default function LobbySettingsPage() {
     if (isLoading || !lobby || !profile || !game)
         return (
             <Page>
-                <LoadingState />
+                <LoadingState/>
             </Page>
         );
 
     if (isError)
         return (
             <Page>
-                <ErrorState />
+                <ErrorState/>
             </Page>
         );
 
@@ -79,16 +76,16 @@ export default function LobbySettingsPage() {
     return (
         <Page>
             <Column gap={Gap.Large}>
-                <TabRow tabs={getTabs(lobby.id)} />
+                <TabRow tabs={getTabs(lobby.id)}/>
 
                 {isOwner && (
                     <Grid size={GridSize.Small}>
                         <Button disabled={!ready} fullWidth={true}>
-                            <PlayIcon />
+                            <PlayIcon/>
                         </Button>
 
                         <Button fullWidth={true}>
-                            <CancelIcon />
+                            <CancelIcon/>
                         </Button>
                     </Grid>
                 )}
@@ -104,7 +101,7 @@ export default function LobbySettingsPage() {
                 {isOwner && (
                     <Button
                         onClick={() =>
-                            save.mutate({ lobby: lobby.id, game: game.title })
+                            save.mutate({lobby: lobby.id, game: game.title})
                         }
                     >
                         Save

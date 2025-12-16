@@ -1,27 +1,46 @@
-import type { Lobby } from "@/features/lobby/models/lobby.ts";
-import { isClosed, shouldStart } from "@/features/lobby/services/lobby.ts";
-import { isPlayerInLobby } from "@/features/lobby/services/players.ts";
-import { watchLobby } from "@/features/lobby/services/socket.ts";
-import { useSocketStore } from "@/stores/socket-store.ts";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router";
-import { type Subscription } from "rxjs";
+import type {Lobby} from "@/features/lobby/models/lobby.ts";
+import {isClosed, shouldStart} from "@/features/lobby/services/lobby.ts";
+import {isPlayerInLobby} from "@/features/lobby/services/players.ts";
+import {watchLobby} from "@/features/lobby/services/socket.ts";
+import {useSocketStore} from "@/stores/socket-store.ts";
+import {useQuery, useQueryClient} from "@tanstack/react-query";
+import {useCallback, useEffect, useRef, useState} from "react";
+import {useNavigate} from "react-router";
+import {type Subscription} from "rxjs";
 
 export function useLobby(lobbyId?: string | null, userId?: string | null) {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
-    const { connect, disconnect, isConnected } = useSocketStore();
+    const {connect, disconnect, isConnected} = useSocketStore();
 
     const enabled = !!lobbyId && !!userId;
     const subscription = useRef<Subscription | null>(null);
+    const redirectTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [isInitialized, setInitialized] = useState(false);
+
+    const cancelRedirect = useCallback(() => {
+        if (!redirectTimeout.current) return;
+        clearTimeout(redirectTimeout.current);
+        redirectTimeout.current = null;
+    }, []);
+
+    const scheduleRedirectToLibrary = useCallback(() => {
+        if (redirectTimeout.current) return;
+
+        redirectTimeout.current = setTimeout(() => {
+            redirectTimeout.current = null;
+            navigate("/library", {replace: true});
+        }, 5_000);
+    }, [navigate]);
 
     useEffect(() => {
         if (!enabled) return;
         connect();
-        return () => disconnect();
-    }, [enabled, connect, disconnect]);
+        return () => {
+            cancelRedirect();
+            disconnect();
+        };
+    }, [enabled, connect, disconnect, cancelRedirect]);
 
     const lobby = useQuery<Lobby>({
         queryKey: ["lobby", lobbyId],
@@ -34,35 +53,50 @@ export function useLobby(lobbyId?: string | null, userId?: string | null) {
 
     useEffect(() => {
         if (!enabled || !lobbyId || !isConnected) return;
+        if (subscription.current && !subscription.current.closed) return;
 
-        if (subscription.current) return;
         let isFirst = true;
 
         subscription.current = watchLobby(lobbyId).subscribe({
             next: (lobby) => {
                 queryClient.setQueryData<Lobby>(["lobby", lobbyId], lobby);
 
-                if (isClosed(lobby)) navigate("/library");
-                if (!isPlayerInLobby(userId, lobby)) navigate("/library");
-                if (shouldStart(lobby)) navigate(`/lobbies/${lobby.id}/game`);
+                const kicked = !isPlayerInLobby(userId, lobby);
+                const closed = isClosed(lobby);
+
+                if (shouldStart(lobby)) {
+                    cancelRedirect();
+                    navigate(`/lobbies/${lobby.id}/game`, {replace: true});
+                }
+
+                if (kicked || closed) scheduleRedirectToLibrary();
+                else cancelRedirect();
 
                 if (isFirst) {
                     isFirst = false;
                     setInitialized(true);
                 }
             },
-            error: () => setInitialized(false),
+            error: (err) => {
+                console.error("watchLobby error", err);
+                subscription.current = null;
+                setInitialized(false);
+                scheduleRedirectToLibrary();
+            },
+            complete: () => {
+                subscription.current = null;
+                setInitialized(false);
+                scheduleRedirectToLibrary();
+            },
         });
 
         return () => {
-            if (subscription.current) {
-                subscription.current.unsubscribe();
-                subscription.current = null;
-            }
-
+            subscription.current?.unsubscribe();
+            subscription.current = null;
+            cancelRedirect();
             setInitialized(false);
         };
-    }, [enabled, lobbyId, userId, isConnected, queryClient, navigate]);
+    }, [enabled, lobbyId, userId, isConnected, queryClient, navigate, scheduleRedirectToLibrary, cancelRedirect,]);
 
     return {
         lobby: lobby.data ?? null,
