@@ -76,7 +76,7 @@ class DbLobbyRepositoryTest {
         assertThat(db.bot().image()).isEqualTo("bot.png");
         assertThat(db.bot().ready()).isTrue();
         LobbySettings mapped = db.settings();
-        assertThat(mapped.maxPlayers()).isEqualTo(4);
+        assertThat(mapped.maxPlayers()).isEqualTo(2);
 
         assertThat(db.startedGameId()).isEqualTo(startedGameId);
     }
