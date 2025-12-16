@@ -36,7 +36,7 @@ public class LibraryController {
         filter.query = Optional.ofNullable(query);
         filter.favourite = Optional.ofNullable(favourite);
 
-        LibraryGamesModel model = service.getLibraryForUser(userId, token, filter);
+        LibraryGamesModel model = service.getLibraryForUser(userId, filter);
         return ResponseEntity.ok(model.games());
     }
 

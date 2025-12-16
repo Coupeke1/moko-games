@@ -1,6 +1,6 @@
 package be.kdg.team22.userservice.application.profile;
 
-import be.kdg.team22.userservice.domain.achievement.AchievementRepository;
+import be.kdg.team22.userservice.application.achievement.AchievementService;
 import be.kdg.team22.userservice.domain.library.LibraryRepository;
 import be.kdg.team22.userservice.domain.profile.*;
 import be.kdg.team22.userservice.domain.profile.exceptions.CannotUpdateProfileException;
@@ -17,17 +17,19 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 class ProfileServiceTest {
 
     private final ProfileRepository repo = mock(ProfileRepository.class);
     private final ExternalImageRepository imageRepo = mock(ExternalImageRepository.class);
-    private final AchievementRepository achievementRepo = mock(AchievementRepository.class);
     private final LibraryRepository libraryRepo = mock(LibraryRepository.class);
     private final ExternalGamesRepository gameRepo = mock(ExternalGamesRepository.class);
-    private final ProfileService service = new ProfileService(repo, imageRepo, achievementRepo, libraryRepo, gameRepo);
+    @SuppressWarnings("unchecked")
+    private final org.springframework.beans.factory.ObjectProvider<AchievementService> achievementServiceProvider = mock(org.springframework.beans.factory.ObjectProvider.class);
+    private final ProfileService service = new ProfileService(repo, imageRepo, libraryRepo, gameRepo, achievementServiceProvider);
 
     private Jwt token(String sub, String username, String email) {
         return Jwt.withTokenValue("dummy")
