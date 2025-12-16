@@ -1,9 +1,13 @@
 package be.kdg.team22.gamesservice.domain.game;
 
 import be.kdg.team22.gamesservice.domain.game.exceptions.*;
+import be.kdg.team22.gamesservice.domain.game.settings.GameSettingsDefinition;
+import be.kdg.team22.gamesservice.domain.game.settings.SettingDefinition;
+import be.kdg.team22.gamesservice.domain.game.settings.SettingType;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,12 +24,30 @@ class GameTest {
                 gid(),
                 "engine-name",
                 "http://localhost",
-                "/start",
+                "http://frontend",
                 "/start",
                 "/health",
                 "Title",
                 "Description",
-                "http://img");
+                "http://img",
+                defaultSettings()
+        );
+    }
+
+    private GameSettingsDefinition defaultSettings() {
+        return new GameSettingsDefinition(
+                List.of(
+                        new SettingDefinition(
+                                "dummy",
+                                SettingType.STRING,
+                                false,
+                                null,
+                                null,
+                                null,
+                                "dummy"
+                        )
+                )
+        );
     }
 
     @Test
@@ -41,7 +63,8 @@ class GameTest {
                 "/health",
                 "Title",
                 "Desc",
-                "http://img"
+                "http://img",
+                defaultSettings()
         );
 
         assertThat(game.id()).isEqualTo(id);
@@ -77,7 +100,8 @@ class GameTest {
                 "Desc",
                 "http://img",
                 created,
-                updated
+                updated,
+                defaultSettings()
         );
 
         assertThat(game.healthy()).isEqualTo(true);
@@ -98,7 +122,8 @@ class GameTest {
                         "/health",
                         "Title",
                         "Desc",
-                        "http://img")
+                        "http://img",
+                        defaultSettings())
         ).isInstanceOf(GameIdNullException.class);
     }
 
@@ -114,7 +139,8 @@ class GameTest {
                         "/health",
                         "Title",
                         "Desc",
-                        "http://img"
+                        "http://img",
+                        defaultSettings()
                 )
         ).isInstanceOf(GameNameInvalidException.class);
     }
@@ -131,7 +157,8 @@ class GameTest {
                         "/health",
                         "Title",
                         "Desc",
-                        "http://img"
+                        "http://img",
+                        defaultSettings()
                 )
         ).isInstanceOf(GameBaseUrlInvalidException.class);
     }
@@ -148,7 +175,8 @@ class GameTest {
                         "/health",
                         "Title",
                         "Desc",
-                        "http://img"
+                        "http://img",
+                        defaultSettings()
                 )
         ).isInstanceOf(GameStartEndpointInvalidException.class);
     }
@@ -165,7 +193,8 @@ class GameTest {
                         " ",
                         "Title",
                         "Desc",
-                        "http://img"
+                        "http://img",
+                        defaultSettings()
                 )
         ).isInstanceOf(GameHealthEndpointInvalidException.class);
     }
@@ -182,7 +211,8 @@ class GameTest {
                         "/health",
                         "",
                         "Desc",
-                        "http://img"
+                        "http://img",
+                        defaultSettings()
                 )
         ).isInstanceOf(GameMetadataException.class);
     }

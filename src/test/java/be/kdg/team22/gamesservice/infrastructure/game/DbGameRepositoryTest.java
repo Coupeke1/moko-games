@@ -3,6 +3,9 @@ package be.kdg.team22.gamesservice.infrastructure.game;
 import be.kdg.team22.gamesservice.config.TestcontainersConfig;
 import be.kdg.team22.gamesservice.domain.game.Game;
 import be.kdg.team22.gamesservice.domain.game.GameId;
+import be.kdg.team22.gamesservice.domain.game.settings.GameSettingsDefinition;
+import be.kdg.team22.gamesservice.domain.game.settings.SettingDefinition;
+import be.kdg.team22.gamesservice.domain.game.settings.SettingType;
 import be.kdg.team22.gamesservice.infrastructure.game.jpa.GameEntity;
 import be.kdg.team22.gamesservice.infrastructure.game.jpa.GameJpaRepository;
 import org.junit.jupiter.api.Test;
@@ -12,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,6 +28,23 @@ class DbGameRepositoryTest {
 
     @Autowired
     private GameJpaRepository jpaRepo;
+
+
+    private GameSettingsDefinition defaultSettings() {
+        return new GameSettingsDefinition(
+                List.of(
+                        new SettingDefinition(
+                                "dummy",
+                                SettingType.STRING,
+                                false,
+                                null,
+                                null,
+                                null,
+                                "dummy"
+                        )
+                )
+        );
+    }
 
     private GameEntity createEntity(UUID id) {
         return new GameEntity(
@@ -38,6 +59,7 @@ class DbGameRepositoryTest {
                 "Title",
                 "Description",
                 "http://image",
+                defaultSettings(),
                 Instant.parse("2024-01-01T10:00:00Z"),
                 Instant.parse("2024-01-02T10:00:00Z")
         );
@@ -79,7 +101,8 @@ class DbGameRepositoryTest {
                 "D",
                 "http://img",
                 Instant.parse("2024-01-01T10:00:00Z"),
-                Instant.parse("2024-01-01T12:00:00Z")
+                Instant.parse("2024-01-01T12:00:00Z"),
+                defaultSettings()
         );
 
         GameEntity entity = GameEntity.fromDomain(domain);

@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -84,5 +85,27 @@ public class GameController {
     public ResponseEntity<AchievementDetailsModel> getAchievement(final @PathVariable UUID id, final @PathVariable String key) {
         Achievement achievement = service.getAchievement(GameId.from(id), AchievementKey.fromString(key));
         return ResponseEntity.ok(AchievementDetailsModel.from(achievement));
+    }
+
+    @GetMapping("/{id}/settings")
+    public ResponseEntity<GameSettingsSchemaModel> getGameSettingsSchema(@PathVariable final UUID id) {
+        Game game = service.findById(GameId.from(id));
+
+        return ResponseEntity.ok(GameSettingsSchemaModel.from(game.settingsDefinition()));
+    }
+
+    @PostMapping("/{id}/settings/validate")
+    public ResponseEntity<ValidateGameSettingsResponse> validateSettings(
+            @PathVariable final UUID id,
+            @RequestBody(required = false) final ValidateGameSettingsRequest request
+    ) {
+        Game game = service.findById(GameId.from(id));
+
+        Map<String, Object> input = (request == null || request.settings() == null)
+                ? Map.of()
+                : request.settings();
+
+        Map<String, Object> resolved = game.validateSettings(input);
+        return ResponseEntity.ok(new ValidateGameSettingsResponse(resolved));
     }
 }

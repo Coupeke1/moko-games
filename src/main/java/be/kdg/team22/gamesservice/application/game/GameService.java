@@ -5,6 +5,7 @@ import be.kdg.team22.gamesservice.api.game.models.StartGameRequest;
 import be.kdg.team22.gamesservice.api.game.models.StartGameResponseModel;
 import be.kdg.team22.gamesservice.domain.game.*;
 import be.kdg.team22.gamesservice.domain.game.exceptions.*;
+import be.kdg.team22.gamesservice.domain.game.settings.GameSettingsValidator;
 import be.kdg.team22.gamesservice.infrastructure.game.engine.ExternalGamesRepository;
 import be.kdg.team22.gamesservice.infrastructure.game.health.GameHealthChecker;
 import be.kdg.team22.gamesservice.infrastructure.store.ExternalStoreRepository;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -40,14 +42,24 @@ public class GameService {
         }
 
         if (request.settings() == null) {
-            throw new InvalidGameConfigurationException("Game settings cannot be null");
+            throw InvalidGameSettingsException.missingSettings();
         }
 
         GameId id = GameId.from(request.gameId());
         Game game = gameRepository.findById(id)
                 .orElseThrow(() -> new GameNotFoundException(id));
 
-        UUID instanceId = engine.startExternalGame(game, request, token);
+        Map<String, Object> resolvedSettings = game.validateSettings(request.settings());
+
+        StartGameRequest resolvedRequest = new StartGameRequest(
+                request.lobbyId(),
+                request.gameId(),
+                request.players(),
+                resolvedSettings,
+                request.aiPlayer()
+        );
+
+        UUID instanceId = engine.startExternalGame(game, resolvedRequest, token);
 
         return new StartGameResponseModel(instanceId);
     }
@@ -71,10 +83,9 @@ public class GameService {
             throw new DuplicateGameNameException(request.name());
         }
 
-        boolean isHealthy = gameHealthChecker.isHealthy(request);
-        if (!isHealthy) {
-            throw new GameUnhealthyException(request.name());
-        }
+        GameSettingsValidator.validateDefinition(request.settingsDefinition());
+
+        if (!gameHealthChecker.isHealthy(request)) throw new GameUnhealthyException(request.name());
 
         Game game = Game.register(request);
         game.updateHealthStatus(true);

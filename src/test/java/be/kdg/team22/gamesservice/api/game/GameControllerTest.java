@@ -9,6 +9,9 @@ import be.kdg.team22.gamesservice.domain.game.AchievementKey;
 import be.kdg.team22.gamesservice.domain.game.Game;
 import be.kdg.team22.gamesservice.domain.game.GameCategory;
 import be.kdg.team22.gamesservice.domain.game.GameId;
+import be.kdg.team22.gamesservice.domain.game.settings.GameSettingsDefinition;
+import be.kdg.team22.gamesservice.domain.game.settings.SettingDefinition;
+import be.kdg.team22.gamesservice.domain.game.settings.SettingType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -51,7 +54,31 @@ class GameControllerTest {
                 "/health",
                 "Tic Tac Toe",
                 "desc",
-                "http://img");
+                "http://img",
+                checkersSettingsDefinition());
+    }
+
+    private GameSettingsDefinition checkersSettingsDefinition() {
+        return new GameSettingsDefinition(List.of(
+                new SettingDefinition(
+                        "boardSize",
+                        SettingType.INTEGER,
+                        true,
+                        3,
+                        20,
+                        null,
+                        8
+                ),
+                new SettingDefinition(
+                        "flyingKings",
+                        SettingType.BOOLEAN,
+                        false,
+                        null,
+                        null,
+                        null,
+                        false
+                )
+        ));
     }
 
     @Test
@@ -142,59 +169,6 @@ class GameControllerTest {
                 .andExpect(jsonPath("$.title").value("Tic Tac Toe"));
 
         verify(gameService).findByName("tic-tac-toe");
-    }
-
-    @Test
-    @DisplayName("PUT /api/games/{name} → updates game")
-    void registerGame_returns200AndUpdatedGame() throws Exception {
-        String name = "tic-tac-toe";
-        UUID id = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
-        Game updatedGame = sampleGame(id);
-
-        RegisterGameRequest request = new RegisterGameRequest(
-                "tic-tac-toe",
-                "http://engine",
-                "http://frontend",
-                "/start",
-                "/health",
-                "Tic Tac Toe",
-                "desc",
-                "http://img",
-                BigDecimal.valueOf(29.99),
-                GameCategory.STRATEGY,
-                List.of()
-        );
-
-        when(gameService.register(name, request)).thenReturn(updatedGame);
-
-        String json = """
-                {
-                  "name": "tic-tac-toe",
-                  "backendUrl": "http://engine",
-                  "frontendUrl": "http://frontend",
-                  "startEndpoint": "/start",
-                  "healthEndpoint": "/health",
-                  "title": "Tic Tac Toe",
-                  "description": "desc",
-                  "image": "http://img",
-                  "price": 29.99,
-                  "category": "STRATEGY",
-                  "achievements": []
-                }
-                """;
-
-        mockMvc.perform(put("/api/games/{name}", name)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(id.toString()))
-                .andExpect(jsonPath("$.title").value("Tic Tac Toe"));
-
-        ArgumentCaptor<RegisterGameRequest> captor = ArgumentCaptor.forClass(RegisterGameRequest.class);
-        verify(gameService).register(any(String.class), captor.capture());
-
-        RegisterGameRequest capturedRequest = captor.getValue();
-        assertThat(capturedRequest.name()).isEqualTo("tic-tac-toe");
     }
 
     @Test

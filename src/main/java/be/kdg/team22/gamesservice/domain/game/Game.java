@@ -3,6 +3,8 @@ package be.kdg.team22.gamesservice.domain.game;
 import be.kdg.team22.gamesservice.api.game.models.RegisterAchievementRequest;
 import be.kdg.team22.gamesservice.api.game.models.RegisterGameRequest;
 import be.kdg.team22.gamesservice.domain.game.exceptions.*;
+import be.kdg.team22.gamesservice.domain.game.settings.GameSettingsDefinition;
+import be.kdg.team22.gamesservice.domain.game.settings.GameSettingsValidator;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 
 import java.time.Instant;
@@ -14,22 +16,21 @@ public class Game {
 
     private final GameId id;
     private final Instant createdAt;
+    private final Set<Achievement> achievements = new HashSet<>();
     private Instant updatedAt;
-
     // Engine data
     private String name;
     private String baseUrl;
     private String frontendUrl;
     private String startEndpoint;
+    private final GameSettingsDefinition settingsDefinition;
     private String healthEndpoint;
     private Instant lastHealthCheck;
     private boolean healthy;
-
     // frontend metadata
     private String title;
     private String description;
     private String image;
-    private final Set<Achievement> achievements = new HashSet<>();
 
     public Game(
             final GameId id,
@@ -44,7 +45,8 @@ public class Game {
             final String description,
             final String image,
             final Instant createdAt,
-            final Instant updatedAt
+            final Instant updatedAt,
+            final GameSettingsDefinition settingsDefinition
     ) {
         validate(id, name, baseUrl, frontendUrl, startEndpoint, healthEndpoint, title, description, image);
 
@@ -60,6 +62,7 @@ public class Game {
         this.title = title;
         this.description = description;
         this.image = image;
+        this.settingsDefinition = settingsDefinition;
 
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -74,7 +77,8 @@ public class Game {
             final String healthEndpoint,
             final String title,
             final String description,
-            final String image
+            final String image,
+            final GameSettingsDefinition settingsDefinition
     ) {
         validate(id, name, baseUrl, frontendUrl, startEndpoint, healthEndpoint, title, description, image);
 
@@ -92,6 +96,36 @@ public class Game {
 
         this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
+        this.settingsDefinition = settingsDefinition;
+    }
+
+    public static Game register(final RegisterGameRequest request) {
+        Game game = new Game(
+                GameId.create(),
+                request.name(),
+                request.backendUrl(),
+                request.frontendUrl(),
+                request.startEndpoint(),
+                request.healthEndpoint(),
+                request.title(),
+                request.description(),
+                request.image(),
+                request.settingsDefinition()
+
+        );
+
+        if (request.achievements() == null) return game;
+
+        List<Achievement> achievements = new ArrayList<>();
+        request.achievements().forEach(achievement -> achievements.add(new Achievement(
+                AchievementKey.fromString(achievement.key()),
+                achievement.name(),
+                achievement.description(),
+                achievement.levels()
+        )));
+        game.addAchievements(achievements);
+
+        return game;
     }
 
     private void validate(
@@ -134,7 +168,7 @@ public class Game {
     public void addAchievement(final Achievement achievement) {
         boolean added = this.achievements.add(achievement);
         if (!added) {
-            throw new achievementKeyAlreadyExistisException(achievement.key().key());
+            throw new AchievementKeyAlreadyExistsException(achievement.key().key());
         }
         this.updatedAt = Instant.now();
     }
@@ -190,33 +224,6 @@ public class Game {
         if (image == null || image.isBlank()) {
             throw GameMetadataException.invalidImage();
         }
-    }
-
-    public static Game register(final RegisterGameRequest request) {
-        Game game = new Game(
-                GameId.create(),
-                request.name(),
-                request.backendUrl(),
-                request.frontendUrl(),
-                request.startEndpoint(),
-                request.healthEndpoint(),
-                request.title(),
-                request.description(),
-                request.image()
-        );
-
-        if (request.achievements() == null) return game;
-
-        List<Achievement> achievements = new ArrayList<>();
-        request.achievements().forEach(achievement -> achievements.add(new Achievement(
-                AchievementKey.fromString(achievement.key()),
-                achievement.name(),
-                achievement.description(),
-                achievement.levels()
-        )));
-        game.addAchievements(achievements);
-
-        return game;
     }
 
     public void update(final RegisterGameRequest request) {
@@ -328,7 +335,15 @@ public class Game {
         return lastHealthCheck;
     }
 
+    public GameSettingsDefinition settingsDefinition() {
+        return settingsDefinition;
+    }
+
     public boolean healthy() {
         return healthy;
+    }
+
+    public Map<String, Object> validateSettings(Map<String, Object> settings) {
+        return GameSettingsValidator.resolveAndValidate(settingsDefinition, settings);
     }
 }

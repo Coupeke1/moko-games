@@ -3,7 +3,10 @@ package be.kdg.team22.gamesservice.infrastructure.game.jpa;
 import be.kdg.team22.gamesservice.domain.game.Achievement;
 import be.kdg.team22.gamesservice.domain.game.Game;
 import be.kdg.team22.gamesservice.domain.game.GameId;
+import be.kdg.team22.gamesservice.domain.game.settings.GameSettingsDefinition;
+import be.kdg.team22.gamesservice.infrastructure.game.jpa.converter.GameSettingsDefinitionJsonConverter;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.Instant;
 import java.util.List;
@@ -31,6 +34,7 @@ public class GameEntity {
 
     @Column(nullable = false, name = "start_endpoint")
     private String startEndpoint;
+
     @Column(nullable = false, name = "health_endpoint")
     private String healthEndpoint;
 
@@ -39,6 +43,7 @@ public class GameEntity {
 
     @Column(nullable = false, name = "healthy")
     private boolean healthy;
+
 
     @Column(nullable = false)
     private String title;
@@ -55,6 +60,15 @@ public class GameEntity {
     @Column(nullable = false, name = "updated_at")
     private Instant updatedAt;
 
+    @Column(
+            name = "settings_definition",
+            nullable = false,
+            columnDefinition = "jsonb"
+    )
+    @ColumnTransformer(write = "?::jsonb")
+    @Convert(converter = GameSettingsDefinitionJsonConverter.class)
+    private GameSettingsDefinition settingsDefinition;
+
     protected GameEntity() {
     }
 
@@ -70,6 +84,7 @@ public class GameEntity {
             String title,
             String description,
             String image,
+            GameSettingsDefinition settingsDefinition,
             Instant createdAt,
             Instant updatedAt
     ) {
@@ -84,6 +99,7 @@ public class GameEntity {
         this.title = title;
         this.description = description;
         this.image = image;
+        this.settingsDefinition = settingsDefinition;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -101,6 +117,7 @@ public class GameEntity {
                 game.title(),
                 game.description(),
                 game.image(),
+                game.settingsDefinition(),
                 game.createdAt(),
                 game.updatedAt()
         );
@@ -161,7 +178,8 @@ public class GameEntity {
                 description,
                 image,
                 createdAt,
-                updatedAt
+                updatedAt,
+                settingsDefinition
         );
 
         if (this.achievements != null) {
@@ -220,5 +238,9 @@ public class GameEntity {
 
     public Instant updatedAt() {
         return updatedAt;
+    }
+
+    public GameSettingsDefinition settingsDefinition() {
+        return settingsDefinition;
     }
 }
