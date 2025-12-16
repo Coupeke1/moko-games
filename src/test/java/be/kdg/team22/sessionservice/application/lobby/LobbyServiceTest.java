@@ -1,8 +1,6 @@
 package be.kdg.team22.sessionservice.application.lobby;
 
-import be.kdg.team22.sessionservice.api.lobby.models.CheckersSettingsModel;
 import be.kdg.team22.sessionservice.api.lobby.models.CreateLobbyModel;
-import be.kdg.team22.sessionservice.api.lobby.models.TicTacToeSettingsModel;
 import be.kdg.team22.sessionservice.api.lobby.models.UpdateLobbySettingsModel;
 import be.kdg.team22.sessionservice.application.player.PlayerService;
 import be.kdg.team22.sessionservice.domain.lobby.GameId;

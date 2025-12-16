@@ -1,15 +1,12 @@
 package be.kdg.team22.sessionservice.domain.lobby.settings;
 
-import org.jmolecules.ddd.annotation.ValueObject;
+import java.util.Map;
 
-@ValueObject
-public record LobbySettings(GameSettings gameSettings, int maxPlayers) {
-
+public record LobbySettings(
+        int maxPlayers,
+        Map<String, Object> gameSettings
+) {
     public LobbySettings {
-        if (maxPlayers <= 0)
-            throw new IllegalArgumentException("maxPlayers > 0");
-
-        if (gameSettings == null)
-            throw new IllegalArgumentException("gameSettings cannot be null");
+        gameSettings = (gameSettings == null) ? Map.of() : Map.copyOf(gameSettings);
     }
 }

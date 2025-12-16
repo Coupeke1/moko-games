@@ -2,7 +2,6 @@ package be.kdg.team22.sessionservice.infrastructure.lobby.jpa.converters;
 
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
 import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.exceptions.SettingsConversionException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
@@ -23,8 +22,7 @@ public class LobbySettingsConverter implements AttributeConverter<LobbySettings,
     @Override
     public LobbySettings convertToEntityAttribute(String dbData) {
         try {
-            return mapper.readValue(dbData, new TypeReference<>() {
-            });
+            return mapper.readValue(dbData, LobbySettings.class);
         } catch (Exception e) {
             throw SettingsConversionException.deserializationError(dbData, e);
         }

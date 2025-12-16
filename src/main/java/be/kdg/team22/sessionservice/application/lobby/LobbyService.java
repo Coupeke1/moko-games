@@ -1,16 +1,14 @@
 package be.kdg.team22.sessionservice.application.lobby;
 
-import be.kdg.team22.sessionservice.api.lobby.models.*;
+import be.kdg.team22.sessionservice.api.lobby.models.CreateLobbyModel;
+import be.kdg.team22.sessionservice.api.lobby.models.UpdateLobbySettingsModel;
 import be.kdg.team22.sessionservice.application.player.PlayerService;
 import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyRepository;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.PlayersException;
-import be.kdg.team22.sessionservice.domain.lobby.settings.CheckersSettings;
-import be.kdg.team22.sessionservice.domain.lobby.settings.GameSettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
-import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.infrastructure.chat.ExternalChatRepository;
@@ -23,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -116,20 +113,5 @@ public class LobbyService {
 
     public List<Lobby> getInvitesFromPlayer(PlayerId id, GameId game) {
         return repository.findInvitesFromPlayerId(id, game);
-    }
-
-    private LobbySettings mapToDomainSettings(final GameSettingsModel model, final Integer maxPlayers) {
-        int resolvedMaxPlayers = maxPlayers != null ? maxPlayers : 4;
-
-        GameSettings gameSettings = switch (model) {
-            case TicTacToeSettingsModel t -> new TicTacToeSettings(t.boardSize());
-            case CheckersSettingsModel c -> new CheckersSettings(c.boardSize(), c.flyingKings());
-        };
-
-        return new LobbySettings(gameSettings, resolvedMaxPlayers);
-    }
-
-    public Optional<Lobby> findByStartedGameId(GameId gameId) {
-        return repository.findByStartedGameId(gameId);
     }
 }
