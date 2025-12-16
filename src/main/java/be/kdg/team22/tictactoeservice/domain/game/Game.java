@@ -14,7 +14,7 @@ public class Game {
     private final GameId id;
     private final NavigableSet<Player> players;
     private final Map<PlayerId, List<Move>> moveHistory;
-    private final PlayerRole aiPlayer;
+    private final PlayerRole botPlayer;
     private Board board;
     private GameStatus status;
     private PlayerRole currentRole;
@@ -23,12 +23,12 @@ public class Game {
     private static final Comparator<Player> PLAYER_COMPARATOR =
             Comparator.comparingInt(p -> p.role().order());
 
-    public Game(PlayerId winner, PlayerRole currentRole, GameStatus status, Board board, PlayerRole aiPlayer, Map<PlayerId, List<Move>> moveHistory, List<Player> players, GameId id) {
+    public Game(PlayerId winner, PlayerRole currentRole, GameStatus status, Board board, PlayerRole botPlayer, Map<PlayerId, List<Move>> moveHistory, List<Player> players, GameId id) {
         this.winner = winner;
         this.currentRole = currentRole;
         this.status = status;
         this.board = board;
-        this.aiPlayer = aiPlayer;
+        this.botPlayer = botPlayer;
         this.moveHistory = moveHistory.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
@@ -39,7 +39,7 @@ public class Game {
         this.id = id;
     }
 
-    private Game(final int requestedSize, final List<Player> players, final PlayerRole aiPlayer) {
+    private Game(final int requestedSize, final List<Player> players, final PlayerRole botPlayer) {
         this.id = GameId.create();
         this.board = Board.create(requestedSize);
         this.status = GameStatus.IN_PROGRESS;
@@ -53,7 +53,7 @@ public class Game {
         this.currentRole = this.players.getFirst().role();
         this.winner = null;
 
-        this.aiPlayer = aiPlayer;
+        this.botPlayer = botPlayer;
     }
 
     public static Game create(
@@ -61,7 +61,7 @@ public class Game {
             final int maxSize,
             final int size,
             final List<PlayerId> playerIds,
-            final boolean aiPlayer
+            final boolean botPlayer
     ) {
         if (size < minSize || size > maxSize)
             throw new BoardSizeException(minSize, maxSize);
@@ -73,25 +73,25 @@ public class Game {
         PlayerRole[] roles = PlayerRole.values();
 
         List<Player> players = new ArrayList<>();
-        PlayerRole aiRole = null;
+        PlayerRole botRole = null;
 
         for (int i = 0; i < playerIds.size(); i++) {
             PlayerId playerId = playerIds.get(i);
             PlayerRole role = roles[i % roles.length];
 
-            boolean isAi = aiPlayer && i == playerIds.size() - 1;
+            boolean isBot = botPlayer && i == playerIds.size() - 1;
 
-            players.add(new Player(playerId, role, isAi));
+            players.add(new Player(playerId, role, isBot));
 
-            if (isAi) {
-                aiRole = role;
+            if (isBot) {
+                botRole = role;
             }
         }
 
         if (players.size() < 2 || players.size() > roles.length)
             throw new GameSizeException(roles.length);
 
-        return new Game(size, players, aiRole);
+        return new Game(size, players, botRole);
     }
 
     public Player nextPlayer() {
@@ -173,7 +173,7 @@ public class Game {
         return winner;
     }
 
-    public PlayerRole aiPlayer() {
-        return aiPlayer;
+    public PlayerRole botPlayer() {
+        return botPlayer;
     }
 }

@@ -32,7 +32,7 @@ public class GameModel {
                 playerId.value().toString(),
                 moves.stream().map(MoveModel::fromDomain).toList()
         ));
-        model.aiPlayer = game.aiPlayer();
+        model.aiPlayer = game.botPlayer();
         model.size = game.board().size();
         model.board = new PlayerRole[model.size][model.size];
         for (int r = 0; r < model.size; r++) {
