@@ -12,6 +12,7 @@ import be.kdg.team22.communicationservice.infrastructure.user.ProfileResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,22 +24,15 @@ public class NotificationService {
     private final ExternalUserRepository userRepository;
     private final EmailService emailService;
 
-    public NotificationService(final NotificationRepository repository,
-                               final ExternalUserRepository userRepository,
-                               final EmailService emailService) {
+    public NotificationService(final NotificationRepository repository, final ExternalUserRepository userRepository, final EmailService emailService) {
         this.repository = repository;
         this.userRepository = userRepository;
         this.emailService = emailService;
     }
 
-    public Notification create(final PlayerId recipient,
-                               final NotificationOrigin origin,
-                               final String title,
-                               final String message) {
+    public Notification create(final PlayerId recipient, final NotificationOrigin origin, final String title, final String message) {
 
-        Notification notification = Notification.create(
-                recipient, origin, title, message
-        );
+        Notification notification = Notification.create(recipient, origin, title, message);
 
         Notification saved = repository.save(notification);
 
@@ -54,21 +48,16 @@ public class NotificationService {
         NotificationPreferences prefs = prefsResponse.to();
 
         if (prefs.allowsEmail(notification)) {
-            emailService.sendNotificationEmail(
-                    profile.email(),
-                    profile.username(),
-                    notification
-            );
+            emailService.sendNotificationEmail(profile.email(), profile.username(), notification);
         }
     }
 
-    public PageResult<Notification> findAllByConstraints(
-            final PlayerId playerId,
-            final NotificationReadFilter type,
-            final NotificationOrigin origin,
-            final Pagination pagination
-    ) {
+    public PageResult<Notification> findAllByConstraints(final PlayerId playerId, final NotificationReadFilter type, final NotificationOrigin origin, final Pagination pagination) {
         return repository.findAllByConstraints(playerId, type, origin, pagination);
+    }
+
+    public List<Notification> getNotificationsSince(final PlayerId playerId, final Instant since) {
+        return repository.findUnreadSince(playerId, since);
     }
 
     public List<Notification> getNotifications(final PlayerId playerId) {
@@ -80,8 +69,7 @@ public class NotificationService {
     }
 
     public void markAsRead(final NotificationId id) {
-        Notification notification =
-                repository.findById(id).orElseThrow(() -> new NotificationNotFoundException(id));
+        Notification notification = repository.findById(id).orElseThrow(() -> new NotificationNotFoundException(id));
 
         notification.markAsRead();
         repository.save(notification);

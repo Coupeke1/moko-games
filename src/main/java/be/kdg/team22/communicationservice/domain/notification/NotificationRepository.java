@@ -4,6 +4,7 @@ import be.kdg.team22.communicationservice.application.queries.NotificationReadFi
 import be.kdg.team22.communicationservice.application.queries.PageResult;
 import be.kdg.team22.communicationservice.application.queries.Pagination;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,4 +23,6 @@ public interface NotificationRepository {
             NotificationOrigin origin,
             Pagination pagination
     );
+
+    List<Notification> findUnreadSince(PlayerId recipientId, Instant since);
 }

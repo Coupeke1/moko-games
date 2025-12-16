@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,10 +22,14 @@ public interface NotificationJpaRepository extends JpaRepository<NotificationEnt
               and (:read is null or n.read = :read)
               and (:origin is null or n.origin = :origin)
             """)
-    Page<NotificationEntity> findAllFiltered(
-            @Param("recipientId") UUID recipientId,
-            @Param("read") Boolean read,
-            @Param("origin") NotificationOrigin origin,
-            Pageable pageable
-    );
+    Page<NotificationEntity> findAllFiltered(@Param("recipientId") UUID recipientId, @Param("read") Boolean read, @Param("origin") NotificationOrigin origin, Pageable pageable);
+
+    @Query("""
+            select n
+            from NotificationEntity n
+            where n.recipientId = :recipientId
+              and n.createdAt >= :since
+              and n.read = false
+            """)
+    List<NotificationEntity> findUnreadSince(UUID recipientId, Instant since);
 }
