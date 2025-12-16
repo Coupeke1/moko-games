@@ -1,17 +1,17 @@
 import Button from "@/components/buttons/button";
 import Dialog from "@/components/dialog/dialog";
 import Column from "@/components/layout/column";
-import { Gap } from "@/components/layout/gap";
+import {Gap} from "@/components/layout/gap";
 import TabContent from "@/components/tabs/buttons/content";
 import TabRow from "@/components/tabs/buttons/row";
 import showToast from "@/components/toast";
-import type { Game } from "@/features/games/models/game.ts";
-import type { Lobby } from "@/features/lobby/models/lobby.ts";
+import type {Game} from "@/features/games/models/game.ts";
+import type {Lobby} from "@/features/lobby/models/lobby.ts";
 import GameTab from "@/features/lobby/dialogs/settings-dialog/game-tab";
 import LobbyTab from "@/features/lobby/dialogs/settings-dialog/lobby-tab";
-import { updateSettings } from "@/features/lobby/services/lobby.ts";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import {updateSettings} from "@/features/lobby/services/lobby.ts";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {useEffect, useState} from "react";
 
 interface Props {
     lobby: Lobby;
@@ -23,13 +23,13 @@ interface Props {
 }
 
 export default function SettingsDialog({
-    lobby,
-    game,
-    isOwner,
-    close,
-    open,
-    onChange,
-}: Props) {
+                                           lobby,
+                                           game,
+                                           isOwner,
+                                           close,
+                                           open,
+                                           onChange,
+                                       }: Props) {
     const client = useQueryClient();
     const [current, setCurrent] = useState<string>("Lobby");
     const [size, setSize] = useState<number>(4);
@@ -39,8 +39,8 @@ export default function SettingsDialog({
     }, [lobby, open]);
 
     const save = useMutation({
-        mutationFn: async ({ lobby, game }: { lobby: string; game: string }) =>
-            await updateSettings(lobby, game, size),
+        mutationFn: async ({lobby}: { lobby: string; game: string }) =>
+            await updateSettings(lobby, size),
         onSuccess: async (_data, variables) => {
             await client.invalidateQueries({
                 queryKey: ["lobby", variables.lobby],
@@ -96,7 +96,7 @@ export default function SettingsDialog({
                         },
                         {
                             title: "Game",
-                            element: <GameTab />,
+                            element: <GameTab/>,
                         },
                     ]}
                 />
