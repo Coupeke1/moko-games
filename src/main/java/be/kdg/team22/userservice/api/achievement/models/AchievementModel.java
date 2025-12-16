@@ -1,14 +1,13 @@
 package be.kdg.team22.userservice.api.achievement.models;
 
 import be.kdg.team22.userservice.domain.achievement.Achievement;
-import be.kdg.team22.userservice.domain.achievement.AchievementMetadata;
+import be.kdg.team22.userservice.infrastructure.games.AchievementDetailsResponse;
 import be.kdg.team22.userservice.infrastructure.games.GameDetailsResponse;
 
 import java.time.Instant;
 import java.util.UUID;
 
 public record AchievementModel(
-        UUID id,
         UUID gameId,
         String code,
         String name,
@@ -18,15 +17,14 @@ public record AchievementModel(
         String gameName,
         String gameImage
 ) {
-    public static AchievementModel from(Achievement a, GameDetailsResponse game) {
+    public static AchievementModel from(Achievement achievement, AchievementDetailsResponse achievementDetails, GameDetailsResponse game) {
         return new AchievementModel(
-                a.id().value(),
-                a.gameId(),
-                a.code().value(),
-                AchievementMetadata.getName(a.code().value()),
-                AchievementMetadata.getDescription(a.code().value()),
-                AchievementMetadata.getLevels(a.code().value()),
-                a.unlockedAt(),
+                achievement.gameId().value(),
+                achievement.key().key(),
+                achievementDetails.name(),
+                achievementDetails.description(),
+                achievementDetails.levels(),
+                achievement.unlockedAt(),
                 game != null ? game.name() : null,
                 game != null ? game.image() : null
         );

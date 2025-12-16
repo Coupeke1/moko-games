@@ -3,16 +3,16 @@ package be.kdg.team22.userservice.application.profile;
 import be.kdg.team22.userservice.api.achievement.models.AchievementModel;
 import be.kdg.team22.userservice.api.profile.models.FavouriteGameModel;
 import be.kdg.team22.userservice.api.profile.models.FilteredProfileModel;
-import be.kdg.team22.userservice.domain.achievement.AchievementRepository;
+import be.kdg.team22.userservice.application.achievement.AchievementService;
 import be.kdg.team22.userservice.domain.library.LibraryEntry;
 import be.kdg.team22.userservice.domain.library.LibraryRepository;
-import be.kdg.team22.userservice.domain.library.exceptions.ExternalGameNotFoundException;
 import be.kdg.team22.userservice.domain.profile.*;
 import be.kdg.team22.userservice.domain.profile.exceptions.CannotUpdateProfileException;
 import be.kdg.team22.userservice.domain.profile.exceptions.ClaimNotFoundException;
 import be.kdg.team22.userservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.userservice.infrastructure.games.GameDetailsResponse;
 import be.kdg.team22.userservice.infrastructure.image.ExternalImageRepository;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,16 +25,16 @@ import java.util.UUID;
 public class ProfileService {
     private final ProfileRepository profileRepository;
     private final ExternalImageRepository imageRepository;
-    private final AchievementRepository achievementRepository;
+    private final ObjectProvider<AchievementService> achievementServiceProvider;
     private final LibraryRepository libraryRepository;
     private final ExternalGamesRepository gamesRepository;
 
-    public ProfileService(final ProfileRepository profileRepository, final ExternalImageRepository imageRepository, final AchievementRepository achievementRepository, final LibraryRepository libraryRepository, final ExternalGamesRepository gamesRepository) {
+    public ProfileService(final ProfileRepository profileRepository, final ExternalImageRepository imageRepository, final LibraryRepository libraryRepository, final ExternalGamesRepository gamesRepository, final ObjectProvider<AchievementService> achievementServiceProvider) {
         this.profileRepository = profileRepository;
         this.imageRepository = imageRepository;
-        this.achievementRepository = achievementRepository;
         this.libraryRepository = libraryRepository;
         this.gamesRepository = gamesRepository;
+        this.achievementServiceProvider = achievementServiceProvider;
     }
 
     public Profile getOrCreate(final Jwt token) {
@@ -60,21 +60,7 @@ public class ProfileService {
         Modules modules = profile.modules();
         Statistics stats = profile.statistics();
 
-        List<AchievementModel> achievements = null;
-        if (modules.achievements()) {
-            achievements = achievementRepository.findByProfile(profileId).stream().map(a -> {
-                GameDetailsResponse game = null;
-
-                try {
-                    game = gamesRepository.getGame(a.gameId(), token);
-                } catch (
-                        ExternalGameNotFoundException e) {
-                    // ignore, game stays null
-                }
-
-                return AchievementModel.from(a, game);
-            }).toList();
-        }
+        List<AchievementModel> achievements = achievementServiceProvider.getObject().findModelsByProfile(profileId, token);
 
         List<FavouriteGameModel> favouriteGames = null;
         if (modules.favourites()) {

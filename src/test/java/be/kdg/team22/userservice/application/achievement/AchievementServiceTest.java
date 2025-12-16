@@ -1,7 +1,8 @@
 package be.kdg.team22.userservice.application.achievement;
 
 import be.kdg.team22.userservice.application.profile.ProfileService;
-import be.kdg.team22.userservice.domain.achievement.*;
+import be.kdg.team22.userservice.domain.achievement.Achievement;
+import be.kdg.team22.userservice.domain.achievement.AchievementRepository;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
 import be.kdg.team22.userservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.userservice.infrastructure.messaging.AchievementEventPublisher;
@@ -34,7 +35,7 @@ class AchievementServiceTest {
         ProfileId profileId = new ProfileId(userId);
         AchievementCode achievementCode = new AchievementCode(code);
 
-        when(repo.existsByProfileAndCode(profileId, achievementCode))
+        when(repo.existsByProfileGameAndKey(profileId, achievementCode))
                 .thenReturn(false);
 
         service.award(userId, code);
@@ -57,7 +58,7 @@ class AchievementServiceTest {
         ProfileId profileId = new ProfileId(userId);
         AchievementCode achievementCode = new AchievementCode(code);
 
-        when(repo.existsByProfileAndCode(profileId, achievementCode))
+        when(repo.existsByProfileGameAndKey(profileId, achievementCode))
                 .thenReturn(false);
 
         service.award(userId, gameId, code);
@@ -79,7 +80,7 @@ class AchievementServiceTest {
         ProfileId profileId = new ProfileId(userId);
         AchievementCode achievementCode = new AchievementCode(code);
 
-        when(repo.existsByProfileAndCode(profileId, achievementCode))
+        when(repo.existsByProfileGameAndKey(profileId, achievementCode))
                 .thenReturn(true);
 
         service.award(userId, code);
@@ -117,7 +118,7 @@ class AchievementServiceTest {
         ProfileId profileId = new ProfileId(userId);
         AchievementCode achievementCode = new AchievementCode(code);
 
-        when(repo.existsByProfileAndCode(profileId, achievementCode))
+        when(repo.existsByProfileGameAndKey(profileId, achievementCode))
                 .thenReturn(false);
 
         service.award(userId, code);
@@ -135,7 +136,7 @@ class AchievementServiceTest {
         ProfileId profileId = new ProfileId(userId);
         AchievementCode achievementCode = new AchievementCode(code);
 
-        when(repo.existsByProfileAndCode(profileId, achievementCode))
+        when(repo.existsByProfileGameAndKey(profileId, achievementCode))
                 .thenReturn(true);
 
         service.award(userId, code);

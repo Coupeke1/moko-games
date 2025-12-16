@@ -1,19 +1,31 @@
 package be.kdg.team22.userservice.domain.library;
 
-import be.kdg.team22.userservice.domain.library.exceptions.GameNotFoundException;
+import be.kdg.team22.userservice.domain.achievement.exceptions.GameIdNullException;
+import be.kdg.team22.userservice.domain.achievement.exceptions.GameNotFoundException;
+import org.jmolecules.ddd.annotation.ValueObject;
 
 import java.util.UUID;
 
+@ValueObject
 public record GameId(UUID value) {
-    public static GameId create(String value) {
-        return new GameId(UUID.fromString(value));
+
+    public GameId {
+        if (value == null) throw new GameIdNullException();
     }
 
     public static GameId from(UUID value) {
         return new GameId(value);
     }
 
+    public static GameId from(String value) {
+        return new GameId(UUID.fromString(value));
+    }
+
+    public static GameId create() {
+        return new GameId(UUID.randomUUID());
+    }
+
     public GameNotFoundException notFound() {
-        throw new GameNotFoundException(this);
+        return new GameNotFoundException(this);
     }
 }

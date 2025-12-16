@@ -4,7 +4,8 @@ import java.util.UUID;
 
 public record AchievementUnlockedEvent(
         UUID playerId,
-        UUID achievementId,
+        UUID gameId,
+        String achievementKey,
         String achievementName,
         String description
 ) {

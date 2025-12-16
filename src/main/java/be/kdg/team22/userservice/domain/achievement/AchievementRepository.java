@@ -1,5 +1,6 @@
 package be.kdg.team22.userservice.domain.achievement;
 
+import be.kdg.team22.userservice.domain.library.GameId;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
 import org.jmolecules.ddd.annotation.Repository;
 
@@ -11,11 +12,11 @@ import java.util.UUID;
 public interface AchievementRepository {
     void save(Achievement achievement);
 
-    Optional<Achievement> findByProfileAndCode(ProfileId profileId, AchievementCode code);
+    Optional<Achievement> findByProfileGameAndKey(ProfileId profileId, GameId gameId, AchievementKey key);
 
     List<Achievement> findByProfile(ProfileId profileId);
 
-    boolean existsByProfileAndCode(ProfileId profileId, AchievementCode code);
+    boolean existsByProfileGameAndKey(ProfileId profileId, GameId gameId, AchievementKey key);
 
     long countByProfile(ProfileId profileId);
 

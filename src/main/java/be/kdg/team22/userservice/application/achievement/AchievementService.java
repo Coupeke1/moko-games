@@ -2,10 +2,13 @@ package be.kdg.team22.userservice.application.achievement;
 
 import be.kdg.team22.userservice.api.achievement.models.AchievementModel;
 import be.kdg.team22.userservice.application.profile.ProfileService;
-import be.kdg.team22.userservice.domain.achievement.*;
-import be.kdg.team22.userservice.domain.library.exceptions.ExternalGameNotFoundException;
+import be.kdg.team22.userservice.domain.achievement.Achievement;
+import be.kdg.team22.userservice.domain.achievement.AchievementKey;
+import be.kdg.team22.userservice.domain.achievement.AchievementRepository;
+import be.kdg.team22.userservice.domain.library.GameId;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
 import be.kdg.team22.userservice.events.AchievementUnlockedEvent;
+import be.kdg.team22.userservice.infrastructure.games.AchievementDetailsResponse;
 import be.kdg.team22.userservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.userservice.infrastructure.games.GameDetailsResponse;
 import be.kdg.team22.userservice.infrastructure.messaging.AchievementEventPublisher;
@@ -13,9 +16,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -32,36 +33,26 @@ public class AchievementService {
         this.gamesRepository = gameRepo;
     }
 
-    public void award(final UUID userId, final String code) {
-        award(userId, null, code);
-    }
+    public void award(final ProfileId userId, final String gameName, final AchievementKey key) {
+        GameDetailsResponse game = gamesRepository.getGame(gameName);
+        GameId gameId = GameId.from(game.id());
 
-    public void award(final UUID userId, final UUID gameId, final String code) {
-        ProfileId profileId = new ProfileId(userId);
-        AchievementCode achievementCode = new AchievementCode(code);
-
-        if (achievements.existsByProfileAndCode(profileId, achievementCode)) {
+        if (achievements.existsByProfileGameAndKey(userId, gameId, key)) {
             return;
         }
 
-        Achievement achievement = new Achievement(
-                AchievementId.create(),
-                profileId,
-                gameId,
-                achievementCode,
-                Instant.now()
-        );
-
+        Achievement achievement = Achievement.create(userId, gameId, key);
         achievements.save(achievement);
 
-        int levels = AchievementMetadata.getLevels(code);
-        profileService.addLevels(profileId, levels);
+        AchievementDetailsResponse achievementDetails = gamesRepository.getAchievementDetails(gameId, key);
+        profileService.addLevels(userId, achievementDetails.levels());
 
         AchievementUnlockedEvent event = new AchievementUnlockedEvent(
-                userId,
-                achievement.id().value(),
-                AchievementMetadata.getName(code),
-                AchievementMetadata.getDescription(code)
+                userId.value(),
+                gameId.value(),
+                key.key(),
+                achievementDetails.name(),
+                achievementDetails.description()
         );
         eventPublisher.publishAchievementUnlocked(event);
     }
@@ -74,15 +65,9 @@ public class AchievementService {
         return achievements.findByProfile(profileId)
                 .stream()
                 .map(a -> {
-                    GameDetailsResponse game = null;
-
-                    try {
-                        game = gamesRepository.getGame(a.gameId(), token);
-                    } catch (ExternalGameNotFoundException ex) {
-                        // Laat game null → geen image of name
-                    }
-
-                    return AchievementModel.from(a, game);
+                    GameDetailsResponse game = gamesRepository.getGame(a.gameId().value(), token);
+                    AchievementDetailsResponse achievement = gamesRepository.getAchievementDetails(a.gameId(), a.key());
+                    return AchievementModel.from(a, achievement, game);
                 })
                 .toList();
     }

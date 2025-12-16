@@ -1,8 +1,9 @@
 package be.kdg.team22.userservice.infrastructure.achievement;
 
 import be.kdg.team22.userservice.domain.achievement.Achievement;
-import be.kdg.team22.userservice.domain.achievement.AchievementCode;
+import be.kdg.team22.userservice.domain.achievement.AchievementKey;
 import be.kdg.team22.userservice.domain.achievement.AchievementRepository;
+import be.kdg.team22.userservice.domain.library.GameId;
 import be.kdg.team22.userservice.domain.profile.ProfileId;
 import be.kdg.team22.userservice.infrastructure.achievement.jpa.AchievementEntity;
 import be.kdg.team22.userservice.infrastructure.achievement.jpa.JpaAchievementRepository;
@@ -27,30 +28,30 @@ public class DbAchievementRepository implements AchievementRepository {
     }
 
     @Override
-    public Optional<Achievement> findByProfileAndCode(ProfileId profileId, AchievementCode code) {
-        return jpa.findByProfileIdAndCode(profileId.value(), code.value())
+    public Optional<Achievement> findByProfileGameAndKey(ProfileId profileId, GameId gameId, AchievementKey key) {
+        return jpa.findByIdProfileIdAndIdGameIdAndIdKey(profileId.value(), gameId.value(), key.key())
                 .map(AchievementEntity::toDomain);
     }
 
     @Override
     public List<Achievement> findByProfile(ProfileId profileId) {
-        return jpa.findByProfileId(profileId.value()).stream()
+        return jpa.findByIdProfileId(profileId.value()).stream()
                 .map(AchievementEntity::toDomain)
                 .toList();
     }
 
     @Override
-    public boolean existsByProfileAndCode(ProfileId profileId, AchievementCode code) {
-        return jpa.existsByProfileIdAndCode(profileId.value(), code.value());
+    public boolean existsByProfileGameAndKey(ProfileId profileId, GameId gameId, AchievementKey key) {
+        return jpa.existsByIdProfileIdAndIdGameIdAndIdKey(profileId.value(), gameId.value(), key.key());
     }
 
     @Override
     public long countByProfile(ProfileId profileId) {
-        return jpa.countByProfileId(profileId.value());
+        return jpa.countByIdProfileId(profileId.value());
     }
 
     @Override
     public long countByProfileAndGame(ProfileId profileId, UUID gameId) {
-        return jpa.countByProfileIdAndGameId(profileId.value(), gameId);
+        return jpa.countByIdProfileIdAndIdGameId(profileId.value(), gameId);
     }
 }
