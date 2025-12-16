@@ -12,7 +12,6 @@ import be.kdg.team22.userservice.infrastructure.games.AchievementDetailsResponse
 import be.kdg.team22.userservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.userservice.infrastructure.games.GameDetailsResponse;
 import be.kdg.team22.userservice.infrastructure.messaging.AchievementEventPublisher;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,11 +60,11 @@ public class AchievementService {
         return achievements.findByProfile(profileId);
     }
 
-    public List<AchievementModel> findModelsByProfile(ProfileId profileId, Jwt token) {
+    public List<AchievementModel> findModelsByProfile(ProfileId profileId) {
         return achievements.findByProfile(profileId)
                 .stream()
                 .map(a -> {
-                    GameDetailsResponse game = gamesRepository.getGame(a.gameId().value(), token);
+                    GameDetailsResponse game = gamesRepository.getGame(a.gameId().value());
                     AchievementDetailsResponse achievement = gamesRepository.getAchievementDetails(a.gameId(), a.key());
                     return AchievementModel.from(a, achievement, game);
                 })

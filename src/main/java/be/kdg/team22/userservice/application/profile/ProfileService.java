@@ -55,19 +55,19 @@ public class ProfileService {
         return profileRepository.findById(id).orElseThrow(id::notFound);
     }
 
-    public FilteredProfileModel getByIdAndPreferences(final ProfileId profileId, final Jwt token) {
+    public FilteredProfileModel getByIdAndPreferences(final ProfileId profileId) {
         Profile profile = getById(profileId);
         Modules modules = profile.modules();
         Statistics stats = profile.statistics();
 
-        List<AchievementModel> achievements = achievementServiceProvider.getObject().findModelsByProfile(profileId, token);
+        List<AchievementModel> achievements = achievementServiceProvider.getObject().findModelsByProfile(profileId);
 
         List<FavouriteGameModel> favouriteGames = null;
         if (modules.favourites()) {
             List<LibraryEntry> entries = libraryRepository.findByUserId(profileId.value());
 
             favouriteGames = entries.stream().filter(LibraryEntry::favourite).map(entry -> {
-                GameDetailsResponse game = gamesRepository.getGame(entry.gameId().value(), token);
+                GameDetailsResponse game = gamesRepository.getGame(entry.gameId().value());
                 return new FavouriteGameModel(game.id(), game.title(), game.description(), game.image());
             }).toList();
         }

@@ -6,7 +6,6 @@ import be.kdg.team22.userservice.domain.library.exceptions.ExternalAchievementNo
 import be.kdg.team22.userservice.domain.library.exceptions.ExternalGameNotFoundException;
 import be.kdg.team22.userservice.domain.library.exceptions.GameServiceNotReachableException;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
@@ -22,11 +21,10 @@ public class ExternalGamesRepository {
         this.client = gameServiceRestClient;
     }
 
-    public GameDetailsResponse getGame(UUID gameId, Jwt token) {
+    public GameDetailsResponse getGame(UUID gameId) {
         try {
             return client.get()
                     .uri("/{id}", gameId)
-                    .header("Authorization", "Bearer " + token.getTokenValue())
                     .retrieve()
                     .body(GameDetailsResponse.class);
 
