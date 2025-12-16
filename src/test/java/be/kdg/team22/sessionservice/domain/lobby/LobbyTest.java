@@ -2,7 +2,6 @@ package be.kdg.team22.sessionservice.domain.lobby;
 
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.*;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
-import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.domain.player.PlayerName;
@@ -11,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -31,8 +31,8 @@ class LobbyTest {
         return new Player(id, username, "");
     }
 
-    private LobbySettings settings(int max) {
-        return new LobbySettings(new TicTacToeSettings(3), max);
+    private LobbySettings settings(int maxPlayers) {
+        return new LobbySettings(maxPlayers, Map.of("boardSize", 3));
     }
 
     @Test
@@ -54,7 +54,9 @@ class LobbyTest {
 
         List<Player> players = List.of(new Player(PlayerId.create(), new PlayerName("p1"), ""));
 
-        assertThatThrownBy(() -> new Lobby(LobbyId.create(), game(), owner, players, Set.of(), settings(4), LobbyStatus.OPEN, Instant.now(), Instant.now())).isInstanceOf(OwnerNotFoundException.class);
+        assertThatThrownBy(() ->
+                new Lobby(LobbyId.create(), game(), owner, players, Set.of(), settings(4), LobbyStatus.OPEN, Instant.now(), Instant.now())
+        ).isInstanceOf(OwnerNotFoundException.class);
     }
 
     @Test
@@ -170,7 +172,7 @@ class LobbyTest {
         PlayerId owner = pid();
         Lobby lobby = new Lobby(game(), lp(owner, new PlayerName("owner")), settings(4));
 
-        LobbySettings newSettings = new LobbySettings(new TicTacToeSettings(4), 5);
+        LobbySettings newSettings = new LobbySettings(5, Map.of("boardSize", 4));
 
         lobby.changeSettings(owner, newSettings);
 
@@ -196,7 +198,8 @@ class LobbyTest {
     void players_returnsImmutableSet() {
         Lobby lobby = new Lobby(game(), lp(pid(), new PlayerName("owner")), settings(4));
 
-        assertThatThrownBy(() -> lobby.players().add(lp(pid(), new PlayerName("x")))).isInstanceOf(UnsupportedOperationException.class);
+        assertThatThrownBy(() -> lobby.players().add(lp(pid(), new PlayerName("x"))))
+                .isInstanceOf(UnsupportedOperationException.class);
     }
 
     @Test

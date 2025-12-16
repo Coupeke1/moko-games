@@ -1,16 +1,14 @@
 package be.kdg.team22.sessionservice.application.lobby;
 
-import be.kdg.team22.sessionservice.api.lobby.models.*;
+import be.kdg.team22.sessionservice.api.lobby.models.CreateLobbyModel;
+import be.kdg.team22.sessionservice.api.lobby.models.UpdateLobbySettingsModel;
 import be.kdg.team22.sessionservice.application.player.PlayerService;
 import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyRepository;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.PlayersException;
-import be.kdg.team22.sessionservice.domain.lobby.settings.CheckersSettings;
-import be.kdg.team22.sessionservice.domain.lobby.settings.GameSettings;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
-import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.infrastructure.chat.ExternalChatRepository;
@@ -21,10 +19,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Transactional
@@ -48,15 +43,17 @@ public class LobbyService {
     }
 
     public Lobby createLobby(final GameId gameId, final PlayerId ownerId, final CreateLobbyModel model, final Jwt token) {
-
         Player owner = playerService.findPlayer(ownerId, token);
-        LobbySettings settings = mapToDomainSettings(model.settings(), model.maxPlayers());
-        Lobby lobby = new Lobby(gameId, owner, settings);
+
+        Map<String, Object> input = (model.settings() == null) ? Map.of() : model.settings();
+        Map<String, Object> resolved = gamesRepository.validateAndResolveSettings(gameId, input, token);
+
+        int maxPlayers = (model.maxPlayers() == null) ? 2 : model.maxPlayers();
+
+        Lobby lobby = new Lobby(gameId, owner, new LobbySettings(maxPlayers, resolved));
 
         publisher.saveAndPublish(lobby);
-
         chatRepository.createLobbyChat(lobby.id(), token);
-
         return lobby;
     }
 
@@ -76,11 +73,17 @@ public class LobbyService {
         return lobby;
     }
 
-    public Lobby updateSettings(final LobbyId lobbyId, final PlayerId ownerId, final UpdateLobbySettingsModel model) {
+    public Lobby updateSettings(final LobbyId lobbyId, final PlayerId ownerId, final UpdateLobbySettingsModel model, final Jwt token) {
         Lobby lobby = findLobby(lobbyId);
-        LobbySettings newSettings = mapToDomainSettings(model.settings(), model.maxPlayers());
-        lobby.changeSettings(ownerId, newSettings);
 
+        int newMaxPlayers = model.maxPlayers() != null ? model.maxPlayers() : lobby.settings().maxPlayers();
+
+        Map<String, Object> merged = new HashMap<>(lobby.settings().gameSettings());
+        if (model.settings() != null) merged.putAll(model.settings());
+
+        Map<String, Object> resolved = gamesRepository.validateAndResolveSettings(lobby.gameId(), merged, token);
+
+        lobby.changeSettings(ownerId, new LobbySettings(newMaxPlayers, resolved));
         publisher.saveAndPublish(lobby);
         return lobby;
     }
@@ -116,17 +119,6 @@ public class LobbyService {
 
     public List<Lobby> getInvitesFromPlayer(PlayerId id, GameId game) {
         return repository.findInvitesFromPlayerId(id, game);
-    }
-
-    private LobbySettings mapToDomainSettings(final GameSettingsModel model, final Integer maxPlayers) {
-        int resolvedMaxPlayers = maxPlayers != null ? maxPlayers : 4;
-
-        GameSettings gameSettings = switch (model) {
-            case TicTacToeSettingsModel t -> new TicTacToeSettings(t.boardSize());
-            case CheckersSettingsModel c -> new CheckersSettings(c.boardSize(), c.flyingKings());
-        };
-
-        return new LobbySettings(gameSettings, resolvedMaxPlayers);
     }
 
     public Optional<Lobby> findByStartedGameId(GameId gameId) {

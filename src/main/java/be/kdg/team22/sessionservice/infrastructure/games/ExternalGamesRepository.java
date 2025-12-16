@@ -13,6 +13,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
+import java.util.Map;
+
 @Component
 public class ExternalGamesRepository implements GameRepository {
     private final RestClient client;
@@ -52,6 +54,25 @@ public class ExternalGamesRepository implements GameRepository {
                 throw new GameNotFoundException(gameId.value());
             throw exception;
         } catch (RestClientException exception) {
+            throw new GameServiceNotReachableException();
+        }
+    }
+
+    public Map<String, Object> validateAndResolveSettings(GameId gameId, Map<String, Object> settings, Jwt token) {
+        try {
+            ValidateGameSettingsResponse resp = client.post()
+                    .uri("/" + gameId.value() + "/settings/validate")
+                    .header("Authorization", "Bearer " + token.getTokenValue())
+                    .body(new ValidateGameSettingsRequest(settings))
+                    .retrieve()
+                    .body(ValidateGameSettingsResponse.class);
+
+            if (resp == null) throw new GameNotFoundException(gameId.value());
+            return resp.resolvedSettings() == null ? Map.of() : resp.resolvedSettings();
+        } catch (HttpClientErrorException ex) {
+            if (ex.getStatusCode() == HttpStatus.NOT_FOUND) throw new GameNotFoundException(gameId.value());
+            throw ex;
+        } catch (RestClientException ex) {
             throw new GameServiceNotReachableException();
         }
     }

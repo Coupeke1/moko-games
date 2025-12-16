@@ -3,7 +3,6 @@ package be.kdg.team22.sessionservice.infrastructure.lobby;
 import be.kdg.team22.sessionservice.config.TestcontainersConfig;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyStatus;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
-import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.BotEmbed;
 import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.JpaLobbyRepository;
 import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.LobbyEntity;
@@ -16,6 +15,7 @@ import org.springframework.context.annotation.Import;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,6 +26,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class DbLobbyRepositoryTest {
 
+    private final LobbySettings settings = new LobbySettings(
+            2,
+            Map.of("boardSize", 3)
+    );
     @Autowired
     private JpaLobbyRepository repo;
 
@@ -35,7 +39,6 @@ class DbLobbyRepositoryTest {
         UUID gameId = UUID.randomUUID();
         UUID ownerId = UUID.randomUUID();
 
-        LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
         PlayerEmbed owner = new PlayerEmbed(ownerId, "ownerUser", "img.png", true);
 
@@ -73,8 +76,7 @@ class DbLobbyRepositoryTest {
         assertThat(db.bot().image()).isEqualTo("bot.png");
         assertThat(db.bot().ready()).isTrue();
         LobbySettings mapped = db.settings();
-        assertThat(mapped.maxPlayers()).isEqualTo(4);
-        assertThat(mapped.gameSettings()).isInstanceOf(TicTacToeSettings.class);
+        assertThat(mapped.maxPlayers()).isEqualTo(2);
 
         assertThat(db.startedGameId()).isEqualTo(startedGameId);
     }

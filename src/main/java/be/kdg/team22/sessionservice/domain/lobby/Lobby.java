@@ -2,7 +2,6 @@ package be.kdg.team22.sessionservice.domain.lobby;
 
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.*;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
-import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerAlreadyInLobbyException;
@@ -119,9 +118,6 @@ public class Lobby {
     }
 
     private void ensureBotConstraints() {
-        if (!(settings.gameSettings() instanceof TicTacToeSettings))
-            throw new BotsNotSupportedException();
-
         if (bot != null)
             throw new TooManyBotsException();
 

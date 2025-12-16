@@ -5,7 +5,6 @@ import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyStatus;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
-import be.kdg.team22.sessionservice.domain.lobby.settings.TicTacToeSettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.domain.player.PlayerName;
@@ -13,12 +12,18 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class LobbyEntityTest {
+
+    private final LobbySettings settings = new LobbySettings(
+            2,
+            Map.of("boardSize", 3)
+    );
 
     private Player p(PlayerId id, String name, String img, boolean ready) {
         return new Player(id, new PlayerName(name), img, ready);
@@ -34,7 +39,6 @@ class LobbyEntityTest {
 
         Player bot = Player.bot(PlayerId.create(), new PlayerName("BOT-MOKO"), "bot.png");
 
-        LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
         Lobby domain = new Lobby(id, gameId, ownerId, List.of(owner), Set.of(PlayerId.from(UUID.randomUUID())), settings, LobbyStatus.OPEN, Instant.parse("2024-01-01T00:00:00Z"), Instant.parse("2024-01-02T00:00:00Z"), GameId.from(UUID.fromString("00000000-0000-0000-0000-000000000999")));
 
@@ -69,7 +73,6 @@ class LobbyEntityTest {
 
         BotEmbed bot = new BotEmbed(UUID.randomUUID(), "BOT-XYZ", "bot.png", true);
 
-        LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 5);
         UUID startedGame = UUID.randomUUID();
 
         LobbyEntity entity = new LobbyEntity(id, gameId, ownerId, List.of(e1), List.of(invited), settings, LobbyStatus.CLOSED, Instant.parse("2024-05-05T10:00:00Z"), Instant.parse("2024-05-06T10:00:00Z"), startedGame, bot);
@@ -102,7 +105,6 @@ class LobbyEntityTest {
         UUID gameId = UUID.randomUUID();
         UUID ownerId = UUID.randomUUID();
 
-        LobbySettings settings = new LobbySettings(new TicTacToeSettings(3), 4);
 
         LobbyEntity entity = new LobbyEntity(id, gameId, ownerId, List.of(new PlayerEmbed(ownerId, "owner", "", false)), List.of(), settings, LobbyStatus.OPEN, Instant.now(), Instant.now(), null, null);
 
@@ -119,7 +121,7 @@ class LobbyEntityTest {
 
         PlayerEmbed owner = new PlayerEmbed(ownerId, "owner", "", true);
 
-        LobbyEntity entity = new LobbyEntity(id, gameId, ownerId, List.of(owner), List.of(), new LobbySettings(new TicTacToeSettings(3), 4), LobbyStatus.OPEN, Instant.now(), Instant.now(), null, null);
+        LobbyEntity entity = new LobbyEntity(id, gameId, ownerId, List.of(owner), List.of(), settings, LobbyStatus.OPEN, Instant.now(), Instant.now(), null, null);
 
         Lobby domain = entity.to();
 
