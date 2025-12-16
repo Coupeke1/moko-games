@@ -82,6 +82,25 @@ class GameServiceTest {
         );
     }
 
+    private Game faultySampleGame(GameId id) {
+        Instant now = Instant.parse("2024-01-01T10:00:00Z");
+        return new Game(
+                id,
+                "checkers",
+                "http://localhost:8087",
+                "http://localhost:3000",
+                "/start",
+                "/health",
+                null,
+                true,
+                "Checkers",
+                "A fun board game",
+                "http://img",
+                now,
+                now,
+                null);
+    }
+
     private StartGameRequest createRequest(Map<String, Object> settings, boolean ai) {
         return new StartGameRequest(
                 UUID.fromString("11111111-1111-1111-1111-111111111111"),
@@ -160,7 +179,7 @@ class GameServiceTest {
         );
 
         assertThatThrownBy(() -> service.startGame(request, tokenFromUuid(request.players().getFirst())))
-                .isInstanceOf(InvalidGameConfigurationException.class);
+                .isInstanceOf(InvalidGameSettingsException.class);
 
         verifyNoInteractions(gameRepository, engine);
     }
@@ -169,7 +188,7 @@ class GameServiceTest {
     @DisplayName("startGame → invalid settings (missing required) → InvalidGameSettingsException")
     void startGame_missingRequiredSetting() {
         GameId gameId = GameId.from(UUID.fromString("22222222-2222-2222-2222-222222222222"));
-        Game game = sampleGame(gameId);
+        Game game = faultySampleGame(gameId);
 
         StartGameRequest request = createRequest(Map.of("flyingKings", true), false);
 
