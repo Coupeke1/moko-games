@@ -151,7 +151,7 @@ public class GameServiceTest {
         GameAchievementEvent event = captor.getValue();
         assertEquals(id.value(), event.gameId());
         assertEquals(playerId.value(), event.playerId());
-        assertEquals(AchievementCode.TICTACTOE_WIN.name(), event.achievementCode());
+        assertEquals(AchievementCode.WIN.name(), event.achievementCode());
     }
 
     @Test
@@ -184,7 +184,7 @@ public class GameServiceTest {
                 .orElseThrow(() -> new AssertionError("Draw event not found"));
         assertEquals(id.value(), playerXDrawEvent.gameId());
         assertEquals(playerX.id().value(), playerXDrawEvent.playerId());
-        assertEquals(AchievementCode.TICTACTOE_DRAW.name(), playerXDrawEvent.achievementCode());
+        assertEquals(AchievementCode.DRAW.name(), playerXDrawEvent.achievementCode());
 
         GameAchievementEvent playerODrawEvent = allValues.stream()
                 .filter(event -> event.playerId().equals(playerO.id().value()))
@@ -192,7 +192,7 @@ public class GameServiceTest {
                 .orElseThrow(() -> new AssertionError("Draw event not found"));
         assertEquals(id.value(), playerODrawEvent.gameId());
         assertEquals(playerO.id().value(), playerODrawEvent.playerId());
-        assertEquals(AchievementCode.TICTACTOE_DRAW.name(), playerODrawEvent.achievementCode());
+        assertEquals(AchievementCode.DRAW.name(), playerODrawEvent.achievementCode());
 
         ArgumentCaptor<GameEndedEvent> endedCaptor = ArgumentCaptor.forClass(GameEndedEvent.class);
         verify(publisher).publishGameEnded(endedCaptor.capture());

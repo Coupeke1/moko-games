@@ -69,7 +69,7 @@ public class GameService {
                 game.players().forEach(player ->
                         publisher.publishAchievement(
                                 new GameAchievementEvent(
-                                        AchievementCode.TICTACTOE_DRAW.name(),
+                                        AchievementCode.DRAW.name(),
                                         game.id().value(),
                                         player.id().value(),
                                         Instant.now()
@@ -80,7 +80,7 @@ public class GameService {
             if (game.status() == GameStatus.WON) {
                 publisher.publishAchievement(
                         new GameAchievementEvent(
-                                AchievementCode.TICTACTOE_WIN.name(),
+                                AchievementCode.WIN.name(),
                                 game.id().value(),
                                 game.winner().value(),
                                 Instant.now()
