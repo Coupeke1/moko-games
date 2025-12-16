@@ -76,12 +76,14 @@ export async function closeLobby(lobby: string) {
 export async function updateSettings(
     lobby: string,
     size: number,
+    settings: Record<string, unknown>,
 ) {
     try {
         validIdCheck(lobby);
 
         await client.put(`${BASE_URL}/${lobby}/settings`, {
             maxPlayers: size,
+            settings,
         });
     } catch {
         throw new Error("Could not update settings");
