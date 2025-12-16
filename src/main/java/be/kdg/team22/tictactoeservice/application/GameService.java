@@ -16,7 +16,7 @@ import be.kdg.team22.tictactoeservice.domain.game.Move;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
 import be.kdg.team22.tictactoeservice.domain.player.exceptions.PlayerIdentityMismatchException;
 import be.kdg.team22.tictactoeservice.domain.player.exceptions.PlayerNotInThisGameException;
-import be.kdg.team22.tictactoeservice.events.AiMoveRequestedEvent;
+import be.kdg.team22.tictactoeservice.events.BotMoveRequestedEvent;
 import be.kdg.team22.tictactoeservice.infrastructure.game.GameRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,11 +45,11 @@ public class GameService {
         logger = LoggerFactory.getLogger(GameService.class);
     }
 
-    public Game create(final PlayerId playerId, final CreateGameModel model, final boolean aiPlayer) {
+    public Game create(final PlayerId playerId, final CreateGameModel model, final boolean botPlayer) {
         List<PlayerId> players = model.players().stream().map(PlayerId::new).toList();
         if (players.stream().noneMatch(p -> p.equals(playerId)))
             throw new PlayerNotInThisGameException();
-        Game game = Game.create(config.minSize(), config.maxSize(), aiPlayer ? 3 : model.settings().boardSize(), players, aiPlayer);
+        Game game = Game.create(config.minSize(), config.maxSize(), botPlayer ? 3 : model.settings().boardSize(), players, botPlayer);
         repository.save(game);
         return game;
     }
@@ -111,9 +111,9 @@ public class GameService {
             logger.error(exception.getMessage());
         }
 
-        if (game.currentPlayer().aiPlayer()) {
+        if (game.currentPlayer().botPlayer()) {
             boolean expectResponse = game.status() == GameStatus.IN_PROGRESS;
-            applicationEventPublisher.publishEvent(AiMoveRequestedEvent.from(game, expectResponse));
+            applicationEventPublisher.publishEvent(BotMoveRequestedEvent.from(game, expectResponse));
         }
 
         return game;

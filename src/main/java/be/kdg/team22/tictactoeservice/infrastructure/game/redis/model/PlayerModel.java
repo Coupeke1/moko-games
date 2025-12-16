@@ -7,13 +7,13 @@ import be.kdg.team22.tictactoeservice.domain.player.PlayerRole;
 public class PlayerModel {
     public String id;
     public PlayerRole role;
-    public boolean ai;
+    public boolean bot;
 
     public static PlayerModel fromDomain(Player player) {
         PlayerModel model = new PlayerModel();
         model.id = player.id().value().toString();
         model.role = player.role();
-        model.ai = player.aiPlayer();
+        model.bot = player.botPlayer();
         return model;
     }
 
@@ -21,7 +21,7 @@ public class PlayerModel {
         return new Player(
                 PlayerId.create(id),
                 role,
-                ai
+                bot
         );
     }
 }

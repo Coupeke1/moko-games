@@ -4,10 +4,10 @@ import be.kdg.team22.tictactoeservice.application.GameService;
 import be.kdg.team22.tictactoeservice.domain.game.GameId;
 import be.kdg.team22.tictactoeservice.domain.game.Move;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
-import be.kdg.team22.tictactoeservice.events.AiMoveRequestedEvent;
-import be.kdg.team22.tictactoeservice.infrastructure.ai.AiMoveRequest;
-import be.kdg.team22.tictactoeservice.infrastructure.ai.AiMoveResponse;
-import be.kdg.team22.tictactoeservice.infrastructure.ai.ExternalAiRepository;
+import be.kdg.team22.tictactoeservice.events.BotMoveRequestedEvent;
+import be.kdg.team22.tictactoeservice.infrastructure.bot.BotMoveRequest;
+import be.kdg.team22.tictactoeservice.infrastructure.bot.BotMoveResponse;
+import be.kdg.team22.tictactoeservice.infrastructure.bot.ExternalBotRepository;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -15,22 +15,22 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-public class AiMoveEventListener {
+public class BotMoveEventListener {
     private final GameService gameService;
-    private final ExternalAiRepository aiRepository;
+    private final ExternalBotRepository aiRepository;
 
-    public AiMoveEventListener(GameService gameService, ExternalAiRepository aiRepository) {
+    public BotMoveEventListener(GameService gameService, ExternalBotRepository aiRepository) {
         this.gameService = gameService;
         this.aiRepository = aiRepository;
     }
 
     @Async
     @EventListener
-    public void handleAiMoveRequest(AiMoveRequestedEvent event) {
-        AiMoveRequest request = new AiMoveRequest(event.gameId(), event.gameName(),
+    public void handleBotMoveRequest(BotMoveRequestedEvent event) {
+        BotMoveRequest request = new BotMoveRequest(event.gameId(), event.gameName(),
                 event.board(), event.currentPlayer().role().name(), event.aiPlayer().name()
         );
-        AiMoveResponse response = aiRepository.requestMove(request);
+        BotMoveResponse response = aiRepository.requestMove(request);
 
         if (!event.expectResponse()) return;
 
