@@ -6,6 +6,7 @@ import be.kdg.team22.gamesservice.domain.game.GameId;
 import be.kdg.team22.gamesservice.domain.game.settings.GameSettingsDefinition;
 import be.kdg.team22.gamesservice.infrastructure.game.jpa.converter.GameSettingsDefinitionJsonConverter;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.Instant;
 import java.util.List;
@@ -64,6 +65,7 @@ public class GameEntity {
             nullable = false,
             columnDefinition = "jsonb"
     )
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = GameSettingsDefinitionJsonConverter.class)
     private GameSettingsDefinition settingsDefinition;
 

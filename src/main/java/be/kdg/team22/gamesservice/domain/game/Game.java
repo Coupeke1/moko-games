@@ -10,30 +10,27 @@ import org.jmolecules.ddd.annotation.AggregateRoot;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.Map;
 
 @AggregateRoot
 public class Game {
 
     private final GameId id;
     private final Instant createdAt;
+    private final Set<Achievement> achievements = new HashSet<>();
     private Instant updatedAt;
-
     // Engine data
     private String name;
     private String baseUrl;
     private String frontendUrl;
     private String startEndpoint;
-    private GameSettingsDefinition settingsDefinition;
+    private final GameSettingsDefinition settingsDefinition;
     private String healthEndpoint;
     private Instant lastHealthCheck;
     private boolean healthy;
-
     // frontend metadata
     private String title;
     private String description;
     private String image;
-    private final Set<Achievement> achievements = new HashSet<>();
 
     public Game(
             final GameId id,
@@ -80,7 +77,8 @@ public class Game {
             final String healthEndpoint,
             final String title,
             final String description,
-            final String image
+            final String image,
+            final GameSettingsDefinition settingsDefinition
     ) {
         validate(id, name, baseUrl, frontendUrl, startEndpoint, healthEndpoint, title, description, image);
 
@@ -98,6 +96,36 @@ public class Game {
 
         this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
+        this.settingsDefinition = settingsDefinition;
+    }
+
+    public static Game register(final RegisterGameRequest request) {
+        Game game = new Game(
+                GameId.create(),
+                request.name(),
+                request.backendUrl(),
+                request.frontendUrl(),
+                request.startEndpoint(),
+                request.healthEndpoint(),
+                request.title(),
+                request.description(),
+                request.image(),
+                request.settingsDefinition()
+
+        );
+
+        if (request.achievements() == null) return game;
+
+        List<Achievement> achievements = new ArrayList<>();
+        request.achievements().forEach(achievement -> achievements.add(new Achievement(
+                AchievementKey.fromString(achievement.key()),
+                achievement.name(),
+                achievement.description(),
+                achievement.levels()
+        )));
+        game.addAchievements(achievements);
+
+        return game;
     }
 
     private void validate(
@@ -196,33 +224,6 @@ public class Game {
         if (image == null || image.isBlank()) {
             throw GameMetadataException.invalidImage();
         }
-    }
-
-    public static Game register(final RegisterGameRequest request) {
-        Game game = new Game(
-                GameId.create(),
-                request.name(),
-                request.backendUrl(),
-                request.frontendUrl(),
-                request.startEndpoint(),
-                request.healthEndpoint(),
-                request.title(),
-                request.description(),
-                request.image()
-        );
-
-        if (request.achievements() == null) return game;
-
-        List<Achievement> achievements = new ArrayList<>();
-        request.achievements().forEach(achievement -> achievements.add(new Achievement(
-                AchievementKey.fromString(achievement.key()),
-                achievement.name(),
-                achievement.description(),
-                achievement.levels()
-        )));
-        game.addAchievements(achievements);
-
-        return game;
     }
 
     public void update(final RegisterGameRequest request) {

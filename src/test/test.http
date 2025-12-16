@@ -1,7 +1,4 @@
-### getting a game id
-GET http://localhost:8084/api/games/00000000-0000-0000-0000-000000000001
-
-### Regsiter a game
+### Register a game
 POST http://localhost:8084/api/games/register
 Content-Type: application/json
 
@@ -16,6 +13,21 @@ Content-Type: application/json
   "image": "test",
   "price": 25,
   "category": "PARTY",
+
+  "settingsDefinition": {
+    "settings": [
+      {
+        "name": "boardSize",
+        "type": "INTEGER",
+        "required": true,
+        "min": 3,
+        "max": null,
+        "allowedValues": null,
+        "defaultValue": 3
+      }
+    ]
+  },
+
   "achievements": [
     {
       "key": "WIN",
