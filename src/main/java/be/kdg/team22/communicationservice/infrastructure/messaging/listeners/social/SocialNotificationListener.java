@@ -2,7 +2,7 @@ package be.kdg.team22.communicationservice.infrastructure.messaging.listeners.so
 
 import be.kdg.team22.communicationservice.application.notification.NotificationService;
 import be.kdg.team22.communicationservice.config.RabbitMQTopology;
-import be.kdg.team22.communicationservice.domain.notification.NotificationType;
+import be.kdg.team22.communicationservice.domain.notification.NotificationOrigin;
 import be.kdg.team22.communicationservice.domain.notification.PlayerId;
 import be.kdg.team22.communicationservice.infrastructure.messaging.events.social.FriendRequestAcceptedEvent;
 import be.kdg.team22.communicationservice.infrastructure.messaging.events.social.FriendRequestReceivedEvent;
@@ -23,7 +23,7 @@ public class SocialNotificationListener {
 
         notifications.create(
                 recipient,
-                NotificationType.FRIEND_REQUEST_RECEIVED,
+                NotificationOrigin.FRIEND_REQUEST_RECEIVED,
                 "New friend request",
                 event.senderName() + " has sent you a friend request."
         );
@@ -35,7 +35,7 @@ public class SocialNotificationListener {
 
         notifications.create(
                 recipient,
-                NotificationType.FRIEND_REQUEST_ACCEPTED,
+                NotificationOrigin.FRIEND_REQUEST_ACCEPTED,
                 "Friend request accepted",
                 event.senderName() + " has accepted your friend request."
         );

@@ -8,7 +8,7 @@ import be.kdg.team22.communicationservice.application.queries.PageResult;
 import be.kdg.team22.communicationservice.application.queries.Pagination;
 import be.kdg.team22.communicationservice.domain.notification.Notification;
 import be.kdg.team22.communicationservice.domain.notification.NotificationId;
-import be.kdg.team22.communicationservice.domain.notification.NotificationType;
+import be.kdg.team22.communicationservice.domain.notification.NotificationOrigin;
 import be.kdg.team22.communicationservice.domain.notification.PlayerId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,7 +31,7 @@ public class NotificationController {
     public ResponseEntity<PagedResponse<NotificationModel>> getNotifications(
             @AuthenticationPrincipal final Jwt jwt,
             @RequestParam(required = false) final NotificationReadFilter type,
-            @RequestParam(required = false) final NotificationType origin,
+            @RequestParam(required = false) final NotificationOrigin origin,
             @RequestParam(defaultValue = "0") final int page,
             @RequestParam(defaultValue = "10") final int size
     ) {
@@ -61,7 +61,7 @@ public class NotificationController {
 
         service.create(
                 id,
-                NotificationType.FRIEND_REQUEST_RECEIVED,
+                NotificationOrigin.FRIEND_REQUEST_RECEIVED,
                 "Test Social Notification",
                 "Dit is een test"
         );

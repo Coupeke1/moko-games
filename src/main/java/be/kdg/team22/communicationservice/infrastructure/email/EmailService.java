@@ -44,8 +44,8 @@ public class EmailService {
             context.setVariable("recipientName", recipientName);
             context.setVariable("title", notification.title());
             context.setVariable("message", notification.message());
-            context.setVariable("notificationType", notification.type().name());
-            context.setVariable("color", getColorForType(notification.type().name()));
+            context.setVariable("notificationType", notification.origin().name());
+            context.setVariable("color", getColorForType(notification.origin().name()));
 
             String htmlContent = templateEngine.process("email/notification", context);
             helper.setText(htmlContent, true);

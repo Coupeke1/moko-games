@@ -8,7 +8,7 @@ public record NotificationPreferences(
         boolean chat
 ) {
     public boolean allows(Notification notification) {
-        return switch (notification.type()) {
+        return switch (notification.origin()) {
             case FRIEND_REQUEST_RECEIVED,
                  FRIEND_REQUEST_ACCEPTED,
                  LOBBY_INVITE,

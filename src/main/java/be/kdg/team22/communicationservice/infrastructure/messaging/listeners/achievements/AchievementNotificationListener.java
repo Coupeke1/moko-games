@@ -2,7 +2,7 @@ package be.kdg.team22.communicationservice.infrastructure.messaging.listeners.ac
 
 import be.kdg.team22.communicationservice.application.notification.NotificationService;
 import be.kdg.team22.communicationservice.config.RabbitMQTopology;
-import be.kdg.team22.communicationservice.domain.notification.NotificationType;
+import be.kdg.team22.communicationservice.domain.notification.NotificationOrigin;
 import be.kdg.team22.communicationservice.domain.notification.PlayerId;
 import be.kdg.team22.communicationservice.infrastructure.messaging.events.achievements.AchievementUnlockedEvent;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -22,7 +22,7 @@ public class AchievementNotificationListener {
 
         notifications.create(
                 recipient,
-                NotificationType.ACHIEVEMENT_UNLOCKED,
+                NotificationOrigin.ACHIEVEMENT_UNLOCKED,
                 "Achievement acquired!",
                 "You acquired: " + event.achievementName()
         );

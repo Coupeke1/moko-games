@@ -1,7 +1,7 @@
 package be.kdg.team22.communicationservice.infrastructure.messaging.listeners.store;
 
 import be.kdg.team22.communicationservice.application.notification.NotificationService;
-import be.kdg.team22.communicationservice.domain.notification.NotificationType;
+import be.kdg.team22.communicationservice.domain.notification.NotificationOrigin;
 import be.kdg.team22.communicationservice.domain.notification.PlayerId;
 import be.kdg.team22.communicationservice.infrastructure.messaging.events.store.OrderCompletedEvent;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ class StoreNotificationListenerTest {
 
         verify(service).create(
                 player.capture(),
-                org.mockito.ArgumentMatchers.eq(NotificationType.ORDER_COMPLETED),
+                org.mockito.ArgumentMatchers.eq(NotificationOrigin.ORDER_COMPLETED),
                 title.capture(),
                 org.mockito.ArgumentMatchers.anyString()
         );

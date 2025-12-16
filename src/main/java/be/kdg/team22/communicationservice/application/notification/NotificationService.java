@@ -32,12 +32,12 @@ public class NotificationService {
     }
 
     public Notification create(final PlayerId recipient,
-                               final NotificationType type,
+                               final NotificationOrigin origin,
                                final String title,
                                final String message) {
 
         Notification notification = Notification.create(
-                recipient, type, title, message
+                recipient, origin, title, message
         );
 
         Notification saved = repository.save(notification);
@@ -65,7 +65,7 @@ public class NotificationService {
     public PageResult<Notification> findAllByConstraints(
             final PlayerId playerId,
             final NotificationReadFilter type,
-            final NotificationType origin,
+            final NotificationOrigin origin,
             final Pagination pagination
     ) {
         return repository.findAllByConstraints(playerId, type, origin, pagination);

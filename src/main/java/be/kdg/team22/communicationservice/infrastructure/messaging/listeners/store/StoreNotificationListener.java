@@ -2,7 +2,7 @@ package be.kdg.team22.communicationservice.infrastructure.messaging.listeners.st
 
 import be.kdg.team22.communicationservice.application.notification.NotificationService;
 import be.kdg.team22.communicationservice.config.RabbitMQTopology;
-import be.kdg.team22.communicationservice.domain.notification.NotificationType;
+import be.kdg.team22.communicationservice.domain.notification.NotificationOrigin;
 import be.kdg.team22.communicationservice.domain.notification.PlayerId;
 import be.kdg.team22.communicationservice.infrastructure.messaging.events.store.OrderCompletedEvent;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -22,7 +22,7 @@ public class StoreNotificationListener {
 
         notifications.create(
                 recipient,
-                NotificationType.ORDER_COMPLETED,
+                NotificationOrigin.ORDER_COMPLETED,
                 "Order completed",
                 String.format("Your order (%s) has successfully been completed for a total of €%.2f",
                         event.orderId(),

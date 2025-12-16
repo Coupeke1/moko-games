@@ -1,7 +1,7 @@
 package be.kdg.team22.communicationservice.infrastructure.messaging.listeners.social;
 
 import be.kdg.team22.communicationservice.application.notification.NotificationService;
-import be.kdg.team22.communicationservice.domain.notification.NotificationType;
+import be.kdg.team22.communicationservice.domain.notification.NotificationOrigin;
 import be.kdg.team22.communicationservice.domain.notification.PlayerId;
 import be.kdg.team22.communicationservice.infrastructure.messaging.events.social.FriendRequestAcceptedEvent;
 import be.kdg.team22.communicationservice.infrastructure.messaging.events.social.FriendRequestReceivedEvent;
@@ -39,7 +39,7 @@ class SocialNotificationListenerTest {
 
         verify(service).create(
                 player.capture(),
-                org.mockito.ArgumentMatchers.eq(NotificationType.FRIEND_REQUEST_RECEIVED),
+                org.mockito.ArgumentMatchers.eq(NotificationOrigin.FRIEND_REQUEST_RECEIVED),
                 org.mockito.ArgumentMatchers.eq("New friend request"),
                 org.mockito.ArgumentMatchers.anyString()
         );
@@ -60,7 +60,7 @@ class SocialNotificationListenerTest {
 
         verify(service).create(
                 player.capture(),
-                org.mockito.ArgumentMatchers.eq(NotificationType.FRIEND_REQUEST_ACCEPTED),
+                org.mockito.ArgumentMatchers.eq(NotificationOrigin.FRIEND_REQUEST_ACCEPTED),
                 org.mockito.ArgumentMatchers.eq("Friend request accepted"),
                 org.mockito.ArgumentMatchers.anyString()
         );

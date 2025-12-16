@@ -2,7 +2,7 @@ package be.kdg.team22.communicationservice.infrastructure.notification.jpa;
 
 import be.kdg.team22.communicationservice.domain.notification.Notification;
 import be.kdg.team22.communicationservice.domain.notification.NotificationId;
-import be.kdg.team22.communicationservice.domain.notification.NotificationType;
+import be.kdg.team22.communicationservice.domain.notification.NotificationOrigin;
 import be.kdg.team22.communicationservice.domain.notification.PlayerId;
 import jakarta.persistence.*;
 
@@ -21,7 +21,7 @@ public class NotificationEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private NotificationType type;
+    private NotificationOrigin origin;
 
     @Column(nullable = false)
     private String title;
@@ -40,14 +40,14 @@ public class NotificationEntity {
 
     public NotificationEntity(final UUID id,
                               final UUID recipientId,
-                              final NotificationType type,
+                              final NotificationOrigin origin,
                               final String title,
                               final String message,
                               final Instant createdAt,
                               final boolean read) {
         this.id = id;
         this.recipientId = recipientId;
-        this.type = type;
+        this.origin = origin;
         this.title = title;
         this.message = message;
         this.createdAt = createdAt;
@@ -58,7 +58,7 @@ public class NotificationEntity {
         return new NotificationEntity(
                 notification.id().value(),
                 notification.recipientId().value(),
-                notification.type(),
+                notification.origin(),
                 notification.title(),
                 notification.message(),
                 notification.createdAt(),
@@ -70,7 +70,7 @@ public class NotificationEntity {
         return new Notification(
                 NotificationId.from(id),
                 PlayerId.from(recipientId),
-                type,
+                origin,
                 title,
                 message,
                 createdAt,
@@ -86,8 +86,8 @@ public class NotificationEntity {
         return recipientId;
     }
 
-    public NotificationType type() {
-        return type;
+    public NotificationOrigin origin() {
+        return origin;
     }
 
     public String title() {

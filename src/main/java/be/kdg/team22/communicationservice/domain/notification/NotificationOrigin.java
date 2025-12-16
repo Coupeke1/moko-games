@@ -1,6 +1,6 @@
 package be.kdg.team22.communicationservice.domain.notification;
 
-public enum NotificationType {
+public enum NotificationOrigin {
     FRIEND_REQUEST_RECEIVED,
     FRIEND_REQUEST_ACCEPTED,
     LOBBY_INVITE,
