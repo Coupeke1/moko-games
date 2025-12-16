@@ -31,9 +31,12 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(mgmt ->
                         mgmt.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/games/*/move")
-                                .authenticated().anyRequest().permitAll())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/games").authenticated()
+                        .requestMatchers("/api/games/**").authenticated()
+                        .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
+                        .anyRequest().permitAll()
+                )
                 .oauth2ResourceServer(rs ->
                         rs.jwt(jwt ->
                                 jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));

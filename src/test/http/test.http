@@ -48,7 +48,7 @@ Content-Type: application/json
 }
 
 ### Generate Game With Bot Player
-POST localhost:8087/api/games?botPlayer=true
+POST localhost:8087/api/games?aiPlayer=true
 Content-Type: application/json
 
 {
@@ -162,5 +162,5 @@ Content-Type: application/json
   ],
   "current_player": "W",
   "ai_player": "W",
-  "king_movement_mode": "MULTI"
+  "king_movement_mode": "SINGLE"
 }

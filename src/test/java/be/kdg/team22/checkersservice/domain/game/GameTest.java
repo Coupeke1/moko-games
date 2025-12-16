@@ -313,41 +313,6 @@ public class GameTest {
         assert (game.board().pieceAt(22).isPresent());
     }
 
-    @Test
-    void resetShouldThrowWhenGameStillRunning() {
-        assertEquals(GameStatus.RUNNING, game.status());
-        assertThrows(GameResetException.class, () ->
-                game.reset()
-        );
-    }
-
-    @Test
-    void resetShouldSucceedWhenGameDraw() throws NoSuchFieldException, IllegalAccessException {
-        Field statusField = Game.class.getDeclaredField("status");
-        statusField.setAccessible(true);
-        statusField.set(game, GameStatus.DRAW);
-
-        assertDoesNotThrow(() -> game.reset());
-    }
-
-    @Test
-    void resetShouldSucceedWhenBlackWins() throws NoSuchFieldException, IllegalAccessException {
-        Field statusField = Game.class.getDeclaredField("status");
-        statusField.setAccessible(true);
-        statusField.set(game, GameStatus.BLACK_WIN);
-
-        assertDoesNotThrow(() -> game.reset());
-    }
-
-    @Test
-    void resetShouldSucceedWhenWhiteWins() throws NoSuchFieldException, IllegalAccessException {
-        Field statusField = Game.class.getDeclaredField("status");
-        statusField.setAccessible(true);
-        statusField.set(game, GameStatus.WHITE_WIN);
-
-        assertDoesNotThrow(() -> game.reset());
-    }
-
     private Board createMultiCaptureBoard() {
         Board testBoard = Board.create(8);
         clearBoard(testBoard);

@@ -5,6 +5,7 @@ import be.kdg.team22.checkersservice.domain.game.exceptions.*;
 import be.kdg.team22.checkersservice.domain.player.exceptions.ClaimNotFoundException;
 import be.kdg.team22.checkersservice.domain.player.exceptions.InvalidPlayerException;
 import be.kdg.team22.checkersservice.domain.player.exceptions.PlayerIdentityMismatchException;
+import be.kdg.team22.checkersservice.domain.player.exceptions.PlayerNotInThisGameException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -33,8 +34,8 @@ public class ExceptionController {
             TooManyTilesException.class,
             UniquePlayersException.class,
     })
-    public ResponseEntity<String> handleDomainErrors(final RuntimeException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<String> handleDomainErrors(final RuntimeException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({
@@ -42,8 +43,8 @@ public class ExceptionController {
             NotFoundException.class,
             StartingPieceNotFoundException.class
     })
-    public ResponseEntity<String> handleNotFoundErrors(final RuntimeException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
+    public ResponseEntity<String> handleNotFoundErrors(final RuntimeException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -56,18 +57,19 @@ public class ExceptionController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
-    @ExceptionHandler(BotMoveRequestFailedException.class)
-    public ResponseEntity<String> handleBotMoveRequestFailedException(BotMoveRequestFailedException ex) {
+    @ExceptionHandler({
+            BotMoveRequestFailedException.class,
+            BotServiceNotReachableException.class
+    })
+    public ResponseEntity<String> handleBotExceptions(final RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
-    @ExceptionHandler(BotServiceNotReachableException.class)
-    public ResponseEntity<String> handleBotServiceNotReachableException(BotServiceNotReachableException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-    }
-
-    @ExceptionHandler(PlayerIdentityMismatchException.class)
-    public ResponseEntity<String> handleForbiddenActionErrors(final RuntimeException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.FORBIDDEN);
+    @ExceptionHandler({
+            PlayerIdentityMismatchException.class,
+            PlayerNotInThisGameException.class
+    })
+    public ResponseEntity<String> handlePlayerAuthExceptions(final RuntimeException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
     }
 }

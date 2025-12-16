@@ -118,14 +118,6 @@ public class Game {
         return status;
     }
 
-    public void reset() {
-        if (status == GameStatus.RUNNING) throw new GameResetException();
-
-        this.status = GameStatus.RUNNING;
-        this.board.setupInitialPieces();
-        this.currentRole = PlayerRole.BLACK;
-    }
-
     public Player playerWithRole(final PlayerRole role) {
         return players.stream()
                 .filter(p -> p.role() == role)

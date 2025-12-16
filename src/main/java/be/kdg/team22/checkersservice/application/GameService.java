@@ -12,6 +12,7 @@ import be.kdg.team22.checkersservice.domain.game.GameId;
 import be.kdg.team22.checkersservice.domain.move.MoveResult;
 import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 import be.kdg.team22.checkersservice.domain.player.exceptions.PlayerIdentityMismatchException;
+import be.kdg.team22.checkersservice.domain.player.exceptions.PlayerNotInThisGameException;
 import be.kdg.team22.checkersservice.events.BotMoveRequestedEvent;
 import be.kdg.team22.checkersservice.infrastructure.game.GameRepository;
 import be.kdg.team22.checkersservice.domain.player.PlayerId;
@@ -38,8 +39,10 @@ public class GameService {
         logger = LoggerFactory.getLogger(GameService.class);
     }
 
-    public Game create(final CreateGameModel model, final boolean botPlayer) {
+    public Game create(final PlayerId playerId, final CreateGameModel model, final boolean botPlayer) {
         List<PlayerId> players = model.players().stream().map(PlayerId::new).toList();
+        if (players.stream().noneMatch(p -> p.equals(playerId)))
+            throw new PlayerNotInThisGameException();
         Game game = Game.create(players, botPlayer, model.settings().kingMovementMode());
         repository.save(game);
         return game;
@@ -49,8 +52,16 @@ public class GameService {
         return repository.findById(id).orElseThrow(id::notFound);
     }
 
+    public Game requestState(final GameId id, final PlayerId playerId) {
+        Game game = getById(id);
+        if (game.players().stream().noneMatch(p -> p.id().equals(playerId)))
+            throw new PlayerNotInThisGameException();
+        return game;
+    }
+
     public Game requestMove(final GameId gameId, final PlayerId playerId, final Move move) {
-        if (!playerId.equals(move.playerId())) throw new PlayerIdentityMismatchException();
+        if (!playerId.equals(move.playerId()))
+            throw new PlayerIdentityMismatchException();
 
         Game game = getById(gameId);
         MoveResult result = game.requestMove(move);
@@ -144,13 +155,6 @@ public class GameService {
             applicationEventPublisher.publishEvent(BotMoveRequestedEvent.from(game, expectResponse));
         }
 
-        return game;
-    }
-
-    public Game reset(final GameId id) {
-        Game game = getById(id);
-        game.reset();
-        repository.save(game);
         return game;
     }
 }
