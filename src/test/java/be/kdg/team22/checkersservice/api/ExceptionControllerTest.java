@@ -6,6 +6,7 @@ import be.kdg.team22.checkersservice.domain.player.PlayerRole;
 import be.kdg.team22.checkersservice.domain.player.exceptions.ClaimNotFoundException;
 import be.kdg.team22.checkersservice.domain.player.exceptions.InvalidPlayerException;
 import be.kdg.team22.checkersservice.domain.player.exceptions.PlayerIdentityMismatchException;
+import be.kdg.team22.checkersservice.domain.player.exceptions.PlayerNotInThisGameException;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 
@@ -107,23 +108,26 @@ public class ExceptionControllerTest {
     }
 
     @Test
-    void handleBotMoveRequestFailedExceptions() {
+    void handleBotExceptions() {
         BotMoveRequestFailedException botMoveRequestFailedEx = new BotMoveRequestFailedException("");
-        ResponseEntity<String> response = controller.handleBotMoveRequestFailedException(botMoveRequestFailedEx);
-        assertThat(response.getStatusCode().value()).isEqualTo(400);
-    }
-
-    @Test
-    void handleBotServiceNotReachableException() {
         BotServiceNotReachableException botServiceNotReachableEx = new BotServiceNotReachableException("");
-        ResponseEntity<String> response = controller.handleBotServiceNotReachableException(botServiceNotReachableEx);
-        assertThat(response.getStatusCode().value()).isEqualTo(400);
+
+        ResponseEntity<String> botMoveRequestFailedExResponse = controller.handleBotExceptions(botMoveRequestFailedEx);
+        ResponseEntity<String> botServiceNotReachableExResponse = controller.handleBotExceptions(botServiceNotReachableEx);
+
+        assertThat(botMoveRequestFailedExResponse.getStatusCode().value()).isEqualTo(400);
+        assertThat(botServiceNotReachableExResponse.getStatusCode().value()).isEqualTo(400);
     }
 
     @Test
-    void handleForbiddenActions() {
+    void handlePlayerAuthExceptions() {
         PlayerIdentityMismatchException playerIdentityMismatchEx = new PlayerIdentityMismatchException();
-        ResponseEntity<String> response = controller.handleForbiddenActionErrors(playerIdentityMismatchEx);
-        assertThat(response.getStatusCode().value()).isEqualTo(403);
+        PlayerNotInThisGameException playerNotInThisGameEx = new PlayerNotInThisGameException();
+
+        ResponseEntity<String> playerIdentityMismatchExResponse = controller.handlePlayerAuthExceptions(playerIdentityMismatchEx);
+        ResponseEntity<String> playerNotInThisGameExResponse = controller.handlePlayerAuthExceptions(playerNotInThisGameEx);
+
+        assertThat(playerIdentityMismatchExResponse.getStatusCode().value()).isEqualTo(403);
+        assertThat(playerNotInThisGameExResponse.getStatusCode().value()).isEqualTo(403);
     }
 }
