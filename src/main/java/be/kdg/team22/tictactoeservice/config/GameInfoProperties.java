@@ -1,5 +1,6 @@
 package be.kdg.team22.tictactoeservice.config;
 
+import be.kdg.team22.tictactoeservice.infrastructure.register.SettingType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -172,7 +173,7 @@ public class GameInfoProperties {
 
     public static class Setting {
         private String name;
-        private String type;
+        private SettingType type;
         private boolean required;
         private Integer min;
         private Integer max;
@@ -187,11 +188,11 @@ public class GameInfoProperties {
             this.name = name;
         }
 
-        public String type() {
+        public SettingType type() {
             return type;
         }
 
-        public void setType(String type) {
+        public void setType(SettingType type) {
             this.type = type;
         }
 

@@ -19,5 +19,6 @@ public record RegisterGameRequest(
         GameSettingsDefinition settingsDefinition,
         List<RegisterAchievementRequest> achievements
 ) {
-    public record GameSettingsDefinition(List<RegisterSettingsRequest> settings) {}
+    public record GameSettingsDefinition(List<RegisterSettingsRequest> settings) {
+    }
 }

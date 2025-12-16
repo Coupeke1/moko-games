@@ -4,7 +4,7 @@ import java.util.List;
 
 public record RegisterSettingsRequest(
         String name,
-        String type,
+        SettingType type,
         boolean required,
         Integer min,
         Integer max,
