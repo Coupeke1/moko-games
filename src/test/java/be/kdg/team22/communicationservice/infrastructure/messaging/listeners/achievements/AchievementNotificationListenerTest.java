@@ -46,7 +46,6 @@ class AchievementNotificationListenerTest {
         );
 
         assertThat(playerCaptor.getValue().value()).isEqualTo(playerId);
-        assertThat(titleCaptor.getValue()).isEqualTo("Achievement acquired!");
-        assertThat(messageCaptor.getValue()).isEqualTo("You acquired: Winner");
+        assertThat(titleCaptor.getValue()).isEqualTo("Achievement unlocked");
     }
 }

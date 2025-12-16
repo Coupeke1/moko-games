@@ -20,11 +20,6 @@ public class AchievementNotificationListener {
     public void handle(final AchievementUnlockedEvent event) {
         PlayerId recipient = PlayerId.from(event.playerId());
 
-        notifications.create(
-                recipient,
-                NotificationOrigin.ACHIEVEMENT_UNLOCKED,
-                "Achievement acquired!",
-                "You acquired: " + event.achievementName()
-        );
+        notifications.create(recipient, NotificationOrigin.ACHIEVEMENT_UNLOCKED, "Achievement unlocked", event.achievementName());
     }
 }

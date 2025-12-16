@@ -47,7 +47,7 @@ class ChatNotificationListenerTest {
         );
 
         assertThat(player.getValue().value()).isEqualTo(recipientId);
-        assertThat(title.getValue()).isEqualTo("New private message from Alice");
+        assertThat(title.getValue()).isEqualTo("Message from \"Alice\"");
         assertThat(message.getValue()).isEqualTo("Hi!");
     }
 }

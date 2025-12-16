@@ -20,13 +20,6 @@ public class StoreNotificationListener {
     public void handle(final OrderCompletedEvent event) {
         PlayerId recipient = PlayerId.from(event.userId());
 
-        notifications.create(
-                recipient,
-                NotificationOrigin.ORDER_COMPLETED,
-                "Order completed",
-                String.format("Your order (%s) has successfully been completed for a total of €%.2f",
-                        event.orderId(),
-                        event.totalAmount())
-        );
+        notifications.create(recipient, NotificationOrigin.ORDER_COMPLETED, "Order completed", String.format("Order has been completed for a total of €%.2f!", event.totalAmount()));
     }
 }

@@ -20,11 +20,6 @@ public class ChatNotificationListener {
     public void handle(final DirectMessageReceivedEvent event) {
         PlayerId recipient = PlayerId.from(event.recipientId());
 
-        notifications.create(
-                recipient,
-                NotificationOrigin.DIRECT_MESSAGE,
-                "New private message from " + event.senderName(),
-                event.messagePreview()
-        );
+        notifications.create(recipient, NotificationOrigin.DIRECT_MESSAGE, String.format("Message from \"%s\"", event.senderName()), event.messagePreview());
     }
 }

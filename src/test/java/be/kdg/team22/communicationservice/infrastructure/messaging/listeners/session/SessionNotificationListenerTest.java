@@ -48,7 +48,7 @@ class SessionNotificationListenerTest {
         );
 
         assertThat(player.getValue().value()).isEqualTo(targetUserId);
-        assertThat(title.getValue()).isEqualTo("Invited for lobby");
+        assertThat(title.getValue()).isEqualTo("Invited to lobby");
     }
 
     @Test
@@ -73,6 +73,6 @@ class SessionNotificationListenerTest {
         );
 
         assertThat(player.getValue().value()).isEqualTo(hostUserId);
-        assertThat(title.getValue()).isEqualTo("New player joined");
+        assertThat(title.getValue()).isEqualTo("Player joined");
     }
 }
