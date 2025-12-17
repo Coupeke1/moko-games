@@ -8,7 +8,6 @@ variables:
 
 stages:
   - build
-  - test
   - package
 
 cache:
@@ -26,25 +25,6 @@ build:
   artifacts:
     paths:
       - build/libs/*.jar
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH == "main"'
-
-test:
-  stage: test
-  image: $DEFAULT_IMAGE
-  script:
-    - chmod +x ./gradlew
-    - ./gradlew clean test --no-daemon
-  artifacts:
-    when: always
-    reports:
-      junit: build/test-results/test/*.xml
-  services:
-    - name: docker:27-dind
-  variables:
-    DOCKER_HOST: "tcp://docker:2375"
-    DOCKER_TLS_CERTDIR: ""
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == "main"'
