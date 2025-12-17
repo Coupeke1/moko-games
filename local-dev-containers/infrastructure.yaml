@@ -24,12 +24,15 @@ services:
             RABBITMQ_DEFAULT_PASS: "password"
         ports:
             - "5672:5672"
+            - "61613:61613"
             - "15672:15672"
         networks:
             - moko_backend
         volumes:
             - moko_rabbitmq_all:/var/lib/rabbitmq/
             - moko_rabbitmq_all:/var/log/rabbitmq/
+        command: >
+          sh -c "rabbitmq-plugins enable --offline rabbitmq_stomp && rabbitmq-server"
 
     app-redis:
         image: redis:8.4.0-alpine
