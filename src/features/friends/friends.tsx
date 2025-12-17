@@ -7,7 +7,7 @@ import Grid from "@/components/layout/grid/grid";
 import Page from "@/components/layout/page";
 import State from "@/components/state/state";
 import TabRow from "@/components/tabs/links/row";
-import showToast from "@/components/toast";
+import showToast from "@/components/global/toast";
 import Add from "@/features/friends/components/add";
 import { getTabs } from "@/features/friends/components/tabs";
 import { useFriends } from "@/features/friends/hooks/use-friends.ts";

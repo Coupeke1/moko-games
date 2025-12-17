@@ -35,7 +35,7 @@ export function getButtons(onCart: () => void): Button[] {
         {
             title: "Notifications",
             icon: <NotificationsIcon />,
-            path: "/notifications",
+            path: "/notifications?type=unread",
         },
         { title: "Chat", icon: <ChatIcon />, onClick: () => {} },
         { title: "Cart", icon: <CartIcon />, onClick: onCart },

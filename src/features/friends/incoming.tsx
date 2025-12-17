@@ -9,7 +9,7 @@ import Page from "@/components/layout/page";
 import Row from "@/components/layout/row";
 import State from "@/components/state/state";
 import TabRow from "@/components/tabs/links/row";
-import showToast from "@/components/toast";
+import showToast from "@/components/global/toast";
 import { getTabs } from "@/features/friends/components/tabs";
 import { useIncomingRequests } from "@/features/friends/hooks/use-requests.ts";
 import {

@@ -1,5 +1,5 @@
 import HeartIcon from "@/components/icons/heart-icon";
-import showToast from "@/components/toast";
+import showToast from "@/components/global/toast";
 import type { Game } from "@/features/games/models/game";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFavourite } from "../hooks/use-favourite";

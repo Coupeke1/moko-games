@@ -8,7 +8,7 @@ import Row from "@/components/layout/row";
 import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
 import Statistic from "@/components/statistic";
-import showToast from "@/components/toast";
+import showToast from "@/components/global/toast";
 import { useCart } from "@/features/cart/hooks/use-cart";
 import type { Entry } from "@/features/cart/models/entry";
 import { getTotalPrice } from "@/features/cart/services/cart";

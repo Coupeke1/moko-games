@@ -5,7 +5,7 @@ import { Justify } from "@/components/layout/justify";
 import Page from "@/components/layout/page";
 import Row from "@/components/layout/row";
 import State from "@/components/state/state";
-import showToast from "@/components/toast";
+import showToast from "@/components/global/toast";
 import { useGame } from "@/features/games/hooks/use-game";
 import type { Game } from "@/features/games/models/game.ts";
 import Favourite from "@/features/library/components/favourite";

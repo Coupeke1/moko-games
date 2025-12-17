@@ -33,7 +33,7 @@ function Content({
     return (
         <Column>
             <article
-                className={`flex flex-col ${(href || onClick) && `group cursor-pointer select-none ${image && "hover:bg-bg-3 transition-colors duration-75"}`} relative overflow-hidden justify-end ${image ? " bg-cover bg-center" : "bg-bg-2"} px-4 py-2 rounded-lg ${height}`}
+                className={`flex flex-col ${(href || onClick) && `group cursor-pointer select-none ${image && "hover:bg-bg-3 transition-colors duration-75"}`} relative overflow-hidden justify-end ${image ? " bg-cover bg-center" : "bg-bg-2 hover:bg-bg-3 transition-colors duration-75"} px-4 py-2 rounded-lg ${height}`}
                 style={{ backgroundImage: `url("${image}")` }}
             >
                 {image && (
@@ -47,7 +47,7 @@ function Content({
                         responsive={false}
                     >
                         <section className="min-w-0">
-                            <Stack>
+                            <Stack items={Items.Start}>
                                 <h3 className="font-bold text-lg truncate">
                                     {title}
                                 </h3>

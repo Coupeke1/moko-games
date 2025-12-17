@@ -6,7 +6,7 @@ import Grid from "@/components/layout/grid/grid";
 import Section from "@/components/section";
 import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
-import showToast from "@/components/toast";
+import showToast from "@/components/global/toast";
 import BotCard from "@/features/lobby/components/bot-card";
 import GameInformation from "@/features/lobby/components/information";
 import Page from "@/features/lobby/components/page";

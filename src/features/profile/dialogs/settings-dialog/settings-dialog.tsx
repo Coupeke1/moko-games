@@ -4,7 +4,7 @@ import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import TabContent from "@/components/tabs/buttons/content";
 import TabRow from "@/components/tabs/buttons/row";
-import showToast from "@/components/toast";
+import showToast from "@/components/global/toast";
 import AboutTab, {
     type AboutData,
 } from "@/features/profile/dialogs/settings-dialog/about-tab";

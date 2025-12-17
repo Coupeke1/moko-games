@@ -1,7 +1,7 @@
 import Page from "@/components/layout/page";
 import Message from "@/components/state/message";
 import State from "@/components/state/state";
-import showToast from "@/components/toast";
+import showToast from "@/components/global/toast";
 import { useVerify } from "@/features/checkout/hooks/use-verify";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";

@@ -53,7 +53,7 @@ export default function NavigationMenu({
                         <NavigationLink
                             key={button.title}
                             title={button.title}
-                            path="/"
+                            path={button.path ?? ""}
                         >
                             {button.icon}
                         </NavigationLink>

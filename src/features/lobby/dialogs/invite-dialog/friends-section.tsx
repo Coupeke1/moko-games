@@ -4,7 +4,7 @@ import AcceptIcon from "@/components/icons/accept-icon";
 import PlusIcon from "@/components/icons/plus-icon";
 import ErrorState from "@/components/state/error";
 import LoadingState from "@/components/state/loading";
-import showToast from "@/components/toast";
+import showToast from "@/components/global/toast";
 import { useFriends } from "@/features/friends/hooks/use-friends.ts";
 import type { Lobby } from "@/features/lobby/models/lobby.ts";
 import { sendInvite } from "@/features/lobby/services/invites.ts";

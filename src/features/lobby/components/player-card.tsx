@@ -7,7 +7,7 @@ import StarIcon from "@/components/icons/star-icon";
 import { Gap } from "@/components/layout/gap";
 import { Items } from "@/components/layout/items";
 import Row from "@/components/layout/row";
-import showToast from "@/components/toast";
+import showToast from "@/components/global/toast";
 import type { Lobby } from "@/features/lobby/models/lobby.ts";
 import type { Player } from "@/features/lobby/models/player.ts";
 import type { Profile } from "@/features/profile/models/profile.ts";

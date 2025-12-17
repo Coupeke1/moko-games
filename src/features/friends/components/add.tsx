@@ -2,7 +2,7 @@ import Button from "@/components/buttons/button";
 import Form from "@/components/inputs/form";
 import Input from "@/components/inputs/input";
 import { Gap } from "@/components/layout/gap";
-import showToast from "@/components/toast";
+import showToast from "@/components/global/toast";
 import { sendRequest } from "@/features/friends/services/requests.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";

@@ -7,7 +7,7 @@ import type { Lobby } from "@/features/lobby/models/lobby";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router";
 import { acceptInvite } from "@/features/lobby/services/invites";
-import showToast from "@/components/toast";
+import showToast from "@/components/global/toast";
 import { useEffect } from "react";
 
 export default function InvitesPage() {

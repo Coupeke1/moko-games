@@ -9,12 +9,12 @@ declare global {
             libraryService?: string;
             socialService?: string;
             sessionService?: string;
-            sessionSocket?: string;
             communicationService?: string;
             gamesService?: string;
             storeService?: string;
             orderService?: string;
             cartService?: string;
+            socketService?: string;
         };
     }
 }

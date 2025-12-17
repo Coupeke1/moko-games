@@ -1,41 +1,67 @@
-import { useParams } from "@/features/notifications/hooks/use-params";
-import { findMyNotifications } from "@/features/notifications/services/notifications.ts";
-import { POLLING_INTERVAL } from "@/lib/polling";
-import { useAuthStore } from "@/stores/auth-store.ts";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import type { Notification } from "@/features/notifications/models/notification";
+import { watchNotifications } from "@/features/notifications/services/socket";
+import { useSocketStore } from "@/stores/socket-store.ts";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router";
+import { type Subscription } from "rxjs";
 
 export function useNotifications() {
-    const { authenticated, keycloak, token } = useAuthStore();
-    const { type, origin } = useParams();
+    const queryClient = useQueryClient();
+    const navigate = useNavigate();
+    const { connect, disconnect, isConnected } = useSocketStore();
 
-    const {
-        data,
-        isLoading: loading,
-        isError: error,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage: fetching,
-    } = useInfiniteQuery({
-        queryKey: ["notifications", type, origin],
-        queryFn: ({ pageParam = 0 }) =>
-            findMyNotifications(type, origin, pageParam),
-        getNextPageParam: (lastPage) => {
-            if (lastPage.items.length > 0 && !lastPage.last)
-                return lastPage.page + 1;
-            return undefined;
+    const subscription = useRef<Subscription | null>(null);
+    const [isInitialized, setInitialized] = useState(false);
+
+    useEffect(() => {
+        connect();
+        return () => disconnect();
+    }, [connect, disconnect]);
+
+    const notifications = useQuery<Notification[]>({
+        queryKey: ["notifications", "me"],
+        enabled: false,
+        queryFn: async () => {
+            throw new Error("Should not be called");
         },
-        enabled: authenticated && !!keycloak && !!token,
-        staleTime: 30 * 1000,
-        retry: 1,
-        refetchInterval: POLLING_INTERVAL,
+        staleTime: Infinity,
     });
 
+    useEffect(() => {
+        if (!isConnected) return;
+
+        if (subscription.current) return;
+        let isFirst = true;
+
+        subscription.current = watchNotifications().subscribe({
+            next: (notifications) => {
+                queryClient.setQueryData<Notification[]>(
+                    ["notifications", "me"],
+                    notifications,
+                );
+
+                if (isFirst) {
+                    isFirst = false;
+                    setInitialized(true);
+                }
+            },
+            error: () => setInitialized(false),
+        });
+
+        return () => {
+            if (subscription.current) {
+                subscription.current.unsubscribe();
+                subscription.current = null;
+            }
+
+            setInitialized(false);
+        };
+    }, [isConnected, queryClient, navigate]);
+
     return {
-        notifications: data?.pages.flatMap((page) => page.items) ?? [],
-        loading,
-        fetching,
-        error,
-        fetchNextPage,
-        hasNextPage,
+        notifications: notifications.data ?? null,
+        loading: !isInitialized,
+        error: notifications.isError,
     };
 }
