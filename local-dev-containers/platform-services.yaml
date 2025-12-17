@@ -219,3 +219,22 @@ services:
         networks:
             - moko_backend
             - moko_kc
+    service-socket:
+        image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/socket-service:main-latest
+        restart: no
+        pull_policy: always
+        profiles: ["socket"]
+        environment:
+            SPRING_RABBITMQ_HOST: app-rabbitmq
+            SPRING_RABBITMQ_PORT: 5672
+            SPRING_RABBITMQ_USERNAME: user
+            SPRING_RABBITMQ_PASSWORD: password
+
+            SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
+        ports:
+            - "8090:8090"
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        networks:
+            - moko_backend
+            - moko_kc
