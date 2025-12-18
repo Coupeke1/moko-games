@@ -48,7 +48,7 @@ management:
 
 business:
   user-service:
-    url: ${USER_SERVICE_URL:http://localhost:8080}
+    url: ${USER_SERVICE_URL:http://localhost:8089}
   social-service:
     url: ${SOCIAL_SERVICE_URL:http://localhost:8083}
   game-service:
