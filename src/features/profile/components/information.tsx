@@ -1,4 +1,5 @@
 import EditIcon from "@/components/icons/edit-icon";
+import LogoutIcon from "@/components/icons/logout-icon";
 import Column from "@/components/layout/column";
 import {Gap} from "@/components/layout/gap";
 import {Items} from "@/components/layout/items";
@@ -16,6 +17,7 @@ interface Props {
     level: number;
     playTime: string;
     onEdit: () => void;
+    onLogout: () => void;
 }
 
 export default function ProfileInformation({
@@ -26,6 +28,7 @@ export default function ProfileInformation({
                                                level,
                                                playTime,
                                                onEdit,
+                                               onLogout,
                                            }: Props) {
     return (
         <Row justify={Justify.Between} items={Items.Stretch}>
@@ -37,12 +40,21 @@ export default function ProfileInformation({
                         <Row items={Items.Center} responsive={false}>
                             <h2 className="text-3xl font-bold">{username}</h2>
 
-                            <button
-                                onClick={onEdit}
-                                className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75"
-                            >
-                                <EditIcon small={true}/>
-                            </button>
+                            <Row gap={Gap.Small} items={Items.Center} responsive={false}>
+                                <button
+                                    onClick={onEdit}
+                                    className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75"
+                                >
+                                    <EditIcon small={true}/>
+                                </button>
+
+                                <button
+                                    onClick={onLogout}
+                                    className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75"
+                                >
+                                    <LogoutIcon small={true}/>
+                                </button>
+                            </Row>
                         </Row>
 
                         <h3 className="text-fg-2">{email}</h3>
@@ -56,20 +68,25 @@ export default function ProfileInformation({
             </Row>
 
             <section className="flex flex-col md:justify-between md:items-end p-1">
-                <button
-                    onClick={onEdit}
-                    className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75"
-                >
-                    <EditIcon small={false}/>
-                </button>
+                <Row gap={Gap.Small} responsive={false}>
+                    <button
+                        onClick={onEdit}
+                        className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75"
+                    >
+                        <EditIcon small={false}/>
+                    </button>
+
+                    <button
+                        onClick={onLogout}
+                        className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75"
+                    >
+                        <LogoutIcon small={false}/>
+                    </button>
+                </Row>
 
                 <Row gap={Gap.Large} responsive={false}>
                     <Statistic title="Level" value={level.toString()}/>
-
-                    <Statistic
-                        title="Time Played"
-                        value={playTime.toString()}
-                    />
+                    <Statistic title="Time Played" value={playTime.toString()}/>
                 </Row>
             </section>
         </Row>
