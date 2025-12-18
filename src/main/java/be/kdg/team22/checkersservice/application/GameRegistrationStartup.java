@@ -5,6 +5,7 @@ import be.kdg.team22.checkersservice.domain.register.exceptions.GameNotRegistere
 import be.kdg.team22.checkersservice.infrastructure.register.ExternalRegisterRepository;
 import be.kdg.team22.checkersservice.infrastructure.register.RegisterAchievementRequest;
 import be.kdg.team22.checkersservice.infrastructure.register.RegisterGameRequest;
+import be.kdg.team22.checkersservice.infrastructure.register.RegisterSettingsRequest;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -16,7 +17,8 @@ public class GameRegistrationStartup {
     private final ExternalRegisterRepository externalRegisterRepository;
     private final GameInfoProperties gameInfo;
 
-    public GameRegistrationStartup(final ExternalRegisterRepository externalRegisterRepository, final GameInfoProperties gameInfoProperties) {
+    public GameRegistrationStartup(final ExternalRegisterRepository externalRegisterRepository,
+                                   final GameInfoProperties gameInfoProperties) {
         this.externalRegisterRepository = externalRegisterRepository;
         this.gameInfo = gameInfoProperties;
     }
@@ -25,14 +27,34 @@ public class GameRegistrationStartup {
     public void registerGameOnStartup() {
         try {
             Thread.sleep(3000);
-        } catch (InterruptedException ignored) {}
+        } catch (InterruptedException ignored) {
+        }
 
-        List<RegisterAchievementRequest> achievementRequests = gameInfo.achievements().stream().map(achievement -> new RegisterAchievementRequest(
-                achievement.key(),
-                achievement.name(),
-                achievement.description(),
-                achievement.levels()
-        )).toList();
+        List<RegisterAchievementRequest> achievementRequests =
+                gameInfo.achievements().stream()
+                        .map(achievement -> new RegisterAchievementRequest(
+                                achievement.key(),
+                                achievement.name(),
+                                achievement.description(),
+                                achievement.levels()
+                        )).toList();
+
+        RegisterGameRequest.GameSettingsDefinition settingsDefinition = null;
+        if (gameInfo.settingsDefinition() != null && gameInfo.settingsDefinition().settings() != null) {
+            List<RegisterSettingsRequest> defs = gameInfo.settingsDefinition().settings().stream()
+                    .map(s -> new RegisterSettingsRequest(
+                            s.name(),
+                            s.type(),
+                            s.required(),
+                            s.min(),
+                            s.max(),
+                            s.allowedValues(),
+                            s.defaultValue()
+                    ))
+                    .toList();
+
+            settingsDefinition = new RegisterGameRequest.GameSettingsDefinition(defs);
+        }
 
         RegisterGameRequest request = new RegisterGameRequest(
                 gameInfo.name(),
@@ -45,6 +67,7 @@ public class GameRegistrationStartup {
                 gameInfo.image(),
                 gameInfo.price(),
                 gameInfo.category(),
+                settingsDefinition,
                 achievementRequests
         );
 
