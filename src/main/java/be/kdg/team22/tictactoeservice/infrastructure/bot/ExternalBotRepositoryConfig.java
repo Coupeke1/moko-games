@@ -7,12 +7,22 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
+import java.util.List;
+
 @Configuration
 public class ExternalBotRepositoryConfig {
 
     @Bean("botService")
     RestClient botRestClient(@Value("${business.ai.url}") final String baseUrl) {
+        return createRestClient(baseUrl);
+    }
 
+    @Bean("botServiceFallback")
+    RestClient botRestClientFallback(@Value("${business.ai.fallback_url}") final String fallbackUrl) {
+        return createRestClient(fallbackUrl);
+    }
+
+    private RestClient createRestClient(String baseUrl) {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(2000);
         requestFactory.setReadTimeout(2000);
@@ -22,7 +32,7 @@ public class ExternalBotRepositoryConfig {
                 .requestFactory(requestFactory)
                 .defaultHeaders(headers -> {
                     headers.setContentType(MediaType.APPLICATION_JSON);
-                    headers.setAccept(java.util.List.of(MediaType.APPLICATION_JSON));
+                    headers.setAccept(List.of(MediaType.APPLICATION_JSON));
                 })
                 .build();
     }
