@@ -7,7 +7,7 @@ services:
         pull_policy: always
         profiles: ["user"]
         ports:
-            - "8080:8080"
+            - "8089:8089"
         environment:
             SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=user_service
             SPRING_DATASOURCE_USERNAME: user
@@ -25,7 +25,7 @@ services:
             CHAT_SERVICE_URL: http://host.docker.internal:8082
         healthcheck:
             test:
-                ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+                ["CMD", "wget", "-qO-", "http://localhost:8089/actuator/health"]
             interval: 1m
             timeout: 15s
             retries: 5
@@ -56,7 +56,7 @@ services:
 
             SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
 
-            USER_SERVICE_URL: http://host.docker.internal:8080
+            USER_SERVICE_URL: http://host.docker.internal:8089
             SOCIAL_SERVICE_URL: http://host.docker.internal:8083
             GAME_SERVICE_URL: http://host.docker.internal:8084
             CHAT_SERVICE_URL: http://host.docker.internal:8082
@@ -93,7 +93,7 @@ services:
 
             SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
 
-            USER_SERVICE_URL: http://host.docker.internal:8080
+            USER_SERVICE_URL: http://host.docker.internal:8089
             CHAT_SERVICE_URL: http://host.docker.internal:8082
         healthcheck:
             test:
@@ -163,7 +163,7 @@ services:
 
             SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
 
-            USER_SERVICE_URL: http://host.docker.internal:8080
+            USER_SERVICE_URL: http://host.docker.internal:8089
             GAME_SERVICE_URL: http://host.docker.internal:8084
             CHAT_SERVICE_URL: http://host.docker.internal:8082
         ports:
@@ -200,7 +200,7 @@ services:
             SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
 
             SESSION_SERVICE_URL: http://host.docker.internal:8081
-            USER_SERVICE_URL: http://host.docker.internal:8080
+            USER_SERVICE_URL: http://host.docker.internal:8089
             SOCIAL_SERVICE_URL: http://host.docker.internal:8083
 
             SPRING_MAIL_USERNAME: mokogamesbe@gmail.com

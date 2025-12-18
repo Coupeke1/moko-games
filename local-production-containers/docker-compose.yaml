@@ -22,6 +22,10 @@ services:
       - service-tic-tac-toe
       - idp-keycloak
       - service-games
+      - service-checkers
+      - service-communication
+      - service-socket
+      - service-store
 
   # Frontend
   frontend-platform:
@@ -37,13 +41,14 @@ services:
       VITE_ACHIEVEMENT_SERVICE: http://localhost/user-service/api/achievements
       VITE_LIBRARY_SERVICE: http://localhost/user-service/api/library
       VITE_SOCIAL_SERVICE: http://localhost/social-service/api/friends
+      VITE_COMMUNICATION_SERVICE: http://localhost/communication-service/api/notifications
       VITE_SESSION_SERVICE: http://localhost/session-service/api/lobbies
       VITE_GAMES_SERVICE: http://localhost/games-service/api/games
       VITE_STORE_SERVICE: http://localhost/store-service/api/store/games
       VITE_ORDER_SERVICE: http://localhost/store-service/api/orders
       VITE_CART_SERVICE: http://localhost/store-service/api/cart
 
-      VITE_SESSION_SOCKET: http://localhost/session-service
+      VITE_SOCKET_SERVICE: http://localhost/socket-service
     expose:
       - "80"
     networks:
@@ -298,6 +303,27 @@ services:
       timeout: 15s
       retries: 5
       start_period: 5m
+    networks:
+      - moko_backend
+      - moko_kc
+    depends_on:
+      - app-postgres
+      - app-rabbitmq
+      - idp-keycloak
+
+  service-socket:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/socket-service:main-latest
+    restart: no
+    pull_policy: always
+    environment:
+      SPRING_RABBITMQ_HOST: app-rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: user
+      SPRING_RABBITMQ_PASSWORD: password
+
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
+    expose:
+      - "8090"
     networks:
       - moko_backend
       - moko_kc
