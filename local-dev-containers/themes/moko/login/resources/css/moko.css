@@ -1,3 +1,44 @@
+/* =========================================================
+   MOKO Keycloak Login Theme (CSS only)
+   Dark theme + right-side hero (works even if header DOM differs)
+   + Nunito (self-hosted)
+   ========================================================= */
+
+/* -----------------------------
+   Nunito (self-hosted)
+   Put files in:
+   themes/moko/login/resources/fonts/
+   - Nunito-VariableFont_wght.woff2
+   - Nunito-Italic-VariableFont_wght.woff2 (optional)
+------------------------------ */
+@font-face {
+    font-family: "Nunito";
+    src: url("../fonts/Nunito-VariableFont_wght.woff2") format("woff2");
+    font-weight: 200 1000;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Nunito";
+    src: url("../fonts/Nunito-Italic-VariableFont_wght.ttf") format("tff");
+    font-weight: 200 1000;
+    font-style: italic;
+    font-display: swap;
+}
+
+html, body,
+.pf-v5-c-login,
+.pf-v5-c-login__main,
+.pf-v5-c-title,
+.pf-v5-c-form,
+.pf-v5-c-form-control,
+.pf-v5-c-button,
+#kc-page-title,
+#kc-login {
+    font-family: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif !important;
+}
+
 html, body { height: 100%; }
 
 body {
@@ -15,32 +56,50 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* --- Hide small header brand text (the tiny "Moko") --- */
+#kc-header-wrapper {
+    display: none !important;
+}
+
+/* Optional: remove empty header spacing if it leaves a gap */
+#kc-header {
+    padding: 0 !important;
+    min-height: 0 !important;
+}
+
 body::before {
     content: "MOKO";
     position: fixed;
-    left: 62vw;
-    top: 38vh;
+
+    left: 70vw;
+    top: 40vh;
+
     transform: translate(-50%, -50%);
     font-size: clamp(4.5rem, 9vw, 10rem);
     font-weight: 1000;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: rgba(255,255,255,0.07);
+
     pointer-events: none;
     z-index: 0;
 }
 
 body::after {
-    content: "Game platform";
+    content: "GAME PLATFORM";
     position: fixed;
-    left: 62vw;
-    top: 52vh;
+
+    /* moved more to the right */
+    left: 70vw;
+    top: 54vh;
+
     transform: translate(-50%, -50%);
     font-size: 0.95rem;
     font-weight: 650;
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: rgba(243, 244, 246, 0.55);
+
     pointer-events: none;
     z-index: 0;
 }
@@ -148,13 +207,6 @@ a:hover {
 #kc-info-wrapper,
 #kc-error-message {
     border-radius: 14px;
-}
-
-#kc-header-wrapper,
-.kc-logo-text,
-#kc-header .kc-logo-text,
-.pf-v5-c-login__header * {
-    font-weight: 900;
 }
 
 @media (max-width: 900px) {
