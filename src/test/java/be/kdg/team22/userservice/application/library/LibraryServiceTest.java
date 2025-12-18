@@ -52,10 +52,10 @@ class LibraryServiceTest {
         LibraryEntry e2 = entry(UUID.randomUUID(), userId.value(), game2, false);
 
         when(repo.findByUserId(userId.value())).thenReturn(List.of(e1, e2));
-        when(games.getGame(eq(game1), any())).thenReturn(game(game1, "A"));
-        when(games.getGame(eq(game2), any())).thenReturn(game(game2, "B"));
+        when(games.getGame(eq(game1))).thenReturn(game(game1, "A"));
+        when(games.getGame(eq(game2))).thenReturn(game(game2, "B"));
 
-        LibraryGamesModel result = service.getLibraryForUser(userId, token(), new FilterQuery());
+        LibraryGamesModel result = service.getLibraryForUser(userId, new FilterQuery());
 
         assertThat(result.games()).hasSize(2);
         assertThat(result.games().get(0).id()).isEqualTo(game1);
@@ -64,7 +64,7 @@ class LibraryServiceTest {
         assertThat(result.games().get(1).favourite()).isFalse();
 
         verify(repo).findByUserId(userId.value());
-        verify(games, times(2)).getGame(any(), any());
+        verify(games, times(2)).getGame(any(UUID.class));
     }
 
     @Test
@@ -82,10 +82,10 @@ class LibraryServiceTest {
 
         when(repo.findByUserId(userId.value())).thenReturn(List.of(e1, e2));
 
-        when(games.getGame(eq(game1), any())).thenReturn(game(game1, "Chess"));
-        when(games.getGame(eq(game2), any())).thenReturn(game(game2, "Monopoly"));
+        when(games.getGame(eq(game1))).thenReturn(game(game1, "Chess"));
+        when(games.getGame(eq(game2))).thenReturn(game(game2, "Monopoly"));
 
-        LibraryGamesModel result = service.getLibraryForUser(userId, token(), filter);
+        LibraryGamesModel result = service.getLibraryForUser(userId, filter);
 
         assertThat(result.games()).hasSize(1);
         assertThat(result.games().getFirst().title()).isEqualTo("Chess");
@@ -99,7 +99,7 @@ class LibraryServiceTest {
 
         when(repo.findByUserId(userId.value())).thenReturn(List.of());
 
-        LibraryGamesModel result = service.getLibraryForUser(userId, token(), new FilterQuery());
+        LibraryGamesModel result = service.getLibraryForUser(userId, new FilterQuery());
 
         assertThat(result.games()).isEmpty();
         verifyNoInteractions(games);

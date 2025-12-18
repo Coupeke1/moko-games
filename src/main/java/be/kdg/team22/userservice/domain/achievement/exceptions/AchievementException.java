@@ -10,6 +10,10 @@ public class AchievementException extends RuntimeException {
         return new AchievementException("profileId cannot be null");
     }
 
+    public static AchievementException missingGameId() {
+        return new AchievementException("gameId cannot be null");
+    }
+
     public static AchievementException missingAchievementCode() {
         return new AchievementException("achievementCode cannot be null or blank");
     }

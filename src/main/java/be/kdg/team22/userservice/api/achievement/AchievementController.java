@@ -31,20 +31,19 @@ public class AchievementController {
         ProfileId profileId = ProfileId.get(token);
 
         List<AchievementModel> models =
-                service.findModelsByProfile(profileId, token);
+                service.findModelsByProfile(profileId);
 
         return ResponseEntity.ok(new AchievementListModel(models));
     }
 
     @GetMapping("/{userId}")
     public ResponseEntity<AchievementListModel> getAchievementsForUser(
-            @PathVariable UUID userId,
-            @AuthenticationPrincipal Jwt token
+            @PathVariable UUID userId
     ) {
         ProfileId profileId = ProfileId.from(userId);
 
         List<AchievementModel> models =
-                service.findModelsByProfile(profileId, token);
+                service.findModelsByProfile(profileId);
 
         return ResponseEntity.ok(new AchievementListModel(models));
     }

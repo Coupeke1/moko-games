@@ -11,7 +11,6 @@ import be.kdg.team22.userservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.userservice.infrastructure.games.GameDetailsResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,11 +31,11 @@ public class LibraryService {
         this.gamesRepository = gamesRepository;
     }
 
-    public LibraryGamesModel getLibraryForUser(final ProfileId userId, final Jwt token, final FilterQuery filter) {
+    public LibraryGamesModel getLibraryForUser(final ProfileId userId, final FilterQuery filter) {
         List<LibraryEntry> entries = libraryRepository.findByUserId(userId.value());
 
         List<LibraryGameModel> games = entries.stream().map(entry -> {
-            GameDetailsResponse game = gamesRepository.getGame(entry.gameId().value(), token);
+            GameDetailsResponse game = gamesRepository.getGame(entry.gameId().value());
 
             return new LibraryGameModel(game.id(), game.title(), game.description(), game.price(), game.image(), entry.purchasedAt(), entry.favourite(), game.healthy());
         }).sorted(Comparator.comparing(LibraryGameModel::title)).toList();

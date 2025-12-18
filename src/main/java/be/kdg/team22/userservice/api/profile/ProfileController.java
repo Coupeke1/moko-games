@@ -73,7 +73,7 @@ public class ProfileController {
 
     @GetMapping("/{id}")
     public ResponseEntity<FilteredProfileModel> getById(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token) {
-        FilteredProfileModel profile = service.getByIdAndPreferences(new ProfileId(id), token);
+        FilteredProfileModel profile = service.getByIdAndPreferences(new ProfileId(id));
         return ResponseEntity.ok(profile);
     }
 

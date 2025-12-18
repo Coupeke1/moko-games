@@ -6,15 +6,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface JpaAchievementRepository extends JpaRepository<AchievementEntity, UUID> {
+public interface JpaAchievementRepository extends JpaRepository<AchievementEntity, AchievementId> {
 
-    Optional<AchievementEntity> findByProfileIdAndCode(UUID profileId, String code);
+    Optional<AchievementEntity> findByIdProfileIdAndIdGameIdAndIdKey(UUID profileId, UUID gameId, String key);
 
-    List<AchievementEntity> findByProfileId(UUID profileId);
+    List<AchievementEntity> findByIdProfileId(UUID profileId);
 
-    boolean existsByProfileIdAndCode(UUID profileId, String code);
+    boolean existsByIdProfileIdAndIdGameIdAndIdKey(UUID profileId, UUID gameId, String key);
 
-    long countByProfileId(UUID profileId);
+    long countByIdProfileId(UUID profileId);
 
-    long countByProfileIdAndGameId(UUID profileId, UUID gameId);
+
+    long countByIdProfileIdAndIdGameId(UUID profileId, UUID gameId);
 }
