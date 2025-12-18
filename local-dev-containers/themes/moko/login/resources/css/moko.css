@@ -1,19 +1,7 @@
-/* =========================================================
-   MOKO Keycloak Login Theme (CSS only)
-   Dark theme + right-side hero (works even if header DOM differs)
-   + Nunito (self-hosted)
-   ========================================================= */
 
-/* -----------------------------
-   Nunito (self-hosted)
-   Put files in:
-   themes/moko/login/resources/fonts/
-   - Nunito-VariableFont_wght.woff2
-   - Nunito-Italic-VariableFont_wght.woff2 (optional)
------------------------------- */
 @font-face {
     font-family: "Nunito";
-    src: url("../fonts/Nunito-VariableFont_wght.woff2") format("woff2");
+    src: url("../fonts/Nunito-Italic-VariableFont_wght.ttf") format("tff");
     font-weight: 200 1000;
     font-style: normal;
     font-display: swap;
@@ -56,12 +44,10 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* --- Hide small header brand text (the tiny "Moko") --- */
 #kc-header-wrapper {
     display: none !important;
 }
 
-/* Optional: remove empty header spacing if it leaves a gap */
 #kc-header {
     padding: 0 !important;
     min-height: 0 !important;
@@ -89,7 +75,6 @@ body::after {
     content: "GAME PLATFORM";
     position: fixed;
 
-    /* moved more to the right */
     left: 70vw;
     top: 54vh;
 
