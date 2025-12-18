@@ -1,0 +1,59 @@
+body {
+    background: radial-gradient(1200px circle at 10% 10%, rgba(120, 90, 255, 0.25), transparent 55%),
+    radial-gradient(900px circle at 90% 20%, rgba(0, 200, 255, 0.18), transparent 50%),
+    linear-gradient(180deg, #0b1020 0%, #070a12 100%);
+}
+
+.pf-v5-c-login__main-header .pf-v5-c-title,
+#kc-page-title {
+    font-size: 2rem;
+    line-height: 1.15;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+}
+
+.pf-v5-c-login__main {
+    border-radius: 18px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.55);
+    background: rgba(14, 18, 36, 0.78);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.pf-v5-c-title,
+.pf-v5-c-login__main-header {
+    color: #eef2ff;
+}
+.pf-v5-c-form__label-text,
+.pf-v5-c-helper-text {
+    color: rgba(238, 242, 255, 0.75);
+}
+
+.pf-v5-c-form-control {
+    border-radius: 12px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.10);
+    color: #eef2ff;
+}
+.pf-v5-c-form-control:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(120, 90, 255, 0.35);
+    border-color: rgba(120, 90, 255, 0.65);
+}
+
+.pf-v5-c-button.pf-m-primary {
+    border-radius: 12px;
+    background: linear-gradient(135deg, #7a5cff 0%, #2dd4ff 100%);
+    border: 0;
+}
+.pf-v5-c-button.pf-m-primary:hover {
+    filter: brightness(1.05);
+}
+
+/* Links */
+a {
+    color: #9aa7ff;
+}
+a:hover {
+    color: #c7d2fe;
+}
