@@ -78,6 +78,7 @@ export default function LobbyPage() {
                     <Column gap={Gap.Large}>
                         <GameInformation
                             game={game}
+                            isOwner={isOwner}
                             onStart={() => start.mutate({ lobby: lobby.id })}
                             onQuit={() => close.mutate({ lobby: lobby.id })}
                             onSettings={() => setSettings(true)}
