@@ -25,13 +25,13 @@ import java.util.*;
 @Transactional
 public class LobbyService {
     private final LobbyRepository repository;
-    private final LobbyPublisherService publisher;
+    private final PublisherService publisher;
     private final PlayerService playerService;
     private final ExternalGamesRepository gamesRepository;
     private final ExternalChatRepository chatRepository;
 
     public LobbyService(final LobbyRepository repository,
-                        final LobbyPublisherService publisher,
+                        final PublisherService publisher,
                         final PlayerService playerService,
                         final ExternalGamesRepository gamesRepository,
                         final ExternalChatRepository chatRepository) {

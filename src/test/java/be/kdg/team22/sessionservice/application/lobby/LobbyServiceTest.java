@@ -17,7 +17,7 @@ import be.kdg.team22.sessionservice.domain.player.PlayerName;
 import be.kdg.team22.sessionservice.infrastructure.chat.ExternalChatRepository;
 import be.kdg.team22.sessionservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.sessionservice.infrastructure.games.StartGameResponse;
-import be.kdg.team22.sessionservice.infrastructure.lobby.LobbySocketPublisher;
+import be.kdg.team22.sessionservice.infrastructure.lobby.LobbyPublisher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -35,9 +35,9 @@ class LobbyServiceTest {
     private final LobbyRepository repo = mock(LobbyRepository.class);
     private final PlayerService playerService = mock(PlayerService.class);
     private final ExternalGamesRepository gameClient = mock(ExternalGamesRepository.class);
-    private final LobbySocketPublisher socket = mock(LobbySocketPublisher.class);
+    private final LobbyPublisher socket = mock(LobbyPublisher.class);
     private final ExternalChatRepository chat = mock(ExternalChatRepository.class);
-    private final LobbyPublisherService publisherService = new LobbyPublisherService(repo, socket);
+    private final PublisherService publisherService = new PublisherService(repo, socket);
     private final LobbyService service = new LobbyService(repo, publisherService, playerService, gameClient, chat);
     private final LobbySettings settings = new LobbySettings(
             2,

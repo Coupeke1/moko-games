@@ -12,10 +12,12 @@ public class RabbitMQTopology {
 
     public static final String EXCHANGE_SESSION = "exchange.session";
     public static final String EXCHANGE_GAMEPLAY = "exchange.gameplay";
+    public static final String EXCHANGE_USER_SOCKET = "user.direct.exchange";
 
     public static final String ROUTING_KEY_GAME_ENDED = "game.ended";
 
     public static final String QUEUE_GAME_ENDED = "queue.session.game.ended";
+    public static final String QUEUE_USER_SOCKET = "user.socket.queue";
 
     @Bean
     TopicExchange sessionExchange() {
@@ -28,14 +30,27 @@ public class RabbitMQTopology {
     }
 
     @Bean
+    TopicExchange userSocketExchange() {
+        return new TopicExchange(EXCHANGE_USER_SOCKET, true, false);
+    }
+
+    @Bean
     Queue gameEndedQueue() {
         return QueueBuilder.durable(QUEUE_GAME_ENDED).build();
     }
 
     @Bean
+    Queue userSocketQueue() {
+        return QueueBuilder.durable(QUEUE_USER_SOCKET).build();
+    }
+
+    @Bean
     Binding gameEndedBinding() {
-        return BindingBuilder.bind(gameEndedQueue())
-                .to(gameplayExchange())
-                .with(ROUTING_KEY_GAME_ENDED);
+        return BindingBuilder.bind(gameEndedQueue()).to(gameplayExchange()).with(ROUTING_KEY_GAME_ENDED);
+    }
+
+    @Bean
+    Binding bindUserSocketMessage() {
+        return BindingBuilder.bind(userSocketQueue()).to(userSocketExchange()).with("user.message");
     }
 }

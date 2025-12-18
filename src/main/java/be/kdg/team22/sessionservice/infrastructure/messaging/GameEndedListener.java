@@ -1,6 +1,6 @@
 package be.kdg.team22.sessionservice.infrastructure.messaging;
 
-import be.kdg.team22.sessionservice.application.lobby.LobbyPublisherService;
+import be.kdg.team22.sessionservice.application.lobby.PublisherService;
 import be.kdg.team22.sessionservice.application.lobby.LobbyService;
 import be.kdg.team22.sessionservice.config.RabbitMQTopology;
 import be.kdg.team22.sessionservice.domain.lobby.GameId;
@@ -13,9 +13,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class GameEndedListener {
     private final LobbyService service;
-    private final LobbyPublisherService publisher;
+    private final PublisherService publisher;
 
-    public GameEndedListener(final LobbyService service, final LobbyPublisherService publisher) {
+    public GameEndedListener(final LobbyService service, final PublisherService publisher) {
         this.service = service;
         this.publisher = publisher;
     }
