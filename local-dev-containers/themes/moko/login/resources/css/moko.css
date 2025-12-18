@@ -1,59 +1,165 @@
+html, body { height: 100%; }
+
 body {
-    background: radial-gradient(1200px circle at 10% 10%, rgba(120, 90, 255, 0.25), transparent 55%),
-    radial-gradient(900px circle at 90% 20%, rgba(0, 200, 255, 0.18), transparent 50%),
-    linear-gradient(180deg, #0b1020 0%, #070a12 100%);
+    position: relative;
+    background:
+            radial-gradient(900px circle at 15% 10%, rgba(90, 70, 255, 0.20), transparent 55%),
+            radial-gradient(700px circle at 85% 20%, rgba(0, 200, 255, 0.14), transparent 55%),
+            linear-gradient(180deg, #05060a 0%, #02030a 100%);
+    color: #e9e9ee;
+    overflow-x: hidden;
+}
+
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body::before {
+    content: "MOKO";
+    position: fixed;
+    left: 62vw;
+    top: 38vh;
+    transform: translate(-50%, -50%);
+    font-size: clamp(4.5rem, 9vw, 10rem);
+    font-weight: 1000;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.07);
+    pointer-events: none;
+    z-index: 0;
+}
+
+body::after {
+    content: "Game platform";
+    position: fixed;
+    left: 62vw;
+    top: 52vh;
+    transform: translate(-50%, -50%);
+    font-size: 0.95rem;
+    font-weight: 650;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(243, 244, 246, 0.55);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.pf-v5-c-login::before,
+#kc-login-page::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+            radial-gradient(900px circle at 70% 35%, rgba(122,92,255,0.18), transparent 60%),
+            radial-gradient(800px circle at 75% 70%, rgba(45,212,255,0.12), transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.pf-v5-c-login,
+#kc-login-page,
+.pf-v5-c-login__container,
+#kc-content,
+#kc-content-wrapper {
+    position: relative;
+    z-index: 1;
+}
+
+.pf-v5-c-login {
+    min-height: 100vh;
+    padding: 28px !important;
+}
+
+.pf-v5-c-login__main {
+    background: rgba(10, 12, 18, 0.82);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    box-shadow: 0 24px 70px rgba(0,0,0,0.70);
+    backdrop-filter: blur(12px);
+    width: min(560px, calc(100vw - 48px));
 }
 
 .pf-v5-c-login__main-header .pf-v5-c-title,
 #kc-page-title {
-    font-size: 2rem;
+    font-size: 2.2rem;
     line-height: 1.15;
-    font-weight: 800;
-    margin-bottom: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 0.2px;
+    margin-bottom: 0.85rem;
+    color: rgba(243, 244, 246, 0.96);
 }
 
-.pf-v5-c-login__main {
-    border-radius: 18px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.55);
-    background: rgba(14, 18, 36, 0.78);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.08);
-}
-
-.pf-v5-c-title,
-.pf-v5-c-login__main-header {
-    color: #eef2ff;
-}
 .pf-v5-c-form__label-text,
 .pf-v5-c-helper-text {
-    color: rgba(238, 242, 255, 0.75);
+    color: rgba(233, 233, 238, 0.78);
 }
 
 .pf-v5-c-form-control {
-    border-radius: 12px;
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.10);
-    color: #eef2ff;
-}
-.pf-v5-c-form-control:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(120, 90, 255, 0.35);
-    border-color: rgba(120, 90, 255, 0.65);
+    color: #f3f4f6;
+    border-radius: 14px;
 }
 
-.pf-v5-c-button.pf-m-primary {
-    border-radius: 12px;
+.pf-v5-c-form-control::placeholder {
+    color: rgba(243, 244, 246, 0.45);
+}
+
+.pf-v5-c-form-control:focus {
+    border-color: rgba(120, 90, 255, 0.7);
+    box-shadow: 0 0 0 3px rgba(120, 90, 255, 0.32);
+    outline: none;
+}
+
+.pf-v5-c-check__label {
+    color: rgba(233, 233, 238, 0.85);
+}
+
+.pf-v5-c-button.pf-m-primary,
+#kc-login {
+    border-radius: 14px;
     background: linear-gradient(135deg, #7a5cff 0%, #2dd4ff 100%);
     border: 0;
-}
-.pf-v5-c-button.pf-m-primary:hover {
-    filter: brightness(1.05);
+    font-weight: 800;
+    letter-spacing: 0.2px;
 }
 
-/* Links */
+.pf-v5-c-button.pf-m-primary:hover,
+#kc-login:hover {
+    filter: brightness(1.07);
+}
+
+.pf-v5-c-button.pf-m-primary:focus,
+#kc-login:focus {
+    box-shadow: 0 0 0 4px rgba(45,212,255,0.20);
+}
+
 a {
-    color: #9aa7ff;
+    color: #a5b4fc;
+    text-decoration: none;
 }
 a:hover {
-    color: #c7d2fe;
+    color: #e0e7ff;
+    text-decoration: underline;
+}
+
+.pf-v5-c-alert,
+#kc-info-wrapper,
+#kc-error-message {
+    border-radius: 14px;
+}
+
+#kc-header-wrapper,
+.kc-logo-text,
+#kc-header .kc-logo-text,
+.pf-v5-c-login__header * {
+    font-weight: 900;
+}
+
+@media (max-width: 900px) {
+    body::before,
+    body::after {
+        display: none;
+    }
 }
