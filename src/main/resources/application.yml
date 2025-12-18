@@ -65,7 +65,7 @@ business:
   session-service:
     url: ${SESSION_SERVICE_URL:http://localhost:8081}
   user-service:
-    url: ${USER_SERVICE_URL:http://localhost:8080}
+    url: ${USER_SERVICE_URL:http://localhost:8089}
   social-service:
     url: ${SOCIAL_SERVICE_URL:http://localhost:8083}
   bot-service:
