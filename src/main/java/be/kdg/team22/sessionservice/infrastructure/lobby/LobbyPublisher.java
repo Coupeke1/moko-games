@@ -3,6 +3,7 @@ package be.kdg.team22.sessionservice.infrastructure.lobby;
 import be.kdg.team22.sessionservice.api.lobby.models.LobbyModel;
 import be.kdg.team22.sessionservice.config.RabbitMQTopology;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
+import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
