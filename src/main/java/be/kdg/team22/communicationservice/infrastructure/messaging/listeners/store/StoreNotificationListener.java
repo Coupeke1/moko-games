@@ -16,7 +16,7 @@ public class StoreNotificationListener {
         this.notifications = notifications;
     }
 
-    @RabbitListener(queues = RabbitMQTopology.Q_ORDER_COMPLETED)
+    @RabbitListener(queues = RabbitMQTopology.QUEUE_ORDER_COMPLETED)
     public void handle(final OrderCompletedEvent event) {
         PlayerId recipient = PlayerId.from(event.userId());
 

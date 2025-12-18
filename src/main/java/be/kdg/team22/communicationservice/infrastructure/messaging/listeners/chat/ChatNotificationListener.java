@@ -16,7 +16,7 @@ public class ChatNotificationListener {
         this.notifications = notifications;
     }
 
-    @RabbitListener(queues = RabbitMQTopology.Q_DIRECT_MESSAGE)
+    @RabbitListener(queues = RabbitMQTopology.QUEUE_DIRECT_MESSAGE)
     public void handle(final DirectMessageReceivedEvent event) {
         PlayerId recipient = PlayerId.from(event.recipientId());
 

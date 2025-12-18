@@ -3,7 +3,7 @@ package be.kdg.team22.communicationservice.application.notification;
 import be.kdg.team22.communicationservice.domain.notification.*;
 import be.kdg.team22.communicationservice.domain.notification.exceptions.NotificationNotFoundException;
 import be.kdg.team22.communicationservice.infrastructure.email.EmailService;
-import be.kdg.team22.communicationservice.infrastructure.notification.NotificationSocketPublisher;
+import be.kdg.team22.communicationservice.infrastructure.notification.NotificationPublisher;
 import be.kdg.team22.communicationservice.infrastructure.user.ExternalUserRepository;
 import be.kdg.team22.communicationservice.infrastructure.user.NotificationsResponse;
 import be.kdg.team22.communicationservice.infrastructure.user.ProfileResponse;
@@ -26,8 +26,8 @@ public class NotificationServiceTest {
     private NotificationService service;
     private ExternalUserRepository userRepo;
     private EmailService emailService;
-    private NotificationSocketPublisher socket;
-    private NotificationPublisherService publisherService;
+    private NotificationPublisher socket;
+    private PublisherService publisherService;
 
     private PlayerId recipient;
     private Notification sampleNotification;
@@ -37,8 +37,8 @@ public class NotificationServiceTest {
         repository = mock(NotificationRepository.class);
         userRepo = mock(ExternalUserRepository.class);
         emailService = mock(EmailService.class);
-        socket = mock(NotificationSocketPublisher.class);
-        publisherService = new NotificationPublisherService(repository, socket);
+        socket = mock(NotificationPublisher.class);
+        publisherService = new PublisherService(repository, socket);
 
         service = new NotificationService(repository, publisherService, userRepo, emailService);
 

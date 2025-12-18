@@ -17,14 +17,14 @@ public class SessionNotificationListener {
         this.notifications = notifications;
     }
 
-    @RabbitListener(queues = RabbitMQTopology.Q_LOBBY_INVITE)
+    @RabbitListener(queues = RabbitMQTopology.QUEUE_LOBBY_INVITE)
     public void handle(final LobbyInviteEvent event) {
         PlayerId recipient = PlayerId.from(event.targetUserId());
 
         notifications.create(recipient, NotificationOrigin.LOBBY_INVITE, "Invited to lobby", String.format("\"%s\" has invited you to a lobby for \"%s\"!", event.inviterName(), event.gameName()));
     }
 
-    @RabbitListener(queues = RabbitMQTopology.Q_PLAYER_JOINED)
+    @RabbitListener(queues = RabbitMQTopology.QUEUE_PLAYER_JOINED)
     public void handle(final PlayerJoinedLobbyEvent event) {
         PlayerId host = PlayerId.from(event.hostUserId());
 
