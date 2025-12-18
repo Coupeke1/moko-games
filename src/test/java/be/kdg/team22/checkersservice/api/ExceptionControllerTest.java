@@ -109,7 +109,7 @@ public class ExceptionControllerTest {
 
     @Test
     void handleBotExceptions() {
-        BotMoveRequestFailedException botMoveRequestFailedEx = new BotMoveRequestFailedException("");
+        BotMoveRequestFailedException botMoveRequestFailedEx = new BotMoveRequestFailedException("", "");
         BotServiceNotReachableException botServiceNotReachableEx = new BotServiceNotReachableException("");
 
         ResponseEntity<String> botMoveRequestFailedExResponse = controller.handleBotExceptions(botMoveRequestFailedEx);
