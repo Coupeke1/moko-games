@@ -15,6 +15,7 @@ scope = openid
 
 ### Generate Board
 POST localhost:8087/api/games
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
 {
@@ -33,6 +34,7 @@ Content-Type: application/json
 
 ### Get Game
 GET localhost:8087/api/games/{{game_id}}
+Authorization: Bearer {{access_token}}
 Accept: application/json
 
 ### Request Move
@@ -49,6 +51,7 @@ Content-Type: application/json
 
 ### Generate Game With Bot Player
 POST localhost:8087/api/games?aiPlayer=true
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
 {
