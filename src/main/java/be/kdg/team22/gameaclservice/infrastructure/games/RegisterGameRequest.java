@@ -2,7 +2,6 @@ package be.kdg.team22.gameaclservice.infrastructure.games;
 
 import be.kdg.team22.gameaclservice.config.ChessInfoProperties;
 import be.kdg.team22.gameaclservice.events.inbound.ChessRegisterEvent;
-import be.kdg.team22.gameaclservice.events.outbound.GameAchievementEvent;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -23,12 +22,12 @@ public record RegisterGameRequest(
 
         List<RegisterAchievementRequest> achievements
 ) {
-    public static RegisterGameRequest convert(ChessRegisterEvent event, ChessInfoProperties chessInfo) {
+    public static RegisterGameRequest convert(ChessRegisterEvent event, ChessInfoProperties chessInfo, String aclBackendUrl) {
         List<RegisterAchievementRequest> achievements = new ArrayList<>();
         event.availableAchievements().forEach(achievement -> achievements.add(RegisterAchievementRequest.convert(achievement)));
         return new RegisterGameRequest(
                 "chess",
-                chessInfo.backendUrl(),
+                aclBackendUrl,
                 event.frontendUrl(),
                 "/api/games/chess",
                 "/actuator/health",

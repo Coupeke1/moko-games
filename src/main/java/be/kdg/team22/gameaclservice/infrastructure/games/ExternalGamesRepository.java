@@ -1,6 +1,7 @@
 package be.kdg.team22.gameaclservice.infrastructure.games;
 
 import be.kdg.team22.gameaclservice.domain.exceptions.GameServiceNotReachableException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -11,7 +12,7 @@ import org.springframework.web.client.RestClientException;
 public class ExternalGamesRepository {
     private final RestClient client;
 
-    public ExternalGamesRepository(RestClient gameServiceRestClient) {
+    public ExternalGamesRepository(@Qualifier("gameService") final RestClient gameServiceRestClient) {
         this.client = gameServiceRestClient;
     }
 

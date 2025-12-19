@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 
 @Component
-@ConfigurationProperties(prefix = "chess-info")
+@ConfigurationProperties(prefix = "acl-config.chess-info")
 public class ChessInfoProperties {
     private String backendUrl;
     private BigDecimal price;

@@ -11,3 +11,14 @@ Content-Type: application/json
 
 ### Health check
 GET http://localhost:8088/actuator/health
+
+### Create blackbox game
+POST http://localhost:8088/api/games/chess
+Content-Type: application/json
+
+{
+  "players": [
+    "51415b39-84d2-4cbd-b4fd-5a4f83231abd",
+    "bd169114-8834-4a40-983f-59b4d8bc1334"
+  ]
+}
