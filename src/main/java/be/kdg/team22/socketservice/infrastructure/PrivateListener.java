@@ -6,15 +6,15 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserSocketListener {
+public class PrivateListener {
     private final SimpMessagingTemplate template;
 
-    public UserSocketListener(final SimpMessagingTemplate template) {
+    public PrivateListener(final SimpMessagingTemplate template) {
         this.template = template;
     }
 
     @RabbitListener(queues = RabbitMQTopology.QUEUE_USER_SOCKET)
-    public void handle(final PrivateSocketMessage message) {
+    public void handle(final PrivateMessage message) {
         String userId = message.userId().toString();
         String queue = String.format("/queue/%s", message.queue());
         template.convertAndSendToUser(userId, queue, message.payload());

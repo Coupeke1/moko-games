@@ -7,11 +7,17 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQTopology {
     public static final String EXCHANGE_USER_SOCKET = "user.direct.exchange";
+    public static final String EXCHANGE_SUBSCRIBED_SOCKET = "socket.subscription.exchange";
     public static final String QUEUE_USER_SOCKET = "user.socket.queue";
 
     @Bean
     TopicExchange userSocketExchange() {
         return new TopicExchange(EXCHANGE_USER_SOCKET, true, false);
+    }
+
+    @Bean
+    TopicExchange subscribedSocketExchange() {
+        return new TopicExchange(EXCHANGE_SUBSCRIBED_SOCKET, true, false);
     }
 
     @Bean
