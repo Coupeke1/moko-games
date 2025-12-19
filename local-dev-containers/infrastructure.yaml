@@ -76,6 +76,8 @@ services:
       - --import-realm
       - --spi-theme-cache-themes=false
       - --spi-theme-cache-templates=false
+      - --features=quick-theme
+
     volumes:
       - ./init-scripts/keycloak-import:/opt/keycloak/data/import
       - ./themes/moko:/opt/keycloak/themes/moko:ro

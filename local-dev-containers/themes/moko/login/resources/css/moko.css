@@ -1,11 +1,4 @@
-
-@font-face {
-    font-family: "Nunito";
-    src: url("../fonts/Nunito-Italic-VariableFont_wght.ttf") format("tff");
-    font-weight: 200 1000;
-    font-style: normal;
-    font-display: swap;
-}
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
 
 html, body,
 .pf-v5-c-login,
@@ -16,69 +9,40 @@ html, body,
 .pf-v5-c-button,
 #kc-page-title,
 #kc-login {
-    font-family: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif !important;
+    font-family: "Nunito", sans-serif !important;
 }
 
-html, body { height: 100%; }
+html, body {
+    height: 100%;
+    margin: 0;
+}
 
 body {
     position: relative;
-    background:
-            radial-gradient(900px circle at 15% 10%, rgba(90, 70, 255, 0.20), transparent 55%),
-            radial-gradient(700px circle at 85% 20%, rgba(0, 200, 255, 0.14), transparent 55%),
-            linear-gradient(180deg, #05060a 0%, #02030a 100%);
-    color: #e9e9ee;
+    min-height: 100svh;
+    overflow: hidden;
     overflow-x: hidden;
+    color: #e9e9ee;
+
+    background:
+            radial-gradient(900px circle at 15% 10%, rgb(92, 20, 91), transparent 55%),
+            radial-gradient(700px circle at 85% 20%, rgba(50, 213, 205, 0.5), transparent 55%),
+            linear-gradient(180deg, #05060a 0%, #02030a 100%);
 }
 
 * {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    box-sizing: border-box;
 }
 
-#kc-header-wrapper {
-    display: none !important;
-}
+#kc-header-wrapper { display: none !important; }
+#kc-header { padding: 0 !important; min-height: 0 !important; }
 
-#kc-header {
-    padding: 0 !important;
-    min-height: 0 !important;
-}
-
-body::before {
-    content: "MOKO";
-    position: fixed;
-
-    left: 70vw;
-    top: 40vh;
-
-    transform: translate(-50%, -50%);
-    font-size: clamp(4.5rem, 9vw, 10rem);
-    font-weight: 1000;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.07);
-
-    pointer-events: none;
-    z-index: 0;
-}
-
+body::before,
 body::after {
-    content: "GAME PLATFORM";
-    position: fixed;
-
-    left: 70vw;
-    top: 54vh;
-
-    transform: translate(-50%, -50%);
-    font-size: 0.95rem;
-    font-weight: 650;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: rgba(243, 244, 246, 0.55);
-
-    pointer-events: none;
-    z-index: 0;
+    content: none !important;
+    display: none !important;
 }
 
 .pf-v5-c-login::before,
@@ -102,29 +66,84 @@ body::after {
     z-index: 1;
 }
 
-.pf-v5-c-login {
-    min-height: 100vh;
-    padding: 28px !important;
+.pf-v5-c-login,
+#kc-login-page {
+    min-height: 100svh;
+    width: 100%;
+    margin: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 24px !important;
+    overflow: hidden;
+}
+
+.pf-v5-c-login__container,
+#kc-content,
+#kc-content-wrapper {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
 }
 
 .pf-v5-c-login__main {
     background: rgba(10, 12, 18, 0.82);
     border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 20px;
+    border-radius: 16px;
     box-shadow: 0 24px 70px rgba(0,0,0,0.70);
     backdrop-filter: blur(12px);
-    width: min(560px, calc(100vw - 48px));
+
+    width: min(560px, 92vw);
+    margin: 0 auto !important;
+
+    max-height: calc(100svh - 48px);
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .pf-v5-c-login__main-header .pf-v5-c-title,
 #kc-page-title {
-    font-size: 2.2rem;
-    line-height: 1.15;
-    font-weight: 900;
-    letter-spacing: 0.2px;
-    margin-bottom: 0.85rem;
-    color: rgba(243, 244, 246, 0.96);
+    display: none !important;
 }
+
+.pf-v5-c-login__main-header::before {
+    content: "MOKO";
+    display: block;
+    text-align: center;
+
+    font-size: clamp(1.9rem, 4.6vw, 3.0rem);
+    font-weight: 1000;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(243, 244, 246, 0.96);
+
+    margin-top: 0.4rem;
+    margin-bottom: 0.25rem;
+}
+
+.pf-v5-c-login__main-header::after {
+    content: "GAME PLATFORM";
+    display: block;
+    text-align: center;
+
+    font-size: clamp(0.75rem, 2.6vw, 0.9rem);
+    font-weight: 650;
+    letter-spacing: 0.20em;
+    text-transform: uppercase;
+    color: rgba(243, 244, 246, 0.55);
+
+    margin-bottom: 1.0rem;
+}
+
+#kc-form-header { margin: 0 !important; padding: 0 !important; }
+#kc-form-header::before,
+#kc-form-header::after { content: none !important; }
 
 .pf-v5-c-form__label-text,
 .pf-v5-c-helper-text {
@@ -186,9 +205,27 @@ a:hover {
     border-radius: 14px;
 }
 
-@media (max-width: 900px) {
-    body::before,
-    body::after {
-        display: none;
+@media (max-width: 600px) {
+    .pf-v5-c-login,
+    #kc-login-page {
+        padding: 14px !important;
+        align-items: center !important;
+    }
+
+    .pf-v5-c-login__main {
+        width: 94vw;
+        border-radius: 16px;
+        max-height: calc(100svh - 28px);
+    }
+
+    .pf-v5-c-login__main-header::before {
+        font-size: clamp(1.6rem, 8vw, 2.2rem);
+        letter-spacing: 0.12em;
+    }
+
+    .pf-v5-c-login__main-header::after {
+        font-size: 0.72rem;
+        letter-spacing: 0.16em;
+        margin-bottom: 0.85rem;
     }
 }
