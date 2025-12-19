@@ -17,14 +17,14 @@ public class SocialNotificationListener {
         this.notifications = notifications;
     }
 
-    @RabbitListener(queues = RabbitMQTopology.Q_FRIEND_REQUEST_RECEIVED)
+    @RabbitListener(queues = RabbitMQTopology.QUEUE_FRIEND_REQUEST_RECEIVED)
     public void handle(final FriendRequestReceivedEvent event) {
         PlayerId recipient = PlayerId.from(event.targetUserId());
 
         notifications.create(recipient, NotificationOrigin.FRIEND_REQUEST_RECEIVED, "New friend request", String.format("\"%s\" has sent you a friend request!", event.senderName()));
     }
 
-    @RabbitListener(queues = RabbitMQTopology.Q_FRIEND_REQUEST_ACCEPTED)
+    @RabbitListener(queues = RabbitMQTopology.QUEUE_FRIEND_REQUEST_ACCEPTED)
     public void handle(final FriendRequestAcceptedEvent event) {
         PlayerId recipient = PlayerId.from(event.targetUserId());
 

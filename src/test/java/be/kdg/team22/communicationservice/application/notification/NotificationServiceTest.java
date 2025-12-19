@@ -3,6 +3,7 @@ package be.kdg.team22.communicationservice.application.notification;
 import be.kdg.team22.communicationservice.domain.notification.*;
 import be.kdg.team22.communicationservice.domain.notification.exceptions.NotificationNotFoundException;
 import be.kdg.team22.communicationservice.infrastructure.email.EmailService;
+import be.kdg.team22.communicationservice.infrastructure.notification.NotificationPublisher;
 import be.kdg.team22.communicationservice.infrastructure.user.ExternalUserRepository;
 import be.kdg.team22.communicationservice.infrastructure.user.NotificationsResponse;
 import be.kdg.team22.communicationservice.infrastructure.user.ProfileResponse;
@@ -25,6 +26,8 @@ public class NotificationServiceTest {
     private NotificationService service;
     private ExternalUserRepository userRepo;
     private EmailService emailService;
+    private NotificationPublisher socket;
+    private PublisherService publisherService;
 
     private PlayerId recipient;
     private Notification sampleNotification;
@@ -34,38 +37,26 @@ public class NotificationServiceTest {
         repository = mock(NotificationRepository.class);
         userRepo = mock(ExternalUserRepository.class);
         emailService = mock(EmailService.class);
+        socket = mock(NotificationPublisher.class);
+        publisherService = new PublisherService(repository, socket);
 
-        service = new NotificationService(repository, userRepo, emailService);
+        service = new NotificationService(repository, publisherService, userRepo, emailService);
 
         recipient = PlayerId.from(UUID.randomUUID());
 
-        sampleNotification = new Notification(
-                NotificationId.from(UUID.randomUUID()),
-                recipient,
-                NotificationOrigin.FRIEND_REQUEST_RECEIVED,
-                "Test title",
-                "Test message",
-                Instant.now(),
-                false
-        );
+        sampleNotification = new Notification(NotificationId.from(UUID.randomUUID()), recipient, NotificationOrigin.FRIEND_REQUEST_RECEIVED, "Test title", "Test message", Instant.now(), false);
     }
 
     @Test
     void create_shouldGenerateNotificationAndSaveToRepository() {
         NotificationsResponse prefs = new NotificationsResponse(false, true, true, true, true);
-                ProfileResponse profile = new ProfileResponse(recipient.value(), "testuser", "test@example.com", "testImg", "profileDescription");
+        ProfileResponse profile = new ProfileResponse(recipient.value(), "testuser", "test@example.com", "testImg", "profileDescription");
 
         when(userRepo.getProfile(recipient.value())).thenReturn(profile);
         when(userRepo.getNotificationsByUser(recipient.value())).thenReturn(prefs);
-        when(repository.save(any(Notification.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+        when(repository.save(any(Notification.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Notification created = service.create(
-                recipient,
-                NotificationOrigin.FRIEND_REQUEST_RECEIVED,
-                "Hello",
-                "Message"
-        );
+        Notification created = service.create(recipient, NotificationOrigin.FRIEND_REQUEST_RECEIVED, "Hello", "Message");
 
         verify(repository).save(any(Notification.class));
         verify(userRepo).getProfile(recipient.value());
@@ -82,26 +73,16 @@ public class NotificationServiceTest {
     @Test
     void create_shouldSendEmailWhenPreferencesAllow() {
         NotificationsResponse prefs = new NotificationsResponse(true, true, true, true, true);
-        ProfileResponse profile = new ProfileResponse(recipient.value(), "testuser", "test@example.com","testImg","profileDescription");
+        ProfileResponse profile = new ProfileResponse(recipient.value(), "testuser", "test@example.com", "testImg", "profileDescription");
 
         when(userRepo.getProfile(recipient.value())).thenReturn(profile);
         when(userRepo.getNotificationsByUser(recipient.value())).thenReturn(prefs);
-        when(repository.save(any(Notification.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+        when(repository.save(any(Notification.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Notification created = service.create(
-                recipient,
-                NotificationOrigin.FRIEND_REQUEST_RECEIVED,
-                "Hello",
-                "Message"
-        );
+        Notification created = service.create(recipient, NotificationOrigin.FRIEND_REQUEST_RECEIVED, "Hello", "Message");
 
         ArgumentCaptor<Notification> notifCaptor = ArgumentCaptor.forClass(Notification.class);
-        verify(emailService).sendNotificationEmail(
-                eq("test@example.com"),
-                eq("testuser"),
-                notifCaptor.capture()
-        );
+        verify(emailService).sendNotificationEmail(eq("test@example.com"), eq("testuser"), notifCaptor.capture());
 
         assertThat(notifCaptor.getValue().origin()).isEqualTo(NotificationOrigin.FRIEND_REQUEST_RECEIVED);
     }
@@ -109,12 +90,11 @@ public class NotificationServiceTest {
     @Test
     void create_shouldNotSendEmailWhenOriginDisabled() {
         NotificationsResponse prefs = new NotificationsResponse(true, false, true, true, true);
-        ProfileResponse profile = new ProfileResponse(recipient.value(), "testuser", "test@example.com","testImg","profileDescription");
+        ProfileResponse profile = new ProfileResponse(recipient.value(), "testuser", "test@example.com", "testImg", "profileDescription");
 
         when(userRepo.getProfile(recipient.value())).thenReturn(profile);
         when(userRepo.getNotificationsByUser(recipient.value())).thenReturn(prefs);
-        when(repository.save(any(Notification.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+        when(repository.save(any(Notification.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // When
         service.create(recipient, NotificationOrigin.FRIEND_REQUEST_RECEIVED, "Hello", "Message");
@@ -125,8 +105,7 @@ public class NotificationServiceTest {
 
     @Test
     void getNotifications_shouldReturnNotificationsFromRepository() {
-        when(repository.findByRecipientId(recipient))
-                .thenReturn(List.of(sampleNotification));
+        when(repository.findByRecipientId(recipient)).thenReturn(List.of(sampleNotification));
 
         List<Notification> result = service.getNotifications(recipient);
 
@@ -137,18 +116,9 @@ public class NotificationServiceTest {
     @Test
     void getUnreadNotifications_shouldReturnOnlyUnread() {
         Notification unread = sampleNotification;
-        Notification readNotif = new Notification(
-                NotificationId.from(UUID.randomUUID()),
-                recipient,
-                sampleNotification.origin(),
-                sampleNotification.title(),
-                sampleNotification.message(),
-                sampleNotification.createdAt(),
-                true
-        );
+        Notification readNotif = new Notification(NotificationId.from(UUID.randomUUID()), recipient, sampleNotification.origin(), sampleNotification.title(), sampleNotification.message(), sampleNotification.createdAt(), true);
 
-        when(repository.findUnreadByRecipientId(recipient))
-                .thenReturn(List.of(unread));
+        when(repository.findUnreadByRecipientId(recipient)).thenReturn(List.of(unread));
 
         List<Notification> result = service.getUnreadNotifications(recipient);
 
@@ -180,8 +150,6 @@ public class NotificationServiceTest {
 
         when(repository.findById(id)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.markAsRead(id))
-                .isInstanceOf(NotificationNotFoundException.class)
-                .hasMessageContaining(id.value().toString());
+        assertThatThrownBy(() -> service.markAsRead(id)).isInstanceOf(NotificationNotFoundException.class).hasMessageContaining(id.value().toString());
     }
 }

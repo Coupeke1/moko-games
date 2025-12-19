@@ -21,24 +21,23 @@ import java.util.UUID;
 public class NotificationService {
 
     private final NotificationRepository repository;
+    private final PublisherService publisher;
     private final ExternalUserRepository userRepository;
     private final EmailService emailService;
 
-    public NotificationService(final NotificationRepository repository, final ExternalUserRepository userRepository, final EmailService emailService) {
+    public NotificationService(final NotificationRepository repository, final PublisherService publisher, final ExternalUserRepository userRepository, final EmailService emailService) {
         this.repository = repository;
+        this.publisher = publisher;
         this.userRepository = userRepository;
         this.emailService = emailService;
     }
 
     public Notification create(final PlayerId recipient, final NotificationOrigin origin, final String title, final String message) {
+        Notification notification = new Notification(recipient, origin, title, message);
+        publisher.saveAndPublish(notification);
 
-        Notification notification = Notification.create(recipient, origin, title, message);
-
-        Notification saved = repository.save(notification);
-
-        sendEmailIfAllowed(recipient.value(), saved);
-
-        return saved;
+        sendEmailIfAllowed(recipient.value(), notification);
+        return notification;
     }
 
     private void sendEmailIfAllowed(UUID recipientId, Notification notification) {
@@ -47,9 +46,10 @@ public class NotificationService {
         NotificationsResponse prefsResponse = userRepository.getNotificationsByUser(recipientId);
         NotificationPreferences prefs = prefsResponse.to();
 
-        if (prefs.allowsEmail(notification)) {
-            emailService.sendNotificationEmail(profile.email(), profile.username(), notification);
-        }
+        if (!prefs.allowsEmail(notification))
+            return;
+
+        emailService.sendNotificationEmail(profile.email(), profile.username(), notification);
     }
 
     public PageResult<Notification> findAllByConstraints(final PlayerId playerId, final NotificationFilter type, final NotificationOrigin origin, final Pagination pagination) {

@@ -16,7 +16,7 @@ public class AchievementNotificationListener {
         this.notifications = notifications;
     }
 
-    @RabbitListener(queues = RabbitMQTopology.Q_ACHIEVEMENT_UNLOCKED)
+    @RabbitListener(queues = RabbitMQTopology.QUEUE_ACHIEVEMENT_UNLOCKED)
     public void handle(final AchievementUnlockedEvent event) {
         PlayerId recipient = PlayerId.from(event.playerId());
 
