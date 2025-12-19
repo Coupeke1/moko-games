@@ -22,7 +22,6 @@ public class RabbitMQTopology {
     public static final String QUEUE_DIRECT_MESSAGE = "queue.notifications.direct-message";
     public static final String QUEUE_USER_SOCKET = "user.socket.queue";
 
-
     @Bean
     TopicExchange socialExchange() {
         return new TopicExchange(EXCHANGE_SOCIAL, true, false);
