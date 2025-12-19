@@ -18,7 +18,7 @@ public class LobbyPublisher {
     public void publishToPlayers(final Lobby lobby) {
         LobbyModel model = LobbyModel.from(lobby);
         lobby.players().forEach(player -> {
-            LobbyMessage message = new LobbyMessage(player.id().value(), "lobbies", model);
+            LobbyMessage message = new LobbyMessage(player.id().value(), "lobby", model);
             template.convertAndSend(RabbitMQTopology.EXCHANGE_USER_SOCKET, "user.message", message);
         });
     }
