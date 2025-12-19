@@ -2,7 +2,7 @@ import Button from "@/components/buttons/button";
 import Card from "@/components/cards/bot-card";
 import BotIcon from "@/components/icons/bot-icon";
 import CancelIcon from "@/components/icons/cancel-icon";
-import showToast from "@/components/toast";
+import showToast from "@/components/global/toast";
 import type { Lobby } from "@/features/lobby/models/lobby.ts";
 import type { Bot } from "@/features/profile/models/bot.ts";
 import { removeBot } from "@/features/lobby/services/bots.ts";

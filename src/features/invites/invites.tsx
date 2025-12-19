@@ -7,7 +7,7 @@ import type { Lobby } from "@/features/lobby/models/lobby";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router";
 import { acceptInvite } from "@/features/lobby/services/invites";
-import showToast from "@/components/toast";
+import showToast from "@/components/global/toast";
 import { useEffect } from "react";
 
 export default function InvitesPage() {
@@ -39,20 +39,27 @@ export default function InvitesPage() {
 
     return (
         <Page>
-            <State data={invites} loading={loading} error={error} />
-
-            {invites &&
-                (invites.length == 0 ? (
-                    <ErrorState>No invites</ErrorState>
-                ) : (
-                    <Column>
-                        {invites.map((invite: Lobby) => (
-                            <button onClick={() => accept.mutate({ invite })}>
-                                {invite.id}
-                            </button>
-                        ))}
-                    </Column>
-                ))}
+            <State
+                loading={loading}
+                error={error}
+                empty={invites.length === 0}
+                message="No games"
+            >
+                {invites &&
+                    (invites.length == 0 ? (
+                        <ErrorState>No invites</ErrorState>
+                    ) : (
+                        <Column>
+                            {invites.map((invite: Lobby) => (
+                                <button
+                                    onClick={() => accept.mutate({ invite })}
+                                >
+                                    {invite.id}
+                                </button>
+                            ))}
+                        </Column>
+                    ))}
+            </State>
         </Page>
     );
 }

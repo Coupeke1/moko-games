@@ -1,7 +1,7 @@
 import { environment } from "@/config.ts";
 import { client } from "@/lib/api-client.ts";
-import type { Entries } from "@/features/store/models/entry/entries.ts";
 import type { Entry } from "@/features/store/models/entry/entry.ts";
+import type { PagedResponse } from "@/types/paged-response";
 
 const BASE_URL = environment.storeService;
 
@@ -9,7 +9,7 @@ export async function findEntries(
     query?: string,
     sorting?: string,
     category?: string,
-): Promise<Entries> {
+): Promise<PagedResponse<Entry>> {
     try {
         const params = new URLSearchParams();
 
@@ -22,7 +22,7 @@ export async function findEntries(
             ? `${BASE_URL}?${params.toString()}`
             : BASE_URL;
 
-        const { data } = await client.get<Entries>(url);
+        const { data } = await client.get<PagedResponse<Entry>>(url);
         return data;
     } catch {
         throw new Error("Catalog could not be fetched");

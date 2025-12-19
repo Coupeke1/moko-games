@@ -13,5 +13,5 @@ export function useFriends() {
         refetchInterval: POLLING_INTERVAL,
     });
 
-    return { loading, error, friends: data };
+    return { loading, error, friends: data ?? [] };
 }

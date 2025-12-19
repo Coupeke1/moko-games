@@ -15,7 +15,7 @@ import {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router";
 import {useSession} from "@/features/lobby/hooks/use-session";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
-import showToast from "@/components/toast";
+import showToast from "@/components/global/toast";
 import {allPlayersReady, updateSettings,} from "@/features/lobby/services/lobby.ts";
 
 export default function LobbySettingsPage() {

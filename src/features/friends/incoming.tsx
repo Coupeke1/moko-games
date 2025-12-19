@@ -7,17 +7,16 @@ import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
 import Page from "@/components/layout/page";
 import Row from "@/components/layout/row";
-import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
 import TabRow from "@/components/tabs/links/row";
-import showToast from "@/components/toast";
-import { useIncomingRequests } from "@/features/friends/hooks/use-requests.ts";
-import type { Profile } from "@/features/profile/models/profile.ts";
+import showToast from "@/components/global/toast";
 import { getTabs } from "@/features/friends/components/tabs";
+import { useIncomingRequests } from "@/features/friends/hooks/use-requests.ts";
 import {
     acceptRequest,
     rejectRequest,
 } from "@/features/friends/services/requests.ts";
+import type { Profile } from "@/features/profile/models/profile.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function IncomingRequestsPage() {
@@ -57,12 +56,14 @@ export default function IncomingRequestsPage() {
         <Page>
             <Column gap={Gap.Large}>
                 <TabRow tabs={getTabs()} />
-                <State data={requests} loading={loading} error={error} />
 
-                {requests &&
-                    (requests.length == 0 ? (
-                        <ErrorState>No incoming requests</ErrorState>
-                    ) : (
+                <State
+                    loading={loading}
+                    error={error}
+                    empty={requests.length === 0}
+                    message="No incoming requests"
+                >
+                    {requests && (
                         <Grid>
                             {requests.map((request: Profile) => (
                                 <UserCard
@@ -90,7 +91,8 @@ export default function IncomingRequestsPage() {
                                 />
                             ))}
                         </Grid>
-                    ))}
+                    )}
+                </State>
             </Column>
         </Page>
     );

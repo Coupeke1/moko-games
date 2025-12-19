@@ -30,9 +30,9 @@ export const environment = {
         window.__APP_CONFIG__?.sessionService ??
         import.meta.env.VITE_SESSION_SERVICE ??
         "",
-    sessionSocket:
-        window.__APP_CONFIG__?.sessionSocket ??
-        import.meta.env.VITE_SESSION_SOCKET ??
+    communicationService:
+        window.__APP_CONFIG__?.communicationService ??
+        import.meta.env.VITE_COMMUNICATION_SERVICE ??
         "",
     gamesService:
         window.__APP_CONFIG__?.gamesService ??
@@ -49,5 +49,9 @@ export const environment = {
     cartService:
         window.__APP_CONFIG__?.cartService ??
         import.meta.env.VITE_CART_SERVICE ??
+        "",
+    socketService:
+        window.__APP_CONFIG__?.socketService ??
+        import.meta.env.VITE_SOCKET_SERVICE ??
         "",
 };

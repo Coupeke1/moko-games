@@ -1,4 +1,6 @@
-import Auth from "@/components/auth";
+import Auth from "@/components/global/auth";
+import Notifications from "@/components/global/notifications";
+import Scroller from "@/components/global/scroller";
 import ErrorState from "@/components/state/error";
 import LoadingState from "@/components/state/loading";
 import CheckoutPage from "@/features/checkout/checkout";
@@ -12,6 +14,7 @@ import LibraryGamePage from "@/features/library/game";
 import LibraryPage from "@/features/library/library";
 import LobbyPage from "@/features/lobby/lobby";
 import NotFoundPage from "@/features/not-found";
+import NotificationsPage from "@/features/notifications/notifications";
 import { useProfile } from "@/features/profile/hooks/use-profile";
 import ProfilePage from "@/features/profile/profile";
 import StoreGamePage from "@/features/store/game";
@@ -56,6 +59,8 @@ function Content() {
     return (
         <BrowserRouter>
             <Auth />
+            <Scroller />
+            <Notifications />
 
             <Routes>
                 <Route path="/" element={<Navigate to="/store" />} />
@@ -70,6 +75,7 @@ function Content() {
                 <Route path="/invites/:id" element={<InvitesPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/friends" element={<FriendsPage />} />
+                <Route path="/notifications" element={<NotificationsPage />} />
                 <Route
                     path="/friends/requests/incoming"
                     element={<IncomingRequestsPage />}

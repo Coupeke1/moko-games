@@ -18,34 +18,44 @@ export default function ProfilePage() {
 
     return (
         <Page>
-            <State data={profile} loading={loading} error={error}/>
-
-            {profile && (
-                <>
-                    <SettingsDialog
-                        profile={profile}
-                        close={() => setSettings(false)}
-                        open={settings}
-                        onChange={setSettings}
-                    />
-
-                    <Column gap={Gap.ExtraLarge}>
-                        <ProfileInformation
-                            image={profile.image}
-                            username={profile.username}
-                            email={profile.email}
-                            description={profile.description}
-                            level={profile.statistics.level}
-                            playTime={profile.statistics.playTime}
-                            onEdit={() => setSettings(true)}
-                            onLogout={logout}
+            <State
+                loading={loading}
+                error={error}
+                empty={!profile}
+                message="Profile not found"
+            >
+                {profile && (
+                    <>
+                        <SettingsDialog
+                            profile={profile}
+                            close={() => setSettings(false)}
+                            open={settings}
+                            onChange={setSettings}
                         />
 
-                        {profile.modules.achievements && <ProfileAchievements/>}
-                        {profile.modules.favourites && <ProfileFavourites/>}
-                    </Column>
-                </>
-            )}
+                        <Column gap={Gap.ExtraLarge}>
+                            <ProfileInformation
+                                image={profile.image}
+                                username={profile.username}
+                                email={profile.email}
+                                description={profile.description}
+                                level={profile.statistics.level}
+                                playTime={profile.statistics.playTime}
+                                onEdit={() => setSettings(true)}
+                                onLogout={logout}
+                            />
+
+                            {profile.modules.achievements &&
+                                <ProfileAchievements/>
+                            }
+
+                            {profile.modules.favourites && (
+                                <ProfileFavourites/>
+                            )}
+                        </Column>
+                    </>
+                )}
+            </State>
         </Page>
     );
 }

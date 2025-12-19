@@ -1,5 +1,5 @@
 import CartIcon from "@/components/icons/bar/cart-icon";
-import showToast from "@/components/toast";
+import showToast from "@/components/global/toast";
 import { addToCart, removeFromCart } from "@/features/cart/services/cart";
 import { useAvailable } from "@/features/store/hooks/use-available";
 import type { Entry } from "@/features/store/models/entry/entry";

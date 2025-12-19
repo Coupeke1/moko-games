@@ -4,7 +4,7 @@ import SockJS from "sockjs-client";
 import { environment } from "@/config.ts";
 import { useAuthStore } from "@/stores/auth-store";
 
-const BASE_URL = environment.sessionSocket;
+const BASE_URL = environment.socketService;
 
 function getHeaders() {
     const token = useAuthStore.getState().token;

@@ -29,36 +29,45 @@ export default function Posts({ entry }: Props) {
 
     return (
         <>
-            <State data={posts} loading={loading} error={error} />
+            <State
+                loading={loading}
+                error={error}
+                empty={posts.length === 0}
+                message="No posts"
+            >
+                {posts && selected && (
+                    <PostDialog
+                        post={selected}
+                        open={post}
+                        onChange={setPost}
+                    />
+                )}
 
-            {posts && selected && (
-                <PostDialog post={selected} open={post} onChange={setPost} />
-            )}
-
-            {posts && posts.length > 0 && (
-                <Section title="Posts">
-                    <Grid>
-                        {posts.map((post: Post) => (
-                            <Card
-                                key={post.id}
-                                title={post.title}
-                                image={post.image}
-                                onClick={() => select(post)}
-                                information={
-                                    <Row
-                                        gap={Gap.Small}
-                                        items={Items.Center}
-                                        responsive={false}
-                                    >
-                                        <NewsIcon />
-                                        <p>{format(post.type)}</p>
-                                    </Row>
-                                }
-                            />
-                        ))}
-                    </Grid>
-                </Section>
-            )}
+                {posts && posts.length > 0 && (
+                    <Section title="Posts">
+                        <Grid>
+                            {posts.map((post: Post) => (
+                                <Card
+                                    key={post.id}
+                                    title={post.title}
+                                    image={post.image}
+                                    onClick={() => select(post)}
+                                    information={
+                                        <Row
+                                            gap={Gap.Small}
+                                            items={Items.Center}
+                                            responsive={false}
+                                        >
+                                            <NewsIcon />
+                                            <p>{format(post.type)}</p>
+                                        </Row>
+                                    }
+                                />
+                            ))}
+                        </Grid>
+                    </Section>
+                )}
+            </State>
         </>
     );
 }

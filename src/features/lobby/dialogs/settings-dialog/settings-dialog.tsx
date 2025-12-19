@@ -7,7 +7,7 @@ import Column from "@/components/layout/column";
 import {Gap} from "@/components/layout/gap";
 import TabContent from "@/components/tabs/buttons/content";
 import TabRow from "@/components/tabs/buttons/row";
-import showToast from "@/components/toast";
+import showToast from "@/components/global/toast";
 import type {Game} from "@/features/games/models/game.ts";
 import type {Lobby} from "@/features/lobby/models/lobby.ts";
 import LobbyTab from "@/features/lobby/dialogs/settings-dialog/lobby-tab";

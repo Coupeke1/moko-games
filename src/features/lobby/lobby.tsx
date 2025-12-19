@@ -6,7 +6,7 @@ import Grid from "@/components/layout/grid/grid";
 import Section from "@/components/section";
 import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
-import showToast from "@/components/toast";
+import showToast from "@/components/global/toast";
 import BotCard from "@/features/lobby/components/bot-card";
 import GameInformation from "@/features/lobby/components/information";
 import Page from "@/features/lobby/components/page";
@@ -53,73 +53,75 @@ export default function LobbyPage() {
     return (
         <Page>
             <State
-                data={profile && lobby && game}
                 loading={loading}
                 error={error}
-            />
-
-            {profile && lobby && game && (
-                <>
-                    <InviteDialog
-                        lobby={lobby}
-                        close={() => setInvite(false)}
-                        open={invite}
-                        onChange={setInvite}
-                    />
-                    <SettingsDialog
-                        lobby={lobby}
-                        game={game}
-                        isOwner={isOwner}
-                        close={() => setSettings(false)}
-                        open={settings}
-                        onChange={setSettings}
-                    />
-
-                    <Column gap={Gap.Large}>
-                        <GameInformation
+                empty={!lobby && !profile && !game}
+                message="No lobby"
+            >
+                {profile && lobby && game && (
+                    <>
+                        <InviteDialog
+                            lobby={lobby}
+                            close={() => setInvite(false)}
+                            open={invite}
+                            onChange={setInvite}
+                        />
+                        <SettingsDialog
+                            lobby={lobby}
                             game={game}
                             isOwner={isOwner}
-                            onStart={() => start.mutate({lobby: lobby.id})}
-                            onQuit={() => close.mutate({lobby: lobby.id})}
-                            onSettings={() => setSettings(true)}
+                            close={() => setSettings(false)}
+                            open={settings}
+                            onChange={setSettings}
                         />
 
-                        <Section title="Players">
-                            {lobby.players.length == 0 ? (
-                                <ErrorState>No players</ErrorState>
-                            ) : (
-                                <Grid>
-                                    {lobby.players.map((player: Player) => (
-                                        <PlayerCard
-                                            key={player.id}
-                                            player={player}
-                                            lobby={lobby}
-                                            profile={profile}
-                                            isOwner={isOwner}
-                                        />
-                                    ))}
+                        <Column gap={Gap.Large}>
+                            <GameInformation
+                                game={game}
+                                isOwner={isOwner}onStart={() =>
+                                    start.mutate({ lobby: lobby.id })
+                                }
+                                onQuit={() => close.mutate({ lobby: lobby.id })}
+                                onSettings={() => setSettings(true)}
+                            />
 
-                                    {lobby.bot && (
-                                        <BotCard
-                                            bot={lobby.bot}
-                                            lobby={lobby}
-                                            isOwner={isOwner}
-                                        />
-                                    )}
+                            <Section title="Players">
+                                {lobby.players.length == 0 ? (
+                                    <ErrorState>No players</ErrorState>
+                                ) : (
+                                    <Grid>
+                                        {lobby.players.map((player: Player) => (
+                                            <PlayerCard
+                                                key={player.id}
+                                                player={player}
+                                                lobby={lobby}
+                                                profile={profile}
+                                                isOwner={isOwner}
+                                            />
+                                        ))}
 
-                                    {isOwner && (
-                                        <BigButton
-                                            onClick={() => setInvite(true)}
-                                        >
-                                            <InviteIcon/>
-                                        </BigButton>
-                                    )}
-                                </Grid>
-                            )}
-                        </Section>
-                    </Column>
-                </>
-            )}
+                                        {lobby.bot && (
+                                            <BotCard
+                                                bot={lobby.bot}
+                                                lobby={lobby}
+                                                isOwner={isOwner}
+                                            />
+                                        )}
+
+                                        {isOwner && (
+                                            <BigButton
+                                                onClick={() => setInvite(true)}
+                                            >
+                                                <InviteIcon/>
+                                            </BigButton>
+                                        )}
+                                    </Grid>
+                                )}
+                            </Section>
+                        </Column>
+                    </>
+                )}
+            </State>
         </Page>
     );
 }

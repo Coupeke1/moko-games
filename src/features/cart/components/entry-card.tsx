@@ -6,7 +6,7 @@ import Row from "@/components/layout/row";
 import type { Entry } from "@/features/cart/models/entry.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { removeFromCart } from "@/features/cart/services/cart";
-import showToast from "@/components/toast";
+import showToast from "@/components/global/toast";
 import Button from "@/components/buttons/button";
 import CancelIcon from "@/components/icons/cancel-icon";
 import TagIcon from "@/components/icons/tag-icon";

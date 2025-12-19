@@ -1,11 +1,10 @@
 import Grid from "@/components/layout/grid/grid";
 import Page from "@/components/layout/page";
-import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
-import { useStore } from "@/features/store/hooks/use-store.ts";
-import type { Entry } from "@/features/store/models/entry/entry.ts";
 import SearchBar from "@/features/store/components/search-bar";
 import StoreCard from "@/features/store/components/store-card";
+import { useStore } from "@/features/store/hooks/use-store.ts";
+import type { Entry } from "@/features/store/models/entry/entry.ts";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function StorePage() {
@@ -25,18 +24,18 @@ export default function StorePage() {
                 }
             />
 
-            <State data={entries} loading={loading} error={error} />
-
-            {entries &&
-                (entries.items.length == 0 ? (
-                    <ErrorState>No games</ErrorState>
-                ) : (
-                    <Grid>
-                        {entries.items.map((entry: Entry) => (
-                            <StoreCard key={entry.id} entry={entry} />
-                        ))}
-                    </Grid>
-                ))}
+            <State
+                loading={loading}
+                error={error}
+                empty={entries.length === 0}
+                message="No games"
+            >
+                <Grid>
+                    {entries.map((entry: Entry) => (
+                        <StoreCard key={entry.id} entry={entry} />
+                    ))}
+                </Grid>
+            </State>
         </Page>
     );
 }

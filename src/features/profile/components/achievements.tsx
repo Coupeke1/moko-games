@@ -4,19 +4,19 @@ import Column from "@/components/layout/column";
 import { useAchievements } from "@/features/profile/hooks/use-achievements";
 import AchievementCard from "@/features/profile/components/achievement-card";
 import { Gap } from "@/components/layout/gap";
-import ErrorState from "@/components/state/error";
 
 export default function ProfileAchievements() {
     const { achievements, loading, error } = useAchievements();
 
     return (
         <Section title="Achievements">
-            <State data={achievements} loading={loading} error={error} />
-
-            {achievements &&
-                (achievements.length === 0 ? (
-                    <ErrorState>No achievements</ErrorState>
-                ) : (
+            <State
+                loading={loading}
+                error={error}
+                empty={achievements.length === 0}
+                message="No achievements"
+            >
+                {achievements && (
                     <Column gap={Gap.Large}>
                         {achievements.map((achievement) => (
                             <AchievementCard
@@ -33,7 +33,8 @@ export default function ProfileAchievements() {
                             />
                         ))}
                     </Column>
-                ))}
+                )}
+            </State>
         </Section>
     );
 }

@@ -39,5 +39,12 @@ export function useSession() {
     const error = profileError || lobbyError || gameError;
     const isOwner = profile && lobby ? isUserOwner(profile.id, lobby) : false;
 
-    return { lobby, profile, game, isOwner, loading, error };
+    return {
+        lobby: lobby ?? null,
+        profile: profile ?? null,
+        game: game ?? null,
+        isOwner,
+        loading,
+        error,
+    };
 }

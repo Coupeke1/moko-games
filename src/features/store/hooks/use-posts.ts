@@ -12,7 +12,7 @@ export function usePosts(id: string | undefined) {
         enabled: !!id,
     });
 
-    return { loading, error, posts: data };
+    return { loading, error, posts: data ?? [] };
 }
 
 export function usePost(
@@ -29,5 +29,5 @@ export function usePost(
         enabled: !!entryId && !!postId,
     });
 
-    return { loading, error, post: data };
+    return { loading, error, post: data ?? null };
 }

@@ -7,7 +7,7 @@ export function useAchievements() {
     const { authenticated, keycloak, token } = useAuthStore();
 
     const {
-        data: achievements,
+        data,
         isLoading: loading,
         isError: error,
     } = useQuery({
@@ -23,5 +23,5 @@ export function useAchievements() {
         refetchInterval: POLLING_INTERVAL,
     });
 
-    return { achievements, loading, error };
+    return { achievements: data ?? [], loading, error };
 }

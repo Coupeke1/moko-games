@@ -5,7 +5,7 @@ import Select from "@/components/inputs/select";
 import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
 import { GridSize } from "@/components/layout/grid/size";
-import showToast from "@/components/toast";
+import showToast from "@/components/global/toast";
 import { Category, format } from "@/features/store/models/entry/category.ts";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
@@ -66,6 +66,7 @@ export default function SearchBar({ onSearch }: Props) {
                     <Button fullWidth={true}>Search</Button>
                 </section>
             </section>
+
             <Grid size={GridSize.ExtraSmall}>
                 <Select
                     placeholder="Sorting"
@@ -87,6 +88,7 @@ export default function SearchBar({ onSearch }: Props) {
                     onChange={(e) => setCategory(e.target.value)}
                 />
             </Grid>
+
             <section className="sm:hidden">
                 <Button fullWidth={true}>Search</Button>
             </section>
