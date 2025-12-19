@@ -14,10 +14,8 @@ public final class GameSettingsValidator {
     }
 
     public static void validateDefinition(GameSettingsDefinition definition) {
-        if (definition == null) throw InvalidGameSettingsException.missingDefinition();
-        if (definition.settings() == null || definition.settings().isEmpty()) {
-            throw InvalidGameSettingsException.invalidSettings("Settings definition cannot be empty");
-        }
+        if (definition == null) return;
+        if (definition.settings() == null || definition.settings().isEmpty()) return;
 
         Set<String> names = new HashSet<>();
 

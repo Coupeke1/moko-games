@@ -62,7 +62,6 @@ public class GameEntity {
 
     @Column(
             name = "settings_definition",
-            nullable = false,
             columnDefinition = "jsonb"
     )
     @ColumnTransformer(write = "?::jsonb")
