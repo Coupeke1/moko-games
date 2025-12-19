@@ -20,7 +20,7 @@ public record RegisterGameRequest(
         @NotNull String image,
         @NotNull @Positive BigDecimal price,
         @NotNull GameCategory category,
-        @NotNull GameSettingsDefinition settingsDefinition,
+        GameSettingsDefinition settingsDefinition,
         List<RegisterAchievementRequest> achievements
 ) {
 }
