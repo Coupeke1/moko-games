@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PrivateListener {
-
     private final SimpMessagingTemplate template;
 
     public PrivateListener(final SimpMessagingTemplate template) {
