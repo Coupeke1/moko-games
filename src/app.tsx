@@ -1,4 +1,5 @@
 import Auth from "@/components/global/auth";
+import Notifications from "@/components/global/notifications";
 import Scroller from "@/components/global/scroller";
 import ErrorState from "@/components/state/error";
 import LoadingState from "@/components/state/loading";
@@ -59,6 +60,7 @@ function Content() {
         <BrowserRouter>
             <Auth />
             <Scroller />
+            <Notifications />
 
             <Routes>
                 <Route path="/" element={<Navigate to="/store" />} />

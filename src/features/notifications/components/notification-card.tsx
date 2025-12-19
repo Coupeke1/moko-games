@@ -1,4 +1,5 @@
 import Card from "@/components/cards/card";
+import showToast from "@/components/global/toast";
 import CalendarIcon from "@/components/icons/calendar-icon";
 import CategoryIcon from "@/components/icons/category-icon";
 import { Gap } from "@/components/layout/gap";
@@ -6,7 +7,6 @@ import { Items } from "@/components/layout/items";
 import Row from "@/components/layout/row";
 import { Height } from "@/components/layout/size";
 import Stack from "@/components/layout/stack";
-import showToast from "@/components/global/toast";
 import type { Notification } from "@/features/notifications/models/notification.ts";
 import {
     getRoute,
@@ -42,11 +42,11 @@ export default function NotificationCard({ notification }: Props) {
     return (
         <Card
             height={Height.Small}
-            onClick={() => read.mutate()}
+            onClick={notification.read ? undefined : () => read.mutate()}
             title={notification.title}
             information={
                 <section className="min-w-0">
-                    <Stack>
+                    <Stack items={Items.Start}>
                         <p className="truncate text-fg-2">
                             {notification.message}
                         </p>
