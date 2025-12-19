@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import java.util.UUID;
+import java.util.logging.Logger;
 
 @Component
 public class SubscribeListener {
@@ -21,6 +22,7 @@ public class SubscribeListener {
     public void onSubscribe(SessionSubscribeEvent event) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
         String destination = accessor.getDestination();
+        System.out.println("    RECEIVED SUBSCRIPTION");
 
         if (destination == null || accessor.getUser() == null)
             return;
@@ -28,6 +30,7 @@ public class SubscribeListener {
         String user = accessor.getUser().getName();
         String key = String.format("socket.subscribe.%s", normalize(destination));
         String session = accessor.getSessionId();
+        System.out.println("    SENDING SUBSCRIPTION");
 
         template.convertAndSend(RabbitMQTopology.EXCHANGE_SUBSCRIBED_SOCKET, key, new SubscribeMessage(UUID.fromString(user), destination, session));
     }
