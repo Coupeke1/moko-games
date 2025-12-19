@@ -23,11 +23,6 @@ body {
     overflow: hidden;
     overflow-x: hidden;
     color: #e9e9ee;
-
-    background:
-            radial-gradient(900px circle at 15% 10%, rgb(92, 20, 91), transparent 55%),
-            radial-gradient(700px circle at 85% 20%, rgba(50, 213, 205, 0.5), transparent 55%),
-            linear-gradient(180deg, #05060a 0%, #02030a 100%);
 }
 
 * {
@@ -50,9 +45,6 @@ body::after {
     content: "";
     position: fixed;
     inset: 0;
-    background:
-            radial-gradient(900px circle at 70% 35%, rgba(122,92,255,0.18), transparent 60%),
-            radial-gradient(800px circle at 75% 70%, rgba(45,212,255,0.12), transparent 60%);
     pointer-events: none;
     z-index: 0;
 }
@@ -64,6 +56,8 @@ body::after {
 #kc-content-wrapper {
     position: relative;
     z-index: 1;
+    background-color: #1e1d22;
+
 }
 
 .pf-v5-c-login,
@@ -86,6 +80,7 @@ body::after {
     width: 100% !important;
     max-width: none !important;
     margin: 0 !important;
+    background-color: #1e1d22;
 
     display: flex !important;
     justify-content: center !important;
@@ -95,9 +90,9 @@ body::after {
 .pf-v5-c-login__main {
     background: rgba(10, 12, 18, 0.82);
     border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 16px;
     box-shadow: 0 24px 70px rgba(0,0,0,0.70);
     backdrop-filter: blur(12px);
+    border-radius: 0.5rem;
 
     width: min(560px, 92vw);
     margin: 0 auto !important;
@@ -113,14 +108,12 @@ body::after {
 }
 
 .pf-v5-c-login__main-header::before {
-    content: "MOKO";
+    content: "Moko";
     display: block;
     text-align: center;
 
     font-size: clamp(1.9rem, 4.6vw, 3.0rem);
-    font-weight: 1000;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
+    font-weight: 700;
     color: rgba(243, 244, 246, 0.96);
 
     margin-top: 0.4rem;
@@ -128,7 +121,6 @@ body::after {
 }
 
 .pf-v5-c-login__main-header::after {
-    content: "GAME PLATFORM";
     display: block;
     text-align: center;
 
@@ -154,7 +146,6 @@ body::after {
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.10);
     color: #f3f4f6;
-    border-radius: 14px;
 }
 
 .pf-v5-c-form-control::placeholder {
@@ -173,7 +164,6 @@ body::after {
 
 .pf-v5-c-button.pf-m-primary,
 #kc-login {
-    border-radius: 14px;
     background: linear-gradient(135deg, #7a5cff 0%, #2dd4ff 100%);
     border: 0;
     font-weight: 800;
@@ -191,18 +181,17 @@ body::after {
 }
 
 a {
-    color: #a5b4fc;
+    color: #1a191e;
     text-decoration: none;
 }
 a:hover {
-    color: #e0e7ff;
+    color: #1a191e;
     text-decoration: underline;
 }
 
 .pf-v5-c-alert,
 #kc-info-wrapper,
 #kc-error-message {
-    border-radius: 14px;
 }
 
 @media (max-width: 600px) {
@@ -214,7 +203,6 @@ a:hover {
 
     .pf-v5-c-login__main {
         width: 94vw;
-        border-radius: 16px;
         max-height: calc(100svh - 28px);
     }
 
