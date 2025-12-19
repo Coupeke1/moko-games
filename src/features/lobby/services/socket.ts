@@ -1,20 +1,14 @@
 import type { Lobby } from "@/features/lobby/models/lobby.ts";
 import { useSocketStore } from "@/stores/socket-store.ts";
-import type { IMessage } from "@stomp/rx-stomp";
-import { Observable, merge } from "rxjs";
-import { map, take } from "rxjs/operators";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
 
-export function watchLobby(id: string): Observable<Lobby> {
+export function watchLobby(): Observable<Lobby> {
     const client = useSocketStore.getState().client;
-
-    const initial = client.watch({ destination: `/app/lobbies/${id}` }).pipe(
-        take(1),
-        map((msg: IMessage) => JSON.parse(msg.body) as Lobby),
-    );
 
     const updates = client
         .watch({ destination: "/user/queue/lobby" })
-        .pipe(map((msg: IMessage) => JSON.parse(msg.body) as Lobby));
+        .pipe(map((msg) => JSON.parse(msg.body)));
 
-    return merge(initial, updates);
+    return updates;
 }
