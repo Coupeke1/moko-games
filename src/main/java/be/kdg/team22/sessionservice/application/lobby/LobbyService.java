@@ -7,7 +7,6 @@ import be.kdg.team22.sessionservice.domain.lobby.GameId;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyRepository;
-import be.kdg.team22.sessionservice.domain.lobby.exceptions.LobbyNotFoundException;
 import be.kdg.team22.sessionservice.domain.lobby.exceptions.PlayersException;
 import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
 import be.kdg.team22.sessionservice.domain.player.Player;
@@ -123,7 +122,7 @@ public class LobbyService {
         return repository.findByStartedGameId(gameId);
     }
 
-    public Lobby findByPlayer(final PlayerId id) {
-        return repository.findByPlayerId(id).orElseThrow(() -> new LobbyNotFoundException(id));
+    public Optional<Lobby> findByPlayer(final PlayerId id) {
+        return repository.findByPlayerId(id);
     }
 }
