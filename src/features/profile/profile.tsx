@@ -42,15 +42,15 @@ export default function ProfilePage() {
                                 level={profile.statistics.level}
                                 playTime={profile.statistics.playTime}
                                 onEdit={() => setSettings(true)}
-                            onLogout={logout}
-                        />
+                                onLogout={logout}
+                            />
 
                             {profile.modules.achievements &&
-                                <ProfileAchievements />
+                                <ProfileAchievements/>
                             }
 
                             {profile.modules.favourites && (
-                                <ProfileFavourites />
+                                <ProfileFavourites/>
                             )}
                         </Column>
                     </>
