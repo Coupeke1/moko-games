@@ -69,6 +69,6 @@ public class RabbitMQTopology {
 
     @Bean
     Binding bindSubscribedSocketMessage() {
-        return BindingBuilder.bind(subscribedSocketQueue()).to(subscribedSocketExchange()).with("socket.subscribe.user.queue.notifications");
+        return BindingBuilder.bind(subscribedSocketQueue()).to(subscribedSocketExchange()).with("socket.subscribe.user.queue.lobby");
     }
 }
