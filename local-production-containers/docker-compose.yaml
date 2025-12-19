@@ -494,6 +494,8 @@ services:
       - --import-realm
     volumes:
       - ./configs/keycloak-import:/opt/keycloak/data/import
+      - ./configs/themes/moko:/opt/keycloak/themes/moko:ro
+
     expose:
       - "8080"
     depends_on:
