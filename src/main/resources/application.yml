@@ -4,17 +4,11 @@ spring:
   application:
     name: game-acl-service
 
-rabbitmq:
-  platform:
-    host: ${RABBITMQ_PLATFORM_HOST:localhost}
-    port: ${RABBITMQ_PLATFORM_PORT:5672}
-    username: ${RABBITMQ_PLATFORM_USERNAME:user}
-    password: ${RABBITMQ_PLATFORM_PASSWORD:password}
-  chess:
-    host: ${RABBITMQ_CHESS_HOST:localhost}
-    port: ${RABBITMQ_CHESS_PORT:5673}
-    username: ${RABBITMQ_CHESS_USERNAME:user}
-    password: ${RABBITMQ_CHESS_PASSWORD:password}
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:user}
+    password: ${SPRING_RABBITMQ_PASSWORD:password}
 
 logging:
   level:
@@ -34,3 +28,12 @@ management:
           WARNING: 200
           DOWN: 503
           OUT_OF_SERVICE: 503
+
+business:
+  game-service:
+    url: ${GAME_SERVICE_URL:http://localhost:8084}
+
+chess-info:
+  backend-url: ${CHESS_INFO_BACKEND_URL:http://host.docker.internal:8088}
+  price: 79.99
+  category: PARTY
