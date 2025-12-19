@@ -34,7 +34,7 @@ public class LobbyListener {
 
     public void publishToPlayer(final PlayerId id, final Lobby lobby) {
         LobbyModel model = LobbyModel.from(lobby);
-        LobbyMessage message = new LobbyMessage(id.value(), "lobbies", model);
+        LobbyMessage message = new LobbyMessage(id.value(), "lobby", model);
         System.out.println("    SENDING LOBBY TO SUBSCRIBED PLAYER");
         template.convertAndSend(RabbitMQTopology.EXCHANGE_USER_SOCKET, "user.message", message);
     }
