@@ -52,15 +52,3 @@ export async function requestMove(gameId: string, playerId: string, cells: numbe
         throw new Error(`Could not make move: Unknown error`);
     }
 }
-
-export async function resetGame(gameId: string) {
-    try {
-        const response = await axiosInstance.post<GameState>(`/${gameId}/reset`);
-        return response.data;
-    } catch (error) {
-        if (error instanceof Error) {
-            throw new Error(`Could not reset game: ${error.message}`);
-        }
-        throw new Error(`Could not reset game: Unknown error`);
-    }
-}

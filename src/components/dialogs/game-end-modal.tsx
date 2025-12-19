@@ -1,7 +1,7 @@
-import {type GameState} from "../../models/game-state";
-import {type Profile} from "../../models/profile";
-import {GameStatus} from "../../models/game-status";
-import {PlayerRole} from "../../models/player-role";
+import {type GameState} from "@/models/game-state.ts";
+import {type Profile} from "@/models/profile.ts";
+import {GameStatus} from "@/models/game-status.ts";
+import {PlayerRole} from "@/models/player-role.ts";
 import {GameTie} from "./game-tie";
 import {GameStateDisplay} from "../game-state-display";
 import {GameWin} from "./game-win";
@@ -11,10 +11,9 @@ interface GameEndModalProps {
     gameState: GameState;
     myProfile: Profile;
     isOpen: boolean;
-    onReset: () => void;
 }
 
-export function GameEndModal({gameState, myProfile, isOpen, onReset}: GameEndModalProps) {
+export function GameEndModal({gameState, myProfile, isOpen}: GameEndModalProps) {
     const {status, players} = gameState;
 
     const winnerRole = status === GameStatus.WHITE_WIN
@@ -42,15 +41,6 @@ export function GameEndModal({gameState, myProfile, isOpen, onReset}: GameEndMod
                         <GameWin myProfile={myProfile} winningPlayer={winningPlayer!}/>
                     )}
                     <GameStateDisplay gameState={gameState}/>
-
-                    <div className="flex gap-3">
-                        <button
-                            onClick={onReset}
-                            className="flex-1 bg-piece-black text-white py-3 px-4 rounded-lg font-medium hover:bg-opacity-90 transition-colors"
-                        >
-                            New game
-                        </button>
-                    </div>
                 </div>
             </div>
         </>
