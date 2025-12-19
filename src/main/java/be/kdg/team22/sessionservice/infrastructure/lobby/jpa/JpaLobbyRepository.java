@@ -12,6 +12,15 @@ public interface JpaLobbyRepository extends JpaRepository<LobbyEntity, UUID> {
 
     Optional<LobbyEntity> findByStartedGameId(final UUID startedGameId);
 
+
+    @Query("""
+                SELECT DISTINCT l
+                FROM LobbyEntity l
+                JOIN l.players p
+                WHERE p.id = :playerId
+            """)
+    Optional<LobbyEntity> findByPlayerId(@Param("playerId") UUID playerId);
+
     @Query("""
             SELECT l
             FROM LobbyEntity l

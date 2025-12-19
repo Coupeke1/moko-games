@@ -11,6 +11,7 @@ public interface LobbyRepository {
     Optional<Lobby> findById(LobbyId id);
 
     Optional<Lobby> findByStartedGameId(GameId gameInstanceId);
+    Optional<Lobby> findByPlayerId(PlayerId id);
 
     List<Lobby> findAll();
 

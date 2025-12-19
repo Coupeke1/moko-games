@@ -25,16 +25,12 @@ import java.util.*;
 @Transactional
 public class LobbyService {
     private final LobbyRepository repository;
-    private final LobbyPublisherService publisher;
+    private final PublisherService publisher;
     private final PlayerService playerService;
     private final ExternalGamesRepository gamesRepository;
     private final ExternalChatRepository chatRepository;
 
-    public LobbyService(final LobbyRepository repository,
-                        final LobbyPublisherService publisher,
-                        final PlayerService playerService,
-                        final ExternalGamesRepository gamesRepository,
-                        final ExternalChatRepository chatRepository) {
+    public LobbyService(final LobbyRepository repository, final PublisherService publisher, final PlayerService playerService, final ExternalGamesRepository gamesRepository, final ExternalChatRepository chatRepository) {
         this.repository = repository;
         this.publisher = publisher;
         this.playerService = playerService;
@@ -79,7 +75,8 @@ public class LobbyService {
         int newMaxPlayers = model.maxPlayers() != null ? model.maxPlayers() : lobby.settings().maxPlayers();
 
         Map<String, Object> merged = new HashMap<>(lobby.settings().gameSettings());
-        if (model.settings() != null) merged.putAll(model.settings());
+        if (model.settings() != null)
+            merged.putAll(model.settings());
 
         Map<String, Object> resolved = gamesRepository.validateAndResolveSettings(lobby.gameId(), merged, token);
 
@@ -117,11 +114,15 @@ public class LobbyService {
         return lobby;
     }
 
-    public List<Lobby> getInvitesFromPlayer(PlayerId id, GameId game) {
+    public List<Lobby> getInvitesFromPlayer(final PlayerId id, final GameId game) {
         return repository.findInvitesFromPlayerId(id, game);
     }
 
-    public Optional<Lobby> findByStartedGameId(GameId gameId) {
+    public Optional<Lobby> findByStartedGameId(final GameId gameId) {
         return repository.findByStartedGameId(gameId);
+    }
+
+    public Optional<Lobby> findByPlayer(final PlayerId id) {
+        return repository.findByPlayerId(id);
     }
 }

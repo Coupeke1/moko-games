@@ -12,7 +12,7 @@ import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.domain.player.PlayerName;
 import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerNotFriendException;
-import be.kdg.team22.sessionservice.infrastructure.lobby.LobbySocketPublisher;
+import be.kdg.team22.sessionservice.infrastructure.lobby.LobbyPublisher;
 import be.kdg.team22.sessionservice.infrastructure.messaging.LobbyEventPublisher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,9 +33,9 @@ class LobbyPlayerServiceTest {
     private final LobbyRepository repo = mock(LobbyRepository.class);
     private final FriendsService friendsService = mock(FriendsService.class);
     private final PlayerService playerService = mock(PlayerService.class);
-    private final LobbySocketPublisher socket = mock(LobbySocketPublisher.class);
+    private final LobbyPublisher socket = mock(LobbyPublisher.class);
     private final LobbyEventPublisher eventPublisher = mock(LobbyEventPublisher.class);
-    private final LobbyPublisherService publisherService = new LobbyPublisherService(repo, socket);
+    private final PublisherService publisherService = new PublisherService(repo, socket);
     LobbyPlayerService service = new LobbyPlayerService(repo, friendsService, playerService, publisherService, eventPublisher);
     private final LobbySettings settings = new LobbySettings(
             2,

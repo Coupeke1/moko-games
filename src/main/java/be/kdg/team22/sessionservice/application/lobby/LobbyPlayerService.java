@@ -21,10 +21,10 @@ public class LobbyPlayerService {
     private final LobbyRepository lobbyRepository;
     private final FriendsService friendsService;
     private final PlayerService playerService;
-    private final LobbyPublisherService lobbyPublisher;
+    private final PublisherService lobbyPublisher;
     private final LobbyEventPublisher eventPublisher;
 
-    public LobbyPlayerService(final LobbyRepository lobbyRepository, final FriendsService friendsService, final PlayerService playerService, final LobbyPublisherService lobbyPublisher, final LobbyEventPublisher eventPublisher) {
+    public LobbyPlayerService(final LobbyRepository lobbyRepository, final FriendsService friendsService, final PlayerService playerService, final PublisherService lobbyPublisher, final LobbyEventPublisher eventPublisher) {
         this.lobbyRepository = lobbyRepository;
         this.friendsService = friendsService;
         this.playerService = playerService;
