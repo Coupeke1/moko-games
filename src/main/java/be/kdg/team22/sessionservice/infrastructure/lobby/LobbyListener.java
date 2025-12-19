@@ -21,11 +21,11 @@ public class LobbyListener {
 
     @RabbitListener(queues = RabbitMQTopology.QUEUE_SUBSCRIBED_SOCKET)
     public void subscribeListener(final SubscribeMessage message) {
+        System.out.println("    RECEIVED SUBSCRIBE");
         PlayerId playerId = PlayerId.from(message.userId());
         Lobby lobby = service.findByPlayer(playerId);
         publishToPlayer(playerId, lobby);
     }
-
 
     public void publishToPlayer(final PlayerId id, final Lobby lobby) {
         LobbyModel model = LobbyModel.from(lobby);
