@@ -31,7 +31,7 @@ public record RegisterGameRequest(
                 chessInfo.backendUrl(),
                 event.frontendUrl(),
                 "/api/games/chess",
-                null,
+                "/actuator/health",
                 "Chess",
                 "Play chess against other players online.",
                 event.pictureUrl(),

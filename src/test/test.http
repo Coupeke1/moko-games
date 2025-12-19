@@ -8,3 +8,6 @@ Content-Type: application/json
   "blackPlayerId": "45d2a558-9fb0-4625-84be-db2122697671",
   "blackPlayerName": "Player 2"
 }
+
+### Health check
+GET http://localhost:8088/actuator/health
