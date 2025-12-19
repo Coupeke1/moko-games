@@ -36,7 +36,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                     get().login();
                 });
             };
-
             setInterval(() => {
                 get().updateToken(70);
             }, 30000);
