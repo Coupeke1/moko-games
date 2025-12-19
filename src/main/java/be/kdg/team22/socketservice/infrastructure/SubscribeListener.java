@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import java.util.UUID;
-import java.util.logging.Logger;
 
 @Component
 public class SubscribeListener {
