@@ -1,10 +1,10 @@
 import EditIcon from "@/components/icons/edit-icon";
 import LogoutIcon from "@/components/icons/logout-icon";
 import Column from "@/components/layout/column";
-import {Gap} from "@/components/layout/gap";
-import {Items} from "@/components/layout/items";
-import {Justify} from "@/components/layout/justify";
-import {Padding} from "@/components/layout/padding";
+import { Gap } from "@/components/layout/gap";
+import { Items } from "@/components/layout/items";
+import { Justify } from "@/components/layout/justify";
+import { Padding } from "@/components/layout/padding";
 import Row from "@/components/layout/row";
 import Statistic from "@/components/statistic";
 import Image from "@/features/profile/components/image";
@@ -21,38 +21,42 @@ interface Props {
 }
 
 export default function ProfileInformation({
-                                               image,
-                                               username,
-                                               email,
-                                               description,
-                                               level,
-                                               playTime,
-                                               onEdit,
-                                               onLogout,
-                                           }: Props) {
+    image,
+    username,
+    email,
+    description,
+    level,
+    playTime,
+    onEdit,
+    onLogout,
+}: Props) {
     return (
         <Row justify={Justify.Between} items={Items.Stretch}>
             <Row gap={Gap.Large} items={Items.Stretch}>
-                <Image src={image}/>
+                <Image src={image} />
 
                 <Column padding={Padding.Small}>
                     <Column gap={Gap.None}>
                         <Row items={Items.Center} responsive={false}>
                             <h2 className="text-3xl font-bold">{username}</h2>
 
-                            <Row gap={Gap.Small} items={Items.Center} responsive={false}>
+                            <Row
+                                gap={Gap.Small}
+                                items={Items.Center}
+                                responsive={false}
+                            >
                                 <button
                                     onClick={onEdit}
                                     className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75"
                                 >
-                                    <EditIcon small={true}/>
+                                    <EditIcon small={true} />
                                 </button>
 
                                 <button
                                     onClick={onLogout}
                                     className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75"
                                 >
-                                    <LogoutIcon small={true}/>
+                                    <LogoutIcon small={true} />
                                 </button>
                             </Row>
                         </Row>
@@ -73,20 +77,23 @@ export default function ProfileInformation({
                         onClick={onEdit}
                         className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75"
                     >
-                        <EditIcon small={false}/>
+                        <EditIcon small={false} />
                     </button>
 
                     <button
                         onClick={onLogout}
                         className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75"
                     >
-                        <LogoutIcon small={false}/>
+                        <LogoutIcon small={false} />
                     </button>
                 </Row>
 
                 <Row gap={Gap.Large} responsive={false}>
-                    <Statistic title="Level" value={level.toString()}/>
-                    <Statistic title="Time Played" value={playTime.toString()}/>
+                    <Statistic title="Level" value={level.toString()} />
+                    <Statistic
+                        title="Time Played"
+                        value={playTime.toString()}
+                    />
                 </Row>
             </section>
         </Row>
