@@ -3,12 +3,10 @@ import { watchNotifications } from "@/features/notifications/services/socket";
 import { useSocketStore } from "@/stores/socket-store.ts";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router";
 import { type Subscription } from "rxjs";
 
 export function useNotification() {
     const queryClient = useQueryClient();
-    const navigate = useNavigate();
     const { connect, disconnect, isConnected } = useSocketStore();
 
     const subscription = useRef<Subscription | null>(null);
@@ -57,7 +55,7 @@ export function useNotification() {
 
             setInitialized(false);
         };
-    }, [isConnected, queryClient, navigate]);
+    }, [isConnected, queryClient]);
 
     return {
         notifications: notifications.data ?? null,

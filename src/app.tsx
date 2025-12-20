@@ -29,7 +29,15 @@ const client = new QueryClient();
 function App() {
     return (
         <QueryClientProvider client={client}>
-            <Content />
+            <BrowserRouter>
+                <Auth />
+                <Notifications />
+                <Toaster
+                    position="top-right"
+                    toastOptions={{ className: "z-200" }}
+                />
+                <Content />
+            </BrowserRouter>
         </QueryClientProvider>
     );
 }
@@ -38,29 +46,12 @@ function Content() {
     const initialized = useAuthStore((state) => state.initialized);
     const { loading: profileLoading, error: profileError } = useProfile();
 
-    if (!initialized || profileLoading) {
-        return (
-            <BrowserRouter>
-                <Auth />
-                <LoadingState />
-            </BrowserRouter>
-        );
-    }
-
-    if (profileError) {
-        return (
-            <BrowserRouter>
-                <Auth />
-                <ErrorState />
-            </BrowserRouter>
-        );
-    }
+    if (!initialized || profileLoading) return <LoadingState />;
+    if (profileError) return <ErrorState />;
 
     return (
-        <BrowserRouter>
-            <Auth />
+        <>
             <Scroller />
-            <Notifications />
 
             <Routes>
                 <Route path="/" element={<Navigate to="/store" />} />
@@ -87,12 +78,7 @@ function Content() {
 
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>
-
-            <Toaster
-                position="top-right"
-                toastOptions={{ className: "z-200" }}
-            />
-        </BrowserRouter>
+        </>
     );
 }
 
