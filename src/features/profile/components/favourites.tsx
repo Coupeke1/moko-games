@@ -15,7 +15,7 @@ export default function ProfileFavourites() {
                 loading={loading}
                 error={error}
                 empty={favourites.length === 0}
-                message="No achievements"
+                message="No favourites"
             >
                 {favourites && (
                     <Column gap={Gap.Large}>
