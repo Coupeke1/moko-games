@@ -1,6 +1,6 @@
+import showToast from "@/components/global/toast";
 import { useNotification } from "@/features/notifications/hooks/use-notification";
 import type { Notification } from "@/features/notifications/models/notification";
-import showToast from "@/components/global/toast";
 
 export default function Notifications() {
     const { notifications, loading, error } = useNotification();
