@@ -32,7 +32,7 @@ export default function SelectSetting({
         <Select
             label={camel(setting.name)}
             disabled={!isOwner}
-            value={current}
+            value={value}
             onChange={(e) => changeSetting(setting.name, e.target.value)}
             options={options}
         />
