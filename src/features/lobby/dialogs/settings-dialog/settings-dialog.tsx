@@ -1,21 +1,18 @@
-import {useEffect, useState} from "react";
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 
 import Button from "@/components/buttons/button";
 import Dialog from "@/components/dialog/dialog";
+import showToast from "@/components/global/toast";
 import Column from "@/components/layout/column";
-import {Gap} from "@/components/layout/gap";
+import { Gap } from "@/components/layout/gap";
 import TabContent from "@/components/tabs/buttons/content";
 import TabRow from "@/components/tabs/buttons/row";
-import showToast from "@/components/global/toast";
-import type {Game} from "@/features/games/models/game.ts";
-import type {Lobby} from "@/features/lobby/models/lobby.ts";
+import type { Game } from "@/features/games/models/game";
+import GameTab from "@/features/lobby/dialogs/settings-dialog/game-tab/game-tab";
 import LobbyTab from "@/features/lobby/dialogs/settings-dialog/lobby-tab";
-import GameTab from "@/features/lobby/dialogs/settings-dialog/game-tab";
-import {findLobbyGameSettings, updateSettings} from "@/features/lobby/services/lobby.ts";
-import type {GameSettingsSchema} from "@/features/lobby/models/settings.ts";
-import {findGameSettingsSchema} from "@/features/lobby/services/settings.ts";
-
+import type { Lobby } from "@/features/lobby/models/lobby.ts";
+import { updateSettings } from "@/features/lobby/services/lobby.ts";
 
 interface Props {
     lobby: Lobby;
@@ -26,18 +23,19 @@ interface Props {
     onChange: (open: boolean) => void;
 }
 
-function defaultsFromSchema(schema: GameSettingsSchema): Record<string, unknown> {
-    const out: Record<string, unknown> = {};
-    for (const s of schema.settings) out[s.name] = s.defaultValue;
-    return out;
-}
-
-export default function SettingsDialog({lobby, game, isOwner, close, open, onChange}: Props) {
-    const qc = useQueryClient();
+export default function SettingsDialog({
+    lobby,
+    game,
+    isOwner,
+    close,
+    open,
+    onChange,
+}: Props) {
+    const client = useQueryClient();
     const [current, setCurrent] = useState("Lobby");
     const [size, setSize] = useState<number>(4);
-    const [gameSettings, setGameSettings] = useState<Record<string, unknown>>({});
     const [initialized, setInitialized] = useState(false);
+    const [settings, setSettings] = useState<Record<string, unknown>>({});
 
     useEffect(() => {
         if (!open) {
@@ -47,43 +45,19 @@ export default function SettingsDialog({lobby, game, isOwner, close, open, onCha
         setSize(lobby.maxPlayers);
     }, [open, lobby]);
 
-    const schemaQuery = useQuery({
-        queryKey: ["game-settings-schema", game.id],
-        enabled: open && !!game?.id,
-        queryFn: () => findGameSettingsSchema(game.id),
-        staleTime: Infinity,
-    });
-
-    const lobbySettingsQuery = useQuery({
-        queryKey: ["lobby-game-settings", lobby.id],
-        enabled: open && !!lobby?.id,
-        queryFn: () => findLobbyGameSettings(lobby.id),
-        staleTime: 0,
-    });
-
     useEffect(() => {
         if (!open || initialized) return;
-        if (!lobbySettingsQuery.data) return;
-
-        const fromLobby = lobbySettingsQuery.data ?? {};
-        const merged =
-            schemaQuery.data
-                ? {...defaultsFromSchema(schemaQuery.data), ...fromLobby}
-                : fromLobby;
-
-        setGameSettings(merged);
         setInitialized(true);
-    }, [open, initialized, lobbySettingsQuery.data, schemaQuery.data]);
-
-    const setValue = (name: string, value: unknown) =>
-        setGameSettings((prev) => ({...prev, [name]: value}));
+    }, [open, initialized]);
 
     const save = useMutation({
-        mutationFn: async () => updateSettings(lobby.id, size, gameSettings),
+        mutationFn: async () => updateSettings(lobby.id, size, settings),
         onSuccess: async () => {
-            await qc.invalidateQueries({queryKey: ["lobby", lobby.id]});
-            await qc.invalidateQueries({queryKey: ["lobby-game-settings", lobby.id]});
-            showToast("Lobby", "Saved");
+            await client.invalidateQueries({ queryKey: ["lobby", lobby.id] });
+            await client.invalidateQueries({
+                queryKey: ["lobby", lobby.id, "settings"],
+            });
+            showToast("Lobby", "Settings saved");
             close();
         },
         onError: (error: Error) => showToast("Lobby", error.message),
@@ -102,7 +76,11 @@ export default function SettingsDialog({lobby, game, isOwner, close, open, onCha
             }
         >
             <Column gap={Gap.Large}>
-                <TabRow tabs={["Lobby", "Game"]} current={current} setCurrent={setCurrent}/>
+                <TabRow
+                    tabs={["Lobby", "Game"]}
+                    current={current}
+                    setCurrent={setCurrent}
+                />
 
                 <TabContent
                     current={current}
@@ -122,11 +100,20 @@ export default function SettingsDialog({lobby, game, isOwner, close, open, onCha
                             title: "Game",
                             element: (
                                 <GameTab
-                                    schema={schemaQuery.data ?? null}
-                                    loading={schemaQuery.isLoading || lobbySettingsQuery.isLoading}
+                                    lobby={lobby}
+                                    game={game}
                                     isOwner={isOwner}
-                                    values={gameSettings}
-                                    setValue={setValue}
+                                    settings={settings}
+                                    setSettings={setSettings}
+                                    changeSetting={(
+                                        name: string,
+                                        value: unknown,
+                                    ) => {
+                                        setSettings((prev) => ({
+                                            ...prev,
+                                            [name]: value,
+                                        }));
+                                    }}
                                 />
                             ),
                         },
