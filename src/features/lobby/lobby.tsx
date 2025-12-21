@@ -1,34 +1,34 @@
 import BigButton from "@/components/buttons/big-button";
+import showToast from "@/components/global/toast";
 import InviteIcon from "@/components/icons/invite-icon";
 import Column from "@/components/layout/column";
-import {Gap} from "@/components/layout/gap";
+import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
 import Section from "@/components/section";
 import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
-import showToast from "@/components/global/toast";
 import BotCard from "@/features/lobby/components/bot-card";
 import GameInformation from "@/features/lobby/components/information";
 import Page from "@/features/lobby/components/page";
 import PlayerCard from "@/features/lobby/components/player-card";
 import InviteDialog from "@/features/lobby/dialogs/invite-dialog/invite-dialog";
 import SettingsDialog from "@/features/lobby/dialogs/settings-dialog/settings-dialog";
-import {useSession} from "@/features/lobby/hooks/use-session";
-import type {Player} from "@/features/lobby/models/player.ts";
-import {closeLobby, startGame} from "@/features/lobby/services/lobby.ts";
-import {useMutation} from "@tanstack/react-query";
-import {useState} from "react";
-import {useNavigate} from "react-router";
+import { useSession } from "@/features/lobby/hooks/use-session";
+import type { Player } from "@/features/lobby/models/player.ts";
+import { closeLobby, startGame } from "@/features/lobby/services/lobby.ts";
+import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
+import { useNavigate } from "react-router";
 
 export default function LobbyPage() {
     const navigate = useNavigate();
     const [invite, setInvite] = useState(false);
     const [settings, setSettings] = useState(false);
 
-    const {lobby, profile, game, isOwner, loading, error} = useSession();
+    const { lobby, profile, game, isOwner, loading, error } = useSession();
 
     const start = useMutation({
-        mutationFn: async ({lobby}: { lobby: string }) =>
+        mutationFn: async ({ lobby }: { lobby: string }) =>
             await startGame(lobby),
         onSuccess: async () => {
             showToast("Lobby", "Starting");
@@ -39,7 +39,7 @@ export default function LobbyPage() {
     });
 
     const close = useMutation({
-        mutationFn: async ({lobby}: { lobby: string }) =>
+        mutationFn: async ({ lobby }: { lobby: string }) =>
             await closeLobby(lobby),
         onSuccess: async () => {
             showToast("Lobby", "Closed");
@@ -78,7 +78,8 @@ export default function LobbyPage() {
                         <Column gap={Gap.Large}>
                             <GameInformation
                                 game={game}
-                                isOwner={isOwner}onStart={() =>
+                                isOwner={isOwner}
+                                onStart={() =>
                                     start.mutate({ lobby: lobby.id })
                                 }
                                 onQuit={() => close.mutate({ lobby: lobby.id })}
@@ -112,7 +113,7 @@ export default function LobbyPage() {
                                             <BigButton
                                                 onClick={() => setInvite(true)}
                                             >
-                                                <InviteIcon/>
+                                                <InviteIcon />
                                             </BigButton>
                                         )}
                                     </Grid>

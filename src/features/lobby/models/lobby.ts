@@ -11,4 +11,5 @@ export interface Lobby {
     bot: Bot;
     maxPlayers: number;
     status: Status;
+    settings: Record<string, unknown>;
 }

@@ -1,15 +1,17 @@
-import {environment} from "@/config.ts";
-import {client} from "@/lib/api-client.ts";
-import type {GameSettingsSchema} from "@/features/lobby/models/settings.ts";
+import { environment } from "@/config.ts";
+import { client } from "@/lib/api-client.ts";
+import type { Schema } from "@/features/lobby/models/settings.ts";
 
-const GAMES_URL = environment.gamesService;
+const BASE_URL = environment.gamesService;
 
-export async function findGameSettingsSchema(gameId: string): Promise<GameSettingsSchema> {
+export async function findSchema(id: string): Promise<Schema> {
     try {
-        const {data} = await client.get<GameSettingsSchema>(`${GAMES_URL}/${gameId}/settings`);
+        const { data } = await client.get<Schema>(`${BASE_URL}/${id}/settings`);
         return data;
     } catch {
-        const {data} = await client.get<{ settings: GameSettingsSchema["settings"] }>(`${GAMES_URL}/${gameId}`);
-        return {settings: data.settings ?? []};
+        const { data } = await client.get<{ settings: Schema["settings"] }>(
+            `${BASE_URL}/${id}`,
+        );
+        return { settings: data.settings ?? [] };
     }
 }

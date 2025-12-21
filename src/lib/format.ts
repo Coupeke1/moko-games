@@ -2,6 +2,13 @@ export function format(value: string) {
     return `${value.charAt(0)}${value.slice(1).toLowerCase().replaceAll("_", " ")}`;
 }
 
+export function camel(value: string): string {
+    return value
+        .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+        .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
+        .replace(/^./, (char) => char.toUpperCase());
+}
+
 export function slug(value: string) {
     return value.toLowerCase().replaceAll("_", "-");
 }

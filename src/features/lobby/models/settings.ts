@@ -1,8 +1,8 @@
-export type GameSettingType = "STRING" | "INTEGER" | "BOOLEAN" | "ENUM";
+import type { Type } from "@/features/lobby/models/type";
 
-export interface GameSettingDefinition {
+export interface Setting {
     name: string;
-    type: GameSettingType;
+    type: Type;
     required: boolean;
     defaultValue: unknown;
     min: number | null;
@@ -10,6 +10,6 @@ export interface GameSettingDefinition {
     allowedValues: unknown[] | null;
 }
 
-export interface GameSettingsSchema {
-    settings: GameSettingDefinition[];
+export interface Schema {
+    settings: Setting[];
 }

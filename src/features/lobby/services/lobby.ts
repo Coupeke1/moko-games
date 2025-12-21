@@ -1,37 +1,39 @@
-import {environment} from "@/config.ts";
-import type {Game} from "@/features/games/models/game.ts";
-import type {Lobby} from "@/features/lobby/models/lobby.ts";
-import type {Player} from "@/features/lobby/models/player.ts";
-import {Status} from "@/features/lobby/models/status";
-import {client} from "@/lib/api-client.ts";
-import {validIdCheck} from "@/lib/id.ts";
+import { environment } from "@/config.ts";
+import type { Game } from "@/features/games/models/game.ts";
+import type { Lobby } from "@/features/lobby/models/lobby.ts";
+import type { Player } from "@/features/lobby/models/player.ts";
+import { Status } from "@/features/lobby/models/status";
+import { client } from "@/lib/api-client.ts";
+import { validIdCheck } from "@/lib/id.ts";
 
 const BASE_URL = environment.sessionService;
 
 export async function findLobby(id: string): Promise<Lobby> {
     try {
-        const {data} = await client.get<Lobby>(`${BASE_URL}/${id}`);
+        const { data } = await client.get<Lobby>(`${BASE_URL}/${id}`);
         return data;
     } catch {
         throw new Error("Lobby could not be fetched");
     }
 }
 
-export async function findLobbyGameSettings(lobbyId: string): Promise<Record<string, unknown>> {
+export async function findSettings(
+    id: string,
+): Promise<Record<string, unknown>> {
     try {
-        validIdCheck(lobbyId);
-        const {data} = await client.get<Record<string, unknown>>(
-            `${BASE_URL}/${lobbyId}/settings`,
+        validIdCheck(id);
+        const { data } = await client.get<Record<string, unknown>>(
+            `${BASE_URL}/${id}/settings`,
         );
         return data ?? {};
     } catch {
-        throw new Error("Could not fetch lobby game settings");
+        throw new Error("Could not fetch settings");
     }
 }
 
 export async function createLobby(game: Game, size: number): Promise<Lobby> {
     try {
-        const {data} = await client.post<Lobby>(BASE_URL, {
+        const { data } = await client.post<Lobby>(BASE_URL, {
             gameId: game.id,
             maxPlayers: size,
         });
@@ -95,7 +97,7 @@ export async function updateSettings(
 
         await client.put(`${BASE_URL}/${lobby}/settings`, {
             maxPlayers: size,
-            ...(settings ? {settings} : {}),
+            ...(settings ? { settings } : {}),
         });
     } catch {
         throw new Error("Could not update settings");
@@ -105,7 +107,7 @@ export async function updateSettings(
 export async function startGame(lobby: string): Promise<string> {
     try {
         validIdCheck(lobby);
-        const {data} = await client.post(`${BASE_URL}/${lobby}/start`);
+        const { data } = await client.post(`${BASE_URL}/${lobby}/start`);
         return data;
     } catch {
         throw new Error("Could not start game");
