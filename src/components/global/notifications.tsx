@@ -1,4 +1,4 @@
-import showToast from "@/components/global/toast";
+import { showNotification } from "@/components/global/toast/toast";
 import { useNotification } from "@/features/notifications/hooks/use-notification";
 import type { Notification } from "@/features/notifications/models/notification";
 
@@ -9,6 +9,6 @@ export default function Notifications() {
     if (notifications.length <= 0) return null;
 
     notifications.forEach((notification: Notification) => {
-        showToast(notification.title, notification.message);
+        showNotification(notification.title, notification.message);
     });
 }

@@ -1,10 +1,11 @@
 import Button from "@/components/buttons/button";
 import Dialog from "@/components/dialog/dialog";
+import show from "@/components/global/toast/toast";
+import { Type } from "@/components/global/toast/type";
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import TabContent from "@/components/tabs/buttons/content";
 import TabRow from "@/components/tabs/buttons/row";
-import showToast from "@/components/global/toast";
 import AboutTab, {
     type AboutData,
 } from "@/features/profile/dialogs/settings-dialog/about-tab";
@@ -55,16 +56,11 @@ export default function SettingsDialog({
         },
         onSuccess: async () => {
             await client.refetchQueries({ queryKey: ["profile", "me"] });
-
-            if (profile === undefined) return;
-            showToast(profile.username, "Profile was saved!");
+            show(Type.Profile, "Saved");
             setCurrent("About");
             close();
         },
-        onError: (error: Error) => {
-            if (profile === undefined) return;
-            showToast(profile.username, error.message);
-        },
+        onError: (error: Error) => show(Type.Profile, error.message),
     });
 
     return (

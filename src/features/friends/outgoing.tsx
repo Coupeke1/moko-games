@@ -1,5 +1,7 @@
 import Button from "@/components/buttons/button";
 import UserCard from "@/components/cards/user-card";
+import show from "@/components/global/toast/toast";
+import { Type } from "@/components/global/toast/type";
 import CancelIcon from "@/components/icons/cancel-icon";
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
@@ -7,7 +9,6 @@ import Grid from "@/components/layout/grid/grid";
 import Page from "@/components/layout/page";
 import State from "@/components/state/state";
 import TabRow from "@/components/tabs/links/row";
-import showToast from "@/components/global/toast";
 import { getTabs } from "@/features/friends/components/tabs";
 import { useOutgoingRequests } from "@/features/friends/hooks/use-requests.ts";
 import { cancelRequest } from "@/features/friends/services/requests.ts";
@@ -25,11 +26,9 @@ export default function OutgoingRequestsPage() {
             await client.invalidateQueries({
                 queryKey: ["friends", "outgoing"],
             });
-            showToast("Request", "Cancelled");
+            show(Type.Friends, "Request cancelled");
         },
-        onError: (error: Error) => {
-            showToast("Request", error.message);
-        },
+        onError: (error: Error) => show(Type.Friends, error.message),
     });
 
     return (

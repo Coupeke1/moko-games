@@ -1,5 +1,6 @@
 import BigButton from "@/components/buttons/big-button";
-import showToast from "@/components/global/toast";
+import show from "@/components/global/toast/toast";
+import { Type } from "@/components/global/toast/type";
 import InviteIcon from "@/components/icons/invite-icon";
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
@@ -30,24 +31,18 @@ export default function LobbyPage() {
     const start = useMutation({
         mutationFn: async ({ lobby }: { lobby: string }) =>
             await startGame(lobby),
-        onSuccess: async () => {
-            showToast("Lobby", "Starting");
-        },
-        onError: (error: Error) => {
-            showToast("Lobby", error.message);
-        },
+        onSuccess: async () => show(Type.Lobby, "Starting"),
+        onError: (error: Error) => show(Type.Lobby, error.message),
     });
 
     const close = useMutation({
         mutationFn: async ({ lobby }: { lobby: string }) =>
             await closeLobby(lobby),
         onSuccess: async () => {
-            showToast("Lobby", "Closed");
+            show(Type.Lobby, "Closing");
             navigate("/library");
         },
-        onError: (error: Error) => {
-            showToast("Lobby", error.message);
-        },
+        onError: (error: Error) => show(Type.Lobby, error.message),
     });
 
     return (

@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 
 import Button from "@/components/buttons/button";
 import Dialog from "@/components/dialog/dialog";
-import showToast from "@/components/global/toast";
+import show from "@/components/global/toast/toast";
+import { Type } from "@/components/global/toast/type";
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import TabContent from "@/components/tabs/buttons/content";
@@ -57,10 +58,10 @@ export default function SettingsDialog({
             await client.invalidateQueries({
                 queryKey: ["lobby", lobby.id, "settings"],
             });
-            showToast("Lobby", "Settings saved");
+            show(Type.Lobby, "Saved");
             close();
         },
-        onError: (error: Error) => showToast("Lobby", error.message),
+        onError: (error: Error) => show(Type.Lobby, error.message),
     });
 
     return (

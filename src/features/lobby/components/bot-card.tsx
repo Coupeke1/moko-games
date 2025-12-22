@@ -1,11 +1,12 @@
 import Button from "@/components/buttons/button";
 import Card from "@/components/cards/bot-card";
+import show from "@/components/global/toast/toast";
+import { Type } from "@/components/global/toast/type";
 import BotIcon from "@/components/icons/bot-icon";
 import CancelIcon from "@/components/icons/cancel-icon";
-import showToast from "@/components/global/toast";
 import type { Lobby } from "@/features/lobby/models/lobby.ts";
-import type { Bot } from "@/features/profile/models/bot.ts";
 import { removeBot } from "@/features/lobby/services/bots.ts";
+import type { Bot } from "@/features/profile/models/bot.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function BotCard({
@@ -21,11 +22,9 @@ export default function BotCard({
 
     const remove = useMutation({
         mutationFn: async () => await removeBot(lobby.id),
-        onSuccess: async () => {
-            await client.invalidateQueries({ queryKey: ["lobby", lobby.id] });
-            showToast(bot.username, "Removed");
-        },
-        onError: (error: Error) => showToast(bot.username, error.message),
+        onSuccess: async () =>
+            await client.invalidateQueries({ queryKey: ["lobby", lobby.id] }),
+        onError: (error: Error) => show(Type.Lobby, error.message),
     });
 
     function BotButton() {

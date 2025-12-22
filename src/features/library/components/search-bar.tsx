@@ -1,8 +1,9 @@
 import Button from "@/components/buttons/button";
+import show from "@/components/global/toast/toast";
+import { Type } from "@/components/global/toast/type";
 import Form from "@/components/inputs/form";
 import Input from "@/components/inputs/input";
 import { Gap } from "@/components/layout/gap";
-import showToast from "@/components/global/toast";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router";
@@ -29,7 +30,7 @@ export default function SearchBar({ onSearch }: Props) {
             setParams(params);
             onSearch(query);
         },
-        onError: (error: Error) => showToast("Library", error.message),
+        onError: (error: Error) => show(Type.Library, error.message),
     });
 
     const handleSearch = (event: FormEvent<HTMLFormElement>) => {
