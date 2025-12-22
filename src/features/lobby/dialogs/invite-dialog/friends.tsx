@@ -1,10 +1,11 @@
 import Button from "@/components/buttons/button";
 import UserCard from "@/components/cards/user-card";
+import show from "@/components/global/toast/toast";
+import { Type } from "@/components/global/toast/type";
 import AcceptIcon from "@/components/icons/accept-icon";
 import PlusIcon from "@/components/icons/plus-icon";
 import ErrorState from "@/components/state/error";
 import LoadingState from "@/components/state/loading";
-import showToast from "@/components/global/toast";
 import { useFriends } from "@/features/friends/hooks/use-friends.ts";
 import type { Lobby } from "@/features/lobby/models/lobby.ts";
 import { sendInvite } from "@/features/lobby/services/invites.ts";
@@ -27,12 +28,10 @@ export default function FriendsSection({ lobby, onInvite }: Props) {
         },
         onSuccess: async () => {
             await client.refetchQueries({ queryKey: ["lobby", lobby.id] });
-            showToast("Lobby", "Invite sent!");
+            show(Type.Lobby, "Invite sent!");
             onInvite();
         },
-        onError: (error: Error) => {
-            showToast("Lobby", error.message);
-        },
+        onError: (error: Error) => show(Type.Lobby, error.message),
     });
 
     if (isLoading || !friends) return <LoadingState />;

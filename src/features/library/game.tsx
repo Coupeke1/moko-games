@@ -1,3 +1,5 @@
+import show from "@/components/global/toast/toast";
+import { Type } from "@/components/global/toast/type";
 import PlayIcon from "@/components/icons/play-icon";
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
@@ -5,7 +7,6 @@ import { Justify } from "@/components/layout/justify";
 import Page from "@/components/layout/page";
 import Row from "@/components/layout/row";
 import State from "@/components/state/state";
-import showToast from "@/components/global/toast";
 import { useGame } from "@/features/games/hooks/use-game";
 import type { Game } from "@/features/games/models/game.ts";
 import Favourite from "@/features/library/components/favourite";
@@ -28,15 +29,13 @@ export default function LibraryGamePage() {
 
     const start = useMutation({
         mutationFn: async ({ game }: { game: Game }) => {
-            showToast(game.title, "Creating lobby");
+            show(Type.Lobby, "Creating lobby");
             const lobby = await createLobby(game, 4);
             navigate(`/lobbies/${lobby.id}`);
         },
-        onSuccess: async (_data, variables) => {
-            showToast(variables.game.title, "Lobby was created");
-            await client.refetchQueries({ queryKey: ["lobby"] });
-        },
-        onError: (error: Error) => showToast("Lobby", error.message),
+        onSuccess: async () =>
+            await client.refetchQueries({ queryKey: ["lobby"] }),
+        onError: (error: Error) => show(Type.Lobby, error.message),
     });
 
     return (

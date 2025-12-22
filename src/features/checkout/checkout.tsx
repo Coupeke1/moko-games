@@ -1,4 +1,6 @@
 import Button from "@/components/buttons/button";
+import show from "@/components/global/toast/toast";
+import { Type } from "@/components/global/toast/type";
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import { Items } from "@/components/layout/items";
@@ -8,7 +10,6 @@ import Row from "@/components/layout/row";
 import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
 import Statistic from "@/components/statistic";
-import showToast from "@/components/global/toast";
 import { useCart } from "@/features/cart/hooks/use-cart";
 import type { Entry } from "@/features/cart/models/entry";
 import { getTotalPrice } from "@/features/cart/services/cart";
@@ -28,13 +29,11 @@ export default function CheckoutPage() {
 
     const checkout = useMutation({
         mutationFn: async () => {
-            showToast("Checkout", "Redirecting to payment");
+            show(Type.Checkout, "Redirecting");
             return await placeOrder();
         },
-        onSuccess: async (data) => {
-            window.location.replace(data);
-        },
-        onError: (error: Error) => showToast("Checkout", error.message),
+        onSuccess: async (data) => window.location.replace(data),
+        onError: (error: Error) => show(Type.Checkout, error.message),
     });
 
     return (

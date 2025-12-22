@@ -1,8 +1,9 @@
 import Button from "@/components/buttons/button";
 import BotCard from "@/components/cards/bot-card";
+import show from "@/components/global/toast/toast";
+import { Type } from "@/components/global/toast/type";
 import AcceptIcon from "@/components/icons/accept-icon";
 import PlusIcon from "@/components/icons/plus-icon";
-import showToast from "@/components/global/toast";
 import type { Lobby } from "@/features/lobby/models/lobby.ts";
 import { addBot } from "@/features/lobby/services/bots.ts";
 import type { Bot } from "@/features/profile/models/bot.ts";
@@ -20,12 +21,10 @@ export default function BotsSection({ lobby, onInvite }: Props) {
         mutationFn: async () => await addBot(lobby.id),
         onSuccess: async () => {
             await client.refetchQueries({ queryKey: ["lobby", lobby.id] });
-            showToast("Lobby", "Added bot");
+            show(Type.Lobby, "Bot added");
             onInvite();
         },
-        onError: (error: Error) => {
-            showToast("Lobby", error.message);
-        },
+        onError: (error: Error) => show(Type.Lobby, error.message),
     });
 
     return (

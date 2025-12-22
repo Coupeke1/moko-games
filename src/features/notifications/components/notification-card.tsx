@@ -1,5 +1,6 @@
 import Card from "@/components/cards/card";
-import showToast from "@/components/global/toast";
+import show from "@/components/global/toast/toast";
+import { Type } from "@/components/global/toast/type";
 import CalendarIcon from "@/components/icons/calendar-icon";
 import CategoryIcon from "@/components/icons/category-icon";
 import { Gap } from "@/components/layout/gap";
@@ -36,7 +37,7 @@ export default function NotificationCard({ notification }: Props) {
         onSuccess: async () => {
             await client.refetchQueries({ queryKey: ["notifications"] });
         },
-        onError: (error: Error) => showToast(notification.title, error.message),
+        onError: (error: Error) => show(Type.Notifications, error.message),
     });
 
     return (

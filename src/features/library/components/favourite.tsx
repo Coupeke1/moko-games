@@ -1,5 +1,6 @@
+import show from "@/components/global/toast/toast";
+import { Type } from "@/components/global/toast/type";
 import HeartIcon from "@/components/icons/heart-icon";
-import showToast from "@/components/global/toast";
 import type { Game } from "@/features/games/models/game";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFavourite } from "../hooks/use-favourite";
@@ -32,13 +33,8 @@ export default function Favourite({ game }: Props) {
             await client.refetchQueries({
                 queryKey: ["library", "favourite", variables.game.id],
             });
-
-            showToast(
-                variables.game.title,
-                variables.favourited ? "Unfavourited" : "Favourited",
-            );
         },
-        onError: (error: Error) => showToast("Favourite", error.message),
+        onError: (error: Error) => show(Type.Library, error.message),
     });
 
     if (favourited === null || loading || error) return null;

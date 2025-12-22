@@ -7,8 +7,9 @@ import type { Lobby } from "@/features/lobby/models/lobby";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router";
 import { acceptInvite } from "@/features/lobby/services/invites";
-import showToast from "@/components/global/toast";
 import { useEffect } from "react";
+import show from "@/components/global/toast/toast";
+import { Type } from "@/components/global/toast/type";
 
 export default function InvitesPage() {
     const client = useQueryClient();
@@ -29,12 +30,11 @@ export default function InvitesPage() {
             await client.invalidateQueries({
                 queryKey: ["lobby", "invites", id],
             });
-            showToast("Invite", "Accepted");
+
+            show(Type.Friends, "Request accepted");
             navigate(`/lobbies/${variables.invite.id}`);
         },
-        onError: (error: Error) => {
-            showToast("Invite", error.message);
-        },
+        onError: (error: Error) => show(Type.Friends, error.message),
     });
 
     return (

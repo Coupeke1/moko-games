@@ -1,8 +1,9 @@
 import Button from "@/components/buttons/button";
+import show from "@/components/global/toast/toast";
+import { Type } from "@/components/global/toast/type";
 import Form from "@/components/inputs/form";
 import Input from "@/components/inputs/input";
 import { Gap } from "@/components/layout/gap";
-import showToast from "@/components/global/toast";
 import { sendRequest } from "@/features/friends/services/requests.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
@@ -17,11 +18,9 @@ export default function Add() {
         onSuccess: async () => {
             await client.refetchQueries({ queryKey: ["friends"] });
             setUsername("");
-            showToast(username, "Request sent");
+            show(Type.Friends, "Request sent");
         },
-        onError: (error: Error) => {
-            showToast("Friends", error.message);
-        },
+        onError: (error: Error) => show(Type.Friends, error.message),
     });
 
     const handleAdd = (event: FormEvent<HTMLFormElement>) => {

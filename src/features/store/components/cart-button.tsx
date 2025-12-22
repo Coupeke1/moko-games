@@ -1,5 +1,6 @@
+import show from "@/components/global/toast/toast";
+import { Type } from "@/components/global/toast/type";
 import CartIcon from "@/components/icons/bar/cart-icon";
-import showToast from "@/components/global/toast";
 import { addToCart, removeFromCart } from "@/features/cart/services/cart";
 import { useAvailable } from "@/features/store/hooks/use-available";
 import type { Entry } from "@/features/store/models/entry/entry";
@@ -17,23 +18,17 @@ export default function CartButton({ entry }: Props) {
     const add = useMutation({
         mutationFn: async ({ entry }: { entry: Entry }) =>
             await addToCart(entry),
-        onSuccess: async (_data, variables) => {
-            await client.invalidateQueries({ queryKey: ["cart"] });
-            showToast(variables.entry.title, "Added to cart");
-        },
-        onError: (error: Error, variables) =>
-            showToast(variables.entry.title, error.message),
+        onSuccess: async () =>
+            await client.invalidateQueries({ queryKey: ["cart"] }),
+        onError: (error: Error) => show(Type.Cart, error.message),
     });
 
     const remove = useMutation({
         mutationFn: async ({ entry }: { entry: Entry }) =>
             await removeFromCart(entry),
-        onSuccess: async (_data, variables) => {
-            await client.invalidateQueries({ queryKey: ["cart"] });
-            showToast(variables.entry.title, "Removed from cart");
-        },
-        onError: (error: Error, variables) =>
-            showToast(variables.entry.title, error.message),
+        onSuccess: async () =>
+            await client.invalidateQueries({ queryKey: ["cart"] }),
+        onError: (error: Error) => show(Type.Cart, error.message),
     });
 
     if (inLibrary)

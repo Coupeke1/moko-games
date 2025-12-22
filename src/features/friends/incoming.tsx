@@ -1,5 +1,7 @@
 import Button from "@/components/buttons/button";
 import UserCard from "@/components/cards/user-card";
+import show from "@/components/global/toast/toast";
+import { Type } from "@/components/global/toast/type";
 import AcceptIcon from "@/components/icons/accept-icon";
 import RejectIcon from "@/components/icons/reject-icon";
 import Column from "@/components/layout/column";
@@ -9,7 +11,6 @@ import Page from "@/components/layout/page";
 import Row from "@/components/layout/row";
 import State from "@/components/state/state";
 import TabRow from "@/components/tabs/links/row";
-import showToast from "@/components/global/toast";
 import { getTabs } from "@/features/friends/components/tabs";
 import { useIncomingRequests } from "@/features/friends/hooks/use-requests.ts";
 import {
@@ -31,11 +32,9 @@ export default function IncomingRequestsPage() {
                 queryKey: ["friends", "incoming"],
             });
             await client.invalidateQueries({ queryKey: ["friends"] });
-            showToast("Request", "Accepted");
+            show(Type.Friends, "Request accepted");
         },
-        onError: (error: Error) => {
-            showToast("Request", error.message);
-        },
+        onError: (error: Error) => show(Type.Friends, error.message),
     });
 
     const reject = useMutation({
@@ -45,11 +44,9 @@ export default function IncomingRequestsPage() {
             await client.invalidateQueries({
                 queryKey: ["friends", "incoming"],
             });
-            showToast("Request", "Rejected");
+            show(Type.Friends, "Request rejected");
         },
-        onError: (error: Error) => {
-            showToast("Request", error.message);
-        },
+        onError: (error: Error) => show(Type.Friends, error.message),
     });
 
     return (

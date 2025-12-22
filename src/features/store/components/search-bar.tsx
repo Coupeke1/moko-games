@@ -1,11 +1,12 @@
 import Button from "@/components/buttons/button";
+import show from "@/components/global/toast/toast";
+import { Type } from "@/components/global/toast/type";
 import Form from "@/components/inputs/form";
 import Input from "@/components/inputs/input";
 import Select from "@/components/inputs/select";
 import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
 import { GridSize } from "@/components/layout/grid/size";
-import showToast from "@/components/global/toast";
 import { Category, format } from "@/features/store/models/entry/category.ts";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
@@ -43,7 +44,7 @@ export default function SearchBar({ onSearch }: Props) {
             setParams(params);
             onSearch(query, sorting, category);
         },
-        onError: (error: Error) => showToast("Store", error.message),
+        onError: (error: Error) => show(Type.Store, error.message),
     });
 
     const handleSearch = (event: FormEvent<HTMLFormElement>) => {

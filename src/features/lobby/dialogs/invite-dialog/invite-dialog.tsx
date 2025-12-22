@@ -3,8 +3,8 @@ import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
 import type { Lobby } from "@/features/lobby/models/lobby.ts";
-import BotsSection from "@/features/lobby/dialogs/invite-dialog/bots-section";
-import FriendsSection from "@/features/lobby/dialogs/invite-dialog/friends-section";
+import BotsSection from "@/features/lobby/dialogs/invite-dialog/bots";
+import FriendsSection from "@/features/lobby/dialogs/invite-dialog/friends";
 
 interface Props {
     lobby: Lobby;

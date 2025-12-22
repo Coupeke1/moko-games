@@ -1,5 +1,7 @@
 import Button from "@/components/buttons/button";
 import UserCard from "@/components/cards/user-card";
+import show from "@/components/global/toast/toast";
+import { Type } from "@/components/global/toast/type";
 import CancelIcon from "@/components/icons/cancel-icon";
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
@@ -7,7 +9,6 @@ import Grid from "@/components/layout/grid/grid";
 import Page from "@/components/layout/page";
 import State from "@/components/state/state";
 import TabRow from "@/components/tabs/links/row";
-import showToast from "@/components/global/toast";
 import Add from "@/features/friends/components/add";
 import { getTabs } from "@/features/friends/components/tabs";
 import { useFriends } from "@/features/friends/hooks/use-friends.ts";
@@ -24,11 +25,9 @@ function Friend({ friend }: { friend: Profile }) {
             await removeFriend(friend.id),
         onSuccess: async () => {
             await client.invalidateQueries({ queryKey: ["friends"] });
-            showToast(friend.username, "Removed");
+            show(Type.Friends, "Friend removed");
         },
-        onError: (error: Error) => {
-            showToast(friend.username, error.message);
-        },
+        onError: (error: Error) => show(Type.Friends, error.message),
     });
 
     return (

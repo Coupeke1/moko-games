@@ -1,7 +1,8 @@
+import show from "@/components/global/toast/toast";
+import { Type } from "@/components/global/toast/type";
 import Page from "@/components/layout/page";
 import Message from "@/components/state/message";
 import State from "@/components/state/state";
-import showToast from "@/components/global/toast";
 import { useVerify } from "@/features/checkout/hooks/use-verify";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -20,10 +21,9 @@ export default function OrderPage() {
     const { order, loading, error } = useVerify(id);
 
     useEffect(() => {
-        if (error) showToast("Order", "Could not verify order");
+        if (error) show(Type.Order, "Could not verify");
 
         if (order) {
-            showToast("Order", "Sucessful");
             client.invalidateQueries({ queryKey: ["library"] });
             navigate("/library");
         }
