@@ -1,4 +1,4 @@
-import type { Profile } from "@/features/profile/models/profile.ts";
+import type { Me } from "@/features/profile/models/me";
 import { parseProfile } from "@/features/profile/services/profile.ts";
 import { POLLING_INTERVAL } from "@/lib/polling";
 import { useAuthStore } from "@/stores/auth-store.ts";
@@ -13,7 +13,7 @@ export function useProfile() {
         isError: error,
     } = useQuery({
         queryKey: ["profile", "me"],
-        queryFn: async (): Promise<Profile> => {
+        queryFn: async (): Promise<Me> => {
             const { keycloak: freshKeycloak, token: freshToken } =
                 useAuthStore.getState();
 

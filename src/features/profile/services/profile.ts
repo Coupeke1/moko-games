@@ -1,26 +1,36 @@
-import { client } from "@/lib/api-client.ts";
 import { environment } from "@/config.ts";
-import { validIdCheck } from "@/lib/id.ts";
+import type { Me } from "@/features/profile/models/me";
 import {
     match as modulesEquals,
     type Modules,
 } from "@/features/profile/models/modules.ts";
-import type { Profile } from "@/features/profile/models/profile.ts";
-import type { KeycloakTokenParsed } from "keycloak-js";
-import Keycloak from "keycloak-js";
 import {
     match as notificationsMatch,
     type Notifications,
 } from "@/features/profile/models/notifications";
+import type { Profile } from "@/features/profile/models/profile";
+import { client } from "@/lib/api-client.ts";
+import { validIdCheck } from "@/lib/id.ts";
+import type { KeycloakTokenParsed } from "keycloak-js";
+import Keycloak from "keycloak-js";
 
 const BASE_URL = environment.userService;
+
+export async function findMyProfile(id: string): Promise<Me> {
+    try {
+        validIdCheck(id);
+        const { data } = await client.get<Me>(`${BASE_URL}/me`);
+        if (data.id !== id) throw new Error("Profile not found!");
+        return data;
+    } catch {
+        throw new Error("Profile could not be fetched");
+    }
+}
 
 export async function findProfile(id: string): Promise<Profile> {
     try {
         validIdCheck(id);
-        const { data } = await client.get<Profile>(`${BASE_URL}/me`);
-
-        if (data.id !== id) throw new Error("Profile not found!");
+        const { data } = await client.get<Me>(`${BASE_URL}/${id}`);
         return data;
     } catch {
         throw new Error("Profile could not be fetched");
@@ -35,7 +45,7 @@ export async function updateProfile(
     notifications: Notifications,
 ) {
     try {
-        const profile: Profile = await findProfile(id);
+        const profile: Me = await findMyProfile(id);
 
         await Promise.all([
             updateDescription(profile.description, description),
@@ -76,10 +86,8 @@ async function updateNotifications(old: Notifications, model: Notifications) {
 export async function parseProfile(
     keycloak: Keycloak,
     token: string | null,
-): Promise<Profile | null> {
-    if (!token) {
-        throw new Error("Token not found");
-    }
+): Promise<Me | null> {
+    if (!token) throw new Error("Token not found");
 
     try {
         const parsedToken: KeycloakTokenParsed | undefined =
@@ -91,7 +99,7 @@ export async function parseProfile(
             throw new Error("Id could not be found");
 
         const id: string = parsedToken.sub;
-        return await findProfile(id);
+        return await findMyProfile(id);
     } catch {
         throw new Error("Profile could not be found");
     }
