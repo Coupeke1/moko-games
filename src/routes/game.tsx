@@ -8,18 +8,15 @@ import {MyRoleDisplay} from "../components/my-role-display";
 import {GameStatus} from "../models/game-status";
 import {TurnIndicator} from "../components/turn-indicator";
 import {GameGrid} from "../components/game-grid";
-import {requestMove} from "../services/game-service";
-import {toast} from "sonner";
-import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {ConfirmTurnButton} from "@/components/confirm-turn-button.tsx";
 import {useMakeMoveSelection} from "@/hooks/use-make-move-selection.ts";
+import {useMakeMove} from "@/hooks/use-make-move.ts";
 
 export default function GamePage() {
     const {id} = useParams<{ id: string }>();
 
     const {profile, isLoading: profileLoading, isError: profileError} = useMyProfile();
     const {data: gameState, isLoading: gameLoading, isError: gameError} = useGameState(id || "");
-    const queryClient = useQueryClient();
 
     const myRole = useMyPlayerRole(gameState?.players, profile?.id);
     const isAI = gameState?.aiPlayer === myRole;
@@ -32,38 +29,15 @@ export default function GamePage() {
         canConfirmMove,
         setSelectedCell,
         setMovePath
-    } = useMakeMoveSelection(
-        isMyTurn,
-        gameState?.status,
-        myRole,
-        gameState?.board
-    );
+    } = useMakeMoveSelection(isMyTurn, gameState?.status, myRole, gameState?.board);
 
-    const moveMutation = useMutation({
-        mutationFn: (cells: number[]) => requestMove(id!, profile!.id, cells),
-        onSuccess: () => {
-            setSelectedCell(null);
-            setMovePath([]);
-            queryClient.invalidateQueries({queryKey: ['gameState', id]});
-            toast.success("Move successful!");
-        },
-        onError: (error: Error) => {
-            toast.error(`Move failed: ${error.message}`);
-        }
-    });
+    const {confirmMove, isSubmitting} = useMakeMove(id, profile?.id)
 
     const handleConfirmMove = () => {
-        if (movePath.length < 2) {
-            toast.error("Select at least 2 cells to make a move");
-            return;
-        }
-
-        if (!selectedCell || !profile?.id || !id) {
-            toast.error("Cannot make move. Please try again.");
-            return;
-        }
-
-        moveMutation.mutate(movePath);
+        confirmMove(movePath, () => {
+            setSelectedCell(null);
+            setMovePath([]);
+        });
     }
 
     if (profileLoading || (id && gameLoading)) {
@@ -115,8 +89,11 @@ export default function GamePage() {
 
                         {gameState.status === GameStatus.RUNNING && (
                             <TurnIndicator gameState={gameState}>
-                                <ConfirmTurnButton onClick={handleConfirmMove} disabled={!canConfirmMove}>
-                                    Confirm Move
+                                <ConfirmTurnButton
+                                    onClick={handleConfirmMove}
+                                    disabled={!canConfirmMove || isSubmitting}
+                                >
+                                    {isSubmitting ? "Making Move..." : "Confirm Move"}
                                 </ConfirmTurnButton>
                             </TurnIndicator>
                         )}
@@ -133,18 +110,20 @@ export default function GamePage() {
                         validMoves={[]}
                         movePath={movePath}
                         onCellClick={handleCellClick}
+                        disabled={!isMyTurn || isSubmitting}
                     />
                 </div>
 
                 <div className="mt-6 text-fg-2 text-sm text-center">
-                    {!isMyTurn
-                        ? "Waiting for opponent..."
-                        : selectedCell
-                            ? `Selected cell: ${selectedCell} - Click any cell to move`
-                            : "Click a piece to select it"}
+                    {isSubmitting
+                        ? "Processing move..."
+                        : !isMyTurn
+                            ? "Waiting for opponent..."
+                            : selectedCell
+                                ? `Selected cell: ${selectedCell} - Click any cell to move`
+                                : "Click a piece to select it"}
                 </div>
             </main>
-
         </div>
     );
 }
