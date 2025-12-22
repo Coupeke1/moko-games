@@ -1,30 +1,60 @@
-import type {Profile} from "@/models/profile.ts";
-import {useQueryClient} from "@tanstack/react-query";
+import {toast} from "sonner";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {requestMove} from "@/services/game-service.ts";
 import {useState} from "react";
-import {GameStatus} from "../models/game-status";
-import {requestMove} from "../services/game-service";
 
-export function useMakeMove(gameId: string, profile: Profile | undefined, status: GameStatus | undefined) {
+export function useMakeMove(gameId: string | undefined, playerId: string | undefined) {
     const queryClient = useQueryClient();
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const makeMove = async (cells: number[]) => {
-        if (!status || status !== GameStatus.RUNNING) return;
-        if (!profile) return;
-        if (cells.length < 2) return;
-
-        try {
-            const updatedGameState = await requestMove(gameId, profile.id, cells);
-            queryClient.setQueryData(['gameState', gameId], updatedGameState);
-        } catch (error) {
-            if (error instanceof Error) {
-                setErrorMsg(error.message);
+    const moveMutation = useMutation({
+        mutationFn: (cells: number[]) => {
+            if (!gameId) {
+                throw new Error("Game ID missing");
             }
-            setErrorMsg('Illegal move');
+            if (!playerId) {
+                throw new Error("Player ID missing");
+            }
+            return requestMove(gameId, playerId, cells);
+        },
+        onMutate: () => {
+            setIsSubmitting(true);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['gameState', gameId]});
+            toast.success("Move successful!");
+        },
+        onError: (error: Error) => {
+            toast.error(`Move failed: ${error.message}`);
+        },
+        onSettled: () => {
+            setIsSubmitting(false);
         }
-    };
+    });
 
-    const closeToast = () => setErrorMsg(null);
+    const confirmMove = (movePath: number[], onSuccess?: () => void) => {
+        if (movePath.length < 2) {
+            toast.error("Select at least 2 cells to make a move");
+            return false;
+        }
 
-    return {makeMove, errorMsg, closeToast};
+        if (!gameId || !playerId) {
+            toast.error("Cannot make move. Please try again.");
+            return false;
+        }
+
+        moveMutation.mutate(movePath, {
+            onSuccess: () => {
+                onSuccess?.();
+            }
+        });
+
+        return true;
+    }
+
+    return {
+        confirmMove,
+        isSubmitting: isSubmitting || moveMutation.isPending,
+        moveMutation
+    }
 }

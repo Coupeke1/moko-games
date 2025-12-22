@@ -1,12 +1,14 @@
 import {usePlayerProfile} from "../hooks/use-player-profile";
 import {type GameState} from "../models/game-state";
 import {CurrentPlayerDisplay} from "./current-player-display";
+import type {ReactNode} from "react";
 
 interface TurnIndicatorProps {
     gameState: GameState;
+    children: ReactNode
 }
 
-export function TurnIndicator({gameState}: TurnIndicatorProps) {
+export function TurnIndicator({gameState, children}: TurnIndicatorProps) {
     const {currentRole, players, aiPlayer} = gameState;
     const currentPlayer = players.find(player => player.role === currentRole);
     const {data: profile} = usePlayerProfile(currentPlayer?.id);
@@ -24,6 +26,7 @@ export function TurnIndicator({gameState}: TurnIndicatorProps) {
                 player={currentPlayer}
                 profile={profile}
             />
+            {children}
         </div>
     );
 }

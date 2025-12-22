@@ -6,6 +6,7 @@ interface GameGridProps {
     validMoves?: number[];
     movePath?: number[];
     onCellClick?: (cellIndex: number) => void;
+    disabled?: boolean;
 }
 
 export function GameGrid({
@@ -13,6 +14,7 @@ export function GameGrid({
     selectedCell,
     validMoves = [],
     movePath = [],
+    disabled = false,
     onCellClick
 }: GameGridProps) {
     const size = board.length;
@@ -47,7 +49,7 @@ export function GameGrid({
                                 ${piece ? 'cursor-pointer' : ''}
                             `}
                             onClick={() => {
-                                if (isPlayable && cellIndex !== null) {
+                                if (isPlayable && cellIndex !== null && !disabled) {
                                     onCellClick?.(cellIndex);
                                 }
                             }}
