@@ -46,10 +46,8 @@ export async function parseProfile(keycloak: Keycloak, token: string | null): Pr
     try {
         addToken(token);
 
-        // Call /me endpoint which auto-creates profile if needed
         return await getMyProfile();
     } catch {
-        // Fallback: try to get by ID from token
         const parsedToken: KeycloakTokenParsed | undefined = keycloak.tokenParsed;
         if (parsedToken?.sub) {
             try {
