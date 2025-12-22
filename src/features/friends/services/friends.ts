@@ -1,8 +1,8 @@
 import { environment } from "@/config.ts";
+import type { Friend } from "@/features/friends/models/friend.ts";
+import type { Profile } from "@/features/profile/models/profile";
 import { client } from "@/lib/api-client.ts";
 import { validIdCheck } from "@/lib/id.ts";
-import type { Friend } from "@/features/friends/models/friend.ts";
-import type { Profile } from "@/features/profile/models/profile.ts";
 
 const PROFILE_URL = environment.userService;
 const SOCIAL_URL = environment.socialService;

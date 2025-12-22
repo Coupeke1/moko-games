@@ -6,8 +6,7 @@ import LoadingState from "@/components/state/loading";
 import CheckoutPage from "@/features/checkout/checkout";
 import OrderPage from "@/features/checkout/order";
 import FriendsPage from "@/features/friends/friends";
-import IncomingRequestsPage from "@/features/friends/incoming";
-import OutgoingRequestsPage from "@/features/friends/outgoing";
+import RequestsPage from "@/features/friends/requests";
 import GamePage from "@/features/game/game";
 import InvitesPage from "@/features/invites/invites";
 import LibraryGamePage from "@/features/library/game";
@@ -55,27 +54,24 @@ function Content() {
 
             <Routes>
                 <Route path="/" element={<Navigate to="/store" />} />
+
                 <Route path="/store" element={<StorePage />} />
                 <Route path="/store/:id" element={<StoreGamePage />} />
                 <Route path="/store/checkout" element={<CheckoutPage />} />
                 <Route path="/store/checkout/:id" element={<OrderPage />} />
+
                 <Route path="/library" element={<LibraryPage />} />
                 <Route path="/library/:id" element={<LibraryGamePage />} />
+
                 <Route path="/lobbies/:id" element={<LobbyPage />} />
                 <Route path="/lobbies/:id/game" element={<GamePage />} />
                 <Route path="/invites/:id" element={<InvitesPage />} />
+
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/friends" element={<FriendsPage />} />
-                <Route path="/notifications" element={<NotificationsPage />} />
-                <Route
-                    path="/friends/requests/incoming"
-                    element={<IncomingRequestsPage />}
-                />
-                <Route
-                    path="/friends/requests/outgoing"
-                    element={<OutgoingRequestsPage />}
-                />
+                <Route path="/friends/requests" element={<RequestsPage />} />
 
+                <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>
         </>

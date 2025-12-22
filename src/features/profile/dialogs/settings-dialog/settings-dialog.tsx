@@ -18,13 +18,13 @@ import NotificationsTab, {
 import PictureTab, {
     type PictureData,
 } from "@/features/profile/dialogs/settings-dialog/picture-tab";
-import type { Profile } from "@/features/profile/models/profile.ts";
+import type { Me } from "@/features/profile/models/me";
 import { updateProfile } from "@/features/profile/services/profile.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 
 interface Props {
-    profile: Profile;
+    profile: Me;
     close: () => void;
     open: boolean;
     onChange: (open: boolean) => void;

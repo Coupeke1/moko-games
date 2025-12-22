@@ -57,7 +57,7 @@ export function getRoute(notification: Notification): string | null {
         case Origin.FriendAccepted:
             return "/friends";
         case Origin.FriendReceived:
-            return "/friends/requests/incoming";
+            return "/friends/requests";
         case Origin.LobbyInvite:
             return "/library";
         case Origin.Message:
