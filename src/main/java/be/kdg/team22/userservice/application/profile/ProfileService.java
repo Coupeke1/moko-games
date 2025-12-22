@@ -3,6 +3,7 @@ package be.kdg.team22.userservice.application.profile;
 import be.kdg.team22.userservice.api.achievement.models.AchievementModel;
 import be.kdg.team22.userservice.api.profile.models.FavouriteGameModel;
 import be.kdg.team22.userservice.api.profile.models.FilteredProfileModel;
+import be.kdg.team22.userservice.api.profile.models.StatisticsModel;
 import be.kdg.team22.userservice.application.achievement.AchievementService;
 import be.kdg.team22.userservice.domain.library.LibraryEntry;
 import be.kdg.team22.userservice.domain.library.LibraryRepository;
@@ -55,16 +56,16 @@ public class ProfileService {
         return profileRepository.findById(id).orElseThrow(id::notFound);
     }
 
-    public FilteredProfileModel getByIdAndPreferences(final ProfileId profileId) {
-        Profile profile = getById(profileId);
+    public FilteredProfileModel getByIdAndPreferences(final ProfileId id) {
+        Profile profile = getById(id);
         Modules modules = profile.modules();
-        Statistics stats = profile.statistics();
+        Statistics statistics = profile.statistics();
 
-        List<AchievementModel> achievements = achievementServiceProvider.getObject().findModelsByProfile(profileId);
+        List<AchievementModel> achievements = achievementServiceProvider.getObject().findModelsByProfile(id);
 
         List<FavouriteGameModel> favouriteGames = null;
         if (modules.favourites()) {
-            List<LibraryEntry> entries = libraryRepository.findByUserId(profileId.value());
+            List<LibraryEntry> entries = libraryRepository.findByUserId(id.value());
 
             favouriteGames = entries.stream().filter(LibraryEntry::favourite).map(entry -> {
                 GameDetailsResponse game = gamesRepository.getGame(entry.gameId().value());
@@ -72,7 +73,7 @@ public class ProfileService {
             }).toList();
         }
 
-        return new FilteredProfileModel(profile.id().value(), profile.username().value(), profile.description(), profile.image(), stats.level(), stats.playTime(), achievements, favouriteGames);
+        return new FilteredProfileModel(profile.id().value(), profile.username().value(), profile.description(), profile.image(), new StatisticsModel(statistics.level(), statistics.playTime()), achievements, favouriteGames);
     }
 
     public Profile getByUsername(final ProfileName username) {
