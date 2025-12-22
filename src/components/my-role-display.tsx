@@ -20,11 +20,10 @@ export function MyRoleDisplay({ profile, role, isAI = false }: MyRoleDisplayProp
     }
 
     return (
-        <div className="flex items-center gap-4 bg-bg-1 p-4 rounded-xl border border-fg-2/10">
+        <div className="flex items-center gap-4 bg-bg-2 p-4 rounded-lg border border-fg-2/20">
             <PlayerImage src={profile.image} />
 
             <div className="flex flex-col gap-1">
-                {/* Username + AI badge */}
                 <div className="flex items-center gap-2">
                     <span className="text-fg text-lg font-semibold">
                         {profile.username}
@@ -36,11 +35,9 @@ export function MyRoleDisplay({ profile, role, isAI = false }: MyRoleDisplayProp
                     )}
                 </div>
 
-                {/* Role row */}
                 <div className="flex items-center gap-2">
                     <span className="text-fg-2 text-sm">You are:</span>
 
-                    {/* Smaller, cleaner badge */}
                     <PlayerRoleBadge role={role} size="sm" />
 
                     <span className="font-semibold text-fg text-sm tracking-wide">
