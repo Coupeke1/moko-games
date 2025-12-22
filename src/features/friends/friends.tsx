@@ -17,7 +17,7 @@ import { getTabs } from "@/features/friends/components/tabs";
 import { useFriends } from "@/features/friends/hooks/use-friends.ts";
 import type { Friend } from "@/features/friends/models/friend.ts";
 import { removeFriend } from "@/features/friends/services/friends.ts";
-import type { Profile } from "@/features/profile/models/me";
+import type { Profile } from "@/features/profile/models/profile";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 function Friend({ friend }: { friend: Profile }) {

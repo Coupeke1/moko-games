@@ -19,7 +19,7 @@ import {
     acceptRequest,
     rejectRequest,
 } from "@/features/friends/services/requests.ts";
-import type { Profile } from "@/features/profile/models/me";
+import type { Profile } from "@/features/profile/models/profile";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 
