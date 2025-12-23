@@ -77,7 +77,6 @@ export default function GamePage() {
 
     return (
         <Page>
-            {/* Sidebar */}
             <aside className="md:w-[28rem] w-full flex flex-col gap-8">
 
                 <h1 className="text-fg text-5xl font-extrabold tracking-tight drop-shadow text-center md:text-left">
@@ -112,7 +111,6 @@ export default function GamePage() {
                 </div>
             </aside>
 
-            {/* Game Board */}
             <main className="flex-1 flex flex-col items-center justify-center">
                 <div className="w-full max-w-[min(90vw,52rem)] mx-auto">
                     <GameGrid

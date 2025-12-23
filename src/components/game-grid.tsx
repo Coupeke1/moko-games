@@ -55,17 +55,14 @@ export function GameGrid({
                             }}
                             disabled={!isPlayable}
                         >
-                            {/* Valid move indicator */}
                             {isValidMove && !piece && (
                                 <div className="absolute w-1/3 h-1/3 rounded-full bg-valid-move opacity-70" />
                             )}
 
-                            {/* Move path indicator */}
                             {isInPath && !isSelected && (
                                 <div className="absolute inset-1 rounded-full border-4 border-selected opacity-50" />
                             )}
 
-                            {/* Piece rendering */}
                             {piece && (
                                 <CheckerPiece
                                     color={piece.color}
@@ -75,7 +72,6 @@ export function GameGrid({
                                 />
                             )}
 
-                            {/* Valid capture indicator (ring around enemy piece) */}
                             {piece && isValidMove && (
                                 <div className="absolute inset-1 rounded-full border-4 border-valid-move opacity-70" />
                             )}
