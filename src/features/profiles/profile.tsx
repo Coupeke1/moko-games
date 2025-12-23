@@ -5,6 +5,7 @@ import State from "@/components/state/state";
 import ProfileAchievements from "@/features/profiles/components/achievements";
 import ProfileFavourites from "@/features/profiles/components/favourites";
 import ProfileInformation from "@/features/profiles/components/information";
+import { useMyProfile } from "@/features/profiles/hooks/use-my-profile";
 import { useProfile } from "@/features/profiles/hooks/use-profile";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
@@ -18,7 +19,17 @@ export default function ProfilePage() {
         if (!name) navigate("/profile");
     }, [name, navigate]);
 
+    const { profile: me } = useMyProfile();
     const { profile, loading, error } = useProfile(name!);
+
+    useEffect(() => {
+        if (!name) navigate("/profile");
+    }, [name, navigate]);
+
+    useEffect(() => {
+        if (!profile || !me) return;
+        if (profile.id === me.id) navigate("/profile");
+    }, [profile, me, navigate]);
 
     return (
         <Page>
