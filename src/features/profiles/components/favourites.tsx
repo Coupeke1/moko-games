@@ -1,19 +1,27 @@
+import Column from "@/components/layout/column";
+import { Gap } from "@/components/layout/gap";
 import Section from "@/components/section";
 import State from "@/components/state/state";
-import Column from "@/components/layout/column";
-import { useFavourites } from "@/features/profile/hooks/use-favourites";
-import FavouriteCard from "@/features/profile/components/favourite-card";
-import { Gap } from "@/components/layout/gap";
 import type { Entry } from "@/features/library/models/entry";
+import FavouriteCard from "@/features/profiles/components/favourite-card";
+import type { Favourite } from "@/features/profiles/models/favourite";
 
-export default function ProfileFavourites() {
-    const { favourites, loading, error } = useFavourites();
+interface Props {
+    favourites: Favourite[];
+    loading?: boolean;
+    error?: boolean;
+}
 
+export default function ProfileFavourites({
+    favourites,
+    loading,
+    error,
+}: Props) {
     return (
         <Section title="Favourites">
             <State
-                loading={loading}
-                error={error}
+                loading={loading ?? false}
+                error={error ?? false}
                 empty={favourites.length === 0}
                 message="No favourites"
             >

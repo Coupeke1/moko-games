@@ -17,7 +17,7 @@ import {
     removePlayer,
     unReadyPlayer,
 } from "@/features/lobby/services/players";
-import type { Profile } from "@/features/profile/models/profile.ts";
+import type { Profile } from "@/features/profiles/models/profile.ts";
 import { useMutation } from "@tanstack/react-query";
 
 export default function PlayerCard({

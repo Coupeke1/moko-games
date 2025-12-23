@@ -1,6 +1,6 @@
 import Card from "@/components/cards/card";
 import type { Player } from "@/features/lobby/models/player.ts";
-import type { Profile } from "@/features/profile/models/profile.ts";
+import type { Profile } from "@/features/profiles/models/profile.ts";
 import type { ReactNode } from "react";
 
 interface Props {

@@ -19,9 +19,9 @@ import {
     acceptRequest,
     rejectRequest,
 } from "@/features/friends/services/requests.ts";
-import type { Profile } from "@/features/profile/models/profile";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
+import type { Friend } from "@/features/friends/models/friend";
 
 export default function RequestsPage() {
     const client = useQueryClient();
@@ -29,7 +29,7 @@ export default function RequestsPage() {
     const { requests, loading, error } = useRequests();
 
     const accept = useMutation({
-        mutationFn: async ({ request }: { request: Profile }) =>
+        mutationFn: async ({ request }: { request: Friend }) =>
             await acceptRequest(request.id),
         onSuccess: async () => {
             await client.invalidateQueries({
@@ -43,7 +43,7 @@ export default function RequestsPage() {
     });
 
     const reject = useMutation({
-        mutationFn: async ({ request }: { request: Profile }) =>
+        mutationFn: async ({ request }: { request: Friend }) =>
             await rejectRequest(request.id),
         onSuccess: async () => {
             await client.invalidateQueries({
@@ -67,7 +67,7 @@ export default function RequestsPage() {
                 >
                     {requests && (
                         <Grid>
-                            {requests.map((request: Profile) => (
+                            {requests.map((request: Friend) => (
                                 <UserCard
                                     user={request}
                                     statistics={

@@ -7,7 +7,7 @@ import { Justify } from "@/components/layout/justify";
 import { Padding } from "@/components/layout/padding";
 import Row from "@/components/layout/row";
 import Statistic from "@/components/statistic";
-import Image from "@/features/profile/components/image";
+import Image from "@/features/profiles/components/image";
 
 interface Props {
     image: string;
@@ -16,8 +16,8 @@ interface Props {
     description: string;
     level: number;
     playTime: string;
-    onEdit: () => void;
-    onLogout: () => void;
+    onEdit?: () => void;
+    onLogout?: () => void;
 }
 
 export default function ProfileInformation({
@@ -30,6 +30,8 @@ export default function ProfileInformation({
     onEdit,
     onLogout,
 }: Props) {
+    const isOwner = onEdit && onLogout;
+
     return (
         <Row justify={Justify.Between} items={Items.Stretch}>
             <Row gap={Gap.Large} items={Items.Stretch}>
@@ -40,25 +42,27 @@ export default function ProfileInformation({
                         <Row items={Items.Center} responsive={false}>
                             <h2 className="text-3xl font-bold">{username}</h2>
 
-                            <Row
-                                gap={Gap.Small}
-                                items={Items.Center}
-                                responsive={false}
-                            >
-                                <button
-                                    onClick={onEdit}
-                                    className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75"
+                            {isOwner && (
+                                <Row
+                                    gap={Gap.Small}
+                                    items={Items.Center}
+                                    responsive={false}
                                 >
-                                    <EditIcon small={true} />
-                                </button>
+                                    <button
+                                        onClick={onEdit}
+                                        className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75"
+                                    >
+                                        <EditIcon small={true} />
+                                    </button>
 
-                                <button
-                                    onClick={onLogout}
-                                    className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75"
-                                >
-                                    <LogoutIcon small={true} />
-                                </button>
-                            </Row>
+                                    <button
+                                        onClick={onLogout}
+                                        className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75"
+                                    >
+                                        <LogoutIcon small={true} />
+                                    </button>
+                                </Row>
+                            )}
                         </Row>
 
                         <h3 className="text-fg-2">{email}</h3>
@@ -72,21 +76,23 @@ export default function ProfileInformation({
             </Row>
 
             <section className="flex flex-col md:justify-between md:items-end p-1">
-                <Row gap={Gap.Small} responsive={false}>
-                    <button
-                        onClick={onEdit}
-                        className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75"
-                    >
-                        <EditIcon small={false} />
-                    </button>
+                {isOwner && (
+                    <Row gap={Gap.Small} responsive={false}>
+                        <button
+                            onClick={onEdit}
+                            className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75"
+                        >
+                            <EditIcon small={false} />
+                        </button>
 
-                    <button
-                        onClick={onLogout}
-                        className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75"
-                    >
-                        <LogoutIcon small={false} />
-                    </button>
-                </Row>
+                        <button
+                            onClick={onLogout}
+                            className="cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75"
+                        >
+                            <LogoutIcon small={false} />
+                        </button>
+                    </Row>
+                )}
 
                 <Row gap={Gap.Large} responsive={false}>
                     <Statistic title="Level" value={level.toString()} />

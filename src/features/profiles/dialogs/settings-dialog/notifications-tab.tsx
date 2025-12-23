@@ -1,6 +1,6 @@
 import Select from "@/components/inputs/select";
 import Column from "@/components/layout/column";
-import type { Notifications } from "@/features/profile/models/notifications";
+import type { Notifications } from "@/features/profiles/models/notifications";
 import { forwardRef, useImperativeHandle, useState } from "react";
 
 export interface NotificationsData {

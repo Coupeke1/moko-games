@@ -14,14 +14,15 @@ import LibraryPage from "@/features/library/library";
 import LobbyPage from "@/features/lobby/lobby";
 import NotFoundPage from "@/features/not-found";
 import NotificationsPage from "@/features/notifications/notifications";
-import { useProfile } from "@/features/profile/hooks/use-profile";
-import ProfilePage from "@/features/profile/profile";
+import { useMyProfile } from "@/features/profiles/hooks/use-my-profile";
+import MyProfilePage from "@/features/profiles/my-profile";
 import StoreGamePage from "@/features/store/game";
 import StorePage from "@/features/store/store";
 import { useAuthStore } from "@/stores/auth-store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { Toaster } from "sonner";
+import ProfilePage from "./features/profiles/profile";
 
 const client = new QueryClient();
 
@@ -43,7 +44,7 @@ function App() {
 
 function Content() {
     const initialized = useAuthStore((state) => state.initialized);
-    const { loading: profileLoading, error: profileError } = useProfile();
+    const { loading: profileLoading, error: profileError } = useMyProfile();
 
     if (!initialized || profileLoading) return <LoadingState />;
     if (profileError) return <ErrorState />;
@@ -67,7 +68,9 @@ function Content() {
                 <Route path="/lobbies/:id/game" element={<GamePage />} />
                 <Route path="/invites/:id" element={<InvitesPage />} />
 
-                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/profile" element={<MyProfilePage />} />
+                <Route path="/profiles/:name" element={<ProfilePage />} />
+
                 <Route path="/friends" element={<FriendsPage />} />
                 <Route path="/friends/requests" element={<RequestsPage />} />
 

@@ -1,10 +1,10 @@
-import type { Me } from "@/features/profile/models/me";
-import { parseProfile } from "@/features/profile/services/profile.ts";
+import type { Me } from "@/features/profiles/models/me";
+import { parseProfile } from "@/features/profiles/services/profile.ts";
 import { POLLING_INTERVAL } from "@/lib/polling";
 import { useAuthStore } from "@/stores/auth-store.ts";
 import { useQuery } from "@tanstack/react-query";
 
-export function useProfile() {
+export function useMyProfile() {
     const { keycloak, authenticated, token } = useAuthStore();
 
     const {
@@ -12,7 +12,7 @@ export function useProfile() {
         isLoading: loading,
         isError: error,
     } = useQuery({
-        queryKey: ["profile", "me"],
+        queryKey: ["profiles", "me"],
         queryFn: async (): Promise<Me> => {
             const { keycloak: freshKeycloak, token: freshToken } =
                 useAuthStore.getState();
@@ -21,7 +21,6 @@ export function useProfile() {
                 throw new Error("Not authenticated");
 
             const profile = await parseProfile(freshKeycloak, freshToken);
-
             if (profile === null) throw new Error("Could not fetch profile");
 
             return profile;
@@ -32,5 +31,5 @@ export function useProfile() {
         refetchInterval: POLLING_INTERVAL,
     });
 
-    return { loading, error, profile };
+    return { loading, error, profile: profile ?? null };
 }

@@ -1,6 +1,6 @@
 import Input from "@/components/inputs/input";
 import Column from "@/components/layout/column";
-import Image from "@/features/profile/components/image";
+import Image from "@/features/profiles/components/image";
 import { forwardRef, useImperativeHandle, useState } from "react";
 
 export interface PictureData {
