@@ -2,6 +2,7 @@ package be.kdg.team22.socialservice.application.friends;
 
 import be.kdg.team22.socialservice.api.friends.models.FriendModel;
 import be.kdg.team22.socialservice.api.friends.models.FriendsOverviewModel;
+import be.kdg.team22.socialservice.api.friends.models.StatisticsModel;
 import be.kdg.team22.socialservice.domain.friendship.Friendship;
 import be.kdg.team22.socialservice.domain.friendship.FriendshipRepository;
 import be.kdg.team22.socialservice.domain.friendship.FriendshipStatus;
@@ -111,6 +112,6 @@ public class FriendService {
         UserId user = friendship.otherSide(userId);
         UserResponse response = userRepository.getById(user.value());
 
-        return new FriendModel(user.value(), response.username(), response.image(), friendship.status().name());
+        return new FriendModel(user.value(), response.username(), response.image(), StatisticsModel.from(response.statistics()), friendship.status().name());
     }
 }
