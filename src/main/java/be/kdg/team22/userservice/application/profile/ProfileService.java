@@ -58,22 +58,32 @@ public class ProfileService {
 
     public FilteredProfileModel getByIdAndPreferences(final ProfileId id) {
         Profile profile = getById(id);
-        Modules modules = profile.modules();
-        Statistics statistics = profile.statistics();
+        return getFilteredProfile(profile);
+    }
 
-        List<AchievementModel> achievements = achievementServiceProvider.getObject().findModelsByProfile(id);
+    public FilteredProfileModel getByUsernameAndPreferences(final ProfileName username) {
+        Profile profile = getByUsername(username);
+        return getFilteredProfile(profile);
+    }
 
-        List<FavouriteGameModel> favouriteGames = null;
-        if (modules.favourites()) {
-            List<LibraryEntry> entries = libraryRepository.findByUserId(id.value());
+    private FilteredProfileModel getFilteredProfile(final Profile profile) {
+        List<AchievementModel> achievements = profile.modules().achievements() ? getAchievements(profile.id()) : null;
+        List<FavouriteGameModel> favourites = profile.modules().favourites() ? getFavourites(profile.id()) : null;
 
-            favouriteGames = entries.stream().filter(LibraryEntry::favourite).map(entry -> {
-                GameDetailsResponse game = gamesRepository.getGame(entry.gameId().value());
-                return new FavouriteGameModel(game.id(), game.title(), game.description(), game.image());
-            }).toList();
-        }
+        return new FilteredProfileModel(profile.id().value(), profile.username().value(), profile.description(), profile.image(), new StatisticsModel(profile.statistics().level(), profile.statistics().playTime()), achievements, favourites);
+    }
 
-        return new FilteredProfileModel(profile.id().value(), profile.username().value(), profile.description(), profile.image(), new StatisticsModel(statistics.level(), statistics.playTime()), achievements, favouriteGames);
+    private List<AchievementModel> getAchievements(final ProfileId id) {
+        return achievementServiceProvider.getObject().findModelsByProfile(id);
+    }
+
+    private List<FavouriteGameModel> getFavourites(final ProfileId id) {
+        List<LibraryEntry> entries = libraryRepository.findByUserId(id.value());
+
+        return entries.stream().filter(LibraryEntry::favourite).map(entry -> {
+            GameDetailsResponse game = gamesRepository.getGame(entry.gameId().value());
+            return new FavouriteGameModel(game.id(), game.title(), game.description(), game.image());
+        }).toList();
     }
 
     public Profile getByUsername(final ProfileName username) {

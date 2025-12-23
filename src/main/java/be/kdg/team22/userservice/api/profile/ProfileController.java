@@ -77,15 +77,15 @@ public class ProfileController {
         return ResponseEntity.ok(profile);
     }
 
+    @GetMapping("/find/{username}")
+    public ResponseEntity<FilteredProfileModel> getByUsername(@PathVariable final String username) {
+        FilteredProfileModel profile = service.getByUsernameAndPreferences(new ProfileName(username));
+        return ResponseEntity.ok(profile);
+    }
+
     @GetMapping("{id}/preferences/notifications")
     public ResponseEntity<NotificationsModel> getPreferencesById(@PathVariable final UUID id) {
         Profile profile = service.getById(new ProfileId(id));
         return ResponseEntity.ok(NotificationsModel.from(profile.notifications()));
-    }
-
-    @GetMapping("/find/{username}")
-    public ResponseEntity<ProfileModel> getByUsername(@PathVariable final String username) {
-        Profile profile = service.getByUsername(new ProfileName(username));
-        return ResponseEntity.ok(ProfileModel.from(profile));
     }
 }
