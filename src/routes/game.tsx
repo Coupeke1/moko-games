@@ -11,6 +11,8 @@ import {GameGrid} from "../components/game-grid";
 import {ConfirmTurnButton} from "@/components/confirm-turn-button.tsx";
 import {useMakeMoveSelection} from "@/hooks/use-make-move-selection.ts";
 import {useMakeMove} from "@/hooks/use-make-move.ts";
+import Page from "@/components/layout/page.tsx";
+import {GameEndModal} from "@/components/dialogs/game-end-modal.tsx";
 
 export default function GamePage() {
     const {id} = useParams<{ id: string }>();
@@ -21,6 +23,7 @@ export default function GamePage() {
     const myRole = useMyPlayerRole(gameState?.players, profile?.id);
     const isAI = gameState?.aiPlayer === myRole;
     const isMyTurn = gameState?.currentRole === myRole;
+    const boardSize = gameState?.board.length;
 
     const {
         selectedCell,
@@ -41,32 +44,39 @@ export default function GamePage() {
     }
 
     if (profileLoading || (id && gameLoading)) {
-        return <LoadingState/>;
+        return (
+            <Page>
+                <LoadingState/>
+            </Page>
+        );
     }
 
     if (profileError || !profile) {
-        return <ErrorState msg="Could not load your profile"/>;
+        return (
+            <Page>
+                <ErrorState msg="Could not load your profile"/>
+            </Page>
+        );
     }
 
     if (!id) {
         return (
-            <div className="min-h-screen bg-bg flex flex-col items-center justify-center p-4">
-                <h1 className="text-fg text-3xl font-bold mb-4">Checkers</h1>
-                <p className="text-fg-2">No game ID provided. Please join a game through the lobby.</p>
-            </div>
+            <Page>
+                <ErrorState msg="No game ID provided. Please join a game through the lobby."/>;
+            </Page>
         );
     }
 
     if (gameError || !gameState) {
-        return <ErrorState msg={`Could not load game ${id}`}/>;
+        return (
+            <Page>
+                <ErrorState msg={`Could not load game ${id}`}/>;
+            </Page>
+        );
     }
 
-    const boardSize = gameState.board.length;
-
     return (
-        <div className="min-h-screen bg-bg flex flex-col md:flex-row p-10 gap-12">
-
-            {/* Sidebar */}
+        <Page>
             <aside className="md:w-[28rem] w-full flex flex-col gap-8">
 
                 <h1 className="text-fg text-5xl font-extrabold tracking-tight drop-shadow text-center md:text-left">
@@ -101,7 +111,6 @@ export default function GamePage() {
                 </div>
             </aside>
 
-            {/* Game Board */}
             <main className="flex-1 flex flex-col items-center justify-center">
                 <div className="w-full max-w-[min(90vw,52rem)] mx-auto">
                     <GameGrid
@@ -123,7 +132,15 @@ export default function GamePage() {
                                 ? `Selected cell: ${selectedCell} - Click any cell to move`
                                 : "Click a piece to select it"}
                 </div>
+
+                {gameState.status !== GameStatus.RUNNING && (
+                    <GameEndModal
+                        gameState={gameState}
+                        myProfile={profile}
+                        isOpen={true}
+                    />
+                )}
             </main>
-        </div>
+        </Page>
     );
 }
