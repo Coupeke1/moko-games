@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public record FilteredProfileModel(UUID id,
                                    String username,
+                                   String email,
                                    String description,
                                    String image,
                                    StatisticsModel statistics,
