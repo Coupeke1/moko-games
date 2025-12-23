@@ -5,4 +5,5 @@ import java.util.UUID;
 public record FriendModel(UUID id,
                           String username,
                           String image,
+                          StatisticsModel statistics,
                           String status) {}
