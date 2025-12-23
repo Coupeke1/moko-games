@@ -13,6 +13,7 @@ import be.kdg.team22.socialservice.domain.user.UserId;
 import be.kdg.team22.socialservice.domain.user.Username;
 import be.kdg.team22.socialservice.infrastructure.messaging.SocialEventPublisher;
 import be.kdg.team22.socialservice.infrastructure.user.ExternalUserRepository;
+import be.kdg.team22.socialservice.infrastructure.user.StatisticsResponse;
 import be.kdg.team22.socialservice.infrastructure.user.UserResponse;
 import org.junit.jupiter.api.Test;
 
@@ -245,9 +246,9 @@ class FriendServiceTest {
 
         when(friendshipRepository.findAllFor(current)).thenReturn(List.of(accepted, incomingReq, outgoingReq));
 
-        when(userRepository.getById(friend.value())).thenReturn(new UserResponse(friend.value(), "friendUser", "", null));
-        when(userRepository.getById(incoming.value())).thenReturn(new UserResponse(incoming.value(), "incomingUser", "", null));
-        when(userRepository.getById(outgoing.value())).thenReturn(new UserResponse(outgoing.value(), "outgoingUser", "", null));
+        when(userRepository.getById(friend.value())).thenReturn(new UserResponse(friend.value(), "friendUser", "", new StatisticsResponse(5, 5)));
+        when(userRepository.getById(incoming.value())).thenReturn(new UserResponse(incoming.value(), "incomingUser", "", new StatisticsResponse(5, 5)));
+        when(userRepository.getById(outgoing.value())).thenReturn(new UserResponse(outgoing.value(), "outgoingUser", "", new StatisticsResponse(5, 5)));
 
         FriendsOverviewModel overview = service.getOverview(current);
 
