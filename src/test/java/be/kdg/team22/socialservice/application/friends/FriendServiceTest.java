@@ -1,8 +1,7 @@
-package be.kdg.team22.socialservice.applicatiton.friends;
+package be.kdg.team22.socialservice.application.friends;
 
 import be.kdg.team22.socialservice.api.friends.models.FriendModel;
 import be.kdg.team22.socialservice.api.friends.models.FriendsOverviewModel;
-import be.kdg.team22.socialservice.application.friends.FriendService;
 import be.kdg.team22.socialservice.domain.friendship.Friendship;
 import be.kdg.team22.socialservice.domain.friendship.FriendshipId;
 import be.kdg.team22.socialservice.domain.friendship.FriendshipRepository;
@@ -35,7 +34,7 @@ class FriendServiceTest {
     private final FriendService service = new FriendService(friendshipRepository, userRepository, eventPublisher);
 
     private UserResponse userResponse(UUID id, String username) {
-        return new UserResponse(id, username);
+        return new UserResponse(id, username, "", null);
     }
 
     @Test
@@ -246,9 +245,9 @@ class FriendServiceTest {
 
         when(friendshipRepository.findAllFor(current)).thenReturn(List.of(accepted, incomingReq, outgoingReq));
 
-        when(userRepository.getById(friend.value())).thenReturn(new UserResponse(friend.value(), "friendUser"));
-        when(userRepository.getById(incoming.value())).thenReturn(new UserResponse(incoming.value(), "incomingUser"));
-        when(userRepository.getById(outgoing.value())).thenReturn(new UserResponse(outgoing.value(), "outgoingUser"));
+        when(userRepository.getById(friend.value())).thenReturn(new UserResponse(friend.value(), "friendUser", "", null));
+        when(userRepository.getById(incoming.value())).thenReturn(new UserResponse(incoming.value(), "incomingUser", "", null));
+        when(userRepository.getById(outgoing.value())).thenReturn(new UserResponse(outgoing.value(), "outgoingUser", "", null));
 
         FriendsOverviewModel overview = service.getOverview(current);
 

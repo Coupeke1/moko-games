@@ -33,31 +33,22 @@ public class FriendService {
     }
 
     public void sendRequest(final UserId userId, final Username username) {
-        UserResponse response = userRepository.getByUsername(username)
-                .orElseThrow(username::notFound);
+        UserResponse response = userRepository.getByUsername(username).orElseThrow(username::notFound);
         UserId targetId = UserId.from(response.id());
 
         if (userId.equals(targetId))
             throw new CannotAddException(username);
 
-        Friendship friendship = friendshipRepository.findBetween(userId, targetId)
-                .map(existingFriendship -> {
-                    existingFriendship.restartRequest(userId, targetId);
-                    return existingFriendship;
-                })
-                .orElseGet(() -> new Friendship(userId, targetId));
+        Friendship friendship = friendshipRepository.findBetween(userId, targetId).map(existingFriendship -> {
+            existingFriendship.restartRequest(userId, targetId);
+            return existingFriendship;
+        }).orElseGet(() -> new Friendship(userId, targetId));
 
         friendshipRepository.save(friendship);
 
         UserResponse senderInfo = userRepository.getById(userId.value());
 
-        eventPublisher.publishFriendRequestReceived(
-                new FriendRequestReceivedEvent(
-                        userId.value(),
-                        senderInfo.username(),
-                        targetId.value()
-                )
-        );
+        eventPublisher.publishFriendRequestReceived(new FriendRequestReceivedEvent(userId.value(), senderInfo.username(), targetId.value()));
     }
 
     public void acceptRequest(final UserId userId, final UserId targetId) {
@@ -68,13 +59,7 @@ public class FriendService {
 
         UserResponse accepterInfo = userRepository.getById(userId.value());
 
-        eventPublisher.publishFriendRequestAccepted(
-                new FriendRequestAcceptedEvent(
-                        userId.value(),
-                        accepterInfo.username(),
-                        targetId.value()
-                )
-        );
+        eventPublisher.publishFriendRequestAccepted(new FriendRequestAcceptedEvent(userId.value(), accepterInfo.username(), targetId.value()));
     }
 
     public void rejectRequest(final UserId userId, final UserId targetId) {
@@ -126,6 +111,6 @@ public class FriendService {
         UserId user = friendship.otherSide(userId);
         UserResponse response = userRepository.getById(user.value());
 
-        return new FriendModel(user.value(), response.username(), friendship.status().name());
+        return new FriendModel(user.value(), response.username(), response.image(), friendship.status().name());
     }
 }
