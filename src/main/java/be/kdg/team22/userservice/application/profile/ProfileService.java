@@ -70,7 +70,7 @@ public class ProfileService {
         List<AchievementModel> achievements = profile.modules().achievements() ? getAchievements(profile.id()) : null;
         List<FavouriteGameModel> favourites = profile.modules().favourites() ? getFavourites(profile.id()) : null;
 
-        return new FilteredProfileModel(profile.id().value(), profile.username().value(), profile.description(), profile.image(), new StatisticsModel(profile.statistics().level(), profile.statistics().playTime()), achievements, favourites);
+        return new FilteredProfileModel(profile.id().value(), profile.username().value(), profile.email().value(), profile.description(), profile.image(), new StatisticsModel(profile.statistics().level(), profile.statistics().playTime()), achievements, favourites);
     }
 
     private List<AchievementModel> getAchievements(final ProfileId id) {
