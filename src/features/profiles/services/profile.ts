@@ -30,7 +30,7 @@ export async function findMyProfile(id: string): Promise<Me> {
 export async function findProfile(id: string): Promise<Profile> {
     try {
         validIdCheck(id);
-        const { data } = await client.get<Me>(`${BASE_URL}/${id}`);
+        const { data } = await client.get<Profile>(`${BASE_URL}/${id}`);
         return data;
     } catch {
         throw new Error("Profile could not be fetched");
@@ -39,7 +39,7 @@ export async function findProfile(id: string): Promise<Profile> {
 
 export async function findProfileByName(name: string): Promise<Profile> {
     try {
-        const { data } = await client.get<Me>(`${BASE_URL}/find/${name}`);
+        const { data } = await client.get<Profile>(`${BASE_URL}/find/${name}`);
         return data;
     } catch {
         throw new Error("Profile could not be fetched");

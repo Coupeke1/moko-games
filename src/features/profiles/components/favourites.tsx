@@ -1,9 +1,6 @@
-import Column from "@/components/layout/column";
-import { Gap } from "@/components/layout/gap";
 import Grid from "@/components/layout/grid/grid";
 import Section from "@/components/section";
 import State from "@/components/state/state";
-import type { Entry } from "@/features/library/models/entry";
 import FavouriteCard from "@/features/profiles/components/favourite-card";
 import type { Favourite } from "@/features/profiles/models/favourite";
 
