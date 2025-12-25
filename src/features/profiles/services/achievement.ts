@@ -1,6 +1,6 @@
-import { client } from "@/lib/api-client";
 import { environment } from "@/config";
-import type { Achievement } from "@/features/profile/models/achievement";
+import type { Achievement } from "@/features/profiles/models/achievement";
+import { client } from "@/lib/api-client";
 
 const BASE_URL = environment.achievementService;
 

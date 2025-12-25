@@ -17,7 +17,7 @@ import {
     removePlayer,
     unReadyPlayer,
 } from "@/features/lobby/services/players";
-import type { Profile } from "@/features/profile/models/profile.ts";
+import type { Me } from "@/features/profiles/models/me";
 import { useMutation } from "@tanstack/react-query";
 
 export default function PlayerCard({
@@ -28,7 +28,7 @@ export default function PlayerCard({
 }: {
     player: Player;
     lobby: Lobby;
-    profile: Profile;
+    profile: Me;
     isOwner: boolean;
 }) {
     const remove = useMutation({

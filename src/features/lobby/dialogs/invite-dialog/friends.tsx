@@ -7,10 +7,10 @@ import PlusIcon from "@/components/icons/plus-icon";
 import ErrorState from "@/components/state/error";
 import LoadingState from "@/components/state/loading";
 import { useFriends } from "@/features/friends/hooks/use-friends.ts";
+import type { Friend } from "@/features/friends/models/friend";
 import type { Lobby } from "@/features/lobby/models/lobby.ts";
 import { sendInvite } from "@/features/lobby/services/invites.ts";
 import { isPlayerInLobby } from "@/features/lobby/services/players.ts";
-import type { Profile } from "@/features/profile/models/profile.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface Props {
@@ -37,7 +37,7 @@ export default function FriendsSection({ lobby, onInvite }: Props) {
     if (isLoading || !friends) return <LoadingState />;
     if (isError) return <ErrorState />;
 
-    return friends.map((friend: Profile) => {
+    return friends.map((friend: Friend) => {
         const isInLobby: boolean = isPlayerInLobby(friend.id, lobby);
 
         return (

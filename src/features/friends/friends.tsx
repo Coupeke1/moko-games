@@ -3,6 +3,7 @@ import UserCard from "@/components/cards/user-card";
 import show from "@/components/global/toast/toast";
 import { Type } from "@/components/global/toast/type";
 import CancelIcon from "@/components/icons/cancel-icon";
+import ClockIcon from "@/components/icons/clock-icon";
 import LevelIcon from "@/components/icons/level-icon";
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
@@ -17,14 +18,13 @@ import { getTabs } from "@/features/friends/components/tabs";
 import { useFriends } from "@/features/friends/hooks/use-friends.ts";
 import type { Friend } from "@/features/friends/models/friend.ts";
 import { removeFriend } from "@/features/friends/services/friends.ts";
-import type { Profile } from "@/features/profile/models/profile";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-function Friend({ friend }: { friend: Profile }) {
+function Friend({ friend }: { friend: Friend }) {
     const client = useQueryClient();
 
     const remove = useMutation({
-        mutationFn: async ({ friend }: { friend: Profile }) =>
+        mutationFn: async ({ friend }: { friend: Friend }) =>
             await removeFriend(friend.id),
         onSuccess: async () => {
             await client.invalidateQueries({ queryKey: ["friends"] });
@@ -45,6 +45,15 @@ function Friend({ friend }: { friend: Profile }) {
                     >
                         <LevelIcon />
                         <p>{friend.statistics.level}</p>
+                    </Row>
+
+                    <Row
+                        gap={Gap.Small}
+                        items={Items.Center}
+                        responsive={false}
+                    >
+                        <ClockIcon />
+                        <p>{friend.statistics.playTime}</p>
                     </Row>
                 </Row>
             }
@@ -77,7 +86,7 @@ export default function FriendsPage() {
                 >
                     {friends && (
                         <Grid>
-                            {friends.map((friend: Profile) => (
+                            {friends.map((friend: Friend) => (
                                 <Friend key={friend.id} friend={friend} />
                             ))}
                         </Grid>

@@ -1,24 +1,32 @@
+import Column from "@/components/layout/column";
+import { Gap } from "@/components/layout/gap";
 import Section from "@/components/section";
 import State from "@/components/state/state";
-import Column from "@/components/layout/column";
-import { useAchievements } from "@/features/profile/hooks/use-achievements";
-import AchievementCard from "@/features/profile/components/achievement-card";
-import { Gap } from "@/components/layout/gap";
+import AchievementCard from "@/features/profiles/components/achievement-card";
+import type { Achievement } from "@/features/profiles/models/achievement";
 
-export default function ProfileAchievements() {
-    const { achievements, loading, error } = useAchievements();
+interface Props {
+    achievements: Achievement[];
+    loading?: boolean;
+    error?: boolean;
+}
 
+export default function ProfileAchievements({
+    achievements,
+    loading,
+    error,
+}: Props) {
     return (
         <Section title="Achievements">
             <State
-                loading={loading}
-                error={error}
+                loading={loading ?? false}
+                error={error ?? false}
                 empty={achievements.length === 0}
                 message="No achievements"
             >
                 {achievements && (
                     <Column gap={Gap.Large}>
-                        {achievements.map((achievement) => (
+                        {achievements.map((achievement: Achievement) => (
                             <AchievementCard
                                 key={achievement.id}
                                 image={

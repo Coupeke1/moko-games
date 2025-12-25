@@ -1,14 +1,14 @@
 import { environment } from "@/config.ts";
-import type { Me } from "@/features/profile/models/me";
+import type { Me } from "@/features/profiles/models/me";
 import {
     match as modulesEquals,
     type Modules,
-} from "@/features/profile/models/modules.ts";
+} from "@/features/profiles/models/modules.ts";
 import {
     match as notificationsMatch,
     type Notifications,
-} from "@/features/profile/models/notifications";
-import type { Profile } from "@/features/profile/models/profile";
+} from "@/features/profiles/models/notifications";
+import type { Profile } from "@/features/profiles/models/profile";
 import { client } from "@/lib/api-client.ts";
 import { validIdCheck } from "@/lib/id.ts";
 import type { KeycloakTokenParsed } from "keycloak-js";
@@ -30,7 +30,16 @@ export async function findMyProfile(id: string): Promise<Me> {
 export async function findProfile(id: string): Promise<Profile> {
     try {
         validIdCheck(id);
-        const { data } = await client.get<Me>(`${BASE_URL}/${id}`);
+        const { data } = await client.get<Profile>(`${BASE_URL}/${id}`);
+        return data;
+    } catch {
+        throw new Error("Profile could not be fetched");
+    }
+}
+
+export async function findProfileByName(name: string): Promise<Profile> {
+    try {
+        const { data } = await client.get<Profile>(`${BASE_URL}/find/${name}`);
         return data;
     } catch {
         throw new Error("Profile could not be fetched");

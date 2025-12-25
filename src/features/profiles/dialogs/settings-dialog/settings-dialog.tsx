@@ -8,18 +8,18 @@ import TabContent from "@/components/tabs/buttons/content";
 import TabRow from "@/components/tabs/buttons/row";
 import AboutTab, {
     type AboutData,
-} from "@/features/profile/dialogs/settings-dialog/about-tab";
+} from "@/features/profiles/dialogs/settings-dialog/about-tab";
 import ModulesTab, {
     type ModulesData,
-} from "@/features/profile/dialogs/settings-dialog/modules-tab";
+} from "@/features/profiles/dialogs/settings-dialog/modules-tab";
 import NotificationsTab, {
     type NotificationsData,
-} from "@/features/profile/dialogs/settings-dialog/notifications-tab";
+} from "@/features/profiles/dialogs/settings-dialog/notifications-tab";
 import PictureTab, {
     type PictureData,
-} from "@/features/profile/dialogs/settings-dialog/picture-tab";
-import type { Me } from "@/features/profile/models/me";
-import { updateProfile } from "@/features/profile/services/profile.ts";
+} from "@/features/profiles/dialogs/settings-dialog/picture-tab";
+import type { Me } from "@/features/profiles/models/me";
+import { updateProfile } from "@/features/profiles/services/profile.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 
@@ -55,7 +55,7 @@ export default function SettingsDialog({
             );
         },
         onSuccess: async () => {
-            await client.refetchQueries({ queryKey: ["profile", "me"] });
+            await client.refetchQueries({ queryKey: ["profiles", "me"] });
             show(Type.Profile, "Saved");
             setCurrent("About");
             close();

@@ -1,6 +1,6 @@
 import Select from "@/components/inputs/select";
 import Column from "@/components/layout/column";
-import type { Modules } from "@/features/profile/models/modules";
+import type { Modules } from "@/features/profiles/models/modules";
 import { forwardRef, useImperativeHandle, useState } from "react";
 
 export interface ModulesData {

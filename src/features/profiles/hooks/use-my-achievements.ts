@@ -1,9 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
-import { useAuthStore } from "@/stores/auth-store";
-import { findMyLibrary } from "@/features/profile/services/favourites";
+import { findMyAchievements } from "@/features/profiles/services/achievement";
 import { POLLING_INTERVAL } from "@/lib/polling";
+import { useAuthStore } from "@/stores/auth-store.ts";
+import { useQuery } from "@tanstack/react-query";
 
-export function useFavourites() {
+export function useMyAchievements() {
     const { authenticated, keycloak, token } = useAuthStore();
 
     const {
@@ -11,11 +11,11 @@ export function useFavourites() {
         isLoading: loading,
         isError: error,
     } = useQuery({
-        queryKey: ["library", "me", "favourites", token],
+        queryKey: ["achievements", "me", token],
         queryFn: async () => {
             if (!authenticated || !token) throw new Error("Not authenticated");
 
-            return await findMyLibrary({ favourite: true });
+            return await findMyAchievements();
         },
         enabled: authenticated && !!keycloak && !!token,
         staleTime: 5 * 60 * 1000,
@@ -23,5 +23,5 @@ export function useFavourites() {
         refetchInterval: POLLING_INTERVAL,
     });
 
-    return { favourites: data ?? [], loading, error };
+    return { achievements: data ?? [], loading, error };
 }

@@ -31,7 +31,7 @@ export default function InvitesPage() {
                 queryKey: ["lobby", "invites", id],
             });
 
-            show(Type.Friends, "Request accepted");
+            show(Type.Lobby, "Invite accepted");
             navigate(`/lobbies/${variables.invite.id}`);
         },
         onError: (error: Error) => show(Type.Friends, error.message),

@@ -6,7 +6,7 @@ import AcceptIcon from "@/components/icons/accept-icon";
 import PlusIcon from "@/components/icons/plus-icon";
 import type { Lobby } from "@/features/lobby/models/lobby.ts";
 import { addBot } from "@/features/lobby/services/bots.ts";
-import type { Bot } from "@/features/profile/models/bot.ts";
+import type { Bot } from "@/features/profiles/models/bot.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface Props {

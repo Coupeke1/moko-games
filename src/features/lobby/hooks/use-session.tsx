@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router";
-import { useProfile } from "@/features/profile/hooks/use-profile.ts";
+import { useMyProfile } from "@/features/profiles/hooks/use-my-profile";
 import { useLobby } from "@/features/lobby/hooks/use-lobby.ts";
 import { useGame } from "@/features/games/hooks/use-game";
 import { isUserOwner } from "@/features/lobby/services/lobby.ts";
@@ -19,7 +19,7 @@ export function useSession() {
         profile,
         loading: profileLoading,
         error: profileError,
-    } = useProfile();
+    } = useMyProfile();
 
     const profileId = useMemo(() => profile?.id, [profile?.id]);
 

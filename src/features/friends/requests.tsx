@@ -3,6 +3,7 @@ import UserCard from "@/components/cards/user-card";
 import show from "@/components/global/toast/toast";
 import { Type } from "@/components/global/toast/type";
 import AcceptIcon from "@/components/icons/accept-icon";
+import ClockIcon from "@/components/icons/clock-icon";
 import LevelIcon from "@/components/icons/level-icon";
 import RejectIcon from "@/components/icons/reject-icon";
 import Column from "@/components/layout/column";
@@ -15,21 +16,20 @@ import State from "@/components/state/state";
 import TabRow from "@/components/tabs/links/row";
 import { getTabs } from "@/features/friends/components/tabs";
 import { useRequests } from "@/features/friends/hooks/use-requests.ts";
+import type { Friend } from "@/features/friends/models/friend";
 import {
     acceptRequest,
     rejectRequest,
 } from "@/features/friends/services/requests.ts";
-import type { Profile } from "@/features/profile/models/profile";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 
-export default function RequestsPage() {
+function Request({ request }: { request: Friend }) {
     const client = useQueryClient();
     const navigate = useNavigate();
-    const { requests, loading, error } = useRequests();
 
     const accept = useMutation({
-        mutationFn: async ({ request }: { request: Profile }) =>
+        mutationFn: async ({ request }: { request: Friend }) =>
             await acceptRequest(request.id),
         onSuccess: async () => {
             await client.invalidateQueries({
@@ -43,7 +43,7 @@ export default function RequestsPage() {
     });
 
     const reject = useMutation({
-        mutationFn: async ({ request }: { request: Profile }) =>
+        mutationFn: async ({ request }: { request: Friend }) =>
             await rejectRequest(request.id),
         onSuccess: async () => {
             await client.invalidateQueries({
@@ -53,6 +53,53 @@ export default function RequestsPage() {
         },
         onError: (error: Error) => show(Type.Friends, error.message),
     });
+
+    return (
+        <UserCard
+            user={request}
+            statistics={
+                <Row responsive={false}>
+                    <Row
+                        gap={Gap.Small}
+                        items={Items.Center}
+                        responsive={false}
+                    >
+                        <LevelIcon />
+                        <p>{request.statistics.level}</p>
+                    </Row>
+
+                    <Row
+                        gap={Gap.Small}
+                        items={Items.Center}
+                        responsive={false}
+                    >
+                        <ClockIcon />
+                        <p>{request.statistics.playTime}</p>
+                    </Row>
+                </Row>
+            }
+            footer={
+                <Row>
+                    <Button
+                        onClick={() => accept.mutate({ request })}
+                        fullWidth={true}
+                    >
+                        <AcceptIcon />
+                    </Button>
+                    <Button
+                        onClick={() => reject.mutate({ request })}
+                        fullWidth={true}
+                    >
+                        <RejectIcon />
+                    </Button>
+                </Row>
+            }
+        />
+    );
+}
+
+export default function RequestsPage() {
+    const { requests, loading, error } = useRequests();
 
     return (
         <Page>
@@ -67,44 +114,8 @@ export default function RequestsPage() {
                 >
                     {requests && (
                         <Grid>
-                            {requests.map((request: Profile) => (
-                                <UserCard
-                                    user={request}
-                                    statistics={
-                                        <Row responsive={false}>
-                                            <Row
-                                                gap={Gap.Small}
-                                                items={Items.Center}
-                                                responsive={false}
-                                            >
-                                                <LevelIcon />
-                                                <p>
-                                                    {request.statistics.level}
-                                                </p>
-                                            </Row>
-                                        </Row>
-                                    }
-                                    footer={
-                                        <Row>
-                                            <Button
-                                                onClick={() =>
-                                                    accept.mutate({ request })
-                                                }
-                                                fullWidth={true}
-                                            >
-                                                <AcceptIcon />
-                                            </Button>
-                                            <Button
-                                                onClick={() =>
-                                                    reject.mutate({ request })
-                                                }
-                                                fullWidth={true}
-                                            >
-                                                <RejectIcon />
-                                            </Button>
-                                        </Row>
-                                    }
-                                />
+                            {requests.map((request: Friend) => (
+                                <Request request={request} />
                             ))}
                         </Grid>
                     )}

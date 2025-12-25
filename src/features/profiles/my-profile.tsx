@@ -2,16 +2,42 @@ import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
 import Page from "@/components/layout/page";
 import State from "@/components/state/state";
-import ProfileAchievements from "@/features/profile/components/achievements";
-import ProfileFavourites from "@/features/profile/components/favourites";
-import ProfileInformation from "@/features/profile/components/information";
-import SettingsDialog from "@/features/profile/dialogs/settings-dialog/settings-dialog";
-import { useProfile } from "@/features/profile/hooks/use-profile.ts";
+import ProfileAchievements from "@/features/profiles/components/achievements";
+import ProfileFavourites from "@/features/profiles/components/favourites";
+import ProfileInformation from "@/features/profiles/components/information";
+import SettingsDialog from "@/features/profiles/dialogs/settings-dialog/settings-dialog";
+import { useMyAchievements } from "@/features/profiles/hooks/use-my-achievements";
+import { useMyFavourites } from "@/features/profiles/hooks/use-my-favourites";
+import { useMyProfile } from "@/features/profiles/hooks/use-my-profile";
 import { useAuthStore } from "@/stores/auth-store.ts";
 import { useState } from "react";
 
-export default function ProfilePage() {
-    const { profile, loading, error } = useProfile();
+function Achievements() {
+    const { achievements, loading, error } = useMyAchievements();
+
+    return (
+        <ProfileAchievements
+            achievements={achievements}
+            loading={loading}
+            error={error}
+        />
+    );
+}
+
+function Favourites() {
+    const { favourites, loading, error } = useMyFavourites();
+
+    return (
+        <ProfileFavourites
+            favourites={favourites}
+            loading={loading}
+            error={error}
+        />
+    );
+}
+
+export default function MyProfilePage() {
+    const { profile, loading, error } = useMyProfile();
     const [settings, setSettings] = useState(false);
 
     const logout = useAuthStore((s) => s.logout);
@@ -45,13 +71,8 @@ export default function ProfilePage() {
                                 onLogout={logout}
                             />
 
-                            {profile.modules.achievements && (
-                                <ProfileAchievements />
-                            )}
-
-                            {profile.modules.favourites && (
-                                <ProfileFavourites />
-                            )}
+                            {profile.modules.achievements && <Achievements />}
+                            {profile.modules.favourites && <Favourites />}
                         </Column>
                     </>
                 )}

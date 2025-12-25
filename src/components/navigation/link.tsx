@@ -9,7 +9,8 @@ interface Props {
 
 export default function NavigationLink({ title, path, children }: Props) {
     const location = useLocation();
-    const matches: boolean = location.pathname.startsWith(path);
+    const matches =
+        location.pathname === path || location.pathname.startsWith(`${path}/`);
 
     return (
         <RouterLink
