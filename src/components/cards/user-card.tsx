@@ -14,6 +14,7 @@ export default function UserCard({ user, statistics, footer }: Props) {
     return (
         <Card
             image={user.image}
+            href={`/profiles/${user.username}`}
             title={user.username}
             information={statistics}
             footer={footer}

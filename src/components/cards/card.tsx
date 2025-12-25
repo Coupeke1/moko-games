@@ -30,64 +30,66 @@ function Content({
     href,
     onClick,
 }: Props) {
-    return (
-        <Column>
-            <article
-                className={`flex flex-col ${(href || onClick) && `group cursor-pointer select-none ${image ? "bg-cover bg-center hover:bg-bg-3 transition-colors duration-75" : "hover:bg-bg-3 transition-colors duration-75"}`} bg-bg-2 relative overflow-hidden justify-end ${image ? " " : ""} px-4 py-2 rounded-lg ${height}`}
-                style={{ backgroundImage: `url("${image}")` }}
-            >
-                {image && (
-                    <section className="absolute inset-0 bg-linear-to-b from-black/10 via-black/20 to-black/80 from-0% via-45% to-100% group-hover:bg-black/20 transition-colors duration-200 rounded-lg" />
-                )}
+    const CardBody = (
+        <article
+            className={`flex flex-col ${
+                (href || onClick) &&
+                `group cursor-pointer select-none ${
+                    image
+                        ? "bg-cover bg-center hover:bg-bg-3 transition-colors duration-75"
+                        : "hover:bg-bg-3 transition-colors duration-75"
+                }`
+            } bg-bg-2 relative overflow-hidden justify-end px-4 py-2 rounded-lg ${height}`}
+            style={{ backgroundImage: image ? `url("${image}")` : undefined }}
+        >
+            {image && (
+                <section className="absolute inset-0 bg-linear-to-b from-black/10 via-black/20 to-black/80 from-0% via-45% to-100% group-hover:bg-black/20 transition-colors duration-200 rounded-lg" />
+            )}
 
-                <section className="relative z-10">
-                    <Row
-                        items={Items.End}
-                        justify={Justify.Between}
-                        responsive={false}
-                    >
-                        <section className="min-w-0">
-                            <Stack items={Items.Start}>
-                                <h3 className="font-bold text-lg truncate">
-                                    {title}
-                                </h3>
+            <section className="relative z-10">
+                <Row
+                    items={Items.End}
+                    justify={Justify.Between}
+                    responsive={false}
+                >
+                    <section className="min-w-0">
+                        <Stack items={Items.Start}>
+                            <h3 className="font-bold text-lg truncate">
+                                {title}
+                            </h3>
 
+                            {information && (
                                 <section
                                     className={`flex flex-row ${Gap.Medium} min-w-0`}
                                 >
-                                    {information && information}
+                                    {information}
                                 </section>
-                            </Stack>
-                        </section>
+                            )}
+                        </Stack>
+                    </section>
 
-                        {options && options}
-                    </Row>
-                </section>
-            </article>
+                    {options && options}
+                </Row>
+            </section>
+        </article>
+    );
+
+    return (
+        <Column>
+            {href ? (
+                <RouterLink to={href}>{CardBody}</RouterLink>
+            ) : onClick ? (
+                <button onClick={onClick} className="text-left">
+                    {CardBody}
+                </button>
+            ) : (
+                CardBody
+            )}
 
             {footer}
         </Column>
     );
 }
-
 export default function Card(props: Props) {
-    const { href, onClick } = props;
-
-    if (!href && !onClick) return <Content {...props} />;
-
-    if (onClick && !href)
-        return (
-            <button onClick={onClick}>
-                <Content {...props} />
-            </button>
-        );
-
-    if (href && !onClick)
-        return (
-            <RouterLink to={href}>
-                <Content {...props} />
-            </RouterLink>
-        );
-
-    return null;
+    return <Content {...props} />;
 }
