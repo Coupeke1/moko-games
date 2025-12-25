@@ -52,9 +52,11 @@ function Content({
                                     {title}
                                 </h3>
 
-                                <Row gap={Gap.Large} responsive={false}>
+                                <section
+                                    className={`flex flex-row ${Gap.Medium} min-w-0`}
+                                >
                                     {information && information}
-                                </Row>
+                                </section>
                             </Stack>
                         </section>
 

@@ -1,5 +1,6 @@
 import Column from "@/components/layout/column";
 import { Gap } from "@/components/layout/gap";
+import Grid from "@/components/layout/grid/grid";
 import Section from "@/components/section";
 import State from "@/components/state/state";
 import type { Entry } from "@/features/library/models/entry";
@@ -26,16 +27,14 @@ export default function ProfileFavourites({
                 message="No favourites"
             >
                 {favourites && (
-                    <Column gap={Gap.Large}>
-                        {favourites.map((entry: Entry) => (
+                    <Grid>
+                        {favourites.map((favourite: Favourite) => (
                             <FavouriteCard
-                                key={entry.id}
-                                image={entry.image}
-                                title={entry.title}
-                                description={entry.description}
+                                key={favourite.id}
+                                favourite={favourite}
                             />
                         ))}
-                    </Column>
+                    </Grid>
                 )}
             </State>
         </Section>

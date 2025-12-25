@@ -23,10 +23,6 @@ export default function ProfilePage() {
     const { profile, loading, error } = useProfile(name!);
 
     useEffect(() => {
-        if (!name) navigate("/profile");
-    }, [name, navigate]);
-
-    useEffect(() => {
         if (!profile || !me) return;
         if (profile.id === me.id) navigate("/profile");
     }, [profile, me, navigate]);

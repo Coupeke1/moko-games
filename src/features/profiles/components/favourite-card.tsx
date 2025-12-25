@@ -1,17 +1,17 @@
 import Card from "@/components/cards/card";
+import { Height } from "@/components/layout/size";
+import type { Favourite } from "@/features/profiles/models/favourite";
 
 interface Props {
-    image: string;
-    title: string;
-    description: string;
+    favourite: Favourite;
 }
 
-export default function FavouriteCard({ image, title, description }: Props) {
+export default function FavouriteCard({ favourite }: Props) {
     return (
         <Card
-            title={title}
-            image={image}
-            information={<p className="truncate">{description}</p>}
+            image={favourite.image}
+            title={favourite.title}
+            height={Height.Large}
         />
     );
 }
