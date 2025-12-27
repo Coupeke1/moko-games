@@ -14,6 +14,7 @@ import LibraryPage from "@/features/library/library";
 import LobbyPage from "@/features/lobby/lobby";
 import NotFoundPage from "@/features/not-found";
 import NotificationsPage from "@/features/notifications/notifications";
+import ChatPage from "@/features/chat/chat";
 import { useMyProfile } from "@/features/profiles/hooks/use-my-profile";
 import MyProfilePage from "@/features/profiles/my-profile";
 import StoreGamePage from "@/features/store/game";
@@ -75,6 +76,9 @@ function Content() {
                 <Route path="/friends/requests" element={<RequestsPage />} />
 
                 <Route path="/notifications" element={<NotificationsPage />} />
+
+                <Route path="/chat" element={<ChatPage />} />
+
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>
         </>

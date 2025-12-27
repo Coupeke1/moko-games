@@ -49,9 +49,7 @@ export default function SearchBar({ onSearch }: Props) {
                     />
                 </section>
 
-                <Button onClick={() => search.mutate()} fullWidth={true}>
-                    Search
-                </Button>
+                <Button fullWidth={true}>Search</Button>
             </section>
         </Form>
     );

@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
 
+import CartIcon from "@/components/icons/bar/cart-icon";
+import ChatIcon from "@/components/icons/bar/chat-icon";
 import LibraryIcon from "@/components/icons/bar/library-icon";
+import NotificationsIcon from "@/components/icons/bar/notifications-icon";
 import ProfileIcon from "@/components/icons/bar/profile-icon";
 import StoreIcon from "@/components/icons/bar/store-icon";
 import UsersIcon from "@/components/icons/users-icon";
-import NotificationsIcon from "@/components/icons/bar/notifications-icon";
-import ChatIcon from "@/components/icons/bar/chat-icon";
-import CartIcon from "@/components/icons/bar/cart-icon";
 
 export interface Link {
     title: string;
@@ -37,7 +37,7 @@ export function getButtons(onCart: () => void): Button[] {
             icon: <NotificationsIcon />,
             path: "/notifications?type=unread",
         },
-        { title: "Chat", icon: <ChatIcon />, onClick: () => {} },
+        { title: "Chat", icon: <ChatIcon />, path: "/chat" },
         { title: "Cart", icon: <CartIcon />, onClick: onCart },
     ];
 }
