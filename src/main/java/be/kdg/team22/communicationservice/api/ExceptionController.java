@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class ExceptionController {
-
     @ExceptionHandler({NotInLobbyException.class, NotBotChannelOwnerException.class, NotFriendsException.class})
     public ResponseEntity<String> handleAccessDenied(final RuntimeException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
     }
+
     @ExceptionHandler({ChatChannelNotFoundException.class, NotificationNotFoundException.class, UserProfileNotFoundException.class, UserPreferencesNotFoundException.class})
     public ResponseEntity<String> handleNotFound(final Exception ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);

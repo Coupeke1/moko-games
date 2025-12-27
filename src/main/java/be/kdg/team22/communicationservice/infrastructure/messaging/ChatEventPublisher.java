@@ -15,22 +15,8 @@ public class ChatEventPublisher {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void publishDirectMessage(final UUID senderId,
-                                     final String senderName,
-                                     final UUID recipientId,
-                                     final String messagePreview,
-                                     final UUID channelId) {
-        DirectMessageReceivedEvent event = new DirectMessageReceivedEvent(
-                senderId,
-                senderName,
-                recipientId,
-                messagePreview,
-                channelId
-        );
-        rabbitTemplate.convertAndSend(
-                RabbitMQTopology.EXCHANGE_CHAT,
-                "chat.direct-message",
-                event
-        );
+    public void publishDirectMessage(final UUID senderId, final String senderName, final UUID recipientId, final String messagePreview, final UUID channelId) {
+        DirectMessageReceivedEvent event = new DirectMessageReceivedEvent(senderId, senderName, recipientId, messagePreview, channelId);
+        rabbitTemplate.convertAndSend(RabbitMQTopology.EXCHANGE_CHAT, "chat.direct-message", event);
     }
 }

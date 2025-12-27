@@ -1,10 +1,10 @@
 package be.kdg.team22.communicationservice.api.chat;
 
-import be.kdg.team22.communicationservice.api.chat.models.ChatMessageRequestModel;
-import be.kdg.team22.communicationservice.api.chat.models.ChatMessageResponse;
+import be.kdg.team22.communicationservice.api.chat.models.CreateMessageModel;
+import be.kdg.team22.communicationservice.api.chat.models.MessageModel;
 import be.kdg.team22.communicationservice.application.chat.ChatService;
-import be.kdg.team22.communicationservice.domain.chat.ChatChannelType;
-import be.kdg.team22.communicationservice.domain.chat.ChatMessage;
+import be.kdg.team22.communicationservice.domain.chat.UserId;
+import be.kdg.team22.communicationservice.domain.chat.message.Message;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,38 +18,21 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/chat/friends")
 public class FriendsChatController {
-    private final ChatService chatService;
+    private final ChatService service;
 
-    public FriendsChatController(final ChatService chatService) {
-        this.chatService = chatService;
+    public FriendsChatController(final ChatService service) {
+        this.service = service;
     }
 
-    @PostMapping("/{friendId}")
-    public ResponseEntity<ChatMessageResponse> sendMessage(
-            @PathVariable final UUID friendId,
-            @AuthenticationPrincipal final Jwt token,
-            @RequestBody final ChatMessageRequestModel request
-    ) {
-        ChatMessage msg = chatService.sendMessage(
-                ChatChannelType.FRIENDS,
-                friendId.toString(),
-                token.getSubject(),
-                request.content(),
-                token
-        );
-        return ResponseEntity.ok(ChatMessageResponse.from(msg));
+    @PostMapping("/{id}")
+    public ResponseEntity<MessageModel> sendMessage(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token, @RequestBody final CreateMessageModel request) {
+        Message message = service.sendPrivateMessage(UserId.from(id), UserId.get(token), request.content());
+        return ResponseEntity.ok(MessageModel.from(message));
     }
 
-    @GetMapping("/{friendId}")
-    public ResponseEntity<List<ChatMessageResponse>> getMessages(
-            @PathVariable final UUID friendId,
-            @AuthenticationPrincipal final Jwt token,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final Instant since
-    ) {
-        List<ChatMessage> messages =
-                chatService.getMessages(ChatChannelType.FRIENDS, friendId.toString(), since, token.getSubject(), token);
-
-        return ResponseEntity.ok(messages.stream().map(ChatMessageResponse::from).toList());
+    @GetMapping("/{id}")
+    public ResponseEntity<List<MessageModel>> getMessages(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final Instant since) {
+        List<Message> messages = service.getPrivateMessages(UserId.get(token), UserId.from(id), since);
+        return ResponseEntity.ok(messages.stream().map(MessageModel::from).toList());
     }
 }

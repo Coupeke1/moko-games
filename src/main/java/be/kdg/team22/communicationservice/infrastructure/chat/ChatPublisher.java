@@ -1,0 +1,21 @@
+package be.kdg.team22.communicationservice.infrastructure.chat;
+
+import be.kdg.team22.communicationservice.api.chat.models.MessageModel;
+import be.kdg.team22.communicationservice.config.RabbitMQTopology;
+import be.kdg.team22.communicationservice.domain.chat.message.Message;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.stereotype.Component;
+
+@Component
+public class ChatPublisher {
+    private final RabbitTemplate template;
+
+    public ChatPublisher(final RabbitTemplate template) {
+        this.template = template;
+    }
+
+    public void publishToPlayer(final Message message) {
+        MessageModel model = MessageModel.from(message);
+        template.convertAndSend(RabbitMQTopology.EXCHANGE_USER_SOCKET, "user.message", new ChatMessage(message.userId().value(), "chat", model));
+    }
+}
