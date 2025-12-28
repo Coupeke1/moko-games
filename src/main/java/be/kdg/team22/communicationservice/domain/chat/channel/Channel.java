@@ -1,9 +1,6 @@
 package be.kdg.team22.communicationservice.domain.chat.channel;
 
 import be.kdg.team22.communicationservice.domain.chat.UserId;
-import be.kdg.team22.communicationservice.domain.chat.channel.exceptions.NoAccessException;
-import be.kdg.team22.communicationservice.domain.chat.channel.type.BotReferenceType;
-import be.kdg.team22.communicationservice.domain.chat.channel.type.PrivateReferenceType;
 import be.kdg.team22.communicationservice.domain.chat.channel.type.ReferenceType;
 import be.kdg.team22.communicationservice.domain.chat.message.Message;
 import org.jmolecules.ddd.annotation.AggregateRoot;

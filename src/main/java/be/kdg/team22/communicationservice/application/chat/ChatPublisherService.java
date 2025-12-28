@@ -20,6 +20,6 @@ public class ChatPublisherService {
 
     public void saveAndPublish(final Channel channel, final Message message) {
         repository.save(channel);
-        publisher.publishToPlayer(message);
+        publisher.publishToPlayers(channel, message);
     }
 }
