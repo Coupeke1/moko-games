@@ -7,10 +7,12 @@ import be.kdg.team22.communicationservice.application.chat.BotChatService;
 import be.kdg.team22.communicationservice.domain.chat.Channel;
 import be.kdg.team22.communicationservice.domain.chat.ChatMessage;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.util.List;
@@ -63,5 +65,10 @@ public class BotChatController {
         );
 
         return ResponseEntity.ok(messages.stream().map(ChatMessageResponse::from).toList());
+    }
+
+    @PostMapping(value = "/upload-document", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> upload(@RequestPart("file") MultipartFile file) throws Exception {
+        return botChatService.uploadDocument(file.getBytes(), file.getOriginalFilename() != null ? file.getOriginalFilename() : "document.pdf");
     }
 }

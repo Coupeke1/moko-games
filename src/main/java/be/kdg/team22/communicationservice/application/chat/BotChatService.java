@@ -6,6 +6,7 @@ import be.kdg.team22.communicationservice.domain.chat.bot.BotResponse;
 import be.kdg.team22.communicationservice.domain.chat.exceptions.ChatChannelNotFoundException;
 import be.kdg.team22.communicationservice.domain.chat.exceptions.NotBotChannelOwnerException;
 import jakarta.transaction.Transactional;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -72,6 +73,9 @@ public class BotChatService {
         }
 
         return channel;
+    }
+
+    public String uploadDocument(byte[] bytes, String s) {
     }
 }
 

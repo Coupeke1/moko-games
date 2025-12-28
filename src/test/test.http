@@ -28,13 +28,18 @@ scope = openid
     client.global.set("kaj_Token", response.body.access_token);
 %}
 
+### create bot channel
+POST http://localhost:8082/api/chat/bot
+Authorization: Bearer {{chat_token}}
+
 ### 2) Send message to BOT chat channel
-POST http://localhost:8082/api/chat/bot/user123-tictactoe
+POST http://localhost:8082/api/chat/bot/a8d72186-49f3-4ed2-8837-adf0565e017c/messages
 Authorization: Bearer {{chat_token}}
 Content-Type: application/json
 
 {
-  "content": "Hoe speel ik tic tac toe?"
+  "content": "How does Kining work?",
+  "gameName": "checkers"
 }
 
 > {%
