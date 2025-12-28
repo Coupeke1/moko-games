@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Transactional
-public class PublisherService {
+public class NotificationPublisherService {
     private final NotificationRepository repository;
     private final NotificationPublisher publisher;
 
-    public PublisherService(final NotificationRepository repository, final NotificationPublisher publisher) {
+    public NotificationPublisherService(final NotificationRepository repository, final NotificationPublisher publisher) {
         this.repository = repository;
         this.publisher = publisher;
     }

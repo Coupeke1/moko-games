@@ -21,9 +21,9 @@ public class ChatService {
     private final ChannelRepository channelRepository;
     private final ChatEventPublisher chatEventPublisher;
     private final ExternalUserRepository userRepository;
-    private final PublisherService publisher;
+    private final ChatPublisherService publisher;
 
-    public ChatService(final ChannelService channelService, final ChannelRepository channelRepository, final ChatEventPublisher chatEventPublisher, final ExternalUserRepository userRepository, final PublisherService publisher) {
+    public ChatService(final ChannelService channelService, final ChannelRepository channelRepository, final ChatEventPublisher chatEventPublisher, final ExternalUserRepository userRepository, final ChatPublisherService publisher) {
         this.channelService = channelService;
         this.channelRepository = channelRepository;
         this.chatEventPublisher = chatEventPublisher;

@@ -21,11 +21,11 @@ import java.util.UUID;
 public class NotificationService {
 
     private final NotificationRepository repository;
-    private final PublisherService publisher;
+    private final NotificationPublisherService publisher;
     private final ExternalUserRepository userRepository;
     private final EmailService emailService;
 
-    public NotificationService(final NotificationRepository repository, final PublisherService publisher, final ExternalUserRepository userRepository, final EmailService emailService) {
+    public NotificationService(final NotificationRepository repository, final NotificationPublisherService publisher, final ExternalUserRepository userRepository, final EmailService emailService) {
         this.repository = repository;
         this.publisher = publisher;
         this.userRepository = userRepository;

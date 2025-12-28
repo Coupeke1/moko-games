@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Transactional
-public class PublisherService {
+public class ChatPublisherService {
     private final ChannelRepository repository;
     private final ChatPublisher publisher;
 
-    public PublisherService(final ChannelRepository repository, final ChatPublisher publisher) {
+    public ChatPublisherService(final ChannelRepository repository, final ChatPublisher publisher) {
         this.repository = repository;
         this.publisher = publisher;
     }
