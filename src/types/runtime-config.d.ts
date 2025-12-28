@@ -9,7 +9,8 @@ declare global {
             libraryService?: string;
             socialService?: string;
             sessionService?: string;
-            communicationService?: string;
+            notificationsService?: string;
+            chatService?: string;
             gamesService?: string;
             storeService?: string;
             orderService?: string;

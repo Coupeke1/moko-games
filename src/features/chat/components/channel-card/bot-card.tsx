@@ -9,7 +9,7 @@ export default function BotCard({ selected }: Props) {
         <ChannelCard
             username="Moko"
             image="https://cdn2.thecatapi.com/images/MTUwNjE4MQ.jpg"
-            timestamp="15m ago"
+            description="Beep Boop"
             selected={selected}
         />
     );

@@ -11,7 +11,7 @@ export default function FriendCard({ friend, selected }: Props) {
         <ChannelCard
             username={friend.username}
             image={friend.image}
-            timestamp="15m ago"
+            description={`Level ${friend.statistics.level}`}
             selected={selected}
         />
     );

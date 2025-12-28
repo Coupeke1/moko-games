@@ -30,9 +30,13 @@ export const environment = {
         window.__APP_CONFIG__?.sessionService ??
         import.meta.env.VITE_SESSION_SERVICE ??
         "",
-    communicationService:
-        window.__APP_CONFIG__?.communicationService ??
-        import.meta.env.VITE_COMMUNICATION_SERVICE ??
+    notificationsService:
+        window.__APP_CONFIG__?.notificationsService ??
+        import.meta.env.VITE_NOTIFICATIONS_SERVICE ??
+        "",
+    chatService:
+        window.__APP_CONFIG__?.chatService ??
+        import.meta.env.VITE_CHAT_SERVICE ??
         "",
     gamesService:
         window.__APP_CONFIG__?.gamesService ??

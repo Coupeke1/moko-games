@@ -1,14 +1,14 @@
 interface Props {
     username: string;
     image: string;
-    timestamp: string;
+    description: string;
     selected: boolean;
 }
 
 export default function ChannelCard({
     username,
     image,
-    timestamp,
+    description,
     selected,
 }: Props) {
     return (
@@ -23,7 +23,7 @@ export default function ChannelCard({
             />
             <section className="flex flex-col min-w-0">
                 <p className="font-bold text-lg truncate">{username}</p>
-                <p className="text-fg-2">{timestamp}</p>
+                <p className="text-fg-2">{description}</p>
             </section>
         </article>
     );
