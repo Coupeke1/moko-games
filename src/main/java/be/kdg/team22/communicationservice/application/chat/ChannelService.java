@@ -22,14 +22,18 @@ public class ChannelService {
     public Channel getOrCreateLobbyChannel(final LobbyId id) {
         return repository.findLobbyChannel(id).orElseGet(() -> {
             ReferenceType type = new LobbyReferenceType(id);
-            return new Channel(type);
+            Channel channel = new Channel(type);
+            repository.save(channel);
+            return channel;
         });
     }
 
     public Channel getOrCreatePrivateChannel(final UserId userId, final UserId otherUserId) {
         return repository.findPrivateChannel(userId, otherUserId).orElseGet(() -> {
             ReferenceType type = new PrivateReferenceType(userId, otherUserId);
-            return new Channel(type);
+            Channel channel = new Channel(type);
+            repository.save(channel);
+            return channel;
         });
     }
 }
