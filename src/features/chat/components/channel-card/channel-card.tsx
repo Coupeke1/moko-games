@@ -3,6 +3,7 @@ interface Props {
     image: string;
     description: string;
     selected: boolean;
+    onSelect: () => void;
 }
 
 export default function ChannelCard({
@@ -10,10 +11,12 @@ export default function ChannelCard({
     image,
     description,
     selected,
+    onSelect,
 }: Props) {
     return (
         <article
             className={`p-2 w-full rounded-lg flex items-center gap-2 ${selected ? "bg-bg-3" : "hover:bg-bg-3 transition-colors duration-75"} cursor-pointer select-none`}
+            onClick={() => (selected ? {} : onSelect())}
         >
             <section
                 className={`bg-cover min-w-14 min-h-14 rounded-lg bg-center bg-fg-2`}
