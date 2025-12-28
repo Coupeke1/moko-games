@@ -12,7 +12,6 @@ public class RabbitMQTopology {
     public static final String EXCHANGE_STORE = "exchange.store";
     public static final String EXCHANGE_CHAT = "exchange.chat";
     public static final String EXCHANGE_USER_SOCKET = "user.direct.exchange";
-    public static final String EXCHANGE_SUBSCRIBED_SOCKET = "socket.subscription.exchange";
 
 
     public static final String QUEUE_FRIEND_REQUEST_RECEIVED = "queue.notifications.friend-request-received";
@@ -23,7 +22,6 @@ public class RabbitMQTopology {
     public static final String QUEUE_ORDER_COMPLETED = "queue.notifications.order-completed";
     public static final String QUEUE_DIRECT_MESSAGE = "queue.notifications.direct-message";
     public static final String QUEUE_USER_SOCKET = "user.socket.queue";
-    public static final String QUEUE_SUBSCRIBED_SOCKET = "user.subscribe.queue";
 
     @Bean
     TopicExchange socialExchange() {
@@ -53,11 +51,6 @@ public class RabbitMQTopology {
     @Bean
     TopicExchange userSocketExchange() {
         return new TopicExchange(EXCHANGE_USER_SOCKET, true, false);
-    }
-
-    @Bean
-    TopicExchange subscribedSocketExchange() {
-        return new TopicExchange(EXCHANGE_SUBSCRIBED_SOCKET, true, false);
     }
 
     @Bean
@@ -101,11 +94,6 @@ public class RabbitMQTopology {
     }
 
     @Bean
-    Queue subscribedSocketQueue() {
-        return QueueBuilder.durable(QUEUE_SUBSCRIBED_SOCKET).build();
-    }
-
-    @Bean
     Binding bindFriendRequestReceived() {
         return BindingBuilder.bind(friendRequestReceivedQueue()).to(socialExchange()).with("social.friend-request.received");
     }
@@ -143,10 +131,5 @@ public class RabbitMQTopology {
     @Bean
     Binding bindUserSocketMessage() {
         return BindingBuilder.bind(userSocketQueue()).to(userSocketExchange()).with("user.message");
-    }
-
-    @Bean
-    Binding bindSubscribedSocketMessage() {
-        return BindingBuilder.bind(subscribedSocketQueue()).to(subscribedSocketExchange()).with("socket.subscribe.user.queue.chat");
     }
 }
