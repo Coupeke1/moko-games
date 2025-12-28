@@ -17,14 +17,11 @@ public interface JpaChannelRepository extends JpaRepository<ChannelEntity, UUID>
     @Query("""
                 SELECT c
                 FROM ChannelEntity c
-                WHERE (
-                    TREAT(c.referenceType AS PrivateReferenceTypeEntity).userId = :userId
-                    AND TREAT(c.referenceType AS PrivateReferenceTypeEntity).otherUserId = :otherUserId
-                )
-                OR (
-                    TREAT(c.referenceType AS PrivateReferenceTypeEntity).userId = :otherUserId
-                    AND TREAT(c.referenceType AS PrivateReferenceTypeEntity).otherUserId = :userId
-                )
+                JOIN TREAT(c.referenceType AS PrivateReferenceTypeEntity) p
+                WHERE
+                    LEAST(p.userId, p.otherUserId) = LEAST(:userId, :otherUserId)
+                AND
+                    GREATEST(p.userId, p.otherUserId) = GREATEST(:userId, :otherUserId)
             """)
     Optional<ChannelEntity> findPrivateChannel(UUID userId, UUID otherUserId);
 }

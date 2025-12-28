@@ -32,19 +32,19 @@ public class ChatService {
     }
 
     public Message sendLobbyMessage(final LobbyId lobbyId, final UserId senderId, final String content) {
-        Channel channel = channelService.getLobbyChannel(lobbyId);
+        Channel channel = channelService.getOrCreateLobbyChannel(lobbyId);
         Message message = channel.send(senderId, content);
         channelRepository.save(channel);
         return message;
     }
 
     public List<Message> getLobbyMessages(final LobbyId lobbyId, final Instant since) {
-        Channel channel = channelService.getLobbyChannel(lobbyId);
+        Channel channel = channelService.getOrCreateLobbyChannel(lobbyId);
         return since == null ? channel.getMessages() : channel.getMessagesSince(since);
     }
 
     public Message sendPrivateMessage(final UserId friendId, final UserId senderId, final String content) {
-        Channel channel = channelService.getPrivateChannel(friendId, senderId);
+        Channel channel = channelService.getOrCreatePrivateChannel(friendId, senderId);
         Message message = channel.send(senderId, content);
 
         publishMessage(senderId, friendId, content, channel);
@@ -53,7 +53,7 @@ public class ChatService {
     }
 
     public List<Message> getPrivateMessages(final UserId userId, final UserId otherUserId, final Instant since) {
-        Channel channel = channelService.getPrivateChannel(userId, otherUserId);
+        Channel channel = channelService.getOrCreatePrivateChannel(userId, otherUserId);
         return since == null ? channel.getMessages() : channel.getMessagesSince(since);
     }
 

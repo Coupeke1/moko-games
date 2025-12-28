@@ -13,21 +13,21 @@ import org.springframework.stereotype.Service;
 @Service
 @Transactional
 public class ChannelService {
-    private final ChannelRepository channelRepository;
+    private final ChannelRepository repository;
 
-    public ChannelService(final ChannelRepository channelRepository) {
-        this.channelRepository = channelRepository;
+    public ChannelService(final ChannelRepository repository) {
+        this.repository = repository;
     }
 
-    public Channel getLobbyChannel(final LobbyId id) {
-        return channelRepository.findLobbyChannel(id).orElseGet(() -> {
+    public Channel getOrCreateLobbyChannel(final LobbyId id) {
+        return repository.findLobbyChannel(id).orElseGet(() -> {
             ReferenceType type = new LobbyReferenceType(id);
             return new Channel(type);
         });
     }
 
-    public Channel getPrivateChannel(final UserId userId, final UserId otherUserId) {
-        return channelRepository.findPrivateChannel(userId, otherUserId).orElseGet(() -> {
+    public Channel getOrCreatePrivateChannel(final UserId userId, final UserId otherUserId) {
+        return repository.findPrivateChannel(userId, otherUserId).orElseGet(() -> {
             ReferenceType type = new PrivateReferenceType(userId, otherUserId);
             return new Channel(type);
         });

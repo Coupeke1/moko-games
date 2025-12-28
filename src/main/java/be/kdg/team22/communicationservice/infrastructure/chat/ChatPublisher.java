@@ -16,6 +16,7 @@ public class ChatPublisher {
 
     public void publishToPlayer(final Message message) {
         MessageModel model = MessageModel.from(message);
-        template.convertAndSend(RabbitMQTopology.EXCHANGE_USER_SOCKET, "user.message", new ChatMessage(message.userId().value(), "chat", model));
+        String queue = String.format("chat-%s", message.channelId());
+        template.convertAndSend(RabbitMQTopology.EXCHANGE_USER_SOCKET, "user.message", new ChatMessage(message.userId().value(), queue, model));
     }
 }
