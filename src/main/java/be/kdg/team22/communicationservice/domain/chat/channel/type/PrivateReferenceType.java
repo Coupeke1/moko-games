@@ -20,4 +20,16 @@ public class PrivateReferenceType extends ReferenceType {
     public UserId otherUserId() {
         return otherUserId;
     }
+
+    public UserId getOtherUser(final UserId id) {
+        if (id.equals(userId)) return otherUserId;
+        else if (id.equals(otherUserId))
+            return userId;
+
+        throw id.notFound();
+    }
+
+    public boolean hasUser(final UserId id) {
+        return id.equals(userId) || id.equals(otherUserId);
+    }
 }

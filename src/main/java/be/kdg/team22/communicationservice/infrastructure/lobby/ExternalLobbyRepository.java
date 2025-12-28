@@ -10,10 +10,10 @@ import org.springframework.web.client.RestClient;
 import java.util.UUID;
 
 @Component
-public class ExternalSessionRepository {
+public class ExternalLobbyRepository {
     private final RestClient client;
 
-    public ExternalSessionRepository(@Qualifier("sessionService") final RestClient client) {
+    public ExternalLobbyRepository(@Qualifier("sessionService") final RestClient client) {
         this.client = client;
     }
 

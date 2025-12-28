@@ -1,6 +1,9 @@
 package be.kdg.team22.communicationservice.domain.chat.channel;
 
 import be.kdg.team22.communicationservice.domain.chat.UserId;
+import be.kdg.team22.communicationservice.domain.chat.channel.exceptions.NoAccessException;
+import be.kdg.team22.communicationservice.domain.chat.channel.type.BotReferenceType;
+import be.kdg.team22.communicationservice.domain.chat.channel.type.PrivateReferenceType;
 import be.kdg.team22.communicationservice.domain.chat.channel.type.ReferenceType;
 import be.kdg.team22.communicationservice.domain.chat.message.Message;
 import org.jmolecules.ddd.annotation.AggregateRoot;
@@ -48,8 +51,8 @@ public class Channel {
         return messages.stream().filter(m -> m.timestamp().isAfter(since)).toList();
     }
 
-    public Message send(final UserId userId, final String content) {
-        Message message = new Message(id, userId, content);
+    public Message send(final UserId id, final String content) {
+        Message message = new Message(this.id, id, content);
         messages.add(message);
         return message;
     }

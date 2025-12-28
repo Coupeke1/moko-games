@@ -1,6 +1,7 @@
 package be.kdg.team22.communicationservice.domain.chat;
 
 import be.kdg.team22.communicationservice.domain.chat.bot.BotId;
+import be.kdg.team22.communicationservice.domain.chat.channel.exceptions.UserNotFoundException;
 import be.kdg.team22.communicationservice.domain.notification.exceptions.ClaimNotFoundException;
 import org.jmolecules.ddd.annotation.ValueObject;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
@@ -36,5 +37,9 @@ public record UserId(UUID value) {
             throw new ClaimNotFoundException("sub");
 
         return create(sub);
+    }
+
+    public UserNotFoundException notFound() {
+        return new UserNotFoundException(this);
     }
 }
