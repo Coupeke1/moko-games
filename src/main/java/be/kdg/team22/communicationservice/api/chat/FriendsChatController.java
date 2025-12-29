@@ -33,7 +33,7 @@ public class FriendsChatController {
 
     @PostMapping("/{id}")
     public ResponseEntity<MessageModel> sendMessage(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token, @RequestBody final CreateMessageModel request) {
-        Message message = service.sendPrivateMessage(new ChannelId(id), UserId.get(token), request.content(), token);
+        Message message = service.sendPrivateMessage(ChannelId.from(id), UserId.get(token), request.content(), token);
         return ResponseEntity.ok(MessageModel.from(message));
     }
 }
