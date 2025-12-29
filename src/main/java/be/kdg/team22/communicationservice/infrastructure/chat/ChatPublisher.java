@@ -46,6 +46,7 @@ public class ChatPublisher {
             case ChannelType.LOBBY -> {
                 LobbyReferenceType referenceType = (LobbyReferenceType) channel.referenceType();
                 List<PlayerId> players = repository.findPlayers(referenceType.lobbyId().value());
+                
                 return players.stream().map(player -> new UserId(player.value())).toList().toArray(new UserId[0]);
             }
 
