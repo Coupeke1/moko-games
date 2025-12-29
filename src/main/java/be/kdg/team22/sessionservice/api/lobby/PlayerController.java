@@ -5,12 +5,15 @@ import be.kdg.team22.sessionservice.application.lobby.LobbyPlayerService;
 import be.kdg.team22.sessionservice.application.lobby.LobbyService;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.lobby.LobbyId;
+import be.kdg.team22.sessionservice.domain.lobby.exceptions.LobbyClosedException;
+import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -22,6 +25,16 @@ public class PlayerController {
     public PlayerController(final LobbyPlayerService lobbyPlayerService, LobbyService lobbyService) {
         this.lobbyPlayerService = lobbyPlayerService;
         this.lobbyService = lobbyService;
+    }
+
+    @GetMapping("/{id}/players")
+    public ResponseEntity<List<PlayerId>> getPlayers(@PathVariable final UUID id) {
+        Lobby lobby = lobbyService.findLobby(LobbyId.from(id));
+
+        if (lobby.isClosedOrFinished())
+            throw new LobbyClosedException(lobby.id(), lobby.status().toString());
+
+        return ResponseEntity.ok(lobby.players().stream().map(Player::id).toList());
     }
 
     @DeleteMapping("/{lobbyId}/players/{playerId}")

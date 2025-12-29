@@ -40,9 +40,8 @@ public class LobbyController {
     public ResponseEntity<LobbyModel> getById(@PathVariable final UUID id) {
         Lobby lobby = service.findLobby(LobbyId.from(id));
 
-        if (lobby.isClosedOrFinished()) {
+        if (lobby.isClosedOrFinished())
             throw new LobbyClosedException(lobby.id(), lobby.status().toString());
-        }
 
         return ResponseEntity.ok(LobbyModel.from(lobby));
     }
