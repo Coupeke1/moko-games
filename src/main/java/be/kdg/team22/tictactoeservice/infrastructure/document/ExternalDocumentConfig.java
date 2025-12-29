@@ -10,7 +10,7 @@ import org.springframework.web.client.RestClient;
 public class ExternalDocumentConfig {
 
     @Bean
-    @Qualifier("botService")
+    @Qualifier("documentService")
     RestClient botServiceClient(@Value("${business.bot-service.url}") final String baseUrl) {
         return RestClient.builder()
                 .baseUrl(baseUrl)

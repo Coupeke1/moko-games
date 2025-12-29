@@ -1,6 +1,6 @@
 package be.kdg.team22.tictactoeservice.infrastructure.document;
 
-import be.kdg.team22.tictactoeservice.domain.exceptions.BotServiceException;
+import be.kdg.team22.tictactoeservice.domain.document.exceptions.BotServiceException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
@@ -17,8 +17,7 @@ public class ExternalDocumentRepository {
     private final RestClient client;
 
     public ExternalDocumentRepository(
-            @Qualifier("botService") final RestClient client
-
+            @Qualifier("documentService") final RestClient client
     ) {
         this.client = client;
     }

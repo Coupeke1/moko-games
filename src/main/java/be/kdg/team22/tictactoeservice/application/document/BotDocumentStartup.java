@@ -1,5 +1,6 @@
 package be.kdg.team22.tictactoeservice.application.document;
 
+import be.kdg.team22.tictactoeservice.domain.document.exceptions.ResourceNotFoundException;
 import be.kdg.team22.tictactoeservice.infrastructure.document.ExternalDocumentRepository;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -16,7 +17,7 @@ public class BotDocumentStartup {
 
     @EventListener(ApplicationReadyEvent.class)
     public void uploadPlatformPdfOnStartup() throws Exception {
-        ClassPathResource res = new ClassPathResource("pdf/platform-Team-22.pdf");
+        ClassPathResource res = new ClassPathResource("pdf/Tic-Tac-Toe-Team-22.pdf");
 
         if (!res.exists()) {
             throw ResourceNotFoundException.notFoundException();

@@ -1,4 +1,4 @@
-package be.kdg.team22.tictactoeservice.domain.exceptions;
+package be.kdg.team22.tictactoeservice.domain.document.exceptions;
 
 import org.springframework.web.client.RestClientException;
 
