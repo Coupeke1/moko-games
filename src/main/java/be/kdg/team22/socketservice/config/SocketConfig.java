@@ -13,15 +13,13 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-
-import java.util.List;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -69,18 +67,12 @@ public class SocketConfig implements WebSocketMessageBrokerConfigurer {
                     throw new IllegalArgumentException("Authorization header is missing 'Bearer '");
 
                 try {
-//                    Jwt token = decoder.decode(header.substring(7));
-//                    JwtAuthenticationToken authentication = new JwtAuthenticationToken(token);
-//                    accessor.setUser(authentication);
-//                    SecurityContextHolder.getContext().setAuthentication(authentication);
-
                     Jwt token = decoder.decode(header.substring(7));
-
-                    String userId = token.getSubject();
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userId, null, List.of());
+                    JwtAuthenticationToken authentication = new JwtAuthenticationToken(token);
                     accessor.setUser(authentication);
+                    System.out.println("  name: " + authentication.getName());
+                    System.out.println("  principal: " + authentication.getPrincipal());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
-
                 } catch (Exception exception) {
                     throw new IllegalArgumentException("JWT Token is invalid");
                 }
