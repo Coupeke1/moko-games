@@ -2,12 +2,14 @@ package be.kdg.team22.checkersservice.application.document;
 
 import be.kdg.team22.checkersservice.domain.document.exceptions.ResourceNotFoundException;
 import be.kdg.team22.checkersservice.infrastructure.document.ExternalDocumentRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 @Component
+@ConditionalOnProperty(prefix = "bot-service", name = "upload-on-startup", havingValue = "true", matchIfMissing = true)
 public class BotDocumentStartup {
     private final ExternalDocumentRepository documentRepository;
 
