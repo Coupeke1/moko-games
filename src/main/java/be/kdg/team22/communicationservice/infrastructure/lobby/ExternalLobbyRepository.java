@@ -1,12 +1,17 @@
 package be.kdg.team22.communicationservice.infrastructure.lobby;
 
+import be.kdg.team22.communicationservice.domain.notification.PlayerId;
+import be.kdg.team22.communicationservice.infrastructure.lobby.models.LobbyResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -26,10 +31,25 @@ public class ExternalLobbyRepository {
 
             return response.players().stream().anyMatch(p -> p.id().equals(userId));
 
-        } catch (HttpClientErrorException e) {
-            if (e.getStatusCode() == HttpStatus.NOT_FOUND)
+        } catch (
+                HttpClientErrorException exception) {
+            if (exception.getStatusCode() == HttpStatus.NOT_FOUND)
                 return false;
-            throw e;
+
+            throw exception;
         }
     }
+
+    public List<PlayerId> findPlayers(final UUID id) {
+        try {
+            return client.get().uri("/api/lobbies/{id}/players", id).retrieve().body(new ParameterizedTypeReference<List<PlayerId>>() {}).stream().map(playerId -> new PlayerId(playerId.value())).toList();
+        } catch (
+                HttpClientErrorException exception) {
+            if (exception.getStatusCode() == HttpStatus.NOT_FOUND)
+                return Collections.emptyList();
+
+            throw exception;
+        }
+    }
+
 }

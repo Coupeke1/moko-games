@@ -1,4 +1,4 @@
-package be.kdg.team22.communicationservice.infrastructure.lobby;
+package be.kdg.team22.communicationservice.infrastructure.lobby.models;
 
 import java.util.UUID;
 

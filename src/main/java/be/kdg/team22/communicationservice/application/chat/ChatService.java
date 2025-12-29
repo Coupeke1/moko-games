@@ -44,7 +44,7 @@ public class ChatService {
             throw new InvalidChannelException(channelId, ChannelType.LOBBY);
 
         Message message = channel.send(userId, content);
-        channelRepository.save(channel);
+        publisher.saveAndPublish(channel, message);
         return message;
     }
 
@@ -65,8 +65,10 @@ public class ChatService {
         UserId friendId = referenceType.getOtherUser(userId);
 
         Message message = channel.send(userId, content);
+
         publishMessage(userId, friendId, content, channel);
         publisher.saveAndPublish(channel, message);
+        
         return message;
     }
 
