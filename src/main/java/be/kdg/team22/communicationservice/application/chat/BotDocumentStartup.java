@@ -1,7 +1,7 @@
 package be.kdg.team22.communicationservice.application.chat;
 
+import be.kdg.team22.communicationservice.domain.chat.bot.BotChatRepository;
 import be.kdg.team22.communicationservice.domain.chat.exceptions.ResourceNotFoundException;
-import be.kdg.team22.communicationservice.infrastructure.chat.bot.ExternalBotRepository;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.ClassPathResource;
@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class BotDocumentStartup {
-    private final ExternalBotRepository botRepo;
+    private final BotChatRepository botRepo;
 
-    public BotDocumentStartup(ExternalBotRepository botRepo) {
+    public BotDocumentStartup(BotChatRepository botRepo) {
         this.botRepo = botRepo;
     }
 
