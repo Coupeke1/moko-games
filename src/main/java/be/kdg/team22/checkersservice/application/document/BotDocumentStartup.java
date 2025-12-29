@@ -9,7 +9,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnProperty(prefix = "bot-service", name = "upload-on-startup", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "bot-service", name = "upload-on-startup", havingValue = "true", matchIfMissing = false)
 public class BotDocumentStartup {
     private final ExternalDocumentRepository documentRepository;
 
