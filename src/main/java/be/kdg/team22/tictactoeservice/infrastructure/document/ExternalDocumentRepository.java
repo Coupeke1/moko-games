@@ -33,7 +33,6 @@ public class ExternalDocumentRepository {
         try {
             return tryUploadWithClient(primaryClient, pdfBytes, filename);
         } catch (ResourceAccessException ex) {
-            // "Niet bereikbaar" => fallback proberen
             logger.warn("Primary document service not reachable, trying fallback. {}", ex.getMessage());
             try {
                 return tryUploadWithClient(fallbackClient, pdfBytes, filename);
@@ -41,7 +40,6 @@ public class ExternalDocumentRepository {
                 throw BotServiceException.requestFailed(fallbackEx);
             }
         } catch (RestClientException ex) {
-            // Wel bereikbaar maar request faalt (4xx/5xx/etc) => geen fallback
             throw BotServiceException.requestFailed(ex);
         }
     }

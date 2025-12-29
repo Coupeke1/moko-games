@@ -10,19 +10,19 @@ import org.springframework.web.client.RestClient;
 public class ExternalDocumentConfig {
 
     @Bean("documentService")
-    RestClient documentRestClient(@Value("${business.document.url}") final String baseUrl) {
+    RestClient documentRestClient(@Value("${business.ai.url}") final String baseUrl) {
         return createRestClient(baseUrl);
     }
 
     @Bean("documentServiceFallback")
-    RestClient documentRestClientFallback(@Value("${business.document.fallback_url}") final String fallbackUrl) {
+    RestClient documentRestClientFallback(@Value("${business.ai.fallback_url}") final String fallbackUrl) {
         return createRestClient(fallbackUrl);
     }
 
     private RestClient createRestClient(String baseUrl) {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(2000);
-        requestFactory.setReadTimeout(2000);
+        requestFactory.setReadTimeout(20000);
 
         return RestClient.builder()
                 .baseUrl(baseUrl)
