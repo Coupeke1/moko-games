@@ -57,9 +57,13 @@ public class SocketConfig implements WebSocketMessageBrokerConfigurer {
             @Override
             public Message<?> preSend(@NotNull Message<?> message, @NotNull MessageChannel channel) {
                 StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-
-                if (accessor == null || !StompCommand.CONNECT.equals(accessor.getCommand()))
+                if (accessor == null)
                     return message;
+
+                StompCommand command = accessor.getCommand();
+                if (command != StompCommand.CONNECT)
+                    return message;
+
 
                 String header = accessor.getFirstNativeHeader("Authorization");
 
@@ -70,8 +74,7 @@ public class SocketConfig implements WebSocketMessageBrokerConfigurer {
                     Jwt token = decoder.decode(header.substring(7));
                     JwtAuthenticationToken authentication = new JwtAuthenticationToken(token);
                     accessor.setUser(authentication);
-                    System.out.println("  name: " + authentication.getName());
-                    System.out.println("  principal: " + authentication.getPrincipal());
+                    System.out.println("STOMP CONNECT user = " + authentication.getName());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 } catch (Exception exception) {
                     throw new IllegalArgumentException("JWT Token is invalid");
