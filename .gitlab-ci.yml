@@ -40,9 +40,15 @@ test:
   image: $DEFAULT_IMAGE
   script:
     - echo "DOCKER_HOST=$DOCKER_HOST"
-    - ls -l /var/run/docker.sock || true
+    - ls -l /var/run/docker.sock
     - apk add --no-cache docker-cli || true
-    - docker version || true
+    - docker ps
+    - mkdir -p /root
+    - |
+      cat > /root/.testcontainers.properties <<'EOF'
+      docker.client.strategy=org.testcontainers.dockerclient.EnvironmentAndSystemPropertyClientProviderStrategy
+      docker.host=unix:///var/run/docker.sock
+      EOF
     - chmod +x ./gradlew
     - ./gradlew test --no-daemon
   artifacts:
@@ -52,8 +58,11 @@ test:
   services:
     - name: docker:27-dind
   variables:
-    DOCKER_HOST: "tcp://docker:2375"
     DOCKER_TLS_CERTDIR: ""
+    DOCKER_HOST: "unix:///var/run/docker.sock"
+    TESTCONTAINERS_HOST_OVERRIDE: "host.docker.internal"
+    TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE: "/var/run/docker.sock"
+    TESTCONTAINERS_RYUK_DISABLED: "true"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == "main"'
