@@ -16,6 +16,7 @@ public class PrivateListener {
     @RabbitListener(queues = RabbitMQTopology.QUEUE_USER_SOCKET)
     public void handle(final PrivateMessage message) {
         String userId = message.userId().toString();
+        System.out.println("LISTENER USER = " + userId);
         String queue = String.format("/queue/%s", message.queue());
         template.convertAndSendToUser(userId, queue, message.payload());
     }
