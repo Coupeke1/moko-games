@@ -1,6 +1,5 @@
 package be.kdg.team22.socketservice.config;
 
-import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -55,29 +54,25 @@ public class SocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(new ChannelInterceptor() {
             @Override
-            public Message<?> preSend(@NotNull Message<?> message, @NotNull MessageChannel channel) {
+            public Message<?> preSend(Message<?> message, MessageChannel channel) {
                 StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+
                 if (accessor == null)
                     return message;
 
-                StompCommand command = accessor.getCommand();
-                if (command != StompCommand.CONNECT)
-                    return message;
+                if (accessor.getCommand() == StompCommand.CONNECT) {
+                    String header = accessor.getFirstNativeHeader("Authorization");
+                    if (header != null && header.startsWith("Bearer ")) {
+                        Jwt token = decoder.decode(header.substring(7));
+                        JwtAuthenticationToken authentication = new JwtAuthenticationToken(token);
+                        accessor.setUser(authentication);
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                        System.out.println("STOMP CONNECT USER = " + authentication.getName());
+                    }
+                }
 
-
-                String header = accessor.getFirstNativeHeader("Authorization");
-
-                if (header == null || !header.startsWith("Bearer "))
-                    return message;
-
-                try {
-                    Jwt token = decoder.decode(header.substring(7));
-                    JwtAuthenticationToken authentication = new JwtAuthenticationToken(token);
-                    accessor.setUser(authentication);
-                    System.out.println("STOMP CONNECT user = " + authentication.getName());
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                } catch (Exception exception) {
-                    throw new IllegalArgumentException("JWT Token is invalid");
+                if (accessor.getUser() != null) {
+                    System.out.println("WEBSOCKET USER = " + accessor.getUser().getName());
                 }
 
                 return message;
