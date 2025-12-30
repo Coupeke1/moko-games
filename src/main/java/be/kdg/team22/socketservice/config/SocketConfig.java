@@ -57,14 +57,12 @@ public class SocketConfig implements WebSocketMessageBrokerConfigurer {
             @Override
             public Message<?> preSend(@NotNull Message<?> message, @NotNull MessageChannel channel) {
                 StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-
                 if (accessor == null || !StompCommand.CONNECT.equals(accessor.getCommand()))
                     return message;
 
                 String header = accessor.getFirstNativeHeader("Authorization");
-
                 if (header == null || !header.startsWith("Bearer "))
-                    throw new IllegalArgumentException("Authorization header is missing 'Bearer '");
+                    return message;
 
                 try {
                     Jwt token = decoder.decode(header.substring(7));
