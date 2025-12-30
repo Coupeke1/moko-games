@@ -39,8 +39,12 @@ test:
   stage: test
   image: $DEFAULT_IMAGE
   script:
+    - echo "DOCKER_HOST=$DOCKER_HOST"
+    - ls -l /var/run/docker.sock || true
+    - apk add --no-cache docker-cli || true
+    - docker version || true
     - chmod +x ./gradlew
-    - ./gradlew clean test --no-daemon
+    - ./gradlew test --no-daemon
   artifacts:
     when: always
     reports:
