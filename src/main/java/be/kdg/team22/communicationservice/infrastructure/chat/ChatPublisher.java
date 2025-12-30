@@ -28,10 +28,9 @@ public class ChatPublisher {
 
     public void publishToPlayers(final Channel channel, final Message message) {
         MessageModel model = MessageModel.from(message);
-        String queue = String.format("chat-%s", message.channelId());
+        String queue = String.format("chat-%s", message.channelId().value());
 
         for (UserId userId : getUsers(channel)) {
-            System.out.println("    sending chat to " + userId.value());
             ChatMessage chatMessage = new ChatMessage(userId.value(), queue, model);
             template.convertAndSend(RabbitMQTopology.EXCHANGE_USER_SOCKET, "user.message", chatMessage);
         }
