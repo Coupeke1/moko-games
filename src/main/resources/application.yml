@@ -42,6 +42,7 @@ business:
   ai:
     url: ${BUSINESS_AI_URL:https://team3.techtitans.be}
     fallback_url: ${BUSINESS_FALLBACK_AI_URL:http://localhost:3333}
+    api-key: ${BUSINESS_AI_API_KEY:}
   chat:
     url: ${BUSINESS_AI_URL:https://team3.techtitans.be}
     fallback_url: ${BUSINESS_FALLBACK_CHAT_URL:http://localhost:3334}

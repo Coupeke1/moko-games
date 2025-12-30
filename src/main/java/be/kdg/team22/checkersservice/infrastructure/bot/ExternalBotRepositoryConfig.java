@@ -13,16 +13,22 @@ import java.util.List;
 public class ExternalBotRepositoryConfig {
 
     @Bean("botService")
-    RestClient botRestClient(@Value("${business.ai.url}") final String baseUrl) {
-        return createRestClient(baseUrl);
+    RestClient botRestClient(
+            @Value("${business.ai.url}") final String baseUrl,
+            @Value("${business.ai.api-key}") final String apiKey
+    ) {
+        return createRestClient(baseUrl, apiKey);
     }
 
     @Bean("botServiceFallback")
-    RestClient botRestClientFallback(@Value("${business.ai.fallback_url}") final String fallbackUrl) {
-        return createRestClient(fallbackUrl);
+    RestClient botRestClientFallback(
+            @Value("${business.ai.fallback_url}") final String fallbackUrl,
+            @Value("${business.ai.api-key}") final String apiKey
+    ) {
+        return createRestClient(fallbackUrl, apiKey);
     }
 
-    private RestClient createRestClient(String baseUrl) {
+    private RestClient createRestClient(String baseUrl, String apiKey) {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(2000);
         requestFactory.setReadTimeout(2000);
@@ -33,6 +39,10 @@ public class ExternalBotRepositoryConfig {
                 .defaultHeaders(headers -> {
                     headers.setContentType(MediaType.APPLICATION_JSON);
                     headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+
+                    if (apiKey != null && !apiKey.isBlank()) {
+                        headers.set("X-API-Key", apiKey);
+                    }
                 })
                 .build();
     }
