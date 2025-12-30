@@ -53,8 +53,7 @@ public class BotChatController {
             @PathVariable final UUID channelId,
             @AuthenticationPrincipal final Jwt token,
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            final Instant since
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final Instant since
     ) {
         List<ChatMessage> messages = botChatService.getMessages(
                 channelId,
