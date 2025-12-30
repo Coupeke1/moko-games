@@ -1,6 +1,7 @@
 package be.kdg.team22.checkersservice.config;
 
 import be.kdg.team22.checkersservice.application.GameRegistrationStartup;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -9,7 +10,7 @@ import org.testcontainers.utility.DockerImageName;
 
 import static org.mockito.Mockito.mock;
 
-@Configuration
+@TestConfiguration
 public class TestcontainersConfig {
 
     @Bean
