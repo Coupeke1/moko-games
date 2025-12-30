@@ -56,25 +56,24 @@ public class SocketConfig implements WebSocketMessageBrokerConfigurer {
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
                 StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-
-                if (accessor == null)
+                if (accessor == null || accessor.getCommand() != StompCommand.CONNECT)
                     return message;
 
-                if (accessor.getCommand() == StompCommand.CONNECT) {
-                    String header = accessor.getFirstNativeHeader("Authorization");
-                    if (header != null && header.startsWith("Bearer ")) {
-                        Jwt token = decoder.decode(header.substring(7));
-                        JwtAuthenticationToken authentication = new JwtAuthenticationToken(token);
-                        accessor.setUser(authentication);
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                        System.out.println("STOMP CONNECT USER = " + authentication.getName());
-                    }
-                }
+                String header = accessor.getFirstNativeHeader("Authorization");
+                if (header == null || header.startsWith("Bearer "))
+                    return message;
 
-                if (accessor.getUser() != null) {
+                Jwt token = decoder.decode(header.substring(7));
+                JwtAuthenticationToken authentication = new JwtAuthenticationToken(token);
+                accessor.setUser(authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                System.out.println("STOMP CONNECT USER = " + authentication.getName());
+
+                if (accessor.getUser() != null)
                     System.out.println("WEBSOCKET USER = " + accessor.getUser().getName());
-                }
 
+                System.out.println("WEBSOCKET USER = <null>");
                 return message;
             }
         });
