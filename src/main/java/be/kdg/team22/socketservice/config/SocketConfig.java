@@ -68,7 +68,7 @@ public class SocketConfig implements WebSocketMessageBrokerConfigurer {
                 String header = accessor.getFirstNativeHeader("Authorization");
 
                 if (header == null || !header.startsWith("Bearer "))
-                    throw new IllegalArgumentException("Authorization header is missing 'Bearer '");
+                    return message;
 
                 try {
                     Jwt token = decoder.decode(header.substring(7));
