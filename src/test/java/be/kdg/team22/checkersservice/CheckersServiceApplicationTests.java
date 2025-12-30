@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
-@SpringBootTest
+@SpringBootTest(properties = "bot-service.upload-on-startup=false")
 @Import(TestcontainersConfig.class)
 class CheckersServiceApplicationTests {
     @Test
