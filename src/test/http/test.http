@@ -13,8 +13,8 @@ scope = openid
     client.global.set("access_token", response.body.access_token);
 %}
 
-### Generate Board
-POST localhost:8086/api/games?aiPlayer=false
+### Create game
+POST localhost:8086/api/games
 Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
@@ -23,6 +23,7 @@ Content-Type: application/json
     "642999ad-c546-40b6-876c-1048971c7942",
     "cf36d3e1-a1e0-4c18-89eb-95fa76fc81ee"
   ],
+  "hasBot": true,
   "settings": {
     "boardSize": 3
   }
@@ -50,25 +51,8 @@ GET localhost:8086/api/games/{{game_id}}
 Authorization: Bearer {{access_token}}
 Accept: application/json
 
-### Create Game with AI Player
-POST localhost:8086/api/games?aiPlayer=true
-Authorization: Bearer {{access_token}}
-Content-Type: application/json
-
-{
-  "players": [
-    "642999ad-c546-40b6-876c-1048971c7942",
-    "00000000-0000-0000-0000-000000000000"
-  ],
-  "settings": {
-    "boardSize": 3
-  }
-}
-
-> {%
-    client.global.set("game_id", response.body.id);
-    client.log("Created tic tac toe game with ID: " + response.body.id);
-%}
+### GET HEALTH
+GET http://localhost:8086/actuator/health
 
 ### AI
 POST http://34.79.40.150/ai-player/move
