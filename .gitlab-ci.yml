@@ -66,8 +66,7 @@ package:
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
 
     # Enable buildx
-    - docker buildx create --use --name multiarch || docker buildx use multiarch
-    - docker buildx inspect --bootstrap
+    docker buildx build --platform linux/amd64
 
     # Determine tags
     - |
@@ -85,7 +84,7 @@ package:
       for t in $TAGS; do
         echo "Building & pushing tag: $t"
         docker buildx build \
-          --platform linux/amd64,linux/arm64 \
+          --platform linux/amd64 \
           --build-arg CI_COMMIT_SHA="$CI_COMMIT_SHA" \
           --build-arg CI_PIPELINE_CREATED_AT="$CI_PIPELINE_CREATED_AT" \
           --build-arg CI_COMMIT_REF_NAME="$CI_COMMIT_REF_NAME" \
