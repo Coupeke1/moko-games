@@ -5,6 +5,7 @@ import java.util.UUID;
 
 public record CreateGameModel(
         List<UUID> players,
+        boolean hasBot,
         GameSettingsModel settings
 ) {
 }

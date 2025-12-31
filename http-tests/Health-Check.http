@@ -1,2 +1,0 @@
-﻿### GET HEALTH
-GET http://localhost:8086/actuator/health

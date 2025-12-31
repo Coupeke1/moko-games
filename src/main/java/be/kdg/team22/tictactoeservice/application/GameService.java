@@ -45,11 +45,11 @@ public class GameService {
         logger = LoggerFactory.getLogger(GameService.class);
     }
 
-    public Game create(final PlayerId playerId, final CreateGameModel model, final boolean botPlayer) {
+    public Game create(final PlayerId playerId, final CreateGameModel model) {
         List<PlayerId> players = model.players().stream().map(PlayerId::new).toList();
         if (players.stream().noneMatch(p -> p.equals(playerId)))
             throw new PlayerNotInThisGameException();
-        Game game = Game.create(config.minSize(), config.maxSize(), botPlayer ? 3 : model.settings().boardSize(), players, botPlayer);
+        Game game = Game.create(config.minSize(), config.maxSize(), model.hasBot() ? 3 : model.settings().boardSize(), players, model.hasBot());
         repository.save(game);
         return game;
     }
