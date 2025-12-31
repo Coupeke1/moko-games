@@ -63,11 +63,20 @@ package:
     DOCKER_HOST: "tcp://docker:2375"
     DOCKER_TLS_CERTDIR: ""
   script:
+    - echo "Building Docker image…"
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+    -
+      # Base tag for temporary build
+      BASE_TAG="temp-build"
 
-    # Enable buildx
-    - docker buildx create --use --name multiarch || docker buildx use multiarch
-    - docker buildx inspect --bootstrap
+    # Build the image once
+    - docker build
+      --build-arg CI_COMMIT_SHA="$CI_COMMIT_SHA"
+      --build-arg CI_PIPELINE_CREATED_AT="$CI_PIPELINE_CREATED_AT"
+      --build-arg CI_COMMIT_REF_NAME="$CI_COMMIT_REF_NAME"
+      --build-arg CI_COMMIT_TAG="$CI_COMMIT_TAG"
+      --build-arg CI_PIPELINE_ID="$CI_PIPELINE_ID"
+      -t $CI_REGISTRY_IMAGE:$BASE_TAG .
 
     # Determine tags
     - |
@@ -80,19 +89,12 @@ package:
         TAGS="branch-$CI_COMMIT_REF_SLUG"
       fi
 
-    # Build & push multi-arch image
+    # Tag & Push
     - |
       for t in $TAGS; do
-        echo "Building & pushing tag: $t"
-        docker buildx build \
-          --platform linux/amd64,linux/arm64 \
-          --build-arg CI_COMMIT_SHA="$CI_COMMIT_SHA" \
-          --build-arg CI_PIPELINE_CREATED_AT="$CI_PIPELINE_CREATED_AT" \
-          --build-arg CI_COMMIT_REF_NAME="$CI_COMMIT_REF_NAME" \
-          --build-arg CI_COMMIT_TAG="$CI_COMMIT_TAG" \
-          --build-arg CI_PIPELINE_ID="$CI_PIPELINE_ID" \
-          -t $CI_REGISTRY_IMAGE:$t \
-          --push .
+        echo "Pushing tag: $t"
+        docker tag $CI_REGISTRY_IMAGE:$BASE_TAG $CI_REGISTRY_IMAGE:$t
+        docker push $CI_REGISTRY_IMAGE:$t
       done
 
   rules:
