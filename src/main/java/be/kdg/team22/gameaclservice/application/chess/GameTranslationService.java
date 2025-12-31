@@ -4,11 +4,10 @@ import be.kdg.team22.gameaclservice.api.model.CreateChessGameModel;
 import be.kdg.team22.gameaclservice.config.ChessInfoProperties;
 import be.kdg.team22.gameaclservice.domain.Game;
 import be.kdg.team22.gameaclservice.events.inbound.ChessAchievementEvent;
+import be.kdg.team22.gameaclservice.events.inbound.ChessGameEndedEvent;
 import be.kdg.team22.gameaclservice.events.inbound.ChessRegisterEvent;
 import be.kdg.team22.gameaclservice.events.outbound.GameAchievementEvent;
-import be.kdg.team22.gameaclservice.infrastructure.external.chess.ChessGameResponse;
-import be.kdg.team22.gameaclservice.infrastructure.external.chess.CreateChessGameRequest;
-import be.kdg.team22.gameaclservice.infrastructure.external.chess.ExternalChessGame;
+import be.kdg.team22.gameaclservice.events.outbound.GameEndedEvent;
 import be.kdg.team22.gameaclservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.gameaclservice.infrastructure.games.RegisterGameRequest;
 import be.kdg.team22.gameaclservice.infrastructure.messaging.AchievementEventPublisher;
@@ -26,17 +25,15 @@ import java.util.UUID;
 public class GameTranslationService {
     private final AchievementEventPublisher achievementEventPublisher;
     private final ExternalGamesRepository gameRepository;
-    private final ExternalChessGame chessGame;
     private final UserService userService;
     private final ChessInfoProperties chessInfoProperties;
     @Value("${acl-config.backend-url}")
     private String aclBackendUrl;
     private final Logger logger = LoggerFactory.getLogger(GameTranslationService.class);
 
-    public GameTranslationService(final AchievementEventPublisher achievementEventPublisher, final ExternalGamesRepository gameRepository, final ExternalChessGame chessGame, final UserService userService, final  ChessInfoProperties chessInfoProperties) {
+    public GameTranslationService(final AchievementEventPublisher achievementEventPublisher, final ExternalGamesRepository gameRepository, final UserService userService, final  ChessInfoProperties chessInfoProperties) {
         this.achievementEventPublisher = achievementEventPublisher;
         this.gameRepository = gameRepository;
-        this.chessGame = chessGame;
         this.userService = userService;
         this.chessInfoProperties = chessInfoProperties;
     }
@@ -57,12 +54,15 @@ public class GameTranslationService {
         logger.info("Achievement event published");
     }
 
-    public Game startChessGame(CreateChessGameModel request) {
-        Game game = Game.create(request.players());
-        Map<UUID, String> players = userService.resolveUsernames(game.players());
+    public void translateAndSendGameEnded(ChessGameEndedEvent event) {
+        logger.info("Translating and handling game ended event for chess game {}", event.gameId());
+        GameEndedEvent convertedEvent = GameEndedEvent.convert(event);
+        logger.info("Publishing game ended event");
+        achievementEventPublisher.publishGameEndedEvent(convertedEvent);
+        logger.info("Game ended event published");
+    }
 
-        ChessGameResponse response = chessGame.createGame(game.id(), CreateChessGameRequest.convert(players));
-        game.setId(response.data().gameId());
-        return game;
+    public Game startChessGame(CreateChessGameModel request) {
+        return Game.create(request.players());
     }
 }

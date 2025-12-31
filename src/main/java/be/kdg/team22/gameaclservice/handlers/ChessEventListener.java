@@ -3,6 +3,7 @@ package be.kdg.team22.gameaclservice.handlers;
 import be.kdg.team22.gameaclservice.application.chess.GameTranslationService;
 import be.kdg.team22.gameaclservice.config.RabbitMQTopology;
 import be.kdg.team22.gameaclservice.events.inbound.ChessAchievementEvent;
+import be.kdg.team22.gameaclservice.events.inbound.ChessGameEndedEvent;
 import be.kdg.team22.gameaclservice.events.inbound.ChessRegisterEvent;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
@@ -23,5 +24,10 @@ public class ChessEventListener {
     @RabbitListener(queues = RabbitMQTopology.QUEUE_CHESS_EVENTS)
     public void onChessEvent(ChessAchievementEvent message) {
         translator.translateAndSendAchievement(message);
+    }
+
+    @RabbitListener(queues = RabbitMQTopology.QUEUE_CHESS_EVENTS)
+    public void onChessEvent(ChessGameEndedEvent message) {
+        translator.translateAndSendGameEnded(message);
     }
 }

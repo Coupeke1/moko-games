@@ -17,6 +17,7 @@ public class RabbitMQTopology {
 
     // PLATFORM - Routing Keys
     public static final String ROUTING_KEY_PLATFORM_ACHIEVEMENT_AQUIRED = "game.chess.achievement";
+    public static final String ROUTING_KEY_PLATFORM_GAME_ENDED = "game.ended";
 
     // CHESS SERVICE - Queues
     public static final String QUEUE_CHESS_EVENTS = "queue.acl.chess-events";
