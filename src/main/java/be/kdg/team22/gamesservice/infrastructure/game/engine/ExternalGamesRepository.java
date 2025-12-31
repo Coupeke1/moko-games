@@ -23,18 +23,14 @@ public class ExternalGamesRepository {
 
         EngineCreateGameRequest engineReq = new EngineCreateGameRequest(
                 request.players(),
-                request.settings(),
-                request.aiPlayer()
+                request.hasBot(),
+                request.settings()
         );
 
         RestClient client = createRestClient(engineUrl);
 
         try {
             EngineGameResponse response = client.post()
-                    .uri(uriBuilder -> uriBuilder
-                            .queryParam("aiPlayer", request.aiPlayer())
-                            .build()
-                    )
                     .header("Authorization", "Bearer " + token.getTokenValue())
                     .body(engineReq)
                     .retrieve()

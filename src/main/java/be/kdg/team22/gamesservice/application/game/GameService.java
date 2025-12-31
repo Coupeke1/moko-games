@@ -55,8 +55,8 @@ public class GameService {
                 request.lobbyId(),
                 request.gameId(),
                 request.players(),
-                resolvedSettings,
-                request.aiPlayer()
+                request.hasBot(),
+                resolvedSettings
         );
 
         UUID instanceId = engine.startExternalGame(game, resolvedRequest, token);
