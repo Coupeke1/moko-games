@@ -31,7 +31,7 @@ public class ExternalBotRepositoryConfig {
     private RestClient createRestClient(String baseUrl, String apiKey) {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(2000);
-        requestFactory.setReadTimeout(2000);
+        requestFactory.setReadTimeout(20000);
 
         return RestClient.builder()
                 .baseUrl(baseUrl)

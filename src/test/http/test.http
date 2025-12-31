@@ -50,9 +50,6 @@ Content-Type: application/json
   ]
 }
 
-### Reset Game
-POST localhost:8087/api/games/{{game_id}}/reset
-
 ### Health Check
 GET http://localhost:8087/actuator/health
 
