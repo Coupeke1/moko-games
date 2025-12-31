@@ -8,7 +8,7 @@ public record StartGameRequest(
         UUID lobbyId,
         UUID gameId,
         List<UUID> players,
-        Map<String, Object> settings,
-        boolean aiPlayer
+        boolean hasBot,
+        Map<String, Object> settings
 ) {
 }

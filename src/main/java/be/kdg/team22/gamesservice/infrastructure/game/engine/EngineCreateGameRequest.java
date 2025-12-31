@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public record EngineCreateGameRequest(
         List<UUID> players,
-        Map<String, Object> settings,
-        boolean aiPlayer
+        boolean hasBot,
+        Map<String, Object> settings
 ) {
 }

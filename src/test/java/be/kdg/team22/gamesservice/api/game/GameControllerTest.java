@@ -7,7 +7,6 @@ import be.kdg.team22.gamesservice.application.game.GameService;
 import be.kdg.team22.gamesservice.domain.game.Achievement;
 import be.kdg.team22.gamesservice.domain.game.AchievementKey;
 import be.kdg.team22.gamesservice.domain.game.Game;
-import be.kdg.team22.gamesservice.domain.game.GameCategory;
 import be.kdg.team22.gamesservice.domain.game.GameId;
 import be.kdg.team22.gamesservice.domain.game.settings.GameSettingsDefinition;
 import be.kdg.team22.gamesservice.domain.game.settings.SettingDefinition;
@@ -22,7 +21,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -97,12 +95,12 @@ class GameControllerTest {
                     "11111111-1111-1111-1111-111111111111",
                     "22222222-2222-2222-2222-222222222222"
                   ],
+                  "hasBot":true,
                   "settings": {
                     "type": "checkers",
                     "boardSize": 8,
                     "flyingKings": true
-                  },
-                  "aiPlayer": true
+                  }
                 }
                 """;
 
@@ -119,7 +117,7 @@ class GameControllerTest {
         assertThat(req.lobbyId().toString()).isEqualTo("00000000-0000-0000-0000-000000000001");
         assertThat(req.gameId().toString()).isEqualTo("00000000-0000-0000-0000-000000000002");
         assertThat(req.players()).hasSize(2);
-        assertThat(req.aiPlayer()).isTrue();
+        assertThat(req.hasBot()).isTrue();
     }
 
     @Test

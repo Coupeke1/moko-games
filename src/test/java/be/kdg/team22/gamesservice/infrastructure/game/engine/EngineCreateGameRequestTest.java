@@ -18,10 +18,10 @@ class EngineCreateGameRequestTest {
                 "flyingKings", true
         );
 
-        var req = new EngineCreateGameRequest(players, settings, true);
+        var req = new EngineCreateGameRequest(players, true, settings);
 
         assertThat(req.players()).isEqualTo(players);
+        assertThat(req.hasBot()).isTrue();
         assertThat(req.settings()).isEqualTo(settings);
-        assertThat(req.aiPlayer()).isTrue();
     }
 }
