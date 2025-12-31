@@ -1,36 +1,3 @@
-### 1) Haal JWT-token op via Keycloak (PASSWORD GRANT)
-POST http://localhost:8180/realms/moko/protocol/openid-connect/token
-Content-Type: application/x-www-form-urlencoded
-
-grant_type = password &
-client_id = user-service &
-client_secret = ZmXSd2mIzB6hsLrybeD3gH0c11vPwrej &
-username = matti &
-password = loginmatti &
-scope = openid
-
-> {%
-    client.global.set("access_token", response.body.access_token);
-%}
-
-### Start a game
-POST http://localhost:8084/api/games
-Authorization: Bearer {{access_token}}
-Content-Type: application/json
-
-{
-  "lobbyId": "00000000-0000-0000-0000-000000000000",
-  "gameId": "b6dc128e-cc49-4fc0-aa2d-0716fc789fff",
-  "players": [
-    "642999ad-c546-40b6-876c-1048971c7942",
-    "cf36d3e1-a1e0-4c18-89eb-95fa76fc81ee"
-  ],
-    "hasBot": true,
-  "settings": {
-    "kingMovementMode": "SINGLE"
-  }
-}
-
 ### Register a game
 POST http://localhost:8084/api/games/register
 Content-Type: application/json
