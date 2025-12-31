@@ -109,8 +109,8 @@ class GameServiceTest {
                         UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
                         UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
                 ),
-                settings,
-                ai
+                ai,
+                settings
         );
     }
 
@@ -157,8 +157,8 @@ class GameServiceTest {
                 UUID.randomUUID(),
                 UUID.randomUUID(),
                 List.of(),
-                Map.of("boardSize", 8),
-                false
+                false,
+                Map.of("boardSize", 8)
         );
 
         assertThatThrownBy(() -> service.startGame(request, null))
@@ -174,8 +174,8 @@ class GameServiceTest {
                 UUID.randomUUID(),
                 UUID.randomUUID(),
                 List.of(UUID.randomUUID()),
-                null,
-                false
+                false,
+                null
         );
 
         assertThatThrownBy(() -> service.startGame(request, tokenFromUuid(request.players().getFirst())))
