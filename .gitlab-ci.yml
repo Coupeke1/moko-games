@@ -84,5 +84,6 @@ include:
   - template: Jobs/Dependency-Scanning.gitlab-ci.yml
 
 dependency_scanning:
+  stage: build
   before_script:
     - chmod +x ./gradlew
