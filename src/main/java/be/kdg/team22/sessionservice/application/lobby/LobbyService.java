@@ -106,7 +106,7 @@ public class LobbyService {
             players.add(lobby.bot().id().value());
         }
 
-        StartGameResponse response = gamesRepository.startGame(new StartGameRequest(lobbyId.value(), lobby.gameId().value(), players, lobby.settings().gameSettings(), lobby.hasBot()), token);
+        StartGameResponse response = gamesRepository.startGame(new StartGameRequest(lobbyId.value(), lobby.gameId().value(), players, lobby.hasBot(), lobby.settings().gameSettings()), token);
 
         lobby.markStarted(GameId.from(response.gameInstanceId()));
 
