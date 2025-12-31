@@ -13,7 +13,7 @@ scope = openid
     client.global.set("access_token", response.body.access_token);
 %}
 
-### Generate Board
+### Create game
 POST localhost:8087/api/games
 Authorization: Bearer {{access_token}}
 Content-Type: application/json
@@ -23,6 +23,7 @@ Content-Type: application/json
     "642999ad-c546-40b6-876c-1048971c7942",
     "cf36d3e1-a1e0-4c18-89eb-95fa76fc81ee"
   ],
+  "hasBot": true,
   "settings": {
     "kingMovementMode": "SINGLE"
   }
@@ -48,25 +49,6 @@ Content-Type: application/json
     22, 18
   ]
 }
-
-### Generate Game With Bot Player
-POST localhost:8087/api/games?aiPlayer=true
-Authorization: Bearer {{access_token}}
-Content-Type: application/json
-
-{
-  "players": [
-    "642999ad-c546-40b6-876c-1048971c7942",
-    "00000000-0000-0000-0000-000000000000"
-  ],
-  "settings": {
-    "kingMovementMode": "SINGLE"
-  }
-}
-
-> {%
-    client.global.set("game_id", response.body.id);
-%}
 
 ### Reset Game
 POST localhost:8087/api/games/{{game_id}}/reset

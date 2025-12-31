@@ -28,9 +28,8 @@ public class GameController {
 
     @PostMapping({"/", ""})
     public ResponseEntity<GameModel> create(@AuthenticationPrincipal final Jwt token,
-                                            @RequestParam(defaultValue = "false") final boolean aiPlayer,
                                             @Valid @RequestBody final CreateGameModel model) {
-        Game game = service.create(PlayerId.get(token), model, aiPlayer);
+        Game game = service.create(PlayerId.get(token), model);
         GameModel gameModel = GameModel.from(game);
 
         return ResponseEntity.ok(gameModel);
