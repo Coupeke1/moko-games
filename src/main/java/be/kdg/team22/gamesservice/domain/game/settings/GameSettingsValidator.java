@@ -48,7 +48,7 @@ public final class GameSettingsValidator {
             GameSettingsDefinition definition,
             Map<String, Object> input
     ) {
-        if (definition == null) throw InvalidGameSettingsException.missingDefinition();
+        if (definition == null) return Map.of();
         if (input == null) throw InvalidGameSettingsException.missingSettings();
 
         validateDefinition(definition);
