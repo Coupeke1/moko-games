@@ -8,8 +8,6 @@ variables:
   DOCKER_IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
   DS_JAVA_PROJECT_PATH: "$CI_PROJECT_DIR"
   DS_REPORT_FORMAT: "JSON,HTML"
-  DOCKER_HOST: "unix:///var/run/docker.sock"
-  TESTCONTAINERS_HOST_OVERRIDE: "host.docker.internal"
 
 stages:
   - build
@@ -39,16 +37,6 @@ test:
   stage: test
   image: $DEFAULT_IMAGE
   script:
-    - echo "DOCKER_HOST=$DOCKER_HOST"
-    - ls -l /var/run/docker.sock
-    - apk add --no-cache docker-cli || true
-    - docker ps
-    - mkdir -p /root
-    - |
-      cat > /root/.testcontainers.properties <<'EOF'
-      docker.client.strategy=org.testcontainers.dockerclient.EnvironmentAndSystemPropertyClientProviderStrategy
-      docker.host=unix:///var/run/docker.sock
-      EOF
     - chmod +x ./gradlew
     - ./gradlew test --no-daemon
   artifacts:
