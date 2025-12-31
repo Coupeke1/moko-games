@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.UUID;
 
 public record CreateGameModel(
-        boolean hasBot,
         @NotEmpty List<UUID> players,
+        boolean hasBot,
         @NotNull GameSettingsModel settings
 ) {
 }
