@@ -33,4 +33,5 @@ mirror_image:
 
     - docker push registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/local-development/chatbot:latest
   rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == "main"'
