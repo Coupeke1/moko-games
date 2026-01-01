@@ -29,8 +29,6 @@ mirror_image:
     - docker login registry.gitlab.com -u "$DST_USER" -p "$DST_PASS"
   
     # retag + push
-    - docker tag \
-      registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team3/ai-chatbot:latest \
-      registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/local-development/chatbot:latest
+    - docker tag registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team3/ai-chatbot:latest registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/local-development/chatbot:latest
 
     - docker push registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/local-development/chatbot:latest
