@@ -1,5 +1,11 @@
-import type { Lobby } from "@/features/lobby/models/lobby.ts";
-import { isClosed, shouldStart } from "@/features/lobby/services/lobby.ts";
+import show from "@/components/global/toast/toast";
+import { Type } from "@/components/global/toast/type";
+import type { Lobby, LobbyMessage } from "@/features/lobby/models/lobby.ts";
+import {
+    getReasonMessage,
+    isClosed,
+    shouldStart,
+} from "@/features/lobby/services/lobby.ts";
 import { isPlayerInLobby } from "@/features/lobby/services/players.ts";
 import { watchLobby } from "@/features/lobby/services/socket.ts";
 import { useSocketStore } from "@/stores/socket-store.ts";
@@ -58,7 +64,17 @@ export function useLobby(lobbyId?: string | null, userId?: string | null) {
         let isFirst = true;
 
         subscription.current = watchLobby().subscribe({
-            next: (lobby) => {
+            next: (message: LobbyMessage) => {
+                // Handle reason-based messages (kicked, etc.)
+                if (message.reason) {
+                    show(Type.Lobby, getReasonMessage(message.reason));
+                    navigate("/library", { replace: true });
+                    return;
+                }
+
+                const lobby = message.payload;
+                if (!lobby) return;
+
                 queryClient.setQueryData<Lobby>(["lobby", lobbyId], lobby);
 
                 const kicked = !isPlayerInLobby(userId, lobby);
