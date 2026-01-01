@@ -43,10 +43,9 @@ business:
   ai:
     url: ${BUSINESS_AI_URL:https://team3.techtitans.be}
     fallback_url: ${BUSINESS_FALLBACK_AI_URL:http://localhost:3333}
-
-  chat-service:
-    url: ${BOT_SERVICE_URL:http://localhost:3334}
-    fallback_url: ${BUSINESS_FALLBACK_AI_URL:http://localhost:3333}
+  chat:
+    url: ${BUSINESS_AI_URL:https://team3.techtitans.be}
+    fallback_url: ${BUSINESS_FALLBACK_CHAT_URL:http://localhost:3334}
 
 bot-service:
   upload-on-startup=false:
