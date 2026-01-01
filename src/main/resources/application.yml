@@ -46,4 +46,10 @@ business:
     api-key: ${BUSINESS_AI_API_KEY:}
 
 
+  chat-service:
+    url: ${BOT_SERVICE_URL:http://localhost:3334}
+    fallback_url: ${BUSINESS_FALLBACK_AI_URL:http://localhost:3333}
+
+bot-service:
+  upload-on-startup=false:
 cors.allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5174,http://localhost:8084}

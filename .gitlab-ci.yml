@@ -38,7 +38,7 @@ test:
   image: $DEFAULT_IMAGE
   script:
     - chmod +x ./gradlew
-    - ./gradlew clean test --no-daemon
+    - ./gradlew test --no-daemon
   artifacts:
     when: always
     reports:

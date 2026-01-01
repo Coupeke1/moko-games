@@ -76,9 +76,10 @@ public class GameServiceTest {
 
         CreateGameModel model = new CreateGameModel(
                 players.stream().map(p -> p.id().value()).toList(),
+                false,
                 new GameSettingsModel(3));
 
-        Game game = service.create(players.getFirst().id(), model, false);
+        Game game = service.create(players.getFirst().id(), model);
 
         assertNotNull(game);
         assertEquals(3, game.board().size());
@@ -91,9 +92,10 @@ public class GameServiceTest {
 
         CreateGameModel model = new CreateGameModel(
                 players.stream().map(p -> p.id().value()).toList(),
+                false,
                 new GameSettingsModel(4));
 
-        Game game = service.create(players.getFirst().id(), model, false);
+        Game game = service.create(players.getFirst().id(), model);
 
         assertEquals(4, game.board().size());
         verify(repository).save(any(Game.class));
@@ -103,9 +105,10 @@ public class GameServiceTest {
     void shouldThrowWhenTooSmall() {
         CreateGameModel model = new CreateGameModel(
                 players.stream().map(p -> p.id().value()).toList(),
+                false,
                 new GameSettingsModel(2));
 
-        assertThrows(BoardSizeException.class, () -> service.create(players.getFirst().id(), model, false));
+        assertThrows(BoardSizeException.class, () -> service.create(players.getFirst().id(), model));
     }
 
     @Test
