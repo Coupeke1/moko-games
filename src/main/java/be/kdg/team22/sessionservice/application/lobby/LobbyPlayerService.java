@@ -8,6 +8,7 @@ import be.kdg.team22.sessionservice.domain.lobby.LobbyRepository;
 import be.kdg.team22.sessionservice.domain.player.Player;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import be.kdg.team22.sessionservice.domain.player.exceptions.PlayerNotFriendException;
+import be.kdg.team22.sessionservice.infrastructure.lobby.RemovalReason;
 import be.kdg.team22.sessionservice.infrastructure.messaging.LobbyEventPublisher;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -74,7 +75,7 @@ public class LobbyPlayerService {
         Lobby lobby = lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
 
         lobby.removePlayer(ownerId, playerId);
-        lobbyPublisher.saveAndPublish(lobby);
+        lobbyPublisher.savePublishAndNotifyRemoved(lobby, playerId, RemovalReason.KICKED);
     }
 
     private void ensureFriend(final PlayerId ownerId, final PlayerId playerId, final Jwt token) {
