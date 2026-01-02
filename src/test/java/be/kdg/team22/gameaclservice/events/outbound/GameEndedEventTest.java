@@ -1,6 +1,7 @@
 package be.kdg.team22.gameaclservice.events.outbound;
 
 import be.kdg.team22.gameaclservice.events.inbound.ChessGameEndedEvent;
+import be.kdg.team22.gameaclservice.events.inbound.ChessMessageType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +29,7 @@ class GameEndedEventTest {
                 "checkmate",
                 "white_player",
                 42,
-                "GAME_ENDED",
+                ChessMessageType.GAME_ENDED,
                 timestamp
         );
 
@@ -50,7 +51,7 @@ class GameEndedEventTest {
                 "checkmate",
                 "white",
                 10,
-                "GAME_ENDED",
+                ChessMessageType.GAME_ENDED,
                 LocalDateTime.now()
         );
 
@@ -72,7 +73,7 @@ class GameEndedEventTest {
                 "checkmate",
                 "white",
                 50,
-                "GAME_ENDED",
+                ChessMessageType.GAME_ENDED,
                 timestamp
         );
 
@@ -93,7 +94,7 @@ class GameEndedEventTest {
                 "resignation",
                 "black_player",
                 25,
-                "GAME_ENDED",
+                ChessMessageType.GAME_ENDED,
                 LocalDateTime.now()
         );
 
@@ -117,7 +118,7 @@ class GameEndedEventTest {
                     reason,
                     "white",
                     30,
-                    "GAME_ENDED",
+                    ChessMessageType.GAME_ENDED,
                     LocalDateTime.now()
             );
 
@@ -135,11 +136,11 @@ class GameEndedEventTest {
         UUID gameId3 = UUID.randomUUID();
 
         ChessGameEndedEvent event1 = new ChessGameEndedEvent(
-                gameId1, "w", "b", "f", "e", "w", 1, "GAME_ENDED", LocalDateTime.now());
+                gameId1, "w", "b", "f", "e", "w", 1, ChessMessageType.GAME_ENDED, LocalDateTime.now());
         ChessGameEndedEvent event2 = new ChessGameEndedEvent(
-                gameId2, "w", "b", "f", "e", "w", 1, "GAME_ENDED", LocalDateTime.now());
+                gameId2, "w", "b", "f", "e", "w", 1, ChessMessageType.GAME_ENDED, LocalDateTime.now());
         ChessGameEndedEvent event3 = new ChessGameEndedEvent(
-                gameId3, "w", "b", "f", "e", "w", 1, "GAME_ENDED", LocalDateTime.now());
+                gameId3, "w", "b", "f", "e", "w", 1, ChessMessageType.GAME_ENDED, LocalDateTime.now());
 
         GameEndedEvent result1 = GameEndedEvent.convert(event1);
         GameEndedEvent result2 = GameEndedEvent.convert(event2);
@@ -156,9 +157,9 @@ class GameEndedEventTest {
         UUID gameId = UUID.randomUUID();
 
         ChessGameEndedEvent event1 = new ChessGameEndedEvent(
-                gameId, "white", "black", "fen1", "checkmate", "white", 50, "GAME_ENDED", LocalDateTime.now());
+                gameId, "white", "black", "fen1", "checkmate", "white", 50, ChessMessageType.GAME_ENDED, LocalDateTime.now());
         ChessGameEndedEvent event2 = new ChessGameEndedEvent(
-                gameId, "black", "white", "fen2", "resignation", "black", 10, "GAME_ENDED", LocalDateTime.now());
+                gameId, "black", "white", "fen2", "resignation", "black", 10, ChessMessageType.GAME_ENDED, LocalDateTime.now());
 
         GameEndedEvent result1 = GameEndedEvent.convert(event1);
         GameEndedEvent result2 = GameEndedEvent.convert(event2);
@@ -181,7 +182,7 @@ class GameEndedEventTest {
                     "checkmate",
                     "white",
                     moveCount,
-                    "GAME_ENDED",
+                    ChessMessageType.GAME_ENDED,
                     LocalDateTime.now()
             );
 
@@ -200,9 +201,9 @@ class GameEndedEventTest {
         LocalDateTime timestamp2 = LocalDateTime.of(2025, 12, 31, 23, 59, 59);
 
         ChessGameEndedEvent event1 = new ChessGameEndedEvent(
-                gameId, "w", "b", "f", "e", "w", 1, "GAME_ENDED", timestamp1);
+                gameId, "w", "b", "f", "e", "w", 1, ChessMessageType.GAME_ENDED, timestamp1);
         ChessGameEndedEvent event2 = new ChessGameEndedEvent(
-                gameId, "w", "b", "f", "e", "w", 1, "GAME_ENDED", timestamp2);
+                gameId, "w", "b", "f", "e", "w", 1, ChessMessageType.GAME_ENDED, timestamp2);
 
         GameEndedEvent result1 = GameEndedEvent.convert(event1);
         GameEndedEvent result2 = GameEndedEvent.convert(event2);

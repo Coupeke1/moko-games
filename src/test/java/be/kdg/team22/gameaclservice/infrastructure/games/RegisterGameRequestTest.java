@@ -1,6 +1,7 @@
 package be.kdg.team22.gameaclservice.infrastructure.games;
 
 import be.kdg.team22.gameaclservice.config.ChessInfoProperties;
+import be.kdg.team22.gameaclservice.events.inbound.ChessMessageType;
 import be.kdg.team22.gameaclservice.events.inbound.ChessRegisterEvent;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,7 @@ class RegisterGameRequestTest {
                 "http://localhost:3000",
                 "http://image.url/chess.png",
                 List.of(new ChessRegisterEvent.ChessAchievement("first_move", "Make first move")),
-                "GAME_REGISTERED",
+                ChessMessageType.GAME_REGISTERED,
                 LocalDateTime.now()
         );
 
@@ -43,7 +44,7 @@ class RegisterGameRequestTest {
                 "http://frontend",
                 "http://image.url",
                 List.of(),
-                "GAME_REGISTERED",
+                ChessMessageType.GAME_REGISTERED,
                 LocalDateTime.now()
         );
 
@@ -62,7 +63,7 @@ class RegisterGameRequestTest {
                 "http://frontend",
                 "http://image.url",
                 List.of(),
-                "GAME_REGISTERED",
+                ChessMessageType.GAME_REGISTERED,
                 LocalDateTime.now()
         );
 
@@ -83,7 +84,7 @@ class RegisterGameRequestTest {
                 frontendUrl,
                 "http://image.url",
                 List.of(),
-                "GAME_REGISTERED",
+                ChessMessageType.GAME_REGISTERED,
                 LocalDateTime.now()
         );
 
@@ -102,7 +103,7 @@ class RegisterGameRequestTest {
                 "http://frontend",
                 "http://image.url",
                 List.of(),
-                "GAME_REGISTERED",
+                ChessMessageType.GAME_REGISTERED,
                 LocalDateTime.now()
         );
 
@@ -121,7 +122,7 @@ class RegisterGameRequestTest {
                 "http://frontend",
                 "http://image.url",
                 List.of(),
-                "GAME_REGISTERED",
+                ChessMessageType.GAME_REGISTERED,
                 LocalDateTime.now()
         );
 
@@ -140,7 +141,7 @@ class RegisterGameRequestTest {
                 "http://frontend",
                 "http://image.url",
                 List.of(),
-                "GAME_REGISTERED",
+                ChessMessageType.GAME_REGISTERED,
                 LocalDateTime.now()
         );
 
@@ -159,7 +160,7 @@ class RegisterGameRequestTest {
                 "http://frontend",
                 "http://image.url",
                 List.of(),
-                "GAME_REGISTERED",
+                ChessMessageType.GAME_REGISTERED,
                 LocalDateTime.now()
         );
 
@@ -179,7 +180,7 @@ class RegisterGameRequestTest {
                 "http://frontend",
                 imageUrl,
                 List.of(),
-                "GAME_REGISTERED",
+                ChessMessageType.GAME_REGISTERED,
                 LocalDateTime.now()
         );
 
@@ -199,7 +200,7 @@ class RegisterGameRequestTest {
                 "http://frontend",
                 "http://image.url",
                 List.of(),
-                "GAME_REGISTERED",
+                ChessMessageType.GAME_REGISTERED,
                 LocalDateTime.now()
         );
 
@@ -219,7 +220,7 @@ class RegisterGameRequestTest {
                 "http://frontend",
                 "http://image.url",
                 List.of(),
-                "GAME_REGISTERED",
+                ChessMessageType.GAME_REGISTERED,
                 LocalDateTime.now()
         );
 
@@ -241,7 +242,7 @@ class RegisterGameRequestTest {
                         new ChessRegisterEvent.ChessAchievement("first_move", "Make first move"),
                         new ChessRegisterEvent.ChessAchievement("checkmate", "Achieve checkmate")
                 ),
-                "GAME_REGISTERED",
+                ChessMessageType.GAME_REGISTERED,
                 LocalDateTime.now()
         );
 
@@ -260,7 +261,7 @@ class RegisterGameRequestTest {
                 "http://frontend",
                 "http://image.url",
                 List.of(),
-                "GAME_REGISTERED",
+                ChessMessageType.GAME_REGISTERED,
                 LocalDateTime.now()
         );
 
@@ -286,7 +287,7 @@ class RegisterGameRequestTest {
                 "http://frontend",
                 "http://image.url",
                 achievements,
-                "GAME_REGISTERED",
+                ChessMessageType.GAME_REGISTERED,
                 LocalDateTime.now()
         );
 
@@ -305,7 +306,7 @@ class RegisterGameRequestTest {
                 "http://frontend:3000",
                 "http://cdn.com/chess.png",
                 List.of(new ChessRegisterEvent.ChessAchievement("victory", "Win a game")),
-                "GAME_REGISTERED",
+                ChessMessageType.GAME_REGISTERED,
                 LocalDateTime.now()
         );
 

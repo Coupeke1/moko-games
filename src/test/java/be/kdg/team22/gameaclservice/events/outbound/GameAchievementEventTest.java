@@ -1,6 +1,7 @@
 package be.kdg.team22.gameaclservice.events.outbound;
 
 import be.kdg.team22.gameaclservice.events.inbound.ChessAchievementEvent;
+import be.kdg.team22.gameaclservice.events.inbound.ChessMessageType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +28,7 @@ class GameAchievementEventTest {
                 "John",
                 "first_move",
                 "Make your first move",
-                "ACHIEVEMENT_EARNED",
+                ChessMessageType.ACHIEVEMENT_ACQUIRED,
                 timestamp
         );
 
@@ -51,7 +52,7 @@ class GameAchievementEventTest {
                 "Player",
                 achievementCode,
                 "Description",
-                "ACHIEVEMENT_EARNED",
+                ChessMessageType.ACHIEVEMENT_ACQUIRED,
                 timestamp
         );
 
@@ -69,7 +70,7 @@ class GameAchievementEventTest {
                 "Player",
                 "achievement",
                 "Description",
-                "ACHIEVEMENT_EARNED",
+                ChessMessageType.ACHIEVEMENT_ACQUIRED,
                 LocalDateTime.now()
         );
 
@@ -90,7 +91,7 @@ class GameAchievementEventTest {
                 "Player",
                 "achievement",
                 "Description",
-                "ACHIEVEMENT_EARNED",
+                ChessMessageType.ACHIEVEMENT_ACQUIRED,
                 LocalDateTime.now()
         );
 
@@ -111,7 +112,7 @@ class GameAchievementEventTest {
                 "Player",
                 "achievement",
                 "Description",
-                "ACHIEVEMENT_EARNED",
+                ChessMessageType.ACHIEVEMENT_ACQUIRED,
                 LocalDateTime.now()
         );
 
@@ -131,7 +132,7 @@ class GameAchievementEventTest {
                 "Player",
                 "achievement",
                 "Description",
-                "ACHIEVEMENT_EARNED",
+                ChessMessageType.ACHIEVEMENT_ACQUIRED,
                 timestamp
         );
 
@@ -150,7 +151,7 @@ class GameAchievementEventTest {
                 "Player",
                 "achievement",
                 "Description",
-                "ACHIEVEMENT_EARNED",
+                ChessMessageType.ACHIEVEMENT_ACQUIRED,
                 LocalDateTime.now()
         );
 
@@ -176,7 +177,7 @@ class GameAchievementEventTest {
                 "PlayerName",
                 achievementCode,
                 "Win the game",
-                "ACHIEVEMENT_EARNED",
+                ChessMessageType.ACHIEVEMENT_ACQUIRED,
                 timestamp
         );
 
@@ -198,7 +199,7 @@ class GameAchievementEventTest {
                 "Player",
                 achievementCode,
                 "Description",
-                "ACHIEVEMENT_EARNED",
+                ChessMessageType.ACHIEVEMENT_ACQUIRED,
                 LocalDateTime.now()
         );
 

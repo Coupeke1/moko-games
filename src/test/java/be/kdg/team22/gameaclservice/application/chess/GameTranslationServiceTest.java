@@ -5,6 +5,7 @@ import be.kdg.team22.gameaclservice.config.ChessInfoProperties;
 import be.kdg.team22.gameaclservice.domain.Game;
 import be.kdg.team22.gameaclservice.events.inbound.ChessAchievementEvent;
 import be.kdg.team22.gameaclservice.events.inbound.ChessGameEndedEvent;
+import be.kdg.team22.gameaclservice.events.inbound.ChessMessageType;
 import be.kdg.team22.gameaclservice.events.inbound.ChessRegisterEvent;
 import be.kdg.team22.gameaclservice.infrastructure.games.ExternalGamesRepository;
 import be.kdg.team22.gameaclservice.infrastructure.games.RegisterGameRequest;
@@ -51,7 +52,7 @@ class GameTranslationServiceTest {
                         new ChessRegisterEvent.ChessAchievement("first_move", "Make your first move"),
                         new ChessRegisterEvent.ChessAchievement("checkmate", "Achieve checkmate")
                 ),
-                "GAME_REGISTERED",
+                ChessMessageType.GAME_REGISTERED,
                 LocalDateTime.now()
         );
 
@@ -85,7 +86,7 @@ class GameTranslationServiceTest {
                 "http://frontend.url",
                 "http://image.url/chess.png",
                 List.of(),
-                "GAME_REGISTERED",
+                ChessMessageType.GAME_REGISTERED,
                 LocalDateTime.now()
         );
 
@@ -114,7 +115,7 @@ class GameTranslationServiceTest {
                 "John",
                 "first_move",
                 "Make your first move",
-                "ACHIEVEMENT_EARNED",
+                ChessMessageType.ACHIEVEMENT_ACQUIRED,
                 timestamp
         );
 
@@ -147,7 +148,7 @@ class GameTranslationServiceTest {
                 "checkmate",
                 "white_player",
                 42,
-                "GAME_ENDED",
+                ChessMessageType.GAME_ENDED,
                 timestamp
         );
 
@@ -205,7 +206,7 @@ class GameTranslationServiceTest {
                 "Champion",
                 achievementType,
                 "Win a game in 10 moves or less",
-                "ACHIEVEMENT_EARNED",
+                ChessMessageType.ACHIEVEMENT_ACQUIRED,
                 eventTime
         );
 
@@ -230,7 +231,7 @@ class GameTranslationServiceTest {
                 "http://localhost:3000",
                 "http://image.url/chess.png",
                 List.of(),
-                "GAME_REGISTERED",
+                ChessMessageType.GAME_REGISTERED,
                 LocalDateTime.now()
         );
 

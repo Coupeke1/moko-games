@@ -24,7 +24,7 @@ public record RegisterGameRequest(
 ) {
     public static RegisterGameRequest convert(ChessRegisterEvent event, ChessInfoProperties chessInfo, String aclBackendUrl) {
         String frontendUrl = event.frontendUrl();
-        String baseFrontendUrl = frontendUrl.substring(0, frontendUrl.lastIndexOf('/'));
+        String baseFrontendUrl = frontendUrl.replaceAll("/[a-f0-9\\-]+/?$", "");
 
         List<RegisterAchievementRequest> achievements = new ArrayList<>();
         event.availableAchievements().forEach(achievement -> achievements.add(RegisterAchievementRequest.convert(achievement)));
