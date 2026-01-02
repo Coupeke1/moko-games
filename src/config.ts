@@ -9,7 +9,6 @@ export const environment = {
         window.__APP_CONFIG__?.authClientId ??
         import.meta.env.VITE_AUTH_CLIENT ??
         "",
-
     userService:
         window.__APP_CONFIG__?.userService ??
         import.meta.env.VITE_USER_SERVICE ??

@@ -1,8 +1,8 @@
-import { create } from "zustand";
+import { config } from "@/lib/socket-client";
 import type { RxStomp } from "@stomp/rx-stomp";
 import { RxStomp as RxStompClass } from "@stomp/rx-stomp";
-import { config } from "@/lib/socket-client";
 import type { Subscription } from "rxjs";
+import { create } from "zustand";
 
 type SocketState = {
     client: RxStomp;
@@ -53,6 +53,7 @@ export const useSocketStore = create<SocketState>((set, get) => {
         connections: 0,
         connect: () => {
             const { connections: connectionCount, isConnected } = get();
+
             const newCount = connectionCount + 1;
             set({ connections: newCount });
 

@@ -3,12 +3,12 @@ import { useSocketStore } from "@/stores/socket-store.ts";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 
-export function watchChat(): Observable<Message> {
+export function watchChat(id: string): Observable<Message> {
     const client = useSocketStore.getState().client;
 
     const updates = client
-        .watch({ destination: "/user/queue/chat" })
-        .pipe(map((msg) => JSON.parse(msg.body)));
+        .watch({ destination: `/user/queue/chat-${id}` })
+        .pipe(map((msg) => JSON.parse(msg.body) as Message));
 
     return updates;
 }

@@ -5,7 +5,7 @@ import { validIdCheck } from "@/lib/id";
 
 const BASE_URL = environment.chatService;
 
-export async function getPrivateChannel(id: string): Promise<Channel> {
+export async function findPrivateChannel(id: string): Promise<Channel> {
     try {
         validIdCheck(id);
         const { data } = await client.get<Channel>(
