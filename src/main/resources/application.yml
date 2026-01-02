@@ -32,8 +32,6 @@ management:
 business:
   game-service:
     url: ${GAME_SERVICE_URL:http://localhost:8084}
-  user-service:
-    url: ${USER_SERVICE_URL:http://localhost:8089}
 
 acl-config:
   backend-url: ${ACL_CONFIG_BACKEND_URL:http://host.docker.internal:8088}

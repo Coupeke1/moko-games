@@ -22,20 +22,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class GameTranslationService {
     private final AchievementEventPublisher achievementEventPublisher;
     private final ExternalGamesRepository gameRepository;
-    private final UserService userService;
     private final ChessInfoProperties chessInfoProperties;
     @Value("${acl-config.backend-url}")
     private String aclBackendUrl;
     private final Logger logger = LoggerFactory.getLogger(GameTranslationService.class);
 
-    public GameTranslationService(final AchievementEventPublisher achievementEventPublisher, final ExternalGamesRepository gameRepository, final UserService userService, final  ChessInfoProperties chessInfoProperties) {
+    public GameTranslationService(final AchievementEventPublisher achievementEventPublisher, final ExternalGamesRepository gameRepository, final  ChessInfoProperties chessInfoProperties) {
         this.achievementEventPublisher = achievementEventPublisher;
         this.gameRepository = gameRepository;
-        this.userService = userService;
         this.chessInfoProperties = chessInfoProperties;
     }
 
-    public void translateAndRegisterGame(ChessRegisterEvent event) {
+    public void translateAndRegisterGame(final ChessRegisterEvent event) {
         logger.info("Translating and registering chess");
         RegisterGameRequest convertedRequest = RegisterGameRequest.convert(event, chessInfoProperties, aclBackendUrl);
         logger.info("Registering game");
@@ -43,7 +41,7 @@ public class GameTranslationService {
         logger.info("Game registered");
     }
 
-    public void translateAndSendAchievement(ChessAchievementEvent event) {
+    public void translateAndSendAchievement(final ChessAchievementEvent event) {
         logger.info("Translating and awarding achievement for chess with type {} for player {}", event.achievementType(), event.playerId());
         GameAchievementEvent convertedEvent = GameAchievementEvent.convert(event, "chess");
         logger.info("Publishing achievement event");
@@ -51,7 +49,7 @@ public class GameTranslationService {
         logger.info("Achievement event published");
     }
 
-    public void translateAndSendGameEnded(ChessGameEndedEvent event) {
+    public void translateAndSendGameEnded(final ChessGameEndedEvent event) {
         logger.info("Translating and handling game ended event for chess game {}", event.gameId());
         GameEndedEvent convertedEvent = GameEndedEvent.convert(event);
         logger.info("Publishing game ended event");
@@ -59,7 +57,7 @@ public class GameTranslationService {
         logger.info("Game ended event published");
     }
 
-    public Game startChessGame(CreateChessGameModel request) {
+    public Game startChessGame(final CreateChessGameModel request) {
         return Game.create(request.players());
     }
 }
