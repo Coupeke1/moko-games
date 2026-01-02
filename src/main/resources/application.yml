@@ -49,6 +49,6 @@ business:
     url: ${BUSINESS_AI_URL:https://team3.techtitans.be}
     fallback_url: ${BUSINESS_FALLBACK_CHAT_URL:http://localhost:3334}
 
-  bot-service:
-    upload-on-startup: ${CHAT_SERVICE_UPLOAD_ON_STARTUP:true}
+bot-service:
+  upload-on-startup: ${CHAT_SERVICE_UPLOAD_ON_STARTUP:false}
 cors.allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5174,http://localhost:8084}
