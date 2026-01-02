@@ -1,7 +1,7 @@
 import show from "@/components/global/toast/toast";
 import {Type} from "@/components/global/toast/type";
 import type {Lobby, LobbyMessage} from "@/features/lobby/models/lobby.ts";
-import {getReasonMessage, shouldStart,} from "@/features/lobby/services/lobby.ts";
+import {shouldStart,} from "@/features/lobby/services/lobby.ts";
 import {shouldLeaveLobby} from "@/features/lobby/services/players.ts";
 import {watchLobby} from "@/features/lobby/services/socket.ts";
 import {useSocketStore} from "@/stores/socket-store.ts";
@@ -62,8 +62,10 @@ export function useLobby(lobbyId?: string | null, userId?: string | null) {
         subscription.current = watchLobby().subscribe({
             next: (message: LobbyMessage) => {
 
-                if (message.reason) {
-                    show(Type.Lobby, getReasonMessage(message.reason));
+                const leaveInfo = shouldLeaveLobby(message, userId);
+
+                if (leaveInfo.leave) {
+                    show(Type.Lobby, leaveInfo.toastMessage!);
                     navigate("/library", {replace: true});
                     return;
                 }
@@ -73,14 +75,6 @@ export function useLobby(lobbyId?: string | null, userId?: string | null) {
                 if (!lobby) return;
 
                 queryClient.setQueryData<Lobby>(["lobby", lobbyId], lobby);
-
-                const leaveInfo = shouldLeaveLobby(message, userId);
-
-                if (leaveInfo.leave) {
-                    show(Type.Lobby, leaveInfo.toastMessage!);
-                    navigate("/library", {replace: true});
-                    return;
-                }
 
                 if (shouldStart(lobby)) {
                     cancelRedirect();

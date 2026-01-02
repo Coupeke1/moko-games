@@ -54,21 +54,20 @@ export function shouldLeaveLobby(
     message: LobbyMessage,
     userId: string,
 ): { leave: boolean; toastMessage?: string } {
-    const lobby = message.payload;
 
+    if (message.reason) {
+        return {leave: true, toastMessage: getReasonMessage(message.reason)};
+    }
+
+    const lobby = message.payload;
     if (!lobby) return {leave: false};
 
     const kicked = !isPlayerInLobby(userId, lobby);
     const closed = isClosed(lobby);
 
-    const leave = Boolean(message.reason || kicked || closed);
+    if (kicked || closed) {
+        return {leave: true, toastMessage: "You were removed from the lobby"};
+    }
 
-    if (!leave) return {leave: false};
-
-    return {
-        leave: true,
-        toastMessage: message.reason
-            ? getReasonMessage(message.reason)
-            : "You were removed from the lobby",
-    };
+    return {leave: false};
 }
