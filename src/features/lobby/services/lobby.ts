@@ -1,12 +1,22 @@
 import { environment } from "@/config.ts";
 import type { Game } from "@/features/games/models/game.ts";
 import type { Lobby } from "@/features/lobby/models/lobby.ts";
+import { Reason } from "@/features/lobby/models/lobby.ts";
 import type { Player } from "@/features/lobby/models/player.ts";
 import { Status } from "@/features/lobby/models/status";
 import { client } from "@/lib/api-client.ts";
 import { validIdCheck } from "@/lib/id.ts";
 
 const BASE_URL = environment.sessionService;
+
+export function getReasonMessage(reason: Reason): string {
+    switch (reason) {
+        case Reason.Kicked:
+            return "You were kicked from the lobby";
+        default:
+            return "You were removed from the lobby";
+    }
+}
 
 export async function findLobby(id: string): Promise<Lobby> {
     try {

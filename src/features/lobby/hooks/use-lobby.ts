@@ -1,17 +1,19 @@
-import type { Lobby } from "@/features/lobby/models/lobby.ts";
-import { isClosed, shouldStart } from "@/features/lobby/services/lobby.ts";
-import { isPlayerInLobby } from "@/features/lobby/services/players.ts";
-import { watchLobby } from "@/features/lobby/services/socket.ts";
-import { useSocketStore } from "@/stores/socket-store.ts";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router";
-import { type Subscription } from "rxjs";
+import show from "@/components/global/toast/toast";
+import {Type} from "@/components/global/toast/type";
+import type {Lobby, LobbyMessage} from "@/features/lobby/models/lobby.ts";
+import {shouldStart,} from "@/features/lobby/services/lobby.ts";
+import {shouldLeaveLobby} from "@/features/lobby/services/players.ts";
+import {watchLobby} from "@/features/lobby/services/socket.ts";
+import {useSocketStore} from "@/stores/socket-store.ts";
+import {useQuery, useQueryClient} from "@tanstack/react-query";
+import {useCallback, useEffect, useRef, useState} from "react";
+import {useNavigate} from "react-router";
+import {type Subscription} from "rxjs";
 
 export function useLobby(lobbyId?: string | null, userId?: string | null) {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
-    const { connect, disconnect, isConnected } = useSocketStore();
+    const {connect, disconnect, isConnected} = useSocketStore();
 
     const enabled = !!lobbyId && !!userId;
     const subscription = useRef<Subscription | null>(null);
@@ -29,7 +31,7 @@ export function useLobby(lobbyId?: string | null, userId?: string | null) {
 
         redirectTimeout.current = setTimeout(() => {
             redirectTimeout.current = null;
-            navigate("/library", { replace: true });
+            navigate("/library", {replace: true});
         }, 5_000);
     }, [navigate]);
 
@@ -58,19 +60,28 @@ export function useLobby(lobbyId?: string | null, userId?: string | null) {
         let isFirst = true;
 
         subscription.current = watchLobby().subscribe({
-            next: (lobby) => {
-                queryClient.setQueryData<Lobby>(["lobby", lobbyId], lobby);
+            next: (message: LobbyMessage) => {
 
-                const kicked = !isPlayerInLobby(userId, lobby);
-                const closed = isClosed(lobby);
+                const leaveInfo = shouldLeaveLobby(message, userId);
+
+                if (leaveInfo.leave) {
+                    show(Type.Lobby, leaveInfo.toastMessage!);
+                    navigate("/library", {replace: true});
+                    return;
+                }
+
+                const lobby = message.payload;
+
+                if (!lobby) return;
+
+                queryClient.setQueryData<Lobby>(["lobby", lobbyId], lobby);
 
                 if (shouldStart(lobby)) {
                     cancelRedirect();
-                    navigate(`/lobbies/${lobby.id}/game`, { replace: true });
+                    navigate(`/lobbies/${lobby.id}/game`, {replace: true});
                 }
 
-                if (kicked || closed) scheduleRedirectToLibrary();
-                else cancelRedirect();
+                cancelRedirect();
 
                 if (isFirst) {
                     isFirst = false;
