@@ -15,8 +15,15 @@ public class PrivateListener {
 
     @RabbitListener(queues = RabbitMQTopology.QUEUE_USER_SOCKET)
     public void handle(final PrivateMessage message) {
+        if (message == null || message.userId() == null || message.queue() == null) return;
+
         String userId = message.userId().toString();
-        String queue = String.format("/queue/%s", message.queue());
-        template.convertAndSendToUser(userId, queue, message.payload());
+        String destination = String.format("/queue/%s", message.queue());
+
+        Object outgoing = (message.reason() != null || message.payload() == null)
+                ? message
+                : message.payload();
+
+        template.convertAndSendToUser(userId, destination, outgoing);
     }
 }

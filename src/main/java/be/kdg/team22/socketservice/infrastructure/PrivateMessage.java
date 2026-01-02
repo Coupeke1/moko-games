@@ -4,4 +4,5 @@ import java.util.UUID;
 
 public record PrivateMessage(UUID userId,
                              String queue,
-                             Object payload) {}
+                             Object payload,
+                             String reason) {}
