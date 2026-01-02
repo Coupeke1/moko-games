@@ -61,6 +61,13 @@ export function useLobby(lobbyId?: string | null, userId?: string | null) {
 
         subscription.current = watchLobby().subscribe({
             next: (message: LobbyMessage) => {
+
+                if (message.reason) {
+                    show(Type.Lobby, getReasonMessage(message.reason));
+                    navigate("/library", { replace: true });
+                    return;
+                }
+
                 const lobby = message.payload;
 
                 if (!lobby) return;
@@ -70,18 +77,13 @@ export function useLobby(lobbyId?: string | null, userId?: string | null) {
                 const kicked = !isPlayerInLobby(userId, lobby);
                 const closed = isClosed(lobby);
 
-                if (message.reason || kicked || closed) {
-                    show(Type.Lobby, message.reason ? getReasonMessage(message.reason) : "You were removed from the lobby");
-                    navigate("/library", {replace: true});
-                    return;
-                }
-
                 if (shouldStart(lobby)) {
                     cancelRedirect();
                     navigate(`/lobbies/${lobby.id}/game`, {replace: true});
                 }
 
-                cancelRedirect();
+                if (kicked || closed) scheduleRedirectToLibrary();
+                else cancelRedirect();
 
                 if (isFirst) {
                     isFirst = false;
