@@ -50,5 +50,5 @@ business:
     fallback_url: ${BUSINESS_FALLBACK_CHAT_URL:http://localhost:3334}
 
   bot-service:
-    upload-on-startup=false:
+    upload-on-startup: ${CHAT_SERVICE_UPLOAD_ON_STARTUP:true}
 cors.allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5174,http://localhost:8084}
