@@ -43,10 +43,12 @@ business:
   ai:
     url: ${BUSINESS_AI_URL:https://team3.techtitans.be}
     fallback_url: ${BUSINESS_FALLBACK_AI_URL:http://localhost:3333}
+    api-key: ${BUSINESS_AI_API_KEY:}
+
   chat:
     url: ${BUSINESS_AI_URL:https://team3.techtitans.be}
     fallback_url: ${BUSINESS_FALLBACK_CHAT_URL:http://localhost:3334}
 
-bot-service:
-  upload-on-startup=false:
+  bot-service:
+    upload-on-startup=false:
 cors.allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5174,http://localhost:8084}
