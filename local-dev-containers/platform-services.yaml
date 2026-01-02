@@ -238,3 +238,34 @@ services:
         networks:
             - moko_backend
             - moko_kc
+    service-acl:
+      image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/game-acl-service:main-latest
+      restart: no
+      pull_policy: always
+      profiles: [ "acl" ]
+      environment:
+        SPRING_RABBITMQ_HOST: app-rabbitmq
+        SPRING_RABBITMQ_PORT: 5672
+        SPRING_RABBITMQ_USERNAME: user
+        SPRING_RABBITMQ_PASSWORD: password
+
+        SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
+
+        GAME_SERVICE_URL: http://host.docker.internal:8084
+        ACL_CONFIG_BACKEND_URL: http://host.docker.internal:8088
+
+        CHESS_INFO_BACKEND_URL: http://host.docker.internal:8080
+      ports:
+        - "8088:8088"
+      healthcheck:
+        test:
+          [ "CMD", "wget", "-qO-", "http://localhost:8088/actuator/health" ]
+        interval: 1m
+        timeout: 15s
+        retries: 5
+        start_period: 5m
+      extra_hosts:
+        - "host.docker.internal:host-gateway"
+      networks:
+        - moko_backend
+        - moko_kc

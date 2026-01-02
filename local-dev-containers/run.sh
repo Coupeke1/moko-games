@@ -23,7 +23,7 @@ while [ "$#" -gt 0 ]; do
     esac
 done
 
-VALID_SERVICES=("user" "session" "social" "games" "store" "communication" "tic-tac-toe" "checkers" "chess")
+VALID_SERVICES=("user" "session" "social" "games" "store" "communication" "tic-tac-toe" "checkers" "chess" "acl")
 
 # If --all is provided, start with all services
 if [ "$ALL" = true ]; then
