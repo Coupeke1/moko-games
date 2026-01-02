@@ -62,7 +62,7 @@ public class SocketConfig implements WebSocketMessageBrokerConfigurer {
 
                 String header = accessor.getFirstNativeHeader("Authorization");
                 if (header == null || !header.startsWith("Bearer "))
-                    return message;
+                    throw new TokenException();
 
                 try {
                     Jwt token = decoder.decode(header.substring(7));
