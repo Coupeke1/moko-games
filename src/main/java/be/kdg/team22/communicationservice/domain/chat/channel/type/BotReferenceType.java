@@ -4,7 +4,7 @@ import be.kdg.team22.communicationservice.domain.chat.UserId;
 import be.kdg.team22.communicationservice.domain.chat.channel.ChannelType;
 
 public class BotReferenceType extends ReferenceType {
-    private UserId userId;
+    private final UserId userId;
 
     public BotReferenceType(final UserId userId) {
         super(ChannelType.BOT);

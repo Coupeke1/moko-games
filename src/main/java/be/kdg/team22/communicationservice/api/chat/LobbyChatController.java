@@ -1,7 +1,7 @@
 package be.kdg.team22.communicationservice.api.chat;
 
-import be.kdg.team22.communicationservice.api.chat.models.CreateMessageModel;
-import be.kdg.team22.communicationservice.api.chat.models.MessageModel;
+import be.kdg.team22.communicationservice.api.chat.models.message.CreateMessageModel;
+import be.kdg.team22.communicationservice.api.chat.models.message.MessageModel;
 import be.kdg.team22.communicationservice.application.chat.ChatService;
 import be.kdg.team22.communicationservice.domain.chat.UserId;
 import be.kdg.team22.communicationservice.domain.chat.channel.ChannelId;

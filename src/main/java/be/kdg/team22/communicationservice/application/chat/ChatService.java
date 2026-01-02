@@ -51,7 +51,6 @@ public class ChatService {
     public List<Message> getMessages(final ChannelId channelId, final UserId userId, final Instant since, final Jwt token) {
         Channel channel = channelService.getChannel(channelId);
         checkForAccess(channel, userId, token);
-
         return since == null ? channel.getMessages() : channel.getMessagesSince(since);
     }
 
@@ -68,7 +67,7 @@ public class ChatService {
 
         publishMessage(userId, friendId, content, channel);
         publisher.saveAndPublish(channel, message);
-        
+
         return message;
     }
 

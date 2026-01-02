@@ -1,6 +1,6 @@
 package be.kdg.team22.communicationservice.api.chat;
 
-import be.kdg.team22.communicationservice.api.chat.models.ChannelModel;
+import be.kdg.team22.communicationservice.api.chat.models.channel.ChannelModel;
 import be.kdg.team22.communicationservice.application.chat.ChannelService;
 import be.kdg.team22.communicationservice.domain.chat.UserId;
 import be.kdg.team22.communicationservice.domain.chat.channel.Channel;

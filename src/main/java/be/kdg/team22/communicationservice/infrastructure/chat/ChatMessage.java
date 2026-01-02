@@ -1,6 +1,6 @@
 package be.kdg.team22.communicationservice.infrastructure.chat;
 
-import be.kdg.team22.communicationservice.api.chat.models.MessageModel;
+import be.kdg.team22.communicationservice.api.chat.models.message.MessageModel;
 
 import java.util.UUID;
 

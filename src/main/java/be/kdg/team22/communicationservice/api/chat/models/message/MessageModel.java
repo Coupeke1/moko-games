@@ -1,4 +1,4 @@
-package be.kdg.team22.communicationservice.api.chat.models;
+package be.kdg.team22.communicationservice.api.chat.models.message;
 
 import be.kdg.team22.communicationservice.domain.chat.message.Message;
 
