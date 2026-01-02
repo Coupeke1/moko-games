@@ -9,7 +9,7 @@ public record ChessAchievementEvent(
         String playerName,
         String achievementType,
         String achievementDescription,
-        String messageType,
+        ChessMessageType messageType,
         LocalDateTime timestamp
 ) {
 }

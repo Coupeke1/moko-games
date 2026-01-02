@@ -11,7 +11,7 @@ public record ChessGameEndedEvent(
         String endReason,
         String winner,
         long totalMoves,
-        String messageType,
+        ChessMessageType messageType,
         LocalDateTime timestamp
 ) {
 }

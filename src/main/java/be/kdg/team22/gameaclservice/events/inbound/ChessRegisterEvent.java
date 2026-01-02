@@ -11,7 +11,7 @@ public record ChessRegisterEvent(
     String frontendUrl,
     String pictureUrl,
     List<ChessAchievement> availableAchievements,
-    String messageType,
+    ChessMessageType messageType,
     LocalDateTime timestamp
 
 ) {

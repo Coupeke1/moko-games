@@ -13,10 +13,10 @@ public class RabbitMQTopology {
     public static final String EXCHANGE_PLATFORM_GAMEPLAY = "exchange.gameplay";
 
     // CHESS SERVICE - Routing Keys
-    public static final String ROUTING_KEY_CHESS_ACHIEVEMENT_AQUIRED = "achievement.acquired";
+    public static final String ROUTING_KEY_CHESS_ACHIEVEMENT_ACQUIRED = "achievement.acquired";
 
     // PLATFORM - Routing Keys
-    public static final String ROUTING_KEY_PLATFORM_ACHIEVEMENT_AQUIRED = "game.chess.achievement";
+    public static final String ROUTING_KEY_PLATFORM_ACHIEVEMENT_ACQUIRED = "game.chess.achievement";
     public static final String ROUTING_KEY_PLATFORM_GAME_ENDED = "game.ended";
 
     // CHESS SERVICE - Queues

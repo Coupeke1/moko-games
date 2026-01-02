@@ -17,7 +17,7 @@ public class AchievementEventPublisher {
     public void publishAchievementEvent(GameAchievementEvent event) {
         rabbitTemplate.convertAndSend(
                 RabbitMQTopology.EXCHANGE_PLATFORM_GAMEPLAY,
-                RabbitMQTopology.ROUTING_KEY_PLATFORM_ACHIEVEMENT_AQUIRED,
+                RabbitMQTopology.ROUTING_KEY_PLATFORM_ACHIEVEMENT_ACQUIRED,
                 event
         );
     }

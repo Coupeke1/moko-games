@@ -23,12 +23,16 @@ public record RegisterGameRequest(
         List<RegisterAchievementRequest> achievements
 ) {
     public static RegisterGameRequest convert(ChessRegisterEvent event, ChessInfoProperties chessInfo, String aclBackendUrl) {
+        String frontendUrl = event.frontendUrl();
+        String baseFrontendUrl = frontendUrl.substring(0, frontendUrl.lastIndexOf('/'));
+
         List<RegisterAchievementRequest> achievements = new ArrayList<>();
         event.availableAchievements().forEach(achievement -> achievements.add(RegisterAchievementRequest.convert(achievement)));
+
         return new RegisterGameRequest(
                 "chess",
                 aclBackendUrl,
-                event.frontendUrl(),
+                baseFrontendUrl,
                 "/api/games/chess",
                 "/actuator/health",
                 "Chess",
