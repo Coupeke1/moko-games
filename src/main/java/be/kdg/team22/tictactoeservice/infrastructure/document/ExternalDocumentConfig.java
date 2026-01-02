@@ -10,12 +10,12 @@ import org.springframework.web.client.RestClient;
 public class ExternalDocumentConfig {
 
     @Bean("documentService")
-    RestClient documentRestClient(@Value("${business.chat-service.url}") final String baseUrl) {
+    RestClient documentRestClient(@Value("${business.chat.url}") final String baseUrl) {
         return createRestClient(baseUrl);
     }
 
     @Bean("documentServiceFallback")
-    RestClient documentRestClientFallback(@Value("${business.chat-service.fallback_url}") final String fallbackUrl) {
+    RestClient documentRestClientFallback(@Value("${business.chat.fallback_url}") final String fallbackUrl) {
         return createRestClient(fallbackUrl);
     }
 
