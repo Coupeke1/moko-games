@@ -5,10 +5,11 @@ import be.kdg.team22.sessionservice.application.lobby.LobbyService;
 import be.kdg.team22.sessionservice.config.RabbitMQTopology;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
 import be.kdg.team22.sessionservice.domain.player.PlayerId;
-import java.util.Optional;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component
 public class LobbyListener {
@@ -36,7 +37,7 @@ public class LobbyListener {
 
     public void publishToPlayer(final PlayerId id, final Lobby lobby) {
         LobbyModel model = LobbyModel.from(lobby);
-        LobbyMessage message = new LobbyMessage(id.value(), "lobby", model);
+        LobbyMessage message = LobbyMessage.of(id, model);
         template.convertAndSend(
             RabbitMQTopology.EXCHANGE_USER_SOCKET,
             "user.message",

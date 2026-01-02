@@ -3,6 +3,7 @@ package be.kdg.team22.sessionservice.infrastructure.lobby;
 import be.kdg.team22.sessionservice.api.lobby.models.LobbyModel;
 import be.kdg.team22.sessionservice.config.RabbitMQTopology;
 import be.kdg.team22.sessionservice.domain.lobby.Lobby;
+import be.kdg.team22.sessionservice.domain.player.PlayerId;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
@@ -17,8 +18,13 @@ public class LobbyPublisher {
     public void publishToPlayers(final Lobby lobby) {
         LobbyModel model = LobbyModel.from(lobby);
         lobby.players().forEach(player -> {
-            LobbyMessage message = new LobbyMessage(player.id().value(), "lobby", model);
+            LobbyMessage message = LobbyMessage.of(player.id(), model);
             template.convertAndSend(RabbitMQTopology.EXCHANGE_USER_SOCKET, "user.message", message);
         });
+    }
+
+    public void publishToPlayerWithReason(final PlayerId playerId, final RemovalReason reason) {
+        LobbyMessage message = LobbyMessage.withReason(playerId, reason);
+        template.convertAndSend(RabbitMQTopology.EXCHANGE_USER_SOCKET, "user.message", message);
     }
 }
