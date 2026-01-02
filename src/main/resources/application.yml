@@ -28,3 +28,14 @@ management:
           WARNING: 200
           DOWN: 503
           OUT_OF_SERVICE: 503
+
+business:
+  game-service:
+    url: ${GAME_SERVICE_URL:http://localhost:8084}
+
+acl-config:
+  backend-url: ${ACL_CONFIG_BACKEND_URL:http://host.docker.internal:8088}
+  chess-info:
+    backend-url: ${CHESS_INFO_BACKEND_URL:http://localhost:8080}
+    price: 79.99
+    category: PARTY
