@@ -36,7 +36,7 @@ business:
     url: ${USER_SERVICE_URL:http://localhost:8089}
 
 acl-config:
-  backend-url: ${ACL_CONFIG_BACKEND_URL:http://localhost:8088}
+  backend-url: ${ACL_CONFIG_BACKEND_URL:http://host.docker.internal:8088}
   chess-info:
     backend-url: ${CHESS_INFO_BACKEND_URL:http://localhost:8080}
     price: 79.99
