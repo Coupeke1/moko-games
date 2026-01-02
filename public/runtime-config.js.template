@@ -12,6 +12,6 @@ window.__APP_CONFIG__ = {
     gamesService: "$VITE_GAMES_SERVICE",
     storeService: "$VITE_STORE_SERVICE",
     orderService: "$VITE_ORDER_SERVICE",
-    cartService: "$VITE_CART_SERVICE"
+    cartService: "$VITE_CART_SERVICE",
     socketService: "$VITE_SOCKET_SERVICE",
 }
