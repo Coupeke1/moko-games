@@ -9,8 +9,10 @@ export const Reason = {
 export type Reason = (typeof Reason)[keyof typeof Reason];
 
 export interface LobbyMessage {
+    userId: string;
+    queue: string;
     payload: Lobby | null;
-    reason?: Reason;
+    reason: Reason | null;
 }
 
 export interface Lobby {
