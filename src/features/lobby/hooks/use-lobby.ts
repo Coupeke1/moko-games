@@ -1,8 +1,8 @@
 import show from "@/components/global/toast/toast";
 import {Type} from "@/components/global/toast/type";
 import type {Lobby, LobbyMessage} from "@/features/lobby/models/lobby.ts";
-import {getReasonMessage, isClosed, shouldStart,} from "@/features/lobby/services/lobby.ts";
-import {isPlayerInLobby} from "@/features/lobby/services/players.ts";
+import {getReasonMessage, shouldStart,} from "@/features/lobby/services/lobby.ts";
+import {shouldLeaveLobby} from "@/features/lobby/services/players.ts";
 import {watchLobby} from "@/features/lobby/services/socket.ts";
 import {useSocketStore} from "@/stores/socket-store.ts";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
@@ -64,7 +64,7 @@ export function useLobby(lobbyId?: string | null, userId?: string | null) {
 
                 if (message.reason) {
                     show(Type.Lobby, getReasonMessage(message.reason));
-                    navigate("/library", { replace: true });
+                    navigate("/library", {replace: true});
                     return;
                 }
 
@@ -74,16 +74,20 @@ export function useLobby(lobbyId?: string | null, userId?: string | null) {
 
                 queryClient.setQueryData<Lobby>(["lobby", lobbyId], lobby);
 
-                const kicked = !isPlayerInLobby(userId, lobby);
-                const closed = isClosed(lobby);
+                const leaveInfo = shouldLeaveLobby(message, userId);
+
+                if (leaveInfo.leave) {
+                    show(Type.Lobby, leaveInfo.toastMessage!);
+                    navigate("/library", {replace: true});
+                    return;
+                }
 
                 if (shouldStart(lobby)) {
                     cancelRedirect();
                     navigate(`/lobbies/${lobby.id}/game`, {replace: true});
                 }
 
-                if (kicked || closed) scheduleRedirectToLibrary();
-                else cancelRedirect();
+                cancelRedirect();
 
                 if (isFirst) {
                     isFirst = false;
