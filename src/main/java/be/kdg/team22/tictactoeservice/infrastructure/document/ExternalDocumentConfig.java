@@ -21,8 +21,8 @@ public class ExternalDocumentConfig {
 
     private RestClient createRestClient(String baseUrl) {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(2000);
-        requestFactory.setReadTimeout(20000);
+        requestFactory.setConnectTimeout(30000);
+        requestFactory.setReadTimeout(30000);
 
         return RestClient.builder()
                 .baseUrl(baseUrl)
