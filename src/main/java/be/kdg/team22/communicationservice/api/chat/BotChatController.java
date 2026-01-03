@@ -2,8 +2,7 @@ package be.kdg.team22.communicationservice.api.chat;
 
 import be.kdg.team22.communicationservice.api.chat.models.message.CreateMessageModel;
 import be.kdg.team22.communicationservice.api.chat.models.message.MessageModel;
-import be.kdg.team22.communicationservice.application.chat.ChatService;
-import be.kdg.team22.communicationservice.application.chat.PrivateChatService;
+import be.kdg.team22.communicationservice.application.chat.BotChatService;
 import be.kdg.team22.communicationservice.domain.chat.channel.ChannelId;
 import be.kdg.team22.communicationservice.domain.chat.message.Message;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,11 +16,11 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/chat/friends")
-public class FriendsChatController {
-    private final PrivateChatService service;
+@RequestMapping("/api/chat/bot")
+public class BotChatController {
+    private final BotChatService service;
 
-    public FriendsChatController(final PrivateChatService service) {
+    public BotChatController(final BotChatService service) {
         this.service = service;
     }
 
@@ -33,7 +32,7 @@ public class FriendsChatController {
 
     @PostMapping("/{id}")
     public ResponseEntity<MessageModel> sendMessage(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token, @RequestBody final CreateMessageModel request) {
-        Message message = service.sendMessage(ChannelId.from(id), request.content(), token);
+        Message message = service.sendMessage(ChannelId.from(id), request.content(), request.game(), token);
         return ResponseEntity.ok(MessageModel.from(message));
     }
 }

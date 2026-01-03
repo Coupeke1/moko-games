@@ -11,10 +11,6 @@ import java.util.UUID;
 
 @ValueObject
 public record UserId(UUID value) {
-    public UserId(UUID value) {
-        this.value = value;
-    }
-
     public static UserId from(final UUID value) {
         return new UserId(value);
     }
@@ -23,12 +19,8 @@ public record UserId(UUID value) {
         return new UserId(id.value());
     }
 
-    public static UserId create(String value) {
+    private static UserId create(String value) {
         return new UserId(UUID.fromString(value));
-    }
-
-    public static UserId create() {
-        return new UserId(UUID.randomUUID());
     }
 
     public static UserId get(Jwt token) {

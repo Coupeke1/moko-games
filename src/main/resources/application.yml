@@ -71,5 +71,6 @@ business:
   bot-service:
     url: ${BOT_SERVICE_URL:http://localhost:8090}
     team-number: ${BOT_SERVICE_TEAM_NUMBER:22}
+    api-key: ${BOT_SERVICE_API_KEY:}
 
 cors.allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174,http://localhost:5175}

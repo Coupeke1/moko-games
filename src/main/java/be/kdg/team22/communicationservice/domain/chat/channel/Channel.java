@@ -1,6 +1,8 @@
 package be.kdg.team22.communicationservice.domain.chat.channel;
 
+import be.kdg.team22.communicationservice.domain.chat.SenderId;
 import be.kdg.team22.communicationservice.domain.chat.UserId;
+import be.kdg.team22.communicationservice.domain.chat.bot.BotId;
 import be.kdg.team22.communicationservice.domain.chat.channel.type.ReferenceType;
 import be.kdg.team22.communicationservice.domain.chat.message.Message;
 import org.jmolecules.ddd.annotation.AggregateRoot;
@@ -49,7 +51,13 @@ public class Channel {
     }
 
     public Message send(final UserId id, final String content) {
-        Message message = new Message(this.id, id, content);
+        Message message = new Message(this.id, SenderId.from(id), content);
+        messages.add(message);
+        return message;
+    }
+
+    public Message send(final BotId id, final String content) {
+        Message message = new Message(this.id, SenderId.from(id), content);
         messages.add(message);
         return message;
     }

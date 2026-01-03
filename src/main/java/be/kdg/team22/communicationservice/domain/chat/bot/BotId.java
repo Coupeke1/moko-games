@@ -9,9 +9,6 @@ import java.util.UUID;
 
 @ValueObject
 public record BotId(UUID value) {
-    public BotId(UUID value) {
-        this.value = value;
-    }
 
     public static BotId from(final UUID value) {
         return new BotId(value);

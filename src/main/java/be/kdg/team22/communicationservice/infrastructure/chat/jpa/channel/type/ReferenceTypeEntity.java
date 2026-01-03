@@ -33,7 +33,7 @@ public abstract class ReferenceTypeEntity {
         switch (referenceType.type()) {
             case BOT -> {
                 BotReferenceType botReferenceType = (BotReferenceType) referenceType;
-                return new BotReferenceTypeEntity(botReferenceType.userId().value());
+                return new BotReferenceTypeEntity(botReferenceType.userId().value(), botReferenceType.botId().value());
             }
             case LOBBY -> {
                 LobbyReferenceType lobbyReferenceType = (LobbyReferenceType) referenceType;

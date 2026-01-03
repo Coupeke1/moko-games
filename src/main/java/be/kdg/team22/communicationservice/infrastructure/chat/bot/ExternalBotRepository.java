@@ -3,52 +3,101 @@ package be.kdg.team22.communicationservice.infrastructure.chat.bot;
 import be.kdg.team22.communicationservice.domain.chat.bot.BotChatRepository;
 import be.kdg.team22.communicationservice.domain.chat.bot.BotResponse;
 import be.kdg.team22.communicationservice.domain.chat.exceptions.BotServiceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
 @Repository
 public class ExternalBotRepository implements BotChatRepository {
+    @Value("${business.bot-service.api-key}")
+    private String API_KEY;
 
-    private final RestClient client;
-    private final int teamNumber;
+    @Value("${business.bot-service.team-number}")
+    private int TEAM_NUMBER;
 
-    public ExternalBotRepository(
-                        @Qualifier("botService") final RestClient client,
-            @Value("${business.bot-service.team-number}") final int teamNumber
-    ) {
-        this.client = client;
-        this.teamNumber = teamNumber;
+    private final Logger logger = LoggerFactory.getLogger(ExternalBotRepository.class);
+    private final RestClient primaryClient;
+    private final RestClient fallbackClient;
+
+    public ExternalBotRepository(@Qualifier("botService") final RestClient primaryClient, @Qualifier("botServiceFallback") final RestClient fallbackClient) {
+        this.primaryClient = primaryClient;
+        this.fallbackClient = fallbackClient;
     }
 
     @Override
-        public BotResponse askBot(final String question, final String gameName) {
-        BotChatRequest request = new BotChatRequest(question, teamNumber, gameName);
+    public BotResponse ask(final String question, final String gameName) {
+        BotChatRequest request = new BotChatRequest(question, TEAM_NUMBER, gameName);
 
         try {
-            BotResponse response = client.post()
-                    .uri("/chat")
-                    .body(request)
-                    .retrieve()
-                    .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
-                        throw BotServiceException.badResponse("Client error: " + res.getStatusCode());
-                    })
-                    .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
-                        throw BotServiceException.unavailable();
-                    })
-                    .body(BotResponse.class);
-
-            if (response == null || response.answer() == null) {
-                throw BotServiceException.badResponse("Empty response from bot service");
+            return tryAskWithClient(primaryClient, "Primary", request);
+        } catch (ResourceAccessException ex) {
+            logger.warn("Primary chat service not reachable, trying fallback. {}", ex.getMessage());
+            try {
+                return tryAskWithClient(fallbackClient, "Fallback", request);
+            } catch (
+                    RestClientException fallbackEx) {
+                throw BotServiceException.requestFailed(fallbackEx);
             }
-
-            return response;
-
-        } catch (RestClientException e) {
-            throw BotServiceException.requestFailed(e);
+        } catch (RestClientException ex) {
+            throw BotServiceException.requestFailed(ex);
         }
+    }
+
+    private BotResponse tryAskWithClient(RestClient client, String clientName, BotChatRequest request) {
+        BotResponse response = client.post().uri("/chat").header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", API_KEY)).body(request).retrieve().onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
+            throw BotServiceException.badResponse(res.getStatusText());
+        }).onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
+            throw BotServiceException.unavailable();
+        }).body(BotResponse.class);
+
+        if (response == null || response.answer() == null)
+            throw BotServiceException.badResponse("Empty response");
+
+        return response;
+    }
+
+    public boolean uploadPdf(byte[] pdfBytes, String filename) {
+        try {
+            return tryUploadWithClient(primaryClient, "Primary", pdfBytes, filename);
+        } catch (
+                ResourceAccessException resourceAccessException) {
+            logger.warn("Primary chat service upload not reachable, trying fallback. {}", resourceAccessException.getMessage());
+            try {
+                return tryUploadWithClient(fallbackClient, "Fallback", pdfBytes, filename);
+            } catch (
+                    RestClientException restClientException) {
+                throw BotServiceException.requestFailed(restClientException);
+            }
+        } catch (
+                RestClientException restClientException) {
+            throw BotServiceException.requestFailed(restClientException);
+        }
+    }
+
+    private boolean tryUploadWithClient(RestClient client, String clientName, byte[] pdfBytes, String filename) {
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", new ByteArrayResource(pdfBytes) {
+            @Override
+            public String getFilename() {
+                return filename;
+            }
+        });
+
+        ResponseEntity<Void> response = client.post().uri("/upload-document").contentType(MediaType.MULTIPART_FORM_DATA).body(body).retrieve().toBodilessEntity();
+
+        logger.debug("{} upload responded with status: {}", clientName, response.getStatusCode());
+        return response.getStatusCode().is2xxSuccessful();
     }
 }

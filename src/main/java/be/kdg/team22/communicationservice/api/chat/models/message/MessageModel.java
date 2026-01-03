@@ -9,6 +9,6 @@ public record MessageModel(UUID id, UUID senderId,
                            String content,
                            Instant timestamp) {
     public static MessageModel from(Message message) {
-        return new MessageModel(message.id().value(), message.userId().value(), message.content(), message.timestamp());
+        return new MessageModel(message.id().value(), message.senderId().value(), message.content(), message.timestamp());
     }
 }

@@ -1,6 +1,6 @@
 package be.kdg.team22.communicationservice.infrastructure.chat.jpa.message;
 
-import be.kdg.team22.communicationservice.domain.chat.UserId;
+import be.kdg.team22.communicationservice.domain.chat.SenderId;
 import be.kdg.team22.communicationservice.domain.chat.channel.ChannelId;
 import be.kdg.team22.communicationservice.domain.chat.message.Message;
 import be.kdg.team22.communicationservice.domain.chat.message.MessageId;
@@ -21,7 +21,7 @@ public class MessageEntity {
     private ChannelEntity channel;
 
     @Column(nullable = false)
-    private UUID userId;
+    private UUID senderId;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
@@ -32,20 +32,20 @@ public class MessageEntity {
     protected MessageEntity() {
     }
 
-    public MessageEntity(final UUID id, final ChannelEntity channel, final UUID userId, final String content, final Instant timestamp) {
+    public MessageEntity(final UUID id, final ChannelEntity channel, final UUID senderId, final String content, final Instant timestamp) {
         this.id = id;
         this.channel = channel;
-        this.userId = userId;
+        this.senderId = senderId;
         this.content = content;
         this.timestamp = timestamp;
     }
 
     public static MessageEntity from(final Message message, final ChannelEntity parent) {
-        return new MessageEntity(message.id().value(), parent, message.userId().value(), message.content(), message.timestamp());
+        return new MessageEntity(message.id().value(), parent, message.senderId().value(), message.content(), message.timestamp());
     }
 
     public Message to() {
-        return new Message(MessageId.from(id), ChannelId.from(channel.id()), UserId.from(userId), content, timestamp);
+        return new Message(MessageId.from(id), ChannelId.from(channel.id()), SenderId.from(senderId), content, timestamp);
     }
 
     public UUID getId() {
@@ -57,7 +57,7 @@ public class MessageEntity {
     }
 
     public UUID senderId() {
-        return userId;
+        return senderId;
     }
 
     public String content() {
