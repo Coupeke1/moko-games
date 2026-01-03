@@ -6,7 +6,6 @@ import be.kdg.team22.userservice.api.profile.models.NotificationsModel;
 import be.kdg.team22.userservice.api.profile.models.ProfileModel;
 import be.kdg.team22.userservice.application.profile.ProfileService;
 import be.kdg.team22.userservice.domain.profile.*;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -32,9 +31,9 @@ public class ProfileController {
     }
 
     @PostMapping("/bot")
-    public ResponseEntity<ProfileModel> createBotProfile() {
-        Profile bot = service.createBotProfile();
-        return ResponseEntity.status(HttpStatus.CREATED).body(ProfileModel.from(bot));
+    public ResponseEntity<ProfileModel> createBotProfile(@RequestBody final String description) {
+        Profile bot = service.createBotProfile(description);
+        return ResponseEntity.ok(ProfileModel.from(bot));
     }
 
     @GetMapping("/me/preferences/notifications")

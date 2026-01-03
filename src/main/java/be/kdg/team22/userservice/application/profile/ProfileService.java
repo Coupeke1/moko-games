@@ -147,14 +147,13 @@ public class ProfileService {
         throw ClaimNotFoundException.email();
     }
 
-    public Profile createBotProfile() {
+    public Profile createBotProfile(final String description) {
         ProfileId id = new ProfileId(UUID.randomUUID());
         ProfileName username = BotNameGenerator.randomName();
         ProfileEmail email = BotNameGenerator.randomEmail(username);
-        String description = "Hi, I'm a Moko bot.";
         String image = imageRepository.get().url();
 
-        Profile profile = new Profile(id, username, email, description, image);
+        Profile profile = new Profile(id, username, email, description == null ? "Hi, I'm a Moko bot." : description, image);
         profileRepository.save(profile);
 
         return profile;
