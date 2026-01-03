@@ -53,4 +53,12 @@ public class GameController {
 
         return ResponseEntity.ok(model);
     }
+
+    @PostMapping("/{id}/move-bot")
+    public ResponseEntity<GameModel> requestBotMove(@AuthenticationPrincipal final Jwt token,
+                                                    @PathVariable final UUID id) {
+        Game game = service.requestBotMove(new GameId(id), PlayerId.get(token));
+        GameModel model = GameModel.from(game);
+        return ResponseEntity.ok(model);
+    }
 }
