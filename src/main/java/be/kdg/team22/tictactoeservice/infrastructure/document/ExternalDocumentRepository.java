@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
@@ -30,36 +29,40 @@ public class ExternalDocumentRepository {
     }
 
     public boolean uploadPdf(byte[] pdfBytes, String filename) {
+        boolean ok = false;
         try {
-            return tryUploadWithClient(primaryClient, pdfBytes, filename);
-        } catch (ResourceAccessException ex) {
+            ok = tryUploadWithClient(primaryClient, pdfBytes, filename);
+        } catch (BotServiceException ex) {
             logger.warn("Primary document service not reachable, trying fallback. {}", ex.getMessage());
             try {
-                return tryUploadWithClient(fallbackClient, pdfBytes, filename);
-            } catch (RestClientException fallbackEx) {
-                throw BotServiceException.requestFailed(fallbackEx);
+                ok = tryUploadWithClient(fallbackClient, pdfBytes, filename);
+            } catch (BotServiceException fallbackEx) {
+                logger.warn("Fallback document service not reachable. {}", fallbackEx.getMessage());
             }
-        } catch (RestClientException ex) {
-            throw BotServiceException.requestFailed(ex);
         }
+        return ok;
     }
 
     private boolean tryUploadWithClient(RestClient client, byte[] pdfBytes, String filename) {
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("file", new ByteArrayResource(pdfBytes) {
-            @Override
-            public String getFilename() {
-                return filename;
-            }
-        });
+        try {
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", new ByteArrayResource(pdfBytes) {
+                @Override
+                public String getFilename() {
+                    return filename;
+                }
+            });
 
-        ResponseEntity<Void> response = client.post()
-                .uri("/upload-document")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(body)
-                .retrieve()
-                .toBodilessEntity();
+            ResponseEntity<Void> response = client.post()
+                    .uri("/upload-document")
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .body(body)
+                    .retrieve()
+                    .toBodilessEntity();
 
-        return response.getStatusCode().is2xxSuccessful();
+            return response.getStatusCode().is2xxSuccessful();
+        } catch (RestClientException ex) {
+            throw BotServiceException.requestFailed(ex);
+        }
     }
 }
