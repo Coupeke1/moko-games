@@ -74,7 +74,6 @@ public class GameService {
         if (game.currentPlayer().botPlayer()) {
             boolean expectResponse = game.status() == GameStatus.RUNNING;
             applicationEventPublisher.publishEvent(BotMoveRequestedEvent.from(game, expectResponse));
-            repository.save(game);
         }
 
         checkForEvents(game, move, result);
@@ -93,7 +92,6 @@ public class GameService {
 
         boolean expectResponse = game.status() == GameStatus.RUNNING;
         applicationEventPublisher.publishEvent(BotMoveRequestedEvent.from(game, expectResponse));
-        repository.save(game);
 
         checkForEvents(game, null, null);
 
