@@ -56,7 +56,7 @@ public class ChannelController {
     private ReferenceTypeModel getReferenceType(final ReferenceType referenceType) {
         return switch (referenceType) {
             case BotReferenceType botReferenceType ->
-                    new BotReferenceTypeModel(botReferenceType.userId().value(), botReferenceType.botId().value());
+                    new BotReferenceTypeModel(botReferenceType.userId().value(), botReferenceType.botId().value(), botReferenceType.game());
             case LobbyReferenceType lobbyReferenceType ->
                     new LobbyReferenceTypeModel(lobbyReferenceType.lobbyId().value());
             case PrivateReferenceType privateReferenceType ->
