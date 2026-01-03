@@ -38,39 +38,40 @@ public class GameController {
     }
 
     @GetMapping
-    public ResponseEntity<GameListModel> getAllGames() {
+    public ResponseEntity<List<GameModel>> getAllGames() {
         List<Game> games = service.findAll();
 
-        List<GameDetailsModel> models = games.stream()
-                .map(GameDetailsModel::from)
+        List<GameModel> models = games.stream()
+                .map(GameModel::from)
                 .toList();
 
-        return ResponseEntity.ok(new GameListModel(models));
+        return ResponseEntity.ok(models);
     }
 
     @GetMapping("/{value}")
-    public ResponseEntity<GameDetailsModel> getGame(final @PathVariable String value) {
+    public ResponseEntity<GameModel> getGame(final @PathVariable String value) {
         try {
             GameId id = GameId.from(value);
             Game game = service.findById(id);
-            return ResponseEntity.ok(GameDetailsModel.from(game));
-        } catch (IllegalArgumentException ignored) {
+            return ResponseEntity.ok(GameModel.from(game));
+        } catch (
+                IllegalArgumentException ignored) {
         }
 
         Game game = service.findByName(value);
-        return ResponseEntity.ok(GameDetailsModel.from(game));
+        return ResponseEntity.ok(GameModel.from(game));
     }
 
     @PutMapping("/{name}")
-    public ResponseEntity<GameDetailsModel> registerGame(final @PathVariable String name, final @RequestBody RegisterGameRequest request) {
+    public ResponseEntity<GameModel> registerGame(final @PathVariable String name, final @RequestBody RegisterGameRequest request) {
         Game game = service.register(name, request);
-        return ResponseEntity.ok(GameDetailsModel.from(game));
+        return ResponseEntity.ok(GameModel.from(game));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<GameDetailsModel> createGame(final @RequestBody RegisterGameRequest request) {
+    public ResponseEntity<GameModel> createGame(final @RequestBody RegisterGameRequest request) {
         Game game = service.create(request);
-        return ResponseEntity.ok(GameDetailsModel.from(game));
+        return ResponseEntity.ok(GameModel.from(game));
     }
 
     @GetMapping("/{id}/achievements")
