@@ -8,11 +8,12 @@ import {MyRoleDisplay} from "../components/my-role-display";
 import {GameStatus} from "../models/game-status";
 import {TurnIndicator} from "../components/turn-indicator";
 import {GameGrid} from "../components/game-grid";
-import {ConfirmTurnButton} from "@/components/confirm-turn-button.tsx";
+import {BigButton} from "@/components/big-button.tsx";
 import {useMakeMoveSelection} from "@/hooks/use-make-move-selection.ts";
 import {useMakeMove} from "@/hooks/use-make-move.ts";
 import Page from "@/components/layout/page.tsx";
 import {GameEndModal} from "@/components/dialogs/game-end-modal.tsx";
+import {useBotMove} from "@/hooks/use-bot-move.ts";
 
 export default function GamePage() {
     const {id} = useParams<{ id: string }>();
@@ -21,7 +22,7 @@ export default function GamePage() {
     const {data: gameState, isLoading: gameLoading, isError: gameError} = useGameState(id || "");
 
     const myRole = useMyPlayerRole(gameState?.players, profile?.id);
-    const isAI = gameState?.aiPlayer === myRole;
+    const isAI = gameState?.botPlayer === myRole;
     const isMyTurn = gameState?.currentRole === myRole;
     const boardSize = gameState?.board.length;
 
@@ -35,12 +36,17 @@ export default function GamePage() {
     } = useMakeMoveSelection(isMyTurn, gameState?.status, myRole, gameState?.board);
 
     const {confirmMove, isSubmitting} = useMakeMove(id, profile?.id)
+    const {requestBotTurn, isBotMoving} = useBotMove(id);
 
     const handleConfirmMove = () => {
         confirmMove(movePath, () => {
             setSelectedCell(null);
             setMovePath([]);
         });
+    }
+
+    const handleBotMove = () => {
+        requestBotTurn();
     }
 
     if (profileLoading || (id && gameLoading)) {
@@ -99,12 +105,20 @@ export default function GamePage() {
 
                         {gameState.status === GameStatus.RUNNING && (
                             <TurnIndicator gameState={gameState}>
-                                <ConfirmTurnButton
+                                <BigButton
                                     onClick={handleConfirmMove}
                                     disabled={!canConfirmMove || isSubmitting}
                                 >
                                     {isSubmitting ? "Making Move..." : "Confirm Move"}
-                                </ConfirmTurnButton>
+                                </BigButton>
+                                {gameState.botPlayer && gameState.currentRole === gameState.botPlayer && (
+                                    <BigButton
+                                        onClick={handleBotMove}
+                                        disabled={isSubmitting || isBotMoving || isMyTurn}
+                                    >
+                                        {isBotMoving ? "Bot Thinking..." : "Request Bot Move"}
+                                    </BigButton>
+                                )}
                             </TurnIndicator>
                         )}
                     </div>
@@ -119,18 +133,20 @@ export default function GamePage() {
                         validMoves={[]}
                         movePath={movePath}
                         onCellClick={handleCellClick}
-                        disabled={!isMyTurn || isSubmitting}
+                        disabled={!isMyTurn || isSubmitting || isBotMoving}
                     />
                 </div>
 
                 <div className="mt-6 text-fg-2 text-sm text-center">
                     {isSubmitting
                         ? "Processing move..."
-                        : !isMyTurn
-                            ? "Waiting for opponent..."
-                            : selectedCell
-                                ? `Selected cell: ${selectedCell} - Click any cell to move`
-                                : "Click a piece to select it"}
+                        : isBotMoving
+                            ? "Bot is thinking..."
+                            : !isMyTurn
+                                ? "Waiting for opponent..."
+                                : selectedCell
+                                    ? `Selected cell: ${selectedCell} - Click any cell to move`
+                                    : "Click a piece to select it"}
                 </div>
 
                 {gameState.status !== GameStatus.RUNNING && (

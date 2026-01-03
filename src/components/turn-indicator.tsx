@@ -9,10 +9,10 @@ interface TurnIndicatorProps {
 }
 
 export function TurnIndicator({gameState, children}: TurnIndicatorProps) {
-    const {currentRole, players, aiPlayer} = gameState;
+    const {currentRole, players, botPlayer} = gameState;
     const currentPlayer = players.find(player => player.role === currentRole);
     const {data: profile} = usePlayerProfile(currentPlayer?.id);
-    const isAITurn = aiPlayer === currentRole;
+    const isAITurn = botPlayer === currentRole;
 
     return (
         <div

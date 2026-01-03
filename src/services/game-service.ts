@@ -52,3 +52,15 @@ export async function requestMove(gameId: string, playerId: string, cells: numbe
         throw new Error(`Could not make move: Unknown error`);
     }
 }
+
+export async function requestBotMove(gameId: string): Promise<GameState> {
+    try {
+        const response = await axiosInstance.post<GameState>(`/${gameId}/move-bot`);
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            throw new Error(`Could not request bot move: ${error.response?.data?.message || error.message}`);
+        }
+        throw new Error(`Could not request bot move: Unknown error`);
+    }
+}
