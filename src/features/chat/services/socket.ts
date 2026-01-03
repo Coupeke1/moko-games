@@ -6,9 +6,16 @@ import { map } from "rxjs/operators";
 export function watchChat(id: string): Observable<Message> {
     const client = useSocketStore.getState().client;
 
-    const updates = client
-        .watch({ destination: `/user/queue/chat-${id}` })
-        .pipe(map((msg) => JSON.parse(msg.body) as Message));
+    return client.watch({ destination: `/user/queue/chat-${id}` }).pipe(
+        map((msg) => {
+            const parsed = JSON.parse(msg.body) as Message;
 
-    return updates;
+            return {
+                ...parsed,
+                timestamp: new Date(
+                    Number(parsed.timestamp) * 1000,
+                ).toISOString(),
+            };
+        }),
+    );
 }

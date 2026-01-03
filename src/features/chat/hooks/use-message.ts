@@ -1,14 +1,15 @@
 import type { Message } from "@/features/chat/models/message";
 import { watchChat } from "@/features/chat/services/socket";
-import { useSocketStore } from "@/stores/socket-store.ts";
-import { useEffect, useRef, useState } from "react";
-import { type Subscription } from "rxjs";
+import { useSocketStore } from "@/stores/socket-store";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
+import type { Subscription } from "rxjs";
 
 export function useMessage(id?: string | null) {
     const { connect, disconnect, isConnected } = useSocketStore();
     const subscription = useRef<Subscription | null>(null);
+    const queryClient = useQueryClient();
 
-    const [message, setMessage] = useState<Message | null>(null);
     const enabled = !!id;
 
     useEffect(() => {
@@ -22,7 +23,15 @@ export function useMessage(id?: string | null) {
         if (subscription.current && !subscription.current.closed) return;
 
         subscription.current = watchChat(id).subscribe({
-            next: (message) => setMessage(message),
+            next: (message: Message) => {
+                queryClient.setQueryData<Message[]>(
+                    ["chat", id, "messages"],
+                    (old = []) => {
+                        if (old.some((m) => m.id === message.id)) return old;
+                        return [...old, message];
+                    },
+                );
+            },
             error: () => (subscription.current = null),
             complete: () => (subscription.current = null),
         });
@@ -31,7 +40,7 @@ export function useMessage(id?: string | null) {
             subscription.current?.unsubscribe();
             subscription.current = null;
         };
-    }, [enabled, id, isConnected]);
+    }, [enabled, id, isConnected, queryClient]);
 
-    return { message, loading: false, error: false };
+    return null;
 }

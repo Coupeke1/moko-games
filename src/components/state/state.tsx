@@ -6,7 +6,7 @@ interface Props {
     loading: boolean;
     error: boolean;
     empty?: boolean;
-    message: string;
+    message?: string;
     children: ReactNode;
 }
 
@@ -19,6 +19,6 @@ export default function State({
 }: Props) {
     if (loading) return <LoadingState />;
     if (error) return <ErrorState />;
-    if (empty) return <ErrorState>{message}</ErrorState>;
+    if (empty) return message ? <ErrorState>{message}</ErrorState> : null;
     return <>{children}</>;
 }

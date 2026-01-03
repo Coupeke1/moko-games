@@ -55,14 +55,18 @@ export default function ChatPage() {
                 <section
                     className={`flex flex-col ${Gap.Medium} col-span-12 md:col-span-8`}
                 >
-                    <section className="p-4 rounded-lg bg-bg-3 flex flex-col gap-8 h-32 md:h-[calc(100vh-13rem)] overflow-y-scroll">
+                    <section className="p-4 rounded-lg bg-bg-3 flex flex-col gap-8 h-64 md:h-[calc(100vh-15rem)] min-h-0">
                         <State
                             loading={loading}
                             error={error}
                             empty={!channel}
                             message="No channel"
                         >
-                            {channel && <MessagesSection channel={channel} />}
+                            <section className="h-full min-h-0 flex">
+                                {channel && (
+                                    <MessagesSection channel={channel} />
+                                )}
+                            </section>
                         </State>
                     </section>
 
