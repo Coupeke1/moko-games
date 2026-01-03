@@ -5,6 +5,8 @@ import be.kdg.team22.checkersservice.config.RabbitMQTopology;
 import be.kdg.team22.checkersservice.domain.events.*;
 import be.kdg.team22.checkersservice.domain.events.exceptions.PublishAchievementException;
 import be.kdg.team22.checkersservice.domain.events.exceptions.RabbitNotReachableException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.AmqpConnectException;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -14,7 +16,7 @@ import java.util.UUID;
 
 @Component
 public class RabbitMqGameplayEventPublisher implements GameEventPublisher {
-
+    private static final Logger logger = LoggerFactory.getLogger(RabbitMqGameplayEventPublisher.class);
     private final RabbitTemplate rabbitTemplate;
 
     public RabbitMqGameplayEventPublisher(final RabbitTemplate rabbitTemplate) {
@@ -33,6 +35,32 @@ public class RabbitMqGameplayEventPublisher implements GameEventPublisher {
                         msg.getMessageProperties().setCorrelationId(event.gameId().toString());
                         return msg;
                     }
+            );
+            logger.info("Published achievement event for {} game to player {}: {}",
+                    event.gameName(), event.playerId(), event.achievementCode()
+            );
+        } catch (AmqpConnectException exception) {
+            throw new RabbitNotReachableException();
+        } catch (AmqpException exception) {
+            throw new PublishAchievementException();
+        }
+    }
+
+    @Override
+    public void publishGameEnded(final GameEndedEvent event) {
+        try {
+            rabbitTemplate.convertAndSend(
+                    RabbitMQTopology.EXCHANGE_GAMEPLAY,
+                    RabbitMQTopology.ROUTING_GAME_ENDED,
+                    event,
+                    msg -> {
+                        msg.getMessageProperties().setMessageId(UUID.randomUUID().toString());
+                        msg.getMessageProperties().setCorrelationId(event.instanceId().toString());
+                        return msg;
+                    }
+            );
+            logger.info("Published game ended event for {} game with instance ID {}",
+                    "checkers", event.instanceId()
             );
         } catch (AmqpConnectException exception) {
             throw new RabbitNotReachableException();

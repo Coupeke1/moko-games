@@ -8,6 +8,8 @@ import be.kdg.team22.checkersservice.events.BotMoveRequestedEvent;
 import be.kdg.team22.checkersservice.infrastructure.bot.BotMoveRequest;
 import be.kdg.team22.checkersservice.infrastructure.bot.BotMoveResponse;
 import be.kdg.team22.checkersservice.infrastructure.bot.ExternalBotRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -18,6 +20,7 @@ import java.util.UUID;
 
 @Component
 public class BotMoveEventListener {
+    private static final Logger logger = LoggerFactory.getLogger(BotMoveEventListener.class);
     private final GameService gameService;
     private final ExternalBotRepository aiRepository;
 
@@ -49,6 +52,7 @@ public class BotMoveEventListener {
 
             Move move = new Move(botPlayerId, cells);
             gameService.requestMove(gameId, botPlayerId, move);
+            logger.info("Bot move executed for {} game {}", event.gameName(), event.gameId());
         }
     }
 }

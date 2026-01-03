@@ -4,4 +4,6 @@ import be.kdg.team22.checkersservice.domain.events.*;
 
 public interface GameEventPublisher {
     void publishAchievement(GameAchievementEvent event);
+
+    void publishGameEnded(GameEndedEvent event);
 }

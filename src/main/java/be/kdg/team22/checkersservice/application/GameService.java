@@ -158,6 +158,15 @@ public class GameService {
                         )
                 );
             }
+
+            if (game.status() != GameStatus.RUNNING) {
+                publisher.publishGameEnded(
+                        new GameEndedEvent(
+                                game.id().value(),
+                                Instant.now()
+                        )
+                );
+            }
         } catch (PublishAchievementException | RabbitNotReachableException exception) {
             logger.error(exception.getMessage());
         }

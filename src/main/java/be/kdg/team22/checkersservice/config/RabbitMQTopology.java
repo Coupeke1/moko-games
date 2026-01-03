@@ -9,6 +9,7 @@ public class RabbitMQTopology {
     public static final String EXCHANGE_GAMEPLAY = "exchange.gameplay";
 
     public static final String ROUTING_CHECKERS_GAMEPLAY = "game.checkers.achievement";
+    public static final String ROUTING_GAME_ENDED = "game.ended";
 
     public static final String QUEUE_CHECKERS_EVENTS = "queue.checkers.events";
 
