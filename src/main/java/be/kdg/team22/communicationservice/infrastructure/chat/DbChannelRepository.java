@@ -1,10 +1,7 @@
 package be.kdg.team22.communicationservice.infrastructure.chat;
 
 import be.kdg.team22.communicationservice.domain.chat.UserId;
-import be.kdg.team22.communicationservice.domain.chat.channel.Channel;
-import be.kdg.team22.communicationservice.domain.chat.channel.ChannelId;
-import be.kdg.team22.communicationservice.domain.chat.channel.ChannelRepository;
-import be.kdg.team22.communicationservice.domain.chat.channel.LobbyId;
+import be.kdg.team22.communicationservice.domain.chat.channel.*;
 import be.kdg.team22.communicationservice.infrastructure.chat.jpa.channel.ChannelEntity;
 import be.kdg.team22.communicationservice.infrastructure.chat.jpa.channel.JpaChannelRepository;
 import org.springframework.stereotype.Repository;
@@ -35,8 +32,8 @@ public class DbChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Optional<Channel> findBotChannel(final UserId userId, final String game) {
-        return channelRepository.findBotChannel(userId.value(), game).map(ChannelEntity::to);
+    public Optional<Channel> findBotChannel(final UserId userId, final GameId gameId) {
+        return channelRepository.findBotChannel(userId.value(), gameId.value()).map(ChannelEntity::to);
     }
 
     @Override

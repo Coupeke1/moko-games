@@ -18,9 +18,9 @@ public interface JpaChannelRepository extends JpaRepository<ChannelEntity, UUID>
                 SELECT c
                 FROM ChannelEntity c
                 JOIN TREAT(c.referenceType AS BotReferenceTypeEntity) p
-                WHERE p.userId = :id AND p.game = :game
+                WHERE p.userId = :userId AND p.gameId = :gameId
             """)
-    Optional<ChannelEntity> findBotChannel(UUID id, String game);
+    Optional<ChannelEntity> findBotChannel(UUID userId, UUID gameId);
 
     @Query("""
                 SELECT c

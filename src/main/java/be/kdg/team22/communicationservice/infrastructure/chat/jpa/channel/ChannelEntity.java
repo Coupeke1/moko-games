@@ -37,8 +37,8 @@ public class ChannelEntity {
         ReferenceTypeEntity referenceType = ReferenceTypeEntity.from(channel.referenceType());
         ChannelEntity entity = new ChannelEntity(channel.id().value(), referenceType);
 
-        for (Message m : channel.getMessages()) {
-            entity.messages.add(MessageEntity.from(m, entity));
+        for (Message message : channel.getMessages()) {
+            entity.messages.add(MessageEntity.from(message, entity));
         }
 
         return entity;

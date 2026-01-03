@@ -7,6 +7,7 @@ import be.kdg.team22.communicationservice.application.chat.ChannelService;
 import be.kdg.team22.communicationservice.application.chat.UserService;
 import be.kdg.team22.communicationservice.domain.chat.UserId;
 import be.kdg.team22.communicationservice.domain.chat.channel.Channel;
+import be.kdg.team22.communicationservice.domain.chat.channel.GameId;
 import be.kdg.team22.communicationservice.domain.chat.channel.LobbyId;
 import be.kdg.team22.communicationservice.domain.chat.channel.type.BotReferenceType;
 import be.kdg.team22.communicationservice.domain.chat.channel.type.LobbyReferenceType;
@@ -38,13 +39,12 @@ public class ChannelController {
         return ResponseEntity.ok(ChannelModel.from(channel, referenceType));
     }
 
-    @GetMapping("/bot/{game}")
-    public ResponseEntity<ChannelModel> getOrCreateBotChannel(@PathVariable final String game, @AuthenticationPrincipal final Jwt token) {
-        Channel channel = channelService.getOrCreateBotChannel(UserId.get(token), game);
+    @GetMapping("/bot/{id}")
+    public ResponseEntity<ChannelModel> getOrCreateBotChannel(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token) {
+        Channel channel = channelService.getOrCreateBotChannel(UserId.get(token), GameId.from(id));
         ReferenceTypeModel referenceType = getReferenceType(channel.referenceType());
         return ResponseEntity.ok(ChannelModel.from(channel, referenceType));
     }
-
 
     @GetMapping("/friends/{id}")
     public ResponseEntity<ChannelModel> getOrCreatePrivateChannel(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token) {
@@ -56,7 +56,7 @@ public class ChannelController {
     private ReferenceTypeModel getReferenceType(final ReferenceType referenceType) {
         return switch (referenceType) {
             case BotReferenceType botReferenceType ->
-                    new BotReferenceTypeModel(botReferenceType.userId().value(), botReferenceType.botId().value(), botReferenceType.game());
+                    new BotReferenceTypeModel(botReferenceType.userId().value(), botReferenceType.botId().value(), botReferenceType.gameId().value());
             case LobbyReferenceType lobbyReferenceType ->
                     new LobbyReferenceTypeModel(lobbyReferenceType.lobbyId().value());
             case PrivateReferenceType privateReferenceType ->

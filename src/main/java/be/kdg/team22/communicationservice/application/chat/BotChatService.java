@@ -11,6 +11,8 @@ import be.kdg.team22.communicationservice.domain.chat.channel.exceptions.Invalid
 import be.kdg.team22.communicationservice.domain.chat.channel.exceptions.NoAccessException;
 import be.kdg.team22.communicationservice.domain.chat.channel.type.BotReferenceType;
 import be.kdg.team22.communicationservice.domain.chat.message.Message;
+import be.kdg.team22.communicationservice.infrastructure.game.ExternalGameRepository;
+import be.kdg.team22.communicationservice.infrastructure.game.GameResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -23,12 +25,14 @@ import java.util.List;
 public class BotChatService {
     private final ChannelService channelService;
     private final ChatPublisherService publisher;
-    private final BotChatRepository repository;
+    private final BotChatRepository botChatRepository;
+    private final ExternalGameRepository gameRepository;
 
-    public BotChatService(final ChannelService channelService, final ChatPublisherService publisher, final BotChatRepository repository) {
+    public BotChatService(final ChannelService channelService, final ChatPublisherService publisher, final BotChatRepository botChatRepository, final ExternalGameRepository gameRepository) {
         this.channelService = channelService;
         this.publisher = publisher;
-        this.repository = repository;
+        this.botChatRepository = botChatRepository;
+        this.gameRepository = gameRepository;
     }
 
     public List<Message> getMessages(final ChannelId channelId, final Instant since, final Jwt token) {
@@ -54,10 +58,13 @@ public class BotChatService {
         Message message = channel.send(userId, content);
         publisher.saveAndPublish(channel, message);
 
-        BotReferenceType referenceType = (BotReferenceType) channel.referenceType();
-        BotResponse response = repository.ask(content, referenceType.game());
 
-        Message answer = channel.send(referenceType.botId(), response.answer());
+        BotReferenceType referenceType = (BotReferenceType) channel.referenceType();
+
+        GameResponse gameResponse = gameRepository.getGame(referenceType.gameId().value());
+        BotResponse botResponse = botChatRepository.ask(content, gameResponse.name());
+
+        Message answer = channel.send(referenceType.botId(), botResponse.answer());
         publisher.saveAndPublish(channel, answer);
 
         return message;

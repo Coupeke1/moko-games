@@ -3,17 +3,18 @@ package be.kdg.team22.communicationservice.domain.chat.channel.type;
 import be.kdg.team22.communicationservice.domain.chat.UserId;
 import be.kdg.team22.communicationservice.domain.chat.bot.BotId;
 import be.kdg.team22.communicationservice.domain.chat.channel.ChannelType;
+import be.kdg.team22.communicationservice.domain.chat.channel.GameId;
 
 public class BotReferenceType extends ReferenceType {
     private final UserId userId;
     private final BotId botId;
-    private final String game;
+    private final GameId gameId;
 
-    public BotReferenceType(final UserId userId, final BotId botId, final String game) {
+    public BotReferenceType(final UserId userId, final BotId botId, final GameId gameId) {
         super(ChannelType.BOT);
         this.userId = userId;
         this.botId = botId;
-        this.game = game;
+        this.gameId = gameId;
     }
 
     public UserId userId() {
@@ -24,7 +25,7 @@ public class BotReferenceType extends ReferenceType {
         return botId;
     }
 
-    public String game() {
-        return game;
+    public GameId gameId() {
+        return gameId;
     }
 }

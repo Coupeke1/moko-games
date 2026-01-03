@@ -66,6 +66,8 @@ business:
     url: ${SESSION_SERVICE_URL:http://localhost:8081}
   user-service:
     url: ${USER_SERVICE_URL:http://localhost:8089}
+  games-service:
+    url: ${GAMES_SERVICE_URL:http://localhost:8084}
   social-service:
     url: ${SOCIAL_SERVICE_URL:http://localhost:8083}
   bot-service:

@@ -11,7 +11,7 @@ public interface ChannelRepository {
 
     Optional<Channel> findPrivateChannel(final UserId userId, final UserId otherUserId);
 
-    Optional<Channel> findBotChannel(final UserId userId, final String game);
+    Optional<Channel> findBotChannel(final UserId userId, final GameId gameId);
 
     void save(Channel channel);
 
