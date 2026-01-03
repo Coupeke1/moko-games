@@ -1,5 +1,8 @@
+default:
+    tags: [self-hosted]
+
 variables:
-  DEFAULT_IMAGE: "eclipse-temurin:21-jdk-alpine"
+  DEFAULT_IMAGE: "eclipse-temurin:21"
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
   DOCKER_IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
@@ -38,13 +41,13 @@ package:
     DOCKER_HOST: "tcp://docker:2375"
     DOCKER_TLS_CERTDIR: ""
   script:
-    - echo "Building Docker image..."
+    - echo "Building Docker image…"
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-    - |
+    -
       # Base tag for temporary build
       BASE_TAG="temp-build"
 
-      # Build the image once
+    # Build the image once
     - docker build
       --build-arg CI_COMMIT_SHA="$CI_COMMIT_SHA"
       --build-arg CI_PIPELINE_CREATED_AT="$CI_PIPELINE_CREATED_AT"
@@ -53,28 +56,34 @@ package:
       --build-arg CI_PIPELINE_ID="$CI_PIPELINE_ID"
       -t $CI_REGISTRY_IMAGE:$BASE_TAG .
 
-    # Determine tags to apply
+    # Determine tags
     - |
       TAGS=""
       if [ -n "$CI_COMMIT_TAG" ]; then
-        # Tagged release
         TAGS="$CI_COMMIT_TAG latest"
       elif [ "$CI_COMMIT_BRANCH" = "main" ]; then
-        # Latest main branch build
         TAGS="main-latest"
       else
-        # Feature/MR branch
         TAGS="branch-$CI_COMMIT_REF_SLUG"
       fi
 
-      # Tag and push
+    # Tag & Push
     - |
       for t in $TAGS; do
-        echo "Tagging and pushing: $t"
+        echo "Pushing tag: $t"
         docker tag $CI_REGISTRY_IMAGE:$BASE_TAG $CI_REGISTRY_IMAGE:$t
         docker push $CI_REGISTRY_IMAGE:$t
       done
+
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
     - if: '$CI_COMMIT_TAG'
+
+include:
+  - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+
+dependency_scanning:
+  stage: build
+  before_script:
+    - chmod +x ./gradlew
