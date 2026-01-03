@@ -1,6 +1,4 @@
-﻿server.port: 8087
-
-spring:
+﻿spring:
   application:
     name: checkers-service
   config:
@@ -21,6 +19,14 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI:http://localhost:8180/realms/moko/protocol/openid-connect/certs}
+
+server:
+  port: 8087
+
+logging:
+  level:
+    root: WARN
+    be.kdg.team22: INFO
 
 management:
   endpoints:
