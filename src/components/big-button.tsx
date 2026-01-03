@@ -1,12 +1,12 @@
 import type {ReactNode} from "react";
 
-interface ConfirmTurnButtonProps {
+interface BigButtonProps {
     onClick?: () => void,
     disabled?: boolean,
     children: ReactNode
 }
 
-export function ConfirmTurnButton({onClick, disabled, children}: ConfirmTurnButtonProps) {
+export function BigButton({onClick, disabled, children}: BigButtonProps) {
     return (
         <button
             onClick={onClick}
