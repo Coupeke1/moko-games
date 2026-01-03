@@ -1,5 +1,5 @@
 import { environment } from "@/config.ts";
-import type { Channel } from "@/features/chat/models/channel";
+import type { Channel } from "@/features/chat/models/channel/channel";
 import { client } from "@/lib/api-client.ts";
 import { validIdCheck } from "@/lib/id";
 
