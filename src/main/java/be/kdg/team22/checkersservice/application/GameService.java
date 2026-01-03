@@ -7,6 +7,7 @@ import be.kdg.team22.checkersservice.domain.events.*;
 import be.kdg.team22.checkersservice.domain.events.exceptions.PublishAchievementException;
 import be.kdg.team22.checkersservice.domain.events.exceptions.RabbitNotReachableException;
 import be.kdg.team22.checkersservice.domain.game.GameStatus;
+import be.kdg.team22.checkersservice.domain.game.exceptions.NotPlayersTurnException;
 import be.kdg.team22.checkersservice.domain.move.Move;
 import be.kdg.team22.checkersservice.domain.game.Game;
 import be.kdg.team22.checkersservice.domain.game.GameId;
@@ -70,6 +71,36 @@ public class GameService {
         MoveResult result = game.requestMove(move);
         repository.save(game);
 
+        if (game.currentPlayer().botPlayer()) {
+            boolean expectResponse = game.status() == GameStatus.RUNNING;
+            applicationEventPublisher.publishEvent(BotMoveRequestedEvent.from(game, expectResponse));
+            repository.save(game);
+        }
+
+        checkForEvents(game, move, result);
+
+        return game;
+    }
+
+    public Game requestBotMove(final GameId gameId, final PlayerId playerId) {
+        Game game = getById(gameId);
+        if (game.players().stream().noneMatch(p -> p.id().equals(playerId)))
+            throw new PlayerNotInThisGameException();
+
+        if (!game.currentPlayer().botPlayer()) {
+            throw new NotPlayersTurnException(game.botPlayer());
+        }
+
+        boolean expectResponse = game.status() == GameStatus.RUNNING;
+        applicationEventPublisher.publishEvent(BotMoveRequestedEvent.from(game, expectResponse));
+        repository.save(game);
+
+        checkForEvents(game, null, null);
+
+        return game;
+    }
+
+    private void checkForEvents(final Game game, final Move move, final MoveResult result) {
         String gameName = gameInfo.name();
         try {
             switch (game.status()) {
@@ -123,40 +154,42 @@ public class GameService {
                 }
             }
 
-            if (result.promotion()) {
-                publisher.publishAchievement(
-                        new GameAchievementEvent(
-                                AchievementCode.PROMOTION.name(),
-                                gameName,
-                                game.id().value(),
-                                move.playerId().value(),
-                                Instant.now()
-                        )
-                );
-            }
+            if (move != null && result != null) {
+                if (result.promotion()) {
+                    publisher.publishAchievement(
+                            new GameAchievementEvent(
+                                    AchievementCode.PROMOTION.name(),
+                                    gameName,
+                                    game.id().value(),
+                                    move.playerId().value(),
+                                    Instant.now()
+                            )
+                    );
+                }
 
-            if (result.multiCapture()) {
-                publisher.publishAchievement(
-                        new GameAchievementEvent(
-                                AchievementCode.MULTICAPTURE.name(),
-                                gameName,
-                                game.id().value(),
-                                move.playerId().value(),
-                                Instant.now()
-                        )
-                );
-            }
+                if (result.multiCapture()) {
+                    publisher.publishAchievement(
+                            new GameAchievementEvent(
+                                    AchievementCode.MULTICAPTURE.name(),
+                                    gameName,
+                                    game.id().value(),
+                                    move.playerId().value(),
+                                    Instant.now()
+                            )
+                    );
+                }
 
-            if (result.kingCount() >= 3) {
-                publisher.publishAchievement(
-                        new GameAchievementEvent(
-                                AchievementCode.THREE_KINGS.name(),
-                                gameName,
-                                game.id().value(),
-                                move.playerId().value(),
-                                Instant.now()
-                        )
-                );
+                if (result.kingCount() >= 3) {
+                    publisher.publishAchievement(
+                            new GameAchievementEvent(
+                                    AchievementCode.THREE_KINGS.name(),
+                                    gameName,
+                                    game.id().value(),
+                                    move.playerId().value(),
+                                    Instant.now()
+                            )
+                    );
+                }
             }
 
             if (game.status() != GameStatus.RUNNING) {
@@ -170,12 +203,5 @@ public class GameService {
         } catch (PublishAchievementException | RabbitNotReachableException exception) {
             logger.error(exception.getMessage());
         }
-
-        if (game.currentPlayer().botPlayer()) {
-            boolean expectResponse = game.status() == GameStatus.RUNNING;
-            applicationEventPublisher.publishEvent(BotMoveRequestedEvent.from(game, expectResponse));
-        }
-
-        return game;
     }
 }
