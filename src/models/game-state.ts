@@ -7,7 +7,7 @@ import {GameStatus} from "./game-status";
 export interface GameState {
     id: string;
     players: Player[];
-    aiPlayer: PlayerRole | null;
+    botPlayer: PlayerRole | null;
     currentRole: PlayerRole;
     board: string[][];
     kingMovementMode: KingMovementMode;
