@@ -20,29 +20,29 @@ import java.util.UUID;
 public class BotMoveEventListener {
     private static final Logger logger = LoggerFactory.getLogger(BotMoveEventListener.class);
     private final GameService gameService;
-    private final ExternalBotRepository aiRepository;
+    private final ExternalBotRepository botRepository;
 
-    public BotMoveEventListener(GameService gameService, ExternalBotRepository aiRepository) {
+    public BotMoveEventListener(GameService gameService, ExternalBotRepository botRepository) {
         this.gameService = gameService;
-        this.aiRepository = aiRepository;
+        this.botRepository = botRepository;
     }
 
     @Async
     @EventListener
     public void handleBotMoveRequest(BotMoveRequestedEvent event) {
         BotMoveRequest request = new BotMoveRequest(event.gameId(), event.gameName(),
-                event.board(), event.currentPlayer().role().name(), event.aiPlayer().name()
+                event.board(), event.currentPlayer().role().name(), event.botPlayer().name()
         );
-        BotMoveResponse response = aiRepository.requestMove(request);
+        BotMoveResponse response = botRepository.requestMove(request);
 
         if (!event.expectResponse()) return;
 
         if (response != null) {
             GameId gameId = new GameId(UUID.fromString(event.gameId()));
-            PlayerId aiPlayerId = event.currentPlayer().id();
+            PlayerId botPlayerId = event.currentPlayer().id();
 
-            Move move = new Move(aiPlayerId, response.row(), response.col());
-            gameService.requestMove(gameId, aiPlayerId, move);
+            Move move = new Move(botPlayerId, response.row(), response.col());
+            gameService.requestMove(gameId, botPlayerId, move);
             logger.info("Bot move executed for {} game {}", event.gameName(), event.gameId());
         }
     }

@@ -98,8 +98,6 @@ public class GameService {
         boolean expectResponse = game.status() == GameStatus.IN_PROGRESS;
         applicationEventPublisher.publishEvent(BotMoveRequestedEvent.from(game, expectResponse));
 
-        repository.save(game);
-
         checkForEvents(game);
 
         return game;
