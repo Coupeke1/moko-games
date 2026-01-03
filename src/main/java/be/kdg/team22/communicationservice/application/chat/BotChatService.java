@@ -41,7 +41,7 @@ public class BotChatService {
         return since == null ? channel.getMessages() : channel.getMessagesSince(since);
     }
 
-    public Message sendMessage(final ChannelId channelId, final String content, final String game, final Jwt token) {
+    public Message sendMessage(final ChannelId channelId, final String content, final Jwt token) {
         Channel channel = channelService.getChannel(channelId);
         checkType(channel);
 
@@ -51,14 +51,11 @@ public class BotChatService {
         if (content == null || content.isEmpty())
             throw InvalidException.content();
 
-        if (game == null || game.isEmpty())
-            throw InvalidException.game();
-
         Message message = channel.send(userId, content);
         publisher.saveAndPublish(channel, message);
 
         BotReferenceType referenceType = (BotReferenceType) channel.referenceType();
-        BotResponse response = repository.ask(content, game);
+        BotResponse response = repository.ask(content, referenceType.game());
 
         Message answer = channel.send(referenceType.botId(), response.answer());
         publisher.saveAndPublish(channel, answer);

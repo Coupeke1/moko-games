@@ -7,7 +7,6 @@ import be.kdg.team22.communicationservice.domain.chat.channel.ChannelRepository;
 import be.kdg.team22.communicationservice.domain.chat.channel.LobbyId;
 import be.kdg.team22.communicationservice.infrastructure.chat.jpa.channel.ChannelEntity;
 import be.kdg.team22.communicationservice.infrastructure.chat.jpa.channel.JpaChannelRepository;
-import be.kdg.team22.communicationservice.infrastructure.chat.jpa.message.JpaMessageRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -15,11 +14,9 @@ import java.util.Optional;
 @Repository
 public class DbChannelRepository implements ChannelRepository {
     private final JpaChannelRepository channelRepository;
-    private final JpaMessageRepository messageRepository;
 
-    public DbChannelRepository(final JpaChannelRepository channelRepository, final JpaMessageRepository messageRepository) {
+    public DbChannelRepository(final JpaChannelRepository channelRepository) {
         this.channelRepository = channelRepository;
-        this.messageRepository = messageRepository;
     }
 
     @Override
@@ -35,6 +32,11 @@ public class DbChannelRepository implements ChannelRepository {
     @Override
     public Optional<Channel> findPrivateChannel(final UserId userId, final UserId otherUserId) {
         return channelRepository.findPrivateChannel(userId.value(), otherUserId.value()).map(ChannelEntity::to);
+    }
+
+    @Override
+    public Optional<Channel> findBotChannel(final UserId userId, final String game) {
+        return channelRepository.findBotChannel(userId.value(), game).map(ChannelEntity::to);
     }
 
     @Override

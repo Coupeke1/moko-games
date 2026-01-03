@@ -14,17 +14,19 @@ import java.util.UUID;
 public class BotReferenceTypeEntity extends ReferenceTypeEntity {
     private UUID userId;
     private UUID botId;
+    private String game;
 
     protected BotReferenceTypeEntity() {}
 
-    public BotReferenceTypeEntity(final UUID userId, final UUID botId) {
+    public BotReferenceTypeEntity(final UUID userId, final UUID botId, final String game) {
         super(ChannelType.BOT);
         this.userId = userId;
         this.botId = botId;
+        this.game = game;
     }
 
     public BotReferenceType to() {
-        return new BotReferenceType(UserId.from(userId), BotId.from(botId));
+        return new BotReferenceType(UserId.from(userId), BotId.from(botId), game);
     }
 
     public UUID userId() {
@@ -33,5 +35,9 @@ public class BotReferenceTypeEntity extends ReferenceTypeEntity {
 
     public UUID botId() {
         return botId;
+    }
+
+    public String game() {
+        return game;
     }
 }

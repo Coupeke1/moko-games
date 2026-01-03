@@ -10,9 +10,17 @@ public interface JpaChannelRepository extends JpaRepository<ChannelEntity, UUID>
     @Query("""
                 SELECT c
                 FROM ChannelEntity c
-                WHERE TREAT(c.referenceType AS LobbyReferenceTypeEntity).lobbyId = :lobbyId
+                WHERE TREAT(c.referenceType AS LobbyReferenceTypeEntity).lobbyId = :id
             """)
     Optional<ChannelEntity> findLobbyChannel(UUID id);
+
+    @Query("""
+                SELECT c
+                FROM ChannelEntity c
+                JOIN TREAT(c.referenceType AS BotReferenceTypeEntity) p
+                WHERE p.userId = :id AND p.game = :game
+            """)
+    Optional<ChannelEntity> findBotChannel(UUID id, String game);
 
     @Query("""
                 SELECT c

@@ -1,10 +1,12 @@
 package be.kdg.team22.communicationservice.application.chat;
 
 import be.kdg.team22.communicationservice.domain.chat.UserId;
+import be.kdg.team22.communicationservice.domain.chat.bot.BotId;
 import be.kdg.team22.communicationservice.domain.chat.channel.Channel;
 import be.kdg.team22.communicationservice.domain.chat.channel.ChannelId;
 import be.kdg.team22.communicationservice.domain.chat.channel.ChannelRepository;
 import be.kdg.team22.communicationservice.domain.chat.channel.LobbyId;
+import be.kdg.team22.communicationservice.domain.chat.channel.type.BotReferenceType;
 import be.kdg.team22.communicationservice.domain.chat.channel.type.LobbyReferenceType;
 import be.kdg.team22.communicationservice.domain.chat.channel.type.PrivateReferenceType;
 import be.kdg.team22.communicationservice.domain.chat.channel.type.ReferenceType;
@@ -27,6 +29,15 @@ public class ChannelService {
     public Channel getOrCreateLobbyChannel(final LobbyId id) {
         return repository.findLobbyChannel(id).orElseGet(() -> {
             ReferenceType type = new LobbyReferenceType(id);
+            Channel channel = new Channel(type);
+            repository.save(channel);
+            return channel;
+        });
+    }
+
+    public Channel getOrCreateBotChannel(final UserId userId, final String game) {
+        return repository.findBotChannel(userId, game).orElseGet(() -> {
+            ReferenceType type = new BotReferenceType(userId, BotId.create(), game);
             Channel channel = new Channel(type);
             repository.save(channel);
             return channel;

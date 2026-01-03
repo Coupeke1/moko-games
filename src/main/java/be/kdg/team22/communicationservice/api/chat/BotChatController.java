@@ -32,7 +32,7 @@ public class BotChatController {
 
     @PostMapping("/{id}")
     public ResponseEntity<MessageModel> sendMessage(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token, @RequestBody final CreateMessageModel request) {
-        Message message = service.sendMessage(ChannelId.from(id), request.content(), request.game(), token);
+        Message message = service.sendMessage(ChannelId.from(id), request.content(), token);
         return ResponseEntity.ok(MessageModel.from(message));
     }
 }
