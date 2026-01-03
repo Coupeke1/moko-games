@@ -20,6 +20,7 @@ services:
             GAME_SERVICE_URL: http://host.docker.internal:8084
             BUSINESS_AI_URL: https://team3.techtitans.be
             BUSINESS_FALLBACK_AI_URL: http://host.docker.internal:3333
+            BUSINESS_FALLBACK_CHAT_URL: http://host.docker.internal:3334
 
             SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
 
@@ -62,6 +63,7 @@ services:
             GAME_SERVICE_URL: http://host.docker.internal:8084
             BUSINESS_AI_URL: https://team3.techtitans.be
             BUSINESS_FALLBACK_AI_URL: http://host.docker.internal:3333
+            BUSINESS_FALLBACK_CHAT_URL: http://host.docker.internal:3334
 
             SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/realms/moko/protocol/openid-connect/certs
 
