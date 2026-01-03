@@ -9,7 +9,6 @@ export const environment = {
         window.__APP_CONFIG__?.authClientId ??
         import.meta.env.VITE_AUTH_CLIENT ??
         "",
-
     userService:
         window.__APP_CONFIG__?.userService ??
         import.meta.env.VITE_USER_SERVICE ??
@@ -30,9 +29,13 @@ export const environment = {
         window.__APP_CONFIG__?.sessionService ??
         import.meta.env.VITE_SESSION_SERVICE ??
         "",
-    communicationService:
-        window.__APP_CONFIG__?.communicationService ??
-        import.meta.env.VITE_COMMUNICATION_SERVICE ??
+    notificationsService:
+        window.__APP_CONFIG__?.notificationsService ??
+        import.meta.env.VITE_NOTIFICATIONS_SERVICE ??
+        "",
+    chatService:
+        window.__APP_CONFIG__?.chatService ??
+        import.meta.env.VITE_CHAT_SERVICE ??
         "",
     gamesService:
         window.__APP_CONFIG__?.gamesService ??

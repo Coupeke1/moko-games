@@ -115,7 +115,7 @@ export default function RequestsPage() {
                     {requests && (
                         <Grid>
                             {requests.map((request: Friend) => (
-                                <Request request={request} />
+                                <Request key={request.id} request={request} />
                             ))}
                         </Grid>
                     )}

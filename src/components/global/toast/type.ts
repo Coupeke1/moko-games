@@ -8,6 +8,7 @@ export const Type = {
     Friends: "Friends",
     Lobby: "Lobby",
     Notifications: "Notifications",
+    Chat: "Chat",
 } as const;
 
 export type Type = (typeof Type)[keyof typeof Type];

@@ -6,12 +6,12 @@ export function useProfile(name: string) {
     const {
         isLoading: loading,
         isError: error,
-        data: profile,
+        data,
     } = useQuery({
         queryKey: ["profiles", name],
         queryFn: () => findProfileByName(name),
         refetchInterval: POLLING_INTERVAL,
     });
 
-    return { loading, error, profile: profile ?? null };
+    return { loading, error, profile: data ?? null };
 }

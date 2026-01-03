@@ -5,7 +5,7 @@ import { client } from "@/lib/api-client.ts";
 import { slug } from "@/lib/format";
 import type { PagedResponse } from "@/types/paged-response";
 
-const BASE_URL = environment.communicationService;
+const BASE_URL = environment.notificationsService;
 
 export async function findMyNotifications(
     type?: string,
