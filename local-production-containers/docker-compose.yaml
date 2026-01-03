@@ -1,5 +1,8 @@
 ﻿name: moko_prod_local
 
+include:
+  - black-box-chess-game.yaml
+
 services:
   # Proxy
   proxy:
@@ -41,7 +44,8 @@ services:
       VITE_ACHIEVEMENT_SERVICE: http://localhost/user-service/api/achievements
       VITE_LIBRARY_SERVICE: http://localhost/user-service/api/library
       VITE_SOCIAL_SERVICE: http://localhost/social-service/api/friends
-      VITE_COMMUNICATION_SERVICE: http://localhost/communication-service/api/notifications
+      VITE_NOTIFICATIONS_SERVICE: http://localhost/communication-service/api/notifications
+      VITE_CHAT_SERVICE: http://localhost/communication-service/api/chat
       VITE_SESSION_SERVICE: http://localhost/session-service/api/lobbies
       VITE_GAMES_SERVICE: http://localhost/games-service/api/games
       VITE_STORE_SERVICE: http://localhost/store-service/api/store/games
@@ -88,7 +92,7 @@ services:
 
   # Backend Services
   service-user:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/user-service:latest
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/user-service:main-latest
     restart: always
     pull_policy: always
     environment:
@@ -104,13 +108,13 @@ services:
 
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
 
-      CORS_ALLOWED_ORIGINS: http://localhost
       GAME_SERVICE_URL: http://service-games:8084
-      CHAT_SERVICE_URL: http://service-communication:8082
+
+      CORS_ALLOWED_ORIGINS: http://localhost
     expose:
-      - "8080"
+      - "8089"
     healthcheck:
-      test: [ "CMD", "wget", "-qO-", "http://localhost:8080/actuator/health" ]
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8089/actuator/health" ]
       interval: 1m
       timeout: 15s
       retries: 5
@@ -124,7 +128,7 @@ services:
       - idp-keycloak
 
   service-session:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/session-service:latest
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/session-service:main-latest
     restart: always
     pull_policy: always
     environment:
@@ -140,11 +144,12 @@ services:
 
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
 
-      CORS_ALLOWED_ORIGINS: http://localhost
-      USER_SERVICE_URL: http://service-user:8080
+      USER_SERVICE_URL: http://service-user:8089
       CHAT_SERVICE_URL: http://service-communication:8082
       SOCIAL_SERVICE_URL: http://service-social:8083
       GAME_SERVICE_URL: http://service-games:8084
+
+      CORS_ALLOWED_ORIGINS: http://localhost
     expose:
       - "8081"
     healthcheck:
@@ -162,7 +167,7 @@ services:
       - idp-keycloak
 
   service-communication:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/communication-service:latest
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/communication-service:branch-20-coommuncation-start-niet-op-in-docker-fix
     restart: always
     pull_policy: always
     environment:
@@ -176,20 +181,23 @@ services:
       SPRING_RABBITMQ_USERNAME: user
       SPRING_RABBITMQ_PASSWORD: password
 
+      SPRING_MAIL_USERNAME: mokogamesbe@gmail.com
+      SPRING_MAIL_PASSWORD: alofzkyfupctrpmw
+
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
 
       SESSION_SERVICE_URL: http://service-session:8081
-      USER_SERVICE_URL: http://service-user:8080
+      USER_SERVICE_URL: http://service-user:8089
       SOCIAL_SERVICE_URL: http://service-social:8083
 
-      SPRING_MAIL_USERNAME: mokogamesbe@gmail.com
-      SPRING_MAIL_PASSWORD: alofzkyfupctrpmw
+      BUSINESS_AI_URL: https://team3.techtitans.be
+      BUSINESS_FALLBACK_CHAT_URL: http://localhost:3334
 
       CORS_ALLOWED_ORIGINS: http://localhost
     expose:
       - "8082"
     healthcheck:
-       test: [ "CMD", "wget", "-qO-", "http://localhost:8083/actuator/health" ]
+       test: [ "CMD", "wget", "-qO-", "http://localhost:8082/actuator/health" ]
        interval: 1m
        timeout: 15s
        retries: 5
@@ -203,7 +211,7 @@ services:
       - idp-keycloak
 
   service-social:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/social-service:latest
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/social-service:main-latest
     restart: always
     pull_policy: always
     environment:
@@ -219,8 +227,9 @@ services:
 
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
 
+      USER_SERVICE_URL: http://service-user:8089
+
       CORS_ALLOWED_ORIGINS: http://localhost
-      USER_SERVICE_URL: http://service-user:8080
     expose:
       - "8083"
     healthcheck:
@@ -238,7 +247,7 @@ services:
       - idp-keycloak
 
   service-games:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/games-service:latest
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/games-service:main-latest
     restart: always
     pull_policy: always
     environment:
@@ -252,9 +261,11 @@ services:
       SPRING_RABBITMQ_USERNAME: user
       SPRING_RABBITMQ_PASSWORD: password
 
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
+
       STORE_SERVICE_URL: http://service-store:8085
 
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
+      CORS_ALLOWED_ORIGINS: http://localhost
     expose:
       - "8084"
     healthcheck:
@@ -270,9 +281,10 @@ services:
       - app-postgres
       - app-rabbitmq
       - idp-keycloak
+      - service-store
 
   service-store:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/store-service:latest
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/store-service:main-latest
     restart: always
     pull_policy: always
     environment:
@@ -287,14 +299,14 @@ services:
       SPRING_RABBITMQ_PASSWORD: password
 
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
-      CORS_ALLOWED_ORIGINS: http://localhost
+
+      USER_SERVICE_URL: http://service-user:8080
+      GAME_SERVICE_URL: http://service-games:8084
 
       MOLLIE_API_KEY: test_m7sCMkpbCxQ7hAjqKWc2C3v3pBNfKW
       FRONTEND_URL: http://localhost
 
-      USER_SERVICE_URL: http://service-user:8080
-      GAME_SERVICE_URL: http://service-games:8084
-      CHAT_SERVICE_URL: http://service-communication:8082
+      CORS_ALLOWED_ORIGINS: http://localhost
     expose:
       - "8085"
     healthcheck:
@@ -313,7 +325,7 @@ services:
 
   service-socket:
     image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/socket-service:main-latest
-    restart: no
+    restart: always
     pull_policy: always
     environment:
       SPRING_RABBITMQ_HOST: app-rabbitmq
@@ -322,6 +334,8 @@ services:
       SPRING_RABBITMQ_PASSWORD: password
 
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
+
+      CORS_ALLOWED_ORIGINS: http://localhost
     expose:
       - "8090"
     networks:
@@ -332,8 +346,32 @@ services:
       - app-rabbitmq
       - idp-keycloak
 
+  service-acl:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/game-acl-service:main-latest
+    restart: always
+    pull_policy: always
+    environment:
+      SPRING_RABBITMQ_HOST: app-rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: user
+      SPRING_RABBITMQ_PASSWORD: password
+
+      GAME_SERVICE_URL: http://service-games:8084
+
+      ACL_CONFIG_BACKEND_URL: http://service-acl:8088
+      CHESS_INFO_BACKEND_URL: http://localhost:8080
+    expose:
+      - "8088"
+    networks:
+      - moko_backend
+      - moko_kc
+    depends_on:
+      - app-rabbitmq
+      - service-games
+      - service-store
+
   service-tic-tac-toe:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/tic-tac-toe-service:latest
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/tic-tac-toe-service:main-latest
     restart: always
     pull_policy: always
     environment:
@@ -349,13 +387,16 @@ services:
 
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
 
-      CORS_ALLOWED_ORIGINS: http://localhost
-
       GAME_SERVICE_URL: http://service-games:8084
-      AI_URL: https://team3.techtitans.be
+      BUSINESS_AI_URL: https://team3.techtitans.be
+      BUSINESS_AI_API_KEY: POjzhHKDCBDMXkf0Lly8yW8YaCTjZCeh4_UZw_THWjM
+      BUSINESS_FALLBACK_AI_URL: http://localhost:3334
+      BUSINESS_FALLBACK_CHAT_URL: http://localhost:3335
 
       GAME_BACKEND_URL: http://service-tic-tac-toe:8086
       GAME_FRONTEND_URL: http://localhost/tic-tac-toe/game
+
+      CORS_ALLOWED_ORIGINS: http://localhost
     expose:
       - "8086"
     healthcheck:
@@ -375,7 +416,7 @@ services:
       - service-store
 
   service-checkers:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/checkers-service:latest
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/checkers-service:main-latest
     restart: always
     pull_policy: always
     environment:
@@ -391,13 +432,16 @@ services:
 
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
 
-      CORS_ALLOWED_ORIGINS: http://localhost
-
       GAME_SERVICE_URL: http://service-games:8084
-      AI_URL: https://team3.techtitans.be
+      BUSINESS_AI_URL: https://team3.techtitans.be
+      BUSINESS_AI_API_KEY: POjzhHKDCBDMXkf0Lly8yW8YaCTjZCeh4_UZw_THWjM
+      BUSINESS_FALLBACK_AI_URL: http://localhost:3334
+      BUSINESS_FALLBACK_CHAT_URL: http://localhost:3335
 
       GAME_BACKEND_URL: http://service-checkers:8087
       GAME_FRONTEND_URL: http://localhost/checkers/game
+
+      CORS_ALLOWED_ORIGINS: http://localhost
     expose:
       - "8087"
     healthcheck:
@@ -440,6 +484,8 @@ services:
       RABBITMQ_DEFAULT_PASS: 'password'
     ports:
       - "6379:6379"
+      - "61613:61613"
+      - "15672:15672"
     networks:
       - moko_backend
     volumes:
