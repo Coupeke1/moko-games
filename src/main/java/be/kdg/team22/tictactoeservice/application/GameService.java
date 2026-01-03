@@ -13,6 +13,7 @@ import be.kdg.team22.tictactoeservice.domain.game.Game;
 import be.kdg.team22.tictactoeservice.domain.game.GameId;
 import be.kdg.team22.tictactoeservice.domain.game.GameStatus;
 import be.kdg.team22.tictactoeservice.domain.game.Move;
+import be.kdg.team22.tictactoeservice.domain.game.exceptions.NotPlayersTurnException;
 import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
 import be.kdg.team22.tictactoeservice.domain.player.exceptions.PlayerIdentityMismatchException;
 import be.kdg.team22.tictactoeservice.domain.player.exceptions.PlayerNotInThisGameException;
@@ -71,6 +72,40 @@ public class GameService {
         game.requestMove(move);
         repository.save(game);
 
+        if (game.currentPlayer().botPlayer()) {
+            boolean expectResponse = game.status() == GameStatus.IN_PROGRESS;
+            applicationEventPublisher.publishEvent(BotMoveRequestedEvent.from(game, expectResponse));
+        }
+
+        checkForEvents(game);
+
+        return game;
+    }
+
+    public Game requestBotMove(final GameId gameId, final PlayerId playerId) {
+        Game game = getById(gameId);
+        if (game.players().stream().noneMatch(p -> p.id().equals(playerId)))
+            throw new PlayerNotInThisGameException();
+
+        if (!game.currentPlayer().botPlayer())
+            throw new NotPlayersTurnException(
+                    game.players().stream()
+                            .filter(p -> p.role()
+                                    .equals(game.botPlayer()))
+                            .findFirst().orElseThrow()
+                            .id().value());
+
+        boolean expectResponse = game.status() == GameStatus.IN_PROGRESS;
+        applicationEventPublisher.publishEvent(BotMoveRequestedEvent.from(game, expectResponse));
+
+        repository.save(game);
+
+        checkForEvents(game);
+
+        return game;
+    }
+
+    private void checkForEvents(final Game game) {
         String gameName = gameInfo.name();
         try {
             if (game.status() == GameStatus.TIE) {
@@ -109,12 +144,5 @@ public class GameService {
         } catch (PublishAchievementException | RabbitNotReachableException exception) {
             logger.error(exception.getMessage());
         }
-
-        if (game.currentPlayer().botPlayer()) {
-            boolean expectResponse = game.status() == GameStatus.IN_PROGRESS;
-            applicationEventPublisher.publishEvent(BotMoveRequestedEvent.from(game, expectResponse));
-        }
-
-        return game;
     }
 }
