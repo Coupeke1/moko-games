@@ -5,7 +5,7 @@ import be.kdg.team22.gamesservice.domain.game.Game;
 import java.time.Instant;
 import java.util.UUID;
 
-public record GameDetailsModel(
+public record GameModel(
         UUID id,
         String name,
         String title,
@@ -18,8 +18,8 @@ public record GameDetailsModel(
         Instant createdAt,
         Instant updatedAt
 ) {
-    public static GameDetailsModel from(Game game) {
-        return new GameDetailsModel(
+    public static GameModel from(Game game) {
+        return new GameModel(
                 game.id().value(),
                 game.name(),
                 game.title(),
