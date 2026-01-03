@@ -10,13 +10,21 @@ import GameGrid from "@/components/game-grid.tsx";
 import GameEndModal from "@/components/dialogs/game-end-modal";
 import PlayerCard from "@/components/player-card";
 import TurnIndicator from "@/components/turn-indicator";
+import {BigButton} from "@/components/big-button.tsx";
+import {useBotMove} from "@/hooks/use-bot-move.ts";
 
 export default function GamePage() {
     const { id } = useParams<{ id: string }>()
     const { data: gameState, isLoading, isError } = useGameState(id!);
     const { profile, isLoading: profileLoading, isError: profileError } = useMyProfile();
+    const isMyTurn = gameState?.currentRole === gameState?.players.find(p => p.id === profile?.id)?.role;
 
     const { makeMove } = useMakeMove(id!, profile, gameState?.status);
+    const {requestBotTurn, isBotMoving} = useBotMove(id);
+
+    const handleBotMove = () => {
+        requestBotTurn();
+    }
 
     if (isLoading || !gameState || profileLoading || !profile)
         return (
@@ -50,7 +58,14 @@ export default function GamePage() {
                     </div>
 
                     <div className="flex flex-col items-center gap-4 flex-1">
-                        <TurnIndicator gameState={gameState} />
+                        <TurnIndicator gameState={gameState}>
+                            <BigButton
+                                onClick={handleBotMove}
+                                disabled={isBotMoving || isMyTurn}
+                            >
+                                {isBotMoving ? "Bot Thinking..." : "Request Bot Move"}
+                            </BigButton>
+                        </TurnIndicator>
                         <div className="game-board">
                             <GameGrid board={gameState.board} onCellClick={makeMove} />
                         </div>
