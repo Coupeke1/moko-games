@@ -34,7 +34,7 @@ public class GameService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final GameInfoProperties gameInfo;
 
-    private final Logger logger;
+    private static final Logger logger = LoggerFactory.getLogger(GameService.class);
 
     public GameService(GameRepository repository, BoardSizeProperties config, GameEventPublisher publisher, ApplicationEventPublisher applicationEventPublisher, GameInfoProperties gameInfo) {
         this.repository = repository;
@@ -42,7 +42,6 @@ public class GameService {
         this.publisher = publisher;
         this.applicationEventPublisher = applicationEventPublisher;
         this.gameInfo = gameInfo;
-        logger = LoggerFactory.getLogger(GameService.class);
     }
 
     public Game create(final PlayerId playerId, final CreateGameModel model) {
