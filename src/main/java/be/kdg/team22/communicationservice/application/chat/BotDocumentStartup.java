@@ -17,7 +17,7 @@ public class BotDocumentStartup {
 
     @EventListener(ApplicationReadyEvent.class)
     public void uploadPlatformPdfOnStartup() throws Exception {
-        ClassPathResource res = new ClassPathResource("pdf/platform-Team-22.pdf");
+        ClassPathResource res = new ClassPathResource("pdf/Platform-Team-22.pdf");
 
         if (!res.exists()) {
             throw ResourceNotFoundException.notFoundException();
