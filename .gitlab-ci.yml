@@ -1,0 +1,37 @@
+default:
+    tags: [self-hosted]
+
+variables:
+  SRC_USER: "AI-chatbot"
+  SRC_PASS: "gldt-tF2YNLBsL9zUYs4yyxLX"
+  DST_USER: "chatbot"
+  DST_PASS: "gldt-bkW4MZVKKnsx5AZR9d8L"
+
+stages:
+  - mirror
+
+mirror_image:
+  stage: mirror
+  image: docker:26
+
+  services:
+    - docker:26-dind
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+  script:
+    # login to source project
+    - docker login registry.gitlab.com -u "$SRC_USER" -p "$SRC_PASS"
+
+    # pull source image
+    - docker pull registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team3/ai-chatbot:latest
+
+    # login to destination project
+    - docker login registry.gitlab.com -u "$DST_USER" -p "$DST_PASS"
+  
+    # retag + push
+    - docker tag registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team3/ai-chatbot:latest registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/local-development/chatbot:latest
+
+    - docker push registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/local-development/chatbot:latest
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
