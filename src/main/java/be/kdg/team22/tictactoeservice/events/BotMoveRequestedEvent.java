@@ -11,7 +11,7 @@ public record BotMoveRequestedEvent(
         String gameName,
         List<List<String>> board,
         Player currentPlayer,
-        PlayerRole aiPlayer,
+        PlayerRole botPlayer,
         boolean expectResponse
 ) {
     public static BotMoveRequestedEvent from(Game game, boolean expectResponse) {
