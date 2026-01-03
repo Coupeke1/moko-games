@@ -11,7 +11,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnProperty(prefix = "bot-service", name = "upload-on-startup", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "bot-service", name = "upload-on-startup", havingValue = "true", matchIfMissing = true)
 public class BotDocumentStartup {
     private static final Logger logger = LoggerFactory.getLogger(BotDocumentStartup.class);
     private final ExternalDocumentRepository documentRepository;
@@ -31,14 +31,16 @@ public class BotDocumentStartup {
         byte[] pdfBytes = res.getInputStream().readAllBytes();
         String filename = res.getFilename() != null ? res.getFilename() : "platform.pdf";
 
-        boolean ok = false;
-        for (int i = 0; i < 6 && !ok; i++) {
-            ok = documentRepository.uploadPdf(pdfBytes, filename);
+        final int ATTEMPTS = 6;
+        for (int i = 0; i < ATTEMPTS; i++) {
+            boolean ok = documentRepository.uploadPdf(pdfBytes, filename);
             if (!ok) {
                 Thread.sleep(1000);
             } else {
                 logger.info("Document '{}' successfully uploaded.", filename);
+                return;
             }
         }
+        logger.error("Failed to upload document '{}' after {} attempts.", filename, ATTEMPTS);
     }
 }
