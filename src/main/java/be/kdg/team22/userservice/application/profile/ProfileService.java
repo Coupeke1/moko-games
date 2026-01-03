@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -148,15 +147,26 @@ public class ProfileService {
     }
 
     public Profile createBotProfile(final String description) {
-        ProfileId id = new ProfileId(UUID.randomUUID());
-        ProfileName username = BotNameGenerator.randomName();
-        ProfileEmail email = BotNameGenerator.randomEmail(username);
+        Profile profile = createBotProfile(BotId.create(), description);
+        profileRepository.save(profile);
+        return profile;
+    }
+
+    public Profile getOrCreateBotProfile(final BotId botId, final String description) {
+        return profileRepository.findById(ProfileId.from(botId)).orElseGet(() -> {
+            Profile profile = createBotProfile(botId, description);
+            profileRepository.save(profile);
+            return profile;
+        });
+    }
+
+    private Profile createBotProfile(final BotId botId, final String description) {
+        ProfileId id = ProfileId.from(botId);
+        ProfileName username = Generator.name();
+        ProfileEmail email = Generator.email(username);
         String image = imageRepository.get().url();
 
-        Profile profile = new Profile(id, username, email, description == null ? "Hi, I'm a Moko bot." : description, image);
-        profileRepository.save(profile);
-
-        return profile;
+        return new Profile(id, username, email, description != null ? description : "Hi, I'm a Moko bot.", image);
     }
 
     public void addLevels(final ProfileId id, final int amount) {

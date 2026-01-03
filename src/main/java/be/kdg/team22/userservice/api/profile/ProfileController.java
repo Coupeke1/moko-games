@@ -36,6 +36,12 @@ public class ProfileController {
         return ResponseEntity.ok(ProfileModel.from(bot));
     }
 
+    @PostMapping("/bot/{id}")
+    public ResponseEntity<ProfileModel> getOrCreateBotProfile(@PathVariable final UUID id, @RequestBody final String description) {
+        Profile bot = service.getOrCreateBotProfile(BotId.from(id), description);
+        return ResponseEntity.ok(ProfileModel.from(bot));
+    }
+
     @GetMapping("/me/preferences/notifications")
     public ResponseEntity<NotificationsModel> getMyNotifications(@AuthenticationPrincipal final Jwt token) {
         Profile profile = service.getOrCreate(token);
