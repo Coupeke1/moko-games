@@ -202,10 +202,13 @@ services:
             SESSION_SERVICE_URL: http://host.docker.internal:8081
             USER_SERVICE_URL: http://host.docker.internal:8089
             SOCIAL_SERVICE_URL: http://host.docker.internal:8083
+            BOT_SERVICE_URL: http://host.docker.internal:8090
 
             SPRING_MAIL_USERNAME: mokogamesbe@gmail.com
             SPRING_MAIL_PASSWORD: alofzkyfupctrpmw
+
             BOT_SERVICE_API_KEY: POjzhHKDCBDMXkf0Lly8yW8YaCTjZCeh4_UZw_THWjM
+            BOT_SERVICE_TEAM_NUMBER: 22 
         ports:
             - "8082:8082"
         healthcheck:
