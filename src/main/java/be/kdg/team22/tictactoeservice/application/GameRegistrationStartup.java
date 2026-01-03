@@ -6,6 +6,8 @@ import be.kdg.team22.tictactoeservice.infrastructure.register.ExternalRegisterRe
 import be.kdg.team22.tictactoeservice.infrastructure.register.RegisterAchievementRequest;
 import be.kdg.team22.tictactoeservice.infrastructure.register.RegisterGameRequest;
 import be.kdg.team22.tictactoeservice.infrastructure.register.RegisterSettingsRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -14,6 +16,7 @@ import java.util.List;
 
 @Component
 public class GameRegistrationStartup {
+    private static final Logger logger = LoggerFactory.getLogger(GameRegistrationStartup.class);
     private final ExternalRegisterRepository externalRegisterRepository;
     private final GameInfoProperties gameInfo;
 
@@ -69,5 +72,6 @@ public class GameRegistrationStartup {
 
         boolean created = externalRegisterRepository.registerGame(request);
         if (!created) throw new GameNotRegisteredException();
+        logger.info("Game '{}' successfully registered in the game service.", gameInfo.name());
     }
 }
