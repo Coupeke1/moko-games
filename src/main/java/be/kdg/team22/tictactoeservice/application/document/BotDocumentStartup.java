@@ -31,14 +31,16 @@ public class BotDocumentStartup {
         byte[] pdfBytes = res.getInputStream().readAllBytes();
         String filename = res.getFilename() != null ? res.getFilename() : "platform.pdf";
 
-        boolean ok = false;
-        for (int i = 0; i < 6 && !ok; i++) {
-            ok = documentRepository.uploadPdf(pdfBytes, filename);
+        final int ATTEMPTS = 6;
+        for (int i = 0; i < ATTEMPTS; i++) {
+            boolean ok = documentRepository.uploadPdf(pdfBytes, filename);
             if (!ok) {
                 Thread.sleep(1000);
             } else {
                 logger.info("Document '{}' successfully uploaded.", filename);
+                return;
             }
         }
+        logger.error("Failed to upload document '{}' after {} attempts.", filename, ATTEMPTS);
     }
 }
