@@ -11,6 +11,7 @@ import { useGame } from "@/features/games/hooks/use-game";
 import type { Game } from "@/features/games/models/game.ts";
 import GameAchievements from "@/features/library/components/achievements";
 import Favourite from "@/features/library/components/favourite";
+import Invites from "@/features/library/components/invites";
 import { createLobby } from "@/features/lobby/services/lobby.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -81,6 +82,7 @@ export default function LibraryGamePage() {
                         </article>
 
                         <p className="text-fg-2">{game.description}</p>
+                        <Invites game={game} />
                         <GameAchievements game={game} />
                     </Column>
                 )}
