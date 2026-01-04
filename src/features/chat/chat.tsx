@@ -1,3 +1,5 @@
+import MessagesSection from "@/components/chat/messages";
+import SendBar from "@/components/chat/send-bar";
 import show from "@/components/global/toast/toast";
 import { Type as ToastType } from "@/components/global/toast/type";
 import { Gap } from "@/components/layout/gap";
@@ -5,8 +7,6 @@ import Page from "@/components/layout/page";
 import State from "@/components/state/state";
 import BotsSection from "@/features/chat/components/bots";
 import FriendsSection from "@/features/chat/components/friends";
-import MessagesSection from "@/features/chat/components/messages";
-import SendBar from "@/features/chat/components/send-bar";
 import { useChannel } from "@/features/chat/hooks/use-channel";
 import { Type } from "@/features/chat/models/channel/type";
 import { sendMessage } from "@/features/chat/services/chat";

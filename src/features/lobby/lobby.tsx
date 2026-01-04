@@ -9,6 +9,7 @@ import Section from "@/components/section";
 import ErrorState from "@/components/state/error";
 import State from "@/components/state/state";
 import BotCard from "@/features/lobby/components/bot-card";
+import Chat from "@/features/lobby/components/chat";
 import GameInformation from "@/features/lobby/components/information";
 import Page from "@/features/lobby/components/page";
 import PlayerCard from "@/features/lobby/components/player-card";
@@ -114,6 +115,8 @@ export default function LobbyPage() {
                                     </Grid>
                                 )}
                             </Section>
+
+                            <Chat lobby={lobby} />
                         </Column>
                     </>
                 )}

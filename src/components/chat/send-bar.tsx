@@ -2,8 +2,8 @@ import Button from "@/components/buttons/button";
 import Form from "@/components/inputs/form";
 import Input from "@/components/inputs/input";
 import { Gap } from "@/components/layout/gap";
+import { Placeholders } from "@/features/chat/lib/search";
 import { useEffect, useState, type FormEvent } from "react";
-import { Placeholders } from "../lib/search";
 
 interface Props {
     onSend: (message: string) => void;

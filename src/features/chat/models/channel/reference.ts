@@ -12,6 +12,7 @@ export interface BotReference {
 export interface LobbyReference {
     type: typeof Type.Lobby;
     lobbyId: string;
+    players: User[];
 }
 
 export interface PrivateReference {
