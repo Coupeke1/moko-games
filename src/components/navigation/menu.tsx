@@ -1,5 +1,6 @@
 import SmallButton from "@/components/dialog/small-button";
 import CloseIcon from "@/components/icons/bar/close-icon";
+import NavigationButton from "@/components/navigation/button";
 import NavigationLink from "@/components/navigation/link";
 import type { Button, Link } from "@/components/navigation/models";
 
@@ -50,13 +51,14 @@ export default function NavigationMenu({
 
                 <section className="flex flex-col gap-4 p-4">
                     {buttons.map((button: Button) => (
-                        <NavigationLink
+                        <NavigationButton
                             key={button.title}
                             title={button.title}
-                            path={button.path ?? ""}
+                            path={button.path}
+                            onClick={button.onClick}
                         >
                             {button.icon}
-                        </NavigationLink>
+                        </NavigationButton>
                     ))}
                 </section>
             </aside>
