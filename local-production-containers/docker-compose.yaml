@@ -130,7 +130,7 @@ services:
       - idp-keycloak
 
   service-session:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/session-service:branch-session-service-fix
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/session-service:main-latest
     restart: always
     pull_policy: always
     environment:
