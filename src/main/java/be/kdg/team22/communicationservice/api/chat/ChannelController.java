@@ -45,7 +45,7 @@ public class ChannelController {
     public ResponseEntity<ChannelModel> createLobbyChannel(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token) {
         channelService.createLobbyChannel(LobbyId.from(id));
         return ResponseEntity.noContent().build();
-    }é
+    }
 
     @GetMapping("/lobby/{id}")
     public ResponseEntity<ChannelModel> getLobbyChannel(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token) {
