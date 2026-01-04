@@ -1,5 +1,6 @@
 package be.kdg.team22.communicationservice.domain.chat.bot;
 
+import be.kdg.team22.communicationservice.domain.chat.channel.GameId;
 import be.kdg.team22.communicationservice.domain.notification.exceptions.ClaimNotFoundException;
 import org.jmolecules.ddd.annotation.ValueObject;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
@@ -10,8 +11,12 @@ import java.util.UUID;
 @ValueObject
 public record BotId(UUID value) {
 
-    public static BotId from(final UUID value) {
-        return new BotId(value);
+    public static BotId from(final UUID id) {
+        return new BotId(id);
+    }
+
+    public static BotId from(final GameId id) {
+        return new BotId(id.value());
     }
 
     public static BotId create(String value) {

@@ -7,13 +7,11 @@ import be.kdg.team22.communicationservice.domain.chat.channel.GameId;
 
 public class BotReferenceType extends ReferenceType {
     private final UserId userId;
-    private final BotId botId;
     private final GameId gameId;
 
-    public BotReferenceType(final UserId userId, final BotId botId, final GameId gameId) {
+    public BotReferenceType(final UserId userId, final GameId gameId) {
         super(ChannelType.BOT);
         this.userId = userId;
-        this.botId = botId;
         this.gameId = gameId;
     }
 
@@ -22,7 +20,7 @@ public class BotReferenceType extends ReferenceType {
     }
 
     public BotId botId() {
-        return botId;
+        return BotId.from(gameId);
     }
 
     public GameId gameId() {

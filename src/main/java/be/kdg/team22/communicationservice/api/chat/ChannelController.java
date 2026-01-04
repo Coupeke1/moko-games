@@ -4,9 +4,9 @@ import be.kdg.team22.communicationservice.api.chat.models.channel.ChannelModel;
 import be.kdg.team22.communicationservice.api.chat.models.channel.type.*;
 import be.kdg.team22.communicationservice.api.chat.models.channel.type.exceptions.ConvertReferenceTypeException;
 import be.kdg.team22.communicationservice.application.chat.ChannelService;
+import be.kdg.team22.communicationservice.application.chat.GameService;
 import be.kdg.team22.communicationservice.application.chat.UserService;
 import be.kdg.team22.communicationservice.domain.chat.UserId;
-import be.kdg.team22.communicationservice.domain.chat.bot.BotId;
 import be.kdg.team22.communicationservice.domain.chat.channel.Channel;
 import be.kdg.team22.communicationservice.domain.chat.channel.GameId;
 import be.kdg.team22.communicationservice.domain.chat.channel.LobbyId;
@@ -14,6 +14,7 @@ import be.kdg.team22.communicationservice.domain.chat.channel.type.BotReferenceT
 import be.kdg.team22.communicationservice.domain.chat.channel.type.LobbyReferenceType;
 import be.kdg.team22.communicationservice.domain.chat.channel.type.PrivateReferenceType;
 import be.kdg.team22.communicationservice.domain.chat.channel.type.ReferenceType;
+import be.kdg.team22.communicationservice.infrastructure.game.GameResponse;
 import be.kdg.team22.communicationservice.infrastructure.user.ProfileResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,10 +28,12 @@ import java.util.UUID;
 public class ChannelController {
     private final ChannelService channelService;
     private final UserService userService;
+    private final GameService gameService;
 
-    public ChannelController(final ChannelService channelService, final UserService userService) {
+    public ChannelController(final ChannelService channelService, final UserService userService, final GameService gameService) {
         this.channelService = channelService;
         this.userService = userService;
+        this.gameService = gameService;
     }
 
     @PostMapping("/lobby/{id}")
@@ -40,9 +43,9 @@ public class ChannelController {
         return ResponseEntity.ok(ChannelModel.from(channel, referenceType));
     }
 
-    @GetMapping("/bot/{gameId}/{botId}")
-    public ResponseEntity<ChannelModel> getOrCreateBotChannel(@PathVariable final UUID gameId, @PathVariable final UUID botId, @AuthenticationPrincipal final Jwt token) {
-        Channel channel = channelService.getOrCreateBotChannel(UserId.get(token), GameId.from(gameId), BotId.from(botId));
+    @GetMapping("/bot/{id}")
+    public ResponseEntity<ChannelModel> getOrCreateBotChannel(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token) {
+        Channel channel = channelService.getOrCreateBotChannel(UserId.get(token), GameId.from(id));
         ReferenceTypeModel referenceType = getReferenceType(channel.referenceType());
         return ResponseEntity.ok(ChannelModel.from(channel, referenceType));
     }
@@ -57,7 +60,7 @@ public class ChannelController {
     private ReferenceTypeModel getReferenceType(final ReferenceType referenceType) {
         return switch (referenceType) {
             case BotReferenceType botReferenceType ->
-                    new BotReferenceTypeModel(getUser(botReferenceType.userId()), getUser(UserId.from(botReferenceType.botId())), botReferenceType.gameId().value());
+                    new BotReferenceTypeModel(getUser(botReferenceType.userId()), getGame(botReferenceType.gameId()));
             case LobbyReferenceType lobbyReferenceType ->
                     new LobbyReferenceTypeModel(lobbyReferenceType.lobbyId().value());
             case PrivateReferenceType privateReferenceType ->
@@ -70,5 +73,10 @@ public class ChannelController {
     private UserModel getUser(final UserId id) {
         ProfileResponse response = userService.getUser(id);
         return new UserModel(response.id(), response.username());
+    }
+
+    private GameModel getGame(final GameId id) {
+        GameResponse response = gameService.getGame(id);
+        return new GameModel(response.id(), response.title(), response.description());
     }
 }
