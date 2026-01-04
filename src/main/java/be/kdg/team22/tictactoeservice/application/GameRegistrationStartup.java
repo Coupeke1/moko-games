@@ -2,6 +2,7 @@ package be.kdg.team22.tictactoeservice.application;
 
 import be.kdg.team22.tictactoeservice.config.GameInfoProperties;
 import be.kdg.team22.tictactoeservice.domain.register.exceptions.GameNotRegisteredException;
+import be.kdg.team22.tictactoeservice.domain.register.exceptions.GameServiceNotReachableException;
 import be.kdg.team22.tictactoeservice.infrastructure.register.ExternalRegisterRepository;
 import be.kdg.team22.tictactoeservice.infrastructure.register.RegisterAchievementRequest;
 import be.kdg.team22.tictactoeservice.infrastructure.register.RegisterGameRequest;
@@ -70,8 +71,19 @@ public class GameRegistrationStartup {
                 achievementRequests
         );
 
-        boolean created = externalRegisterRepository.registerGame(request);
-        if (!created) throw new GameNotRegisteredException();
-        logger.info("Game '{}' successfully registered in the game service.", gameInfo.name());
+        int maxRetries = 3;
+        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                boolean created = externalRegisterRepository.registerGame(request);
+                if (created) {
+                    logger.info("Game '{}' successfully registered in the game service.", gameInfo.name());
+                    return;
+                }
+                if (attempt < maxRetries) logger.warn("Game registration attempt {} failed. Retrying...", attempt);
+            } catch (GameServiceNotReachableException e) {
+                if (attempt < maxRetries) logger.warn("Game service not reachable on attempt {}. Retrying...", attempt);
+            }
+        }
+        throw new GameNotRegisteredException();
     }
 }
