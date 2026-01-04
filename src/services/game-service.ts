@@ -41,7 +41,7 @@ export async function requestMove(gameId: string, playerId: string, rowIndex: nu
 
 export async function requestBotMove(gameId: string): Promise<GameState> {
     try {
-        const response = await axios.post<GameState>(`/${gameId}/move-bot`);
+        const response = await axios.post<GameState>(`${BASE_URL}/${gameId}/move-bot`);
         return response.data;
     } catch (error) {
         if (axios.isAxiosError(error)) {
