@@ -122,9 +122,18 @@ public class GameService {
 
     private boolean isHealthyWithRetries(final RegisterGameRequest request) {
         int maxRetries = 3;
+        long delayMs = 2000;
         for (int i = 0; i < maxRetries; i++) {
             if (gameHealthChecker.isHealthy(request)) return true;
-            logger.info("Retrying to check if game is healthy {}/{}", i + 1, maxRetries);
+            if (i < maxRetries - 1) {
+                logger.info("Retrying to check if game is healthy {}/{}", i + 1, maxRetries);
+                try {
+                    Thread.sleep(delayMs);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return false;
+                }
+            }
         }
         return false;
     }
