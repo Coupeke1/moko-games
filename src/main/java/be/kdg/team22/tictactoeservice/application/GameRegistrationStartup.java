@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public class GameRegistrationStartup {
         this.gameInfo = gameInfoProperties;
     }
 
+    @Async
     @EventListener(ApplicationReadyEvent.class)
     public void registerGameOnStartup() {
         try {
@@ -79,9 +81,23 @@ public class GameRegistrationStartup {
                     logger.info("Game '{}' successfully registered in the game service.", gameInfo.name());
                     return;
                 }
-                if (attempt < maxRetries) logger.warn("Game registration attempt {} failed. Retrying...", attempt);
+                if (attempt < maxRetries) {
+                    logger.warn("Game registration attempt {} failed. Retrying...", attempt);
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException ignored) {
+                    }
+                }
             } catch (GameServiceNotReachableException e) {
-                if (attempt < maxRetries) logger.warn("Game service not reachable on attempt {}. Retrying...", attempt);
+                if (attempt < maxRetries) {
+                    logger.warn("Game service not reachable on attempt {}. Retrying...", attempt);
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException ignored) {
+                    }
+                } else {
+                    throw e;
+                }
             }
         }
         throw new GameNotRegisteredException();
