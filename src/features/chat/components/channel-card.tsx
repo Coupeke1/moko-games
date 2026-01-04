@@ -26,7 +26,7 @@ export default function ChannelCard({
             />
             <section className="flex flex-col min-w-0">
                 <p className="font-bold text-lg truncate">{username}</p>
-                <p className="text-fg-2">{description}</p>
+                <p className="text-fg-2 truncate">{description}</p>
             </section>
         </article>
     );

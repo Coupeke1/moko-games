@@ -1,4 +1,4 @@
-import { findGame } from "@/features/games/services/game.ts";
+import { findGame } from "@/features/games/services/games";
 import { useQuery } from "@tanstack/react-query";
 
 export function useGame(id: string | undefined) {
