@@ -2,8 +2,8 @@ import Button from "@/components/buttons/button";
 import Form from "@/components/inputs/form";
 import Input from "@/components/inputs/input";
 import { Gap } from "@/components/layout/gap";
+import { Placeholders } from "@/features/chat/lib/search";
 import { useEffect, useState, type FormEvent } from "react";
-import { Placeholders } from "../lib/search";
 
 interface Props {
     onSend: (message: string) => void;
@@ -28,8 +28,8 @@ export default function SendBar({ onSend }: Props) {
 
     return (
         <Form submit={handleSearch}>
-            <section className={`grid sm:grid-cols-4 ${Gap.Medium}`}>
-                <section className="sm:col-span-3">
+            <section className={`grid md:grid-cols-4 ${Gap.Medium}`}>
+                <section className="md:col-span-3">
                     <Input
                         placeholder={placeholder}
                         value={message}

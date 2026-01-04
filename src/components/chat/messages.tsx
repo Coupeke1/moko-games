@@ -1,6 +1,6 @@
+import Message from "@/components/chat/message";
 import { Gap } from "@/components/layout/gap";
 import State from "@/components/state/state";
-import Message from "@/features/chat/components/message";
 import { useMessage } from "@/features/chat/hooks/use-message";
 import { useMessages } from "@/features/chat/hooks/use-messages";
 import type { Channel } from "@/features/chat/models/channel/channel";
