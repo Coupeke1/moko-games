@@ -17,6 +17,7 @@ export function GameGrid({
     disabled = false,
     onCellClick
 }: GameGridProps) {
+    if (!board) return null;
     const size = board.length;
 
     return (
