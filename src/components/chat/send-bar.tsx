@@ -28,8 +28,8 @@ export default function SendBar({ onSend }: Props) {
 
     return (
         <Form submit={handleSearch}>
-            <section className={`grid sm:grid-cols-4 ${Gap.Medium}`}>
-                <section className="sm:col-span-3">
+            <section className={`grid md:grid-cols-4 ${Gap.Medium}`}>
+                <section className="md:col-span-3">
                     <Input
                         placeholder={placeholder}
                         value={message}

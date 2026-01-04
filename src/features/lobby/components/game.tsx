@@ -1,15 +1,16 @@
 import { Gap } from "@/components/layout/gap";
 import State from "@/components/state/state";
-import Page from "@/features/game/components/page";
+import Page from "@/features/lobby/components/page";
 import { useSession } from "@/features/lobby/hooks/use-session";
 import { useRef } from "react";
+import Chat from "./chat";
 
 export default function GamePage() {
     const { lobby, profile, game, loading, error } = useSession();
     const frame = useRef<HTMLIFrameElement | null>(null);
 
     return (
-        <Page>
+        <Page largerWidth={true}>
             <State
                 loading={loading}
                 error={error}
@@ -21,18 +22,18 @@ export default function GamePage() {
                         className={`
                             grid sm:grid-cols-12
                             ${Gap.Medium}
-                            h-[calc(100vh-4rem)]
+                            md:h-[calc(100vh-12rem)]
                         `}
                     >
                         <iframe
                             ref={frame}
                             src={`${game.frontendUrl}/${lobby.startedGameId}`}
                             title={game.title}
-                            className="col-span-8 w-full h-11/12 max-h-full rounded-lg bg-bg-3 border-3 border-bg-2"
+                            className="sm:col-span-8 w-full sm:h-11/12 h-96 max-h-full rounded-lg bg-bg-3 border-3 border-bg-2"
                         />
 
-                        <section className="col-span-4 h-11/12 max-h-full bg-bg-3 rounded-lg flex items-center justify-center">
-                            <p>Chat</p>
+                        <section className="sm:col-span-4 h-11/12 max-h-full w-full bg-bg-3 rounded-lg">
+                            <Chat padding={true} lobby={lobby} />
                         </section>
                     </section>
                 )}

@@ -7,7 +7,7 @@ import CheckoutPage from "@/features/checkout/checkout";
 import OrderPage from "@/features/checkout/order";
 import FriendsPage from "@/features/friends/friends";
 import RequestsPage from "@/features/friends/requests";
-import GamePage from "@/features/game/game";
+import GamePage from "@/features/lobby/components/game";
 import InvitesPage from "@/features/invites/invites";
 import LibraryGamePage from "@/features/library/game";
 import LibraryPage from "@/features/library/library";
