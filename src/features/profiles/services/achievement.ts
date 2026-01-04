@@ -14,3 +14,16 @@ export async function findMyAchievements(): Promise<Achievement[]> {
         throw new Error("Could not fetch achievements");
     }
 }
+
+export async function findMyAchievementsForGame(
+    id: string,
+): Promise<Achievement[]> {
+    try {
+        const { data } = await client.get<{ achievements: Achievement[] }>(
+            `${BASE_URL}/me/${id}`,
+        );
+        return data.achievements;
+    } catch {
+        throw new Error("Could not fetch achievements");
+    }
+}

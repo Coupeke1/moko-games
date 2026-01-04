@@ -9,6 +9,7 @@ import Row from "@/components/layout/row";
 import State from "@/components/state/state";
 import { useGame } from "@/features/games/hooks/use-game";
 import type { Game } from "@/features/games/models/game.ts";
+import GameAchievements from "@/features/library/components/achievements";
 import Favourite from "@/features/library/components/favourite";
 import { createLobby } from "@/features/lobby/services/lobby.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -80,8 +81,7 @@ export default function LibraryGamePage() {
                         </article>
 
                         <p className="text-fg-2">{game.description}</p>
-
-                        <p>TODO: Show achievements for {game.title} here</p>
+                        <GameAchievements game={game} />
                     </Column>
                 )}
             </State>
