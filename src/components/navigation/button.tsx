@@ -34,7 +34,7 @@ function Button({
     onClick,
     children,
 }: {
-    title: string;
+    title?: string;
     onClick: () => void;
     children: ReactNode;
 }) {
@@ -44,7 +44,7 @@ function Button({
             className="text-xl cursor-pointer text-fg-2 hover:text-fg transition-colors duration-75 flex flex-row items-center gap-2"
         >
             <h2>{children}</h2>
-            <h2>{title}</h2>
+            {title && <h2>{title}</h2>}
         </button>
     );
 }
