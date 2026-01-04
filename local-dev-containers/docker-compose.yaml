@@ -5,6 +5,7 @@ include:
     - platform-services.yaml
     - game-services.yaml
     - black-box-chess-game.yaml
+    - chatbot.yaml
 
 networks:
     moko_kc:

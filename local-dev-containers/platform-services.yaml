@@ -203,7 +203,7 @@ services:
             USER_SERVICE_URL: http://host.docker.internal:8089
             SOCIAL_SERVICE_URL: http://host.docker.internal:8083
             GAMES_SERVICE_URL: http://host.docker.internal:8084
-            CHAT_SERVICE_URL: http://host.docker.internal:8090
+            CHAT_SERVICE_URL: http://host.docker.internal:3334
 
             SPRING_MAIL_USERNAME: mokogamesbe@gmail.com
             SPRING_MAIL_PASSWORD: alofzkyfupctrpmw
