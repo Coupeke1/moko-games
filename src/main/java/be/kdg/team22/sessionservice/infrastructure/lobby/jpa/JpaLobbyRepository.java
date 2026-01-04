@@ -13,13 +13,15 @@ public interface JpaLobbyRepository extends JpaRepository<LobbyEntity, UUID> {
     Optional<LobbyEntity> findByStartedGameId(final UUID startedGameId);
 
 
-    @Query("""
-                SELECT DISTINCT l
-                FROM LobbyEntity l
-                JOIN l.players p
-                WHERE p.id = :playerId
+    @Query(value = """
+                SELECT DISTINCT l.*
+                FROM lobbies l
+                INNER JOIN session_service.lobby_players p ON l.id = p.lobby_id
+                WHERE p.player_id = :playerId
                   AND l.status IN ('OPEN', 'STARTED')
-            """)
+                ORDER BY l.updated_at DESC
+                LIMIT 1
+            """, nativeQuery = true)
     Optional<LobbyEntity> findByPlayerId(@Param("playerId") UUID playerId);
 
     @Query("""
