@@ -42,11 +42,10 @@ public class ChannelController {
     }
 
     @PostMapping("/lobby/{id}")
-    public ResponseEntity<ChannelModel> getOrCreateLobbyChannel(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token) {
-        Channel channel = channelService.getOrCreateLobbyChannel(LobbyId.from(id));
-        ReferenceTypeModel referenceType = getReferenceType(channel.referenceType(), token);
-        return ResponseEntity.ok(ChannelModel.from(channel, referenceType));
-    }
+    public ResponseEntity<ChannelModel> createLobbyChannel(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token) {
+        channelService.createLobbyChannel(LobbyId.from(id));
+        return ResponseEntity.noContent().build();
+    }é
 
     @GetMapping("/lobby/{id}")
     public ResponseEntity<ChannelModel> getLobbyChannel(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token) {

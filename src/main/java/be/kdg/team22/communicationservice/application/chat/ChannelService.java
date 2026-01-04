@@ -22,13 +22,10 @@ public class ChannelService {
         return repository.findById(id).orElseThrow(id::notFound);
     }
 
-    public Channel getOrCreateLobbyChannel(final LobbyId id) {
-        return repository.findLobbyChannel(id).orElseGet(() -> {
-            ReferenceType type = new LobbyReferenceType(id);
-            Channel channel = new Channel(type);
-            repository.save(channel);
-            return channel;
-        });
+    public void createLobbyChannel(final LobbyId id) {
+        ReferenceType type = new LobbyReferenceType(id);
+        Channel channel = new Channel(type);
+        repository.save(channel);
     }
 
     public Channel getLobbyChannel(final LobbyId id) {

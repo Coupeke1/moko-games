@@ -1,6 +1,5 @@
 package be.kdg.team22.communicationservice.infrastructure.lobby.models;
 
-import be.kdg.team22.communicationservice.domain.chat.channel.ChannelId;
 import be.kdg.team22.communicationservice.domain.chat.channel.LobbyId;
 
 public class LobbyNotFoundException extends RuntimeException {
