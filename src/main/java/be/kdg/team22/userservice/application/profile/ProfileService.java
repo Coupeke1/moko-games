@@ -73,7 +73,7 @@ public class ProfileService {
     }
 
     private List<AchievementModel> getAchievements(final ProfileId id) {
-        return achievementServiceProvider.getObject().findModelsByProfile(id);
+        return achievementServiceProvider.getObject().findAchievementsByProfile(id);
     }
 
     private List<FavouriteGameModel> getFavourites(final ProfileId id) {
