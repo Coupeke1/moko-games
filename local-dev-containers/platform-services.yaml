@@ -182,7 +182,7 @@ services:
             - moko_kc
 
     service-communication:
-        image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/communication-service:branch-19-websockets-implementeren-voor-chat
+        image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/communication-service:main-latest
         restart: no
         pull_policy: always
         profiles: ["communication"]
