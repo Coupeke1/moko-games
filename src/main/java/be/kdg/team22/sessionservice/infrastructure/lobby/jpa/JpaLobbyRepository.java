@@ -18,6 +18,7 @@ public interface JpaLobbyRepository extends JpaRepository<LobbyEntity, UUID> {
                 FROM LobbyEntity l
                 JOIN l.players p
                 WHERE p.id = :playerId
+                  AND l.status IN ('OPEN', 'STARTED')
             """)
     Optional<LobbyEntity> findByPlayerId(@Param("playerId") UUID playerId);
 
