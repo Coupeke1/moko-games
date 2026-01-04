@@ -28,7 +28,6 @@ public class GameRegistrationStartup {
         this.gameInfo = gameInfoProperties;
     }
 
-    @Async
     @EventListener(ApplicationReadyEvent.class)
     public void registerGameOnStartup() {
         try {
