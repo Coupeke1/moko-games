@@ -18,6 +18,7 @@ export default function GamePage() {
     const {data: gameState, isLoading, isError} = useGameState(id!);
     const {profile, isLoading: profileLoading, isError: profileError} = useMyProfile();
     const isMyTurn = gameState?.currentRole === gameState?.players.find(p => p.id === profile?.id)?.role;
+    const isBotTurn = gameState?.currentRole === gameState?.botPlayer;
 
     const {makeMove} = useMakeMove(id!, profile, gameState?.status);
     const {requestBotTurn, isBotMoving} = useBotMove(id);
@@ -59,10 +60,10 @@ export default function GamePage() {
 
                     <div className="flex flex-col items-center gap-4 flex-1">
                         <TurnIndicator gameState={gameState}>
-                            {!isMyTurn && (
+                            {!isMyTurn && isBotTurn && (
                                 <BigButton
                                     onClick={handleBotMove}
-                                    disabled={isBotMoving}
+                                    disabled={isBotMoving || !isBotTurn}
                                 >
                                     {isBotMoving ? "Bot Thinking..." : "Request Bot Move"}
                                 </BigButton>

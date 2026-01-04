@@ -7,5 +7,6 @@ export interface GameState {
     status: GameStatus;
     players: Player[];
     currentRole: string;
+    botPlayer: string;
     winner?: string;
 }
