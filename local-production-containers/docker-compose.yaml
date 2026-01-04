@@ -33,7 +33,7 @@ services:
 
   # Frontend
   frontend-platform:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/platform-frontend:latest
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/platform-frontend:main-latest
     restart: always
     pull_policy: always
     environment:
@@ -60,7 +60,7 @@ services:
       - moko_frontend
 
   frontend-tic-tac-toe:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/tic-tac-toe-frontend:latest
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/tic-tac-toe-frontend:main-latest
     restart: always
     pull_policy: always
     environment:
@@ -168,7 +168,7 @@ services:
       - idp-keycloak
 
   service-communication:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/communication-service:branch-20-coommuncation-start-niet-op-in-docker-fix
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/communication-service:main-latest
     restart: always
     pull_policy: always
     environment:
@@ -303,7 +303,7 @@ services:
 
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
 
-      USER_SERVICE_URL: http://service-user:8080
+      USER_SERVICE_URL: http://service-user:8089
       GAME_SERVICE_URL: http://service-games:8084
 
       MOLLIE_API_KEY: ${MOLLIE_API_KEY}
@@ -498,6 +498,8 @@ services:
     volumes:
       - moko_rabbitmq_all:/var/lib/rabbitmq/
       - moko_rabbitmq_all:/var/log/rabbitmq/
+    command: >
+      sh -c "rabbitmq-plugins enable --offline rabbitmq_stomp && rabbitmq-server"
 
   app-redis:
     image: redis:8.4.0-alpine
