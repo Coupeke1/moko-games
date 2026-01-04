@@ -32,9 +32,9 @@ public class ChannelService {
         });
     }
 
-    public Channel getOrCreateBotChannel(final UserId userId, final GameId gameId) {
+    public Channel getOrCreateBotChannel(final UserId userId, final GameId gameId, final BotId botId) {
         return repository.findBotChannel(userId, gameId).orElseGet(() -> {
-            ReferenceType type = new BotReferenceType(userId, BotId.create(), gameId);
+            ReferenceType type = new BotReferenceType(userId, botId, gameId);
             Channel channel = new Channel(type);
             repository.save(channel);
             return channel;

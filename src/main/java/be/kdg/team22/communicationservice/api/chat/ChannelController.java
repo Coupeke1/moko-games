@@ -6,6 +6,7 @@ import be.kdg.team22.communicationservice.api.chat.models.channel.type.exception
 import be.kdg.team22.communicationservice.application.chat.ChannelService;
 import be.kdg.team22.communicationservice.application.chat.UserService;
 import be.kdg.team22.communicationservice.domain.chat.UserId;
+import be.kdg.team22.communicationservice.domain.chat.bot.BotId;
 import be.kdg.team22.communicationservice.domain.chat.channel.Channel;
 import be.kdg.team22.communicationservice.domain.chat.channel.GameId;
 import be.kdg.team22.communicationservice.domain.chat.channel.LobbyId;
@@ -39,9 +40,9 @@ public class ChannelController {
         return ResponseEntity.ok(ChannelModel.from(channel, referenceType));
     }
 
-    @GetMapping("/bot/{id}")
-    public ResponseEntity<ChannelModel> getOrCreateBotChannel(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token) {
-        Channel channel = channelService.getOrCreateBotChannel(UserId.get(token), GameId.from(id));
+    @GetMapping("/bot/{gameId}/{botId}")
+    public ResponseEntity<ChannelModel> getOrCreateBotChannel(@PathVariable final UUID gameId, @PathVariable final UUID botId, @AuthenticationPrincipal final Jwt token) {
+        Channel channel = channelService.getOrCreateBotChannel(UserId.get(token), GameId.from(gameId), BotId.from(botId));
         ReferenceTypeModel referenceType = getReferenceType(channel.referenceType());
         return ResponseEntity.ok(ChannelModel.from(channel, referenceType));
     }
