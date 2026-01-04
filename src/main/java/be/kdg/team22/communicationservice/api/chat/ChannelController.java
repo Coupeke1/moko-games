@@ -43,6 +43,13 @@ public class ChannelController {
         return ResponseEntity.ok(ChannelModel.from(channel, referenceType));
     }
 
+    @GetMapping("/lobby/{id}")
+    public ResponseEntity<ChannelModel> getLobbyChannel(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token) {
+        Channel channel = channelService.getLobbyChannel(LobbyId.from(id));
+        ReferenceTypeModel referenceType = getReferenceType(channel.referenceType());
+        return ResponseEntity.ok(ChannelModel.from(channel, referenceType));
+    }
+
     @GetMapping("/bot/{id}")
     public ResponseEntity<ChannelModel> getOrCreateBotChannel(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token) {
         Channel channel = channelService.getOrCreateBotChannel(UserId.get(token), GameId.from(id));

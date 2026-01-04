@@ -20,7 +20,7 @@ public class ExternalBotConfig {
 
     private RestClient createRestClient(String baseUrl) {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(2000);
+        requestFactory.setConnectTimeout(12000);
         requestFactory.setReadTimeout(20000);
 
         return RestClient.builder().baseUrl(baseUrl).requestFactory(requestFactory).build();

@@ -51,6 +51,7 @@ public class ExternalBotRepository implements BotChatRepository {
                 throw BotServiceException.requestFailed(fallbackEx);
             }
         } catch (RestClientException ex) {
+            System.out.println("     " + ex.getMessage());
             throw BotServiceException.requestFailed(ex);
         }
     }

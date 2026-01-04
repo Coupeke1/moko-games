@@ -31,6 +31,10 @@ public class ChannelService {
         });
     }
 
+    public Channel getLobbyChannel(final LobbyId id) {
+        return repository.findLobbyChannel(id).orElseThrow(id::notFound);
+    }
+
     public Channel getOrCreateBotChannel(final UserId userId, final GameId gameId) {
         return repository.findBotChannel(userId, gameId).orElseGet(() -> {
             ReferenceType type = new BotReferenceType(userId, gameId);
