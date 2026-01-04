@@ -36,6 +36,7 @@ public class ExternalGameRepository {
 
             throw exception;
         } catch (RestClientException exception) {
+            System.out.println("    " + exception);
             throw ServiceUnavailableException.gamesServiceUnavailable();
         }
     }
