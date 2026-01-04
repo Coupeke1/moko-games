@@ -57,10 +57,10 @@ public class LobbyChatService {
     }
 
     private void checkType(final Channel channel) {
-        if (channel.referenceType().type().equals(ChannelType.BOT))
+        if (channel.referenceType().type().equals(ChannelType.LOBBY))
             return;
 
-        throw new InvalidChannelException(channel.id(), ChannelType.BOT);
+        throw new InvalidChannelException(channel.id(), ChannelType.LOBBY);
     }
 
     private void checkForAccess(final Channel channel, final UserId userId, final Jwt token) {
