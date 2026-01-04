@@ -51,7 +51,6 @@ export default function NavigationBar({ links, buttons }: Props) {
                         {buttons.map((button: Button) => (
                             <NavigationButton
                                 key={button.title}
-                                title={button.title}
                                 onClick={button.onClick ?? undefined}
                                 path={button.path ?? undefined}
                             >

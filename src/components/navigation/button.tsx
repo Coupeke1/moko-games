@@ -3,7 +3,7 @@ import { Link as RouterLink, useLocation } from "react-router";
 import { Gap } from "../layout/gap";
 
 interface Props {
-    title: string;
+    title?: string;
     path?: string;
     onClick?: () => void;
     children: ReactNode;
@@ -54,7 +54,7 @@ function Link({
     path,
     children,
 }: {
-    title: string;
+    title?: string;
     path: string;
     children: ReactNode;
 }) {
@@ -67,7 +67,7 @@ function Link({
             className={`text-xl cursor-pointer flex flex-row items-center ${Gap.Medium} ${matches ? "text-fg" : `text-fg-2 hover:text-fg transition-colors duration-75`}`}
         >
             <h2>{children}</h2>
-            <h2>{title}</h2>
+            {title && <h2>{title}</h2>}
         </RouterLink>
     );
 }
