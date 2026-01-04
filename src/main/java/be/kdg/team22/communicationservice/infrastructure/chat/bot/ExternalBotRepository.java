@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,11 +40,11 @@ public class ExternalBotRepository implements BotChatRepository {
         BotChatRequest request = new BotChatRequest(question, TEAM_NUMBER, gameName);
 
         try {
-            return tryAskWithClient(primaryClient, "Primary", request);
+            return tryAskWithClient(primaryClient, request);
         } catch (ResourceAccessException ex) {
             logger.warn("Primary chat service not reachable, trying fallback. {}", ex.getMessage());
             try {
-                return tryAskWithClient(fallbackClient, "Fallback", request);
+                return tryAskWithClient(fallbackClient, request);
             } catch (
                     RestClientException fallbackEx) {
                 throw BotServiceException.requestFailed(fallbackEx);
@@ -55,8 +54,8 @@ public class ExternalBotRepository implements BotChatRepository {
         }
     }
 
-    private BotResponse tryAskWithClient(RestClient client, String clientName, BotChatRequest request) {
-        BotResponse response = client.post().uri("/chat").header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", API_KEY)).body(request).retrieve().onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
+    private BotResponse tryAskWithClient(RestClient client, BotChatRequest request) {
+        BotResponse response = client.post().uri("/chat").header("X_API-Key", API_KEY).body(request).retrieve().onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
             throw BotServiceException.badResponse(res.getStatusText());
         }).onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
             throw BotServiceException.unavailable();
@@ -74,6 +73,7 @@ public class ExternalBotRepository implements BotChatRepository {
         } catch (
                 ResourceAccessException resourceAccessException) {
             logger.warn("Primary chat service upload not reachable, trying fallback. {}", resourceAccessException.getMessage());
+
             try {
                 return tryUploadWithClient(fallbackClient, "Fallback", pdfBytes, filename);
             } catch (
