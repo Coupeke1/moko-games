@@ -31,7 +31,7 @@ public class ProfileController {
     }
 
     @PostMapping("/bot")
-    public ResponseEntity<ProfileModel> createBotProfile(@RequestBody final String description) {
+    public ResponseEntity<ProfileModel> createBotProfile(@RequestBody(required = false) final String description) {
         Profile bot = service.createBotProfile(description);
         return ResponseEntity.ok(ProfileModel.from(bot));
     }
