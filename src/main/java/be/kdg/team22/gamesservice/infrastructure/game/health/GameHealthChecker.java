@@ -22,6 +22,7 @@ public class GameHealthChecker {
 
     private boolean checkEndpoint(String baseUrl, String healthEndpoint) {
         try {
+            logger.info("Checking game health endpoint : {}/{}", baseUrl, healthEndpoint);
             RestClient client = RestClient.builder().baseUrl(baseUrl).build();
             ResponseEntity<Void> response = client.get()
                     .uri(healthEndpoint)
