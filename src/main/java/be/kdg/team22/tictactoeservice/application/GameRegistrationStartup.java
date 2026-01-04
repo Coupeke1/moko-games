@@ -2,6 +2,7 @@ package be.kdg.team22.tictactoeservice.application;
 
 import be.kdg.team22.tictactoeservice.config.GameInfoProperties;
 import be.kdg.team22.tictactoeservice.domain.register.exceptions.GameNotRegisteredException;
+import be.kdg.team22.tictactoeservice.domain.register.exceptions.GameServiceNotReachableException;
 import be.kdg.team22.tictactoeservice.infrastructure.register.ExternalRegisterRepository;
 import be.kdg.team22.tictactoeservice.infrastructure.register.RegisterAchievementRequest;
 import be.kdg.team22.tictactoeservice.infrastructure.register.RegisterGameRequest;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,6 +21,9 @@ public class GameRegistrationStartup {
     private static final Logger logger = LoggerFactory.getLogger(GameRegistrationStartup.class);
     private final ExternalRegisterRepository externalRegisterRepository;
     private final GameInfoProperties gameInfo;
+
+    private final static int MAX_RETRIES = 3;
+    private final static int RETRY_DELAY_MS = 2000;
 
     public GameRegistrationStartup(final ExternalRegisterRepository externalRegisterRepository,
                                    final GameInfoProperties gameInfoProperties) {
@@ -70,8 +75,32 @@ public class GameRegistrationStartup {
                 achievementRequests
         );
 
-        boolean created = externalRegisterRepository.registerGame(request);
-        if (!created) throw new GameNotRegisteredException();
-        logger.info("Game '{}' successfully registered in the game service.", gameInfo.name());
+        for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            try {
+                boolean created = externalRegisterRepository.registerGame(request);
+                if (created) {
+                    logger.info("Game '{}' successfully registered in the game service.", gameInfo.name());
+                    return;
+                }
+                if (attempt < MAX_RETRIES) {
+                    logger.warn("Game registration attempt {} failed. Retrying...", attempt);
+                    try {
+                        Thread.sleep(RETRY_DELAY_MS);
+                    } catch (InterruptedException ignored) {
+                    }
+                }
+            } catch (GameServiceNotReachableException e) {
+                if (attempt < MAX_RETRIES) {
+                    logger.warn("Game service not reachable on attempt {}. Retrying...", attempt);
+                    try {
+                        Thread.sleep(RETRY_DELAY_MS);
+                    } catch (InterruptedException ignored) {
+                    }
+                } else {
+                    throw e;
+                }
+            }
+        }
+        throw new GameNotRegisteredException();
     }
 }

@@ -1,18 +1,20 @@
 package be.kdg.team22.tictactoeservice.infrastructure.register;
 
 import be.kdg.team22.tictactoeservice.domain.register.exceptions.GameServiceNotReachableException;
-import be.kdg.team22.tictactoeservice.domain.register.GameRegisterId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
 @Component
 public class ExternalRegisterRepository {
     private final RestClient client;
+
+    private final Logger logger = LoggerFactory.getLogger(ExternalRegisterRepository.class);
 
     public ExternalRegisterRepository(@Qualifier("registerRepository") final RestClient client) {
         this.client = client;
@@ -29,6 +31,7 @@ public class ExternalRegisterRepository {
                     .toBodilessEntity();
             return response.getStatusCode().is2xxSuccessful();
         } catch (RestClientException exception) {
+            logger.error("Error registering game", exception);
             throw new GameServiceNotReachableException(client.toString());
         }
     }
