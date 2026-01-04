@@ -1,5 +1,6 @@
 package be.kdg.team22.communicationservice.infrastructure.chat.bot;
 
+import be.kdg.team22.communicationservice.domain.chat.UserId;
 import be.kdg.team22.communicationservice.domain.chat.bot.BotChatRepository;
 import be.kdg.team22.communicationservice.domain.chat.bot.BotResponse;
 import be.kdg.team22.communicationservice.domain.chat.exceptions.BotServiceException;
@@ -36,8 +37,8 @@ public class ExternalBotRepository implements BotChatRepository {
     }
 
     @Override
-    public BotResponse ask(final String question, final String gameName) {
-        BotChatRequest request = new BotChatRequest(question, TEAM_NUMBER, gameName);
+    public BotResponse ask(final UserId userId, String question, final String gameName) {
+        BotChatRequest request = new BotChatRequest(question, TEAM_NUMBER, gameName, userId.value().toString());
 
         try {
             return tryAskWithClient(primaryClient, request);

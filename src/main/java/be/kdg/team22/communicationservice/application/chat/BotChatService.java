@@ -58,11 +58,10 @@ public class BotChatService {
         Message message = channel.send(userId, content);
         publisher.saveAndPublish(channel, message);
 
-
         BotReferenceType referenceType = (BotReferenceType) channel.referenceType();
 
         GameResponse gameResponse = gameRepository.getGame(referenceType.gameId().value());
-        BotResponse botResponse = botChatRepository.ask(content, gameResponse.name());
+        BotResponse botResponse = botChatRepository.ask(userId, content, gameResponse.name());
 
         Message answer = channel.send(referenceType.botId(), botResponse.answer());
         publisher.saveAndPublish(channel, answer);
