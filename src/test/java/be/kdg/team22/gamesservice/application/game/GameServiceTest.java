@@ -352,7 +352,7 @@ class GameServiceTest {
                 .isInstanceOf(GameUnhealthyException.class);
 
         verify(gameRepository).findByName("Checkers");
-        verify(gameHealthChecker).isHealthy(request);
+        verify(gameHealthChecker, times(3)).isHealthy(request);
         verify(gameRepository, never()).save(any());
     }
 
