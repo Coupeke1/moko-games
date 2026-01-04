@@ -46,13 +46,7 @@ public class AchievementService {
         AchievementDetailsResponse achievementDetails = gamesRepository.getAchievementDetails(gameId, key);
         profileService.addLevels(userId, achievementDetails.levels());
 
-        AchievementUnlockedEvent event = new AchievementUnlockedEvent(
-                userId.value(),
-                gameId.value(),
-                key.key(),
-                achievementDetails.name(),
-                achievementDetails.description()
-        );
+        AchievementUnlockedEvent event = new AchievementUnlockedEvent(userId.value(), gameId.value(), key.key(), achievementDetails.name(), achievementDetails.description());
         eventPublisher.publishAchievementUnlocked(event);
     }
 
@@ -60,14 +54,19 @@ public class AchievementService {
         return achievements.findByProfile(profileId);
     }
 
-    public List<AchievementModel> findModelsByProfile(ProfileId profileId) {
-        return achievements.findByProfile(profileId)
-                .stream()
-                .map(a -> {
-                    GameDetailsResponse game = gamesRepository.getGame(a.gameId().value());
-                    AchievementDetailsResponse achievement = gamesRepository.getAchievementDetails(a.gameId(), a.key());
-                    return AchievementModel.from(a, achievement, game);
-                })
-                .toList();
+    public List<AchievementModel> findAchievementsByProfile(final ProfileId profileId) {
+        return achievements.findByProfile(profileId).stream().map(a -> {
+            GameDetailsResponse game = gamesRepository.getGame(a.gameId().value());
+            AchievementDetailsResponse achievement = gamesRepository.getAchievementDetails(a.gameId(), a.key());
+            return AchievementModel.from(a, achievement, game);
+        }).toList();
+    }
+
+    public List<AchievementModel> findAchievementsByProfileAndGame(final ProfileId profileId, final GameId gameId) {
+        return achievements.findByProfile(profileId).stream().map(a -> {
+            GameDetailsResponse game = gamesRepository.getGame(a.gameId().value());
+            AchievementDetailsResponse achievement = gamesRepository.getAchievementDetails(a.gameId(), a.key());
+            return AchievementModel.from(a, achievement, game);
+        }).filter(achievement -> achievement.gameId().equals(gameId.value())).toList();
     }
 }
