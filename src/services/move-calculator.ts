@@ -1,6 +1,7 @@
 import {cellIndexToRowCol} from "@/lib/checkers-board.ts";
 
 export function getPieceAtCell(board: string[][], cell: number): string | null {
+    if (!board) return null;
     const boardSize = board.length;
     const { row, col } = cellIndexToRowCol(cell, board.length);
 

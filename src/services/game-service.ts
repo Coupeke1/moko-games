@@ -2,8 +2,9 @@ import validIdCheck from "@/lib/id.ts";
 import axios from "axios";
 import {type GameState} from "../models/game-state";
 import {useAuthStore} from "@/stores/auth-store";
+import {environment} from "@/config.ts";
 
-const BASE_URL = import.meta.env.VITE_CHECKERS_SERVICE;
+const BASE_URL = environment.checkersService;
 
 const axiosInstance = axios.create({
     baseURL: BASE_URL,
