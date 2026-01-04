@@ -9,16 +9,6 @@ import org.springframework.web.client.RestClient;
 @Configuration
 public class ExternalBotConfig {
     @Bean("botService")
-    RestClient botRestClient(@Value("${business.chat-service.url}") final String baseUrl) {
-        return createRestClient(baseUrl);
-    }
-
-    @Bean("botServiceFallback")
-    RestClient botRestClientFallback(@Value("${business.chat-service.fallback_url}") final String fallbackUrl) {
-        return createRestClient(fallbackUrl);
-    }
-
-    @Bean("botService")
     RestClient botRestClient(
             @Value("${business.chat-service.url}") final String baseUrl,
             @Value("${business.chat-service.api-key}") final String apiKey) {
@@ -41,7 +31,8 @@ public class ExternalBotConfig {
                 .baseUrl(baseUrl)
                 .requestFactory(requestFactory)
                 .defaultHeaders(headers -> {
-                    if(apiKey != null && !apiKey.isEmpty()) headers.set("X-API-Key", apiKey);
+                    if (apiKey != null && !apiKey.isEmpty())
+                        headers.set("X-API-Key", apiKey);
                 })
                 .build();
     }
