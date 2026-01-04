@@ -182,7 +182,7 @@ services:
             - moko_kc
 
     service-communication:
-        image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/communication-service:main-latest
+        image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/communication-service:branch-19-websockets-implementeren-voor-chat
         restart: no
         pull_policy: always
         profiles: ["communication"]
@@ -202,6 +202,7 @@ services:
             SESSION_SERVICE_URL: http://host.docker.internal:8081
             USER_SERVICE_URL: http://host.docker.internal:8089
             SOCIAL_SERVICE_URL: http://host.docker.internal:8083
+            GAMES_SERVICE_URL: http://host.docker.internal:8084
             CHAT_SERVICE_URL: http://host.docker.internal:8090
 
             SPRING_MAIL_USERNAME: mokogamesbe@gmail.com
