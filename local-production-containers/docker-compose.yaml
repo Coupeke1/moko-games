@@ -191,10 +191,11 @@ services:
       SESSION_SERVICE_URL: http://service-session:8081
       USER_SERVICE_URL: http://service-user:8089
       SOCIAL_SERVICE_URL: http://service-social:8083
+      GAMES_SERVICE_URL: http://service-games:8084
 
-      BUSINESS_AI_URL: https://team3.techtitans.be
-      BUSINESS_FALLBACK_CHAT_URL: http://host.docker.internal:3335
-      BUSINESS_AI_API_KEY: ${AI_API_KEY}
+      CHAT_SERVICE_URL: https://team3.techtitans.be
+      CHAT_SERVICE_FALLBACK_URL: http://host.docker.internal:3335
+      CHAT_SERVICE_API_KEY: ${AI_API_KEY}
 
       CORS_ALLOWED_ORIGINS: http://localhost
     expose:
