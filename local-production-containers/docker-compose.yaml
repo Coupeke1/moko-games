@@ -395,7 +395,7 @@ services:
       GAME_SERVICE_URL: http://service-games:8084
       BUSINESS_AI_URL: https://team3.techtitans.be
       BUSINESS_AI_API_KEY: ${AI_API_KEY}
-      BUSINESS_FALLBACK_AI_URL: http://localhost:3334
+      BUSINESS_FALLBACK_AI_URL: http://host.docker.internal:3334
       BUSINESS_FALLBACK_CHAT_URL: http://localhost:3335
       CHAT_SERVICE_UPLOAD_ON_STARTUP: true
 
@@ -442,7 +442,7 @@ services:
       GAME_SERVICE_URL: http://service-games:8084
       BUSINESS_AI_URL: https://team3.techtitans.be
       BUSINESS_AI_API_KEY: ${AI_API_KEY}
-      BUSINESS_FALLBACK_AI_URL: http://localhost:3334
+      BUSINESS_FALLBACK_AI_URL: http://host.docker.internal:3334
       BUSINESS_FALLBACK_CHAT_URL: http://localhost:3335
       CHAT_SERVICE_UPLOAD_ON_STARTUP: true
 
