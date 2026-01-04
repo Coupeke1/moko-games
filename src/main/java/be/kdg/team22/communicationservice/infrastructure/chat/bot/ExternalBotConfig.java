@@ -8,7 +8,6 @@ import org.springframework.web.client.RestClient;
 
 @Configuration
 public class ExternalBotConfig {
-
     @Bean("botService")
     RestClient botRestClient(
             @Value("${business.chat-service.url}") final String baseUrl,
@@ -32,7 +31,8 @@ public class ExternalBotConfig {
                 .baseUrl(baseUrl)
                 .requestFactory(requestFactory)
                 .defaultHeaders(headers -> {
-                    if(apiKey != null && !apiKey.isEmpty()) headers.set("X-API-Key", apiKey);
+                    if (apiKey != null && !apiKey.isEmpty())
+                        headers.set("X-API-Key", apiKey);
                 })
                 .build();
     }

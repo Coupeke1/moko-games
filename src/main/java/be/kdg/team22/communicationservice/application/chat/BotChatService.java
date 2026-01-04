@@ -1,77 +1,86 @@
 package be.kdg.team22.communicationservice.application.chat;
 
-import be.kdg.team22.communicationservice.domain.chat.*;
+import be.kdg.team22.communicationservice.application.chat.exceptions.InvalidException;
+import be.kdg.team22.communicationservice.domain.chat.UserId;
 import be.kdg.team22.communicationservice.domain.chat.bot.BotChatRepository;
 import be.kdg.team22.communicationservice.domain.chat.bot.BotResponse;
-import be.kdg.team22.communicationservice.domain.chat.exceptions.ChatChannelNotFoundException;
-import be.kdg.team22.communicationservice.domain.chat.exceptions.NotBotChannelOwnerException;
+import be.kdg.team22.communicationservice.domain.chat.channel.Channel;
+import be.kdg.team22.communicationservice.domain.chat.channel.ChannelId;
+import be.kdg.team22.communicationservice.domain.chat.channel.ChannelType;
+import be.kdg.team22.communicationservice.domain.chat.channel.exceptions.InvalidChannelException;
+import be.kdg.team22.communicationservice.domain.chat.channel.exceptions.NoAccessException;
+import be.kdg.team22.communicationservice.domain.chat.channel.type.BotReferenceType;
+import be.kdg.team22.communicationservice.domain.chat.message.Message;
+import be.kdg.team22.communicationservice.infrastructure.game.ExternalGameRepository;
+import be.kdg.team22.communicationservice.infrastructure.game.GameResponse;
 import jakarta.transaction.Transactional;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @Transactional
 public class BotChatService {
-    private final ChatChannelRepository channelRepository;
+    private final ChannelService channelService;
+    private final ChatPublisherService publisher;
     private final BotChatRepository botChatRepository;
+    private final ExternalGameRepository gameRepository;
 
-    public BotChatService(final ChatChannelRepository channelRepository,
-                          final BotChatRepository botChatRepository) {
-        this.channelRepository = channelRepository;
+    public BotChatService(final ChannelService channelService, final ChatPublisherService publisher, final BotChatRepository botChatRepository, final ExternalGameRepository gameRepository) {
+        this.channelService = channelService;
+        this.publisher = publisher;
         this.botChatRepository = botChatRepository;
+        this.gameRepository = gameRepository;
     }
 
-    public Channel createChannel(final String userId) {
-        return channelRepository
-                .findByTypeAndReferenceId(ChatChannelType.BOT, userId)
-                .orElseGet(() -> {
-                    Channel channel = Channel.createNew(ChatChannelType.BOT, userId);
-                    channelRepository.save(channel);
-                    return channel;
-                });
-    }
+    public List<Message> getMessages(final ChannelId channelId, final Instant since, final Jwt token) {
+        Channel channel = channelService.getChannel(channelId);
+        checkType(channel);
 
-    public ChatMessage sendMessage(final UUID channelId,
-                                   final String senderId,
-                                   final String content,
-                                   final String gameName) {
-        Channel channel = findChannelWithOwnerCheck(channelId, senderId);
+        UserId userId = UserId.get(token);
+        checkForAccess(channel, userId);
 
-        channel.postUserMessage(senderId, content);
-        channelRepository.save(channel);
-
-        BotResponse botResponse = botChatRepository.askBot(content, gameName);
-
-        ChatMessage botMessage = channel.postBotMessage("bot", botResponse.answer());
-        channelRepository.save(channel);
-
-        return botMessage;
-    }
-
-    public List<ChatMessage> getMessages(final UUID channelId,
-                                         final String requesterId,
-                                         final Instant since) {
-        Channel channel = findChannelWithOwnerCheck(channelId, requesterId);
         return since == null ? channel.getMessages() : channel.getMessagesSince(since);
     }
 
-    private Channel findChannelWithOwnerCheck(final UUID channelId, final String userId) {
-        Channel channel = channelRepository
-                .findById(ChatChannelId.from(channelId))
-                .orElseThrow(() -> new ChatChannelNotFoundException(ChatChannelType.BOT, channelId.toString()));
+    public Message sendMessage(final ChannelId channelId, final String content, final Jwt token) {
+        Channel channel = channelService.getChannel(channelId);
+        checkType(channel);
 
-        if (channel.getType() != ChatChannelType.BOT) {
-            throw new ChatChannelNotFoundException(ChatChannelType.BOT, channelId.toString());
-        }
+        UserId userId = UserId.get(token);
+        checkForAccess(channel, userId);
 
-        if (!channel.getReferenceId().equals(userId)) {
-            throw new NotBotChannelOwnerException(userId, channelId.toString());
-        }
+        if (content == null || content.isEmpty())
+            throw InvalidException.content();
 
-        return channel;
+        Message message = channel.send(userId, content);
+        publisher.saveAndPublish(channel, message);
+
+        BotReferenceType referenceType = (BotReferenceType) channel.referenceType();
+
+        GameResponse gameResponse = gameRepository.getGame(referenceType.gameId().value());
+        BotResponse botResponse = botChatRepository.ask(userId, content, gameResponse.name());
+
+        Message answer = channel.send(referenceType.botId(), botResponse.answer());
+        publisher.saveAndPublish(channel, answer);
+
+        return message;
+    }
+
+    private void checkType(final Channel channel) {
+        if (channel.referenceType().type().equals(ChannelType.BOT))
+            return;
+
+        throw new InvalidChannelException(channel.id(), ChannelType.BOT);
+    }
+
+    private void checkForAccess(final Channel channel, final UserId userId) {
+        BotReferenceType referenceType = (BotReferenceType) channel.referenceType();
+        if (referenceType.userId().equals(userId))
+            return;
+
+        throw new NoAccessException(userId, channel.id());
     }
 }
-

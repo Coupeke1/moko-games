@@ -9,5 +9,9 @@ public class ServiceUnavailableException extends RuntimeException {
     public static ServiceUnavailableException userServiceUnavailable() {
         return new ServiceUnavailableException("User service is currently unavailable. Please try again later.");
     }
+
+    public static ServiceUnavailableException gamesServiceUnavailable() {
+        return new ServiceUnavailableException("Games service is currently unavailable. Please try again later.");
+    }
 }
 

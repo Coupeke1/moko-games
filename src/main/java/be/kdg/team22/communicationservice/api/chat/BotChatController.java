@@ -1,11 +1,10 @@
 package be.kdg.team22.communicationservice.api.chat;
 
-import be.kdg.team22.communicationservice.api.chat.models.BotMessageRequestModel;
-import be.kdg.team22.communicationservice.api.chat.models.ChatChannelResponse;
-import be.kdg.team22.communicationservice.api.chat.models.ChatMessageResponse;
+import be.kdg.team22.communicationservice.api.chat.models.message.CreateMessageModel;
+import be.kdg.team22.communicationservice.api.chat.models.message.MessageModel;
 import be.kdg.team22.communicationservice.application.chat.BotChatService;
-import be.kdg.team22.communicationservice.domain.chat.Channel;
-import be.kdg.team22.communicationservice.domain.chat.ChatMessage;
+import be.kdg.team22.communicationservice.domain.chat.channel.ChannelId;
+import be.kdg.team22.communicationservice.domain.chat.message.Message;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,48 +18,21 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/chat/bot")
 public class BotChatController {
-    private final BotChatService botChatService;
+    private final BotChatService service;
 
-    public BotChatController(final BotChatService botChatService) {
-        this.botChatService = botChatService;
+    public BotChatController(final BotChatService service) {
+        this.service = service;
     }
 
-    @PostMapping
-    public ResponseEntity<ChatChannelResponse> createBotChannel(
-            @AuthenticationPrincipal final Jwt token
-    ) {
-        Channel channel = botChatService.createChannel(token.getSubject());
-        return ResponseEntity.ok(ChatChannelResponse.from(channel));
+    @GetMapping("/{id}")
+    public ResponseEntity<List<MessageModel>> getMessages(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final Instant since) {
+        List<Message> messages = service.getMessages(ChannelId.from(id), since, token);
+        return ResponseEntity.ok(messages.stream().map(MessageModel::from).toList());
     }
 
-    @PostMapping("/{channelId}/messages")
-    public ResponseEntity<ChatMessageResponse> sendMessage(
-            @PathVariable final UUID channelId,
-            @AuthenticationPrincipal final Jwt token,
-            @RequestBody final BotMessageRequestModel request
-    ) {
-        ChatMessage msg = botChatService.sendMessage(
-                channelId,
-                token.getSubject(),
-                request.content(),
-                request.gameName()
-        );
-        return ResponseEntity.ok(ChatMessageResponse.from(msg));
-    }
-
-    @GetMapping("/{channelId}/messages")
-    public ResponseEntity<List<ChatMessageResponse>> getMessages(
-            @PathVariable final UUID channelId,
-            @AuthenticationPrincipal final Jwt token,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final Instant since
-    ) {
-        List<ChatMessage> messages = botChatService.getMessages(
-                channelId,
-                token.getSubject(),
-                since
-        );
-
-        return ResponseEntity.ok(messages.stream().map(ChatMessageResponse::from).toList());
+    @PostMapping("/{id}")
+    public ResponseEntity<MessageModel> sendMessage(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token, @RequestBody final CreateMessageModel request) {
+        Message message = service.sendMessage(ChannelId.from(id), request.content(), token);
+        return ResponseEntity.ok(MessageModel.from(message));
     }
 }

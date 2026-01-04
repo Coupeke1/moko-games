@@ -27,7 +27,7 @@ public class NotificationServiceTest {
     private ExternalUserRepository userRepo;
     private EmailService emailService;
     private NotificationPublisher socket;
-    private PublisherService publisherService;
+    private NotificationPublisherService notificationPublisherService;
 
     private PlayerId recipient;
     private Notification sampleNotification;
@@ -38,9 +38,9 @@ public class NotificationServiceTest {
         userRepo = mock(ExternalUserRepository.class);
         emailService = mock(EmailService.class);
         socket = mock(NotificationPublisher.class);
-        publisherService = new PublisherService(repository, socket);
+        notificationPublisherService = new NotificationPublisherService(repository, socket);
 
-        service = new NotificationService(repository, publisherService, userRepo, emailService);
+        service = new NotificationService(repository, notificationPublisherService, userRepo, emailService);
 
         recipient = PlayerId.from(UUID.randomUUID());
 

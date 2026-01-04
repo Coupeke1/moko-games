@@ -1,10 +1,10 @@
 package be.kdg.team22.communicationservice.api.chat;
 
-import be.kdg.team22.communicationservice.api.chat.models.ChatMessageRequestModel;
-import be.kdg.team22.communicationservice.api.chat.models.ChatMessageResponse;
-import be.kdg.team22.communicationservice.application.chat.ChatService;
-import be.kdg.team22.communicationservice.domain.chat.ChatChannelType;
-import be.kdg.team22.communicationservice.domain.chat.ChatMessage;
+import be.kdg.team22.communicationservice.api.chat.models.message.CreateMessageModel;
+import be.kdg.team22.communicationservice.api.chat.models.message.MessageModel;
+import be.kdg.team22.communicationservice.application.chat.LobbyChatService;
+import be.kdg.team22.communicationservice.domain.chat.channel.ChannelId;
+import be.kdg.team22.communicationservice.domain.chat.message.Message;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,43 +13,26 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/chat/lobby")
 public class LobbyChatController {
-    private final ChatService chatService;
+    private final LobbyChatService service;
 
-    public LobbyChatController(final ChatService chatService) {
-        this.chatService = chatService;
+    public LobbyChatController(final LobbyChatService service) {
+        this.service = service;
     }
 
-    @PostMapping("/{lobbyId}")
-    public ResponseEntity<ChatMessageResponse> sendMessage(
-            @PathVariable String lobbyId,
-            @AuthenticationPrincipal Jwt token,
-            @RequestBody ChatMessageRequestModel request
-    ) {
-        ChatMessage msg = chatService.sendMessage(
-                ChatChannelType.LOBBY,
-                lobbyId,
-                token.getSubject(),
-                request.content(),
-                token
-        );
-        return ResponseEntity.ok(ChatMessageResponse.from(msg));
+    @GetMapping("/{id}")
+    public ResponseEntity<List<MessageModel>> getMessages(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final Instant since) {
+        List<Message> messages = service.getMessages(ChannelId.from(id), since, token);
+        return ResponseEntity.ok(messages.stream().map(MessageModel::from).toList());
     }
 
-    @GetMapping("/{lobbyId}")
-    public ResponseEntity<List<ChatMessageResponse>> getMessages(
-            @PathVariable String lobbyId,
-            @AuthenticationPrincipal Jwt token,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            Instant since
-    ) {
-        List<ChatMessage> messages =
-                chatService.getMessages(ChatChannelType.LOBBY, lobbyId, since, token.getSubject(), token);
-
-        return ResponseEntity.ok(messages.stream().map(ChatMessageResponse::from).toList());
+    @PostMapping("/{id}")
+    public ResponseEntity<MessageModel> sendMessage(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token, @RequestBody final CreateMessageModel request) {
+        Message message = service.sendMessage(ChannelId.from(id), request.content(), token);
+        return ResponseEntity.ok(MessageModel.from(message));
     }
 }

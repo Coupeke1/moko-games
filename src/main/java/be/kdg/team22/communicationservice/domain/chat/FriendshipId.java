@@ -19,11 +19,4 @@ public record FriendshipId(UUID value) {
     public static FriendshipId from(UUID value) {
         return new FriendshipId(value);
     }
-
-    public static String toReferenceId(String userId1, String userId2) {
-        if (userId1.compareTo(userId2) < 0) {
-            return userId1 + "-" + userId2;
-        }
-        return userId2 + "-" + userId1;
-    }
 }

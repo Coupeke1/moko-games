@@ -66,11 +66,14 @@ business:
     url: ${SESSION_SERVICE_URL:http://localhost:8081}
   user-service:
     url: ${USER_SERVICE_URL:http://localhost:8089}
+  games-service:
+    url: ${GAMES_SERVICE_URL:http://localhost:8084}
   social-service:
     url: ${SOCIAL_SERVICE_URL:http://localhost:8083}
   chat-service:
-    url: ${BUSINESS_AI_URL:https://team3.techtitans.be}
-    fallback_url: ${BUSINESS_FALLBACK_CHAT_URL:http://localhost:3334}
-    api-key: ${BUSINESS_AI_API_KEY:}
+    url: ${CHAT_SERVICE_URL:https://team3.techtitans.be}
+    fallback_url: ${CHAT_SERVICE_FALLBACK_URL:http://localhost:8090}
+    team-number: ${CHAT_SERVICE_TEAM_NUMBER:22}
+    api-key: ${CHAT_SERVICE_API_KEY:}
 
 cors.allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174,http://localhost:5175}

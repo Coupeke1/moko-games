@@ -1,5 +1,6 @@
 package be.kdg.team22.communicationservice.infrastructure.user;
 
+import be.kdg.team22.communicationservice.domain.chat.UserId;
 import be.kdg.team22.communicationservice.domain.notification.exceptions.ServiceUnavailableException;
 import be.kdg.team22.communicationservice.domain.notification.exceptions.UserPreferencesNotFoundException;
 import be.kdg.team22.communicationservice.domain.notification.exceptions.UserProfileNotFoundException;
@@ -35,18 +36,18 @@ public class ExternalUserRepository {
         try {
             ProfileResponse response = client.get().uri("/api/profiles/{id}", id).retrieve().body(ProfileResponse.class);
 
-            if (response == null) {
-                throw new UserProfileNotFoundException(id);
-            }
+            if (response == null)
+                throw new UserProfileNotFoundException(UserId.from(id));
 
             return response;
 
-        } catch (HttpClientErrorException e) {
-            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                throw new UserProfileNotFoundException(id);
-            }
-            throw e;
-        } catch (RestClientException e) {
+        } catch (
+                HttpClientErrorException exception) {
+            if (exception.getStatusCode() == HttpStatus.NOT_FOUND)
+                throw new UserProfileNotFoundException(UserId.from(id));
+
+            throw exception;
+        } catch (RestClientException exception) {
             throw ServiceUnavailableException.userServiceUnavailable();
         }
     }

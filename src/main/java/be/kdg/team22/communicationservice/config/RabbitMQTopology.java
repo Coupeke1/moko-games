@@ -13,6 +13,7 @@ public class RabbitMQTopology {
     public static final String EXCHANGE_CHAT = "exchange.chat";
     public static final String EXCHANGE_USER_SOCKET = "user.direct.exchange";
 
+
     public static final String QUEUE_FRIEND_REQUEST_RECEIVED = "queue.notifications.friend-request-received";
     public static final String QUEUE_FRIEND_REQUEST_ACCEPTED = "queue.notifications.friend-request-accepted";
     public static final String QUEUE_LOBBY_INVITE = "queue.notifications.lobby-invite";
