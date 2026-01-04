@@ -2,6 +2,7 @@ package be.kdg.team22.checkersservice.application;
 
 import be.kdg.team22.checkersservice.config.GameInfoProperties;
 import be.kdg.team22.checkersservice.domain.register.exceptions.GameNotRegisteredException;
+import be.kdg.team22.checkersservice.domain.register.exceptions.GameServiceNotReachableException;
 import be.kdg.team22.checkersservice.infrastructure.register.ExternalRegisterRepository;
 import be.kdg.team22.checkersservice.infrastructure.register.RegisterAchievementRequest;
 import be.kdg.team22.checkersservice.infrastructure.register.RegisterGameRequest;
@@ -20,6 +21,9 @@ public class GameRegistrationStartup {
     private final ExternalRegisterRepository externalRegisterRepository;
     private final GameInfoProperties gameInfo;
 
+    private final static int MAX_RETRIES = 3;
+    private final static int RETRY_DELAY_MS = 2000;
+
     public GameRegistrationStartup(final ExternalRegisterRepository externalRegisterRepository,
                                    final GameInfoProperties gameInfoProperties) {
         this.externalRegisterRepository = externalRegisterRepository;
@@ -35,12 +39,8 @@ public class GameRegistrationStartup {
 
         List<RegisterAchievementRequest> achievementRequests =
                 gameInfo.achievements().stream()
-                        .map(achievement -> new RegisterAchievementRequest(
-                                achievement.key(),
-                                achievement.name(),
-                                achievement.description(),
-                                achievement.levels()
-                        )).toList();
+                        .map(a -> new RegisterAchievementRequest(a.key(), a.name(), a.description(), a.levels()))
+                        .toList();
 
         RegisterGameRequest.GameSettingsDefinition settingsDefinition = null;
         if (gameInfo.settingsDefinition() != null && gameInfo.settingsDefinition().settings() != null) {
@@ -74,8 +74,32 @@ public class GameRegistrationStartup {
                 achievementRequests
         );
 
-        boolean created = externalRegisterRepository.registerGame(request);
-        if (!created) throw new GameNotRegisteredException();
-        logger.info("Game '{}' successfully registered in the game service.", gameInfo.name());
+        for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            try {
+                boolean created = externalRegisterRepository.registerGame(request);
+                if (created) {
+                    logger.info("Game '{}' successfully registered in the game service.", gameInfo.name());
+                    return;
+                }
+                if (attempt < MAX_RETRIES) {
+                    logger.warn("Game registration attempt {} failed. Retrying...", attempt);
+                    try {
+                        Thread.sleep(RETRY_DELAY_MS);
+                    } catch (InterruptedException ignored) {
+                    }
+                }
+            } catch (GameServiceNotReachableException e) {
+                if (attempt < MAX_RETRIES) {
+                    logger.warn("Game service not reachable on attempt {}. Retrying...", attempt);
+                    try {
+                        Thread.sleep(RETRY_DELAY_MS);
+                    } catch (InterruptedException ignored) {
+                    }
+                } else {
+                    throw e;
+                }
+            }
+        }
+        throw new GameNotRegisteredException();
     }
 }
