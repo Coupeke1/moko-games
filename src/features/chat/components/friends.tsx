@@ -1,10 +1,10 @@
 import Column from "@/components/layout/column";
-import FriendCard from "@/features/chat/components/channel-card/friend-card";
+import ChannelCard from "@/features/chat/components/channel-card";
 import { useFriends } from "@/features/friends/hooks/use-friends";
 import type { Friend } from "@/features/friends/models/friend";
 
 interface Props {
-    selected: string;
+    selected: string | null;
     onSelect: (id: string) => void;
 }
 
@@ -15,11 +15,13 @@ export default function FriendsSection({ selected, onSelect }: Props) {
     return (
         <Column>
             {friends.map((friend: Friend) => (
-                <FriendCard
+                <ChannelCard
                     key={friend.id}
-                    friend={friend}
+                    username={friend.username}
+                    image={friend.image}
+                    description={`Level ${friend.statistics.level}`}
                     selected={selected === friend.id}
-                    onSelect={(id: string) => onSelect(id)}
+                    onSelect={() => onSelect(friend.id)}
                 />
             ))}
         </Column>

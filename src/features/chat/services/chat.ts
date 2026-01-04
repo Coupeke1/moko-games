@@ -1,6 +1,9 @@
 import { environment } from "@/config.ts";
 import type { Channel } from "@/features/chat/models/channel/channel";
-import type { PrivateReference } from "@/features/chat/models/channel/reference";
+import type {
+    BotReference,
+    PrivateReference,
+} from "@/features/chat/models/channel/reference";
 import { Type } from "@/features/chat/models/channel/type";
 import type { User } from "@/features/chat/models/channel/user";
 import type { Message } from "@/features/chat/models/message";
@@ -22,10 +25,12 @@ export async function findMessages(id: string, type: Type): Promise<Message[]> {
     }
 }
 
-export async function sendPrivateMessage(id: string, message: string) {
+export async function sendMessage(id: string, type: Type, message: string) {
     try {
         validIdCheck(id);
-        await client.post(`${BASE_URL}/friends/${id}`, { content: message });
+        await client.post(`${BASE_URL}/${type.toLowerCase()}/${id}`, {
+            content: message,
+        });
     } catch {
         throw new Error("Message could not be sent");
     }
@@ -33,8 +38,8 @@ export async function sendPrivateMessage(id: string, message: string) {
 
 export function getSender(channel: Channel, message: Message): Bot | User {
     switch (channel.type) {
-        // case Type.Bot:
-        //     return {};
+        case Type.Bot:
+            return getBotSender(channel, message);
         // case Type.Lobby:
         //     return {};
         case Type.Friends:
@@ -42,6 +47,15 @@ export function getSender(channel: Channel, message: Message): Bot | User {
         default:
             throw new Error("Could not get sender");
     }
+}
+
+function getBotSender(channel: Channel, message: Message): User {
+    const reference: BotReference = channel.referenceType as BotReference;
+
+    if (message.senderId === reference.user.id) return reference.user;
+    else if (message.senderId === reference.bot.id) return reference.bot;
+
+    throw new Error("Could not get sender");
 }
 
 function getPrivateSender(channel: Channel, message: Message): User {
