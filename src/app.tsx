@@ -3,18 +3,17 @@ import Notifications from "@/components/global/notifications";
 import Scroller from "@/components/global/scroller";
 import ErrorState from "@/components/state/error";
 import LoadingState from "@/components/state/loading";
+import ChatPage from "@/features/chat/chat";
 import CheckoutPage from "@/features/checkout/checkout";
 import OrderPage from "@/features/checkout/order";
 import FriendsPage from "@/features/friends/friends";
 import RequestsPage from "@/features/friends/requests";
-import GamePage from "@/features/lobby/components/game";
-import InvitesPage from "@/features/invites/invites";
 import LibraryGamePage from "@/features/library/game";
 import LibraryPage from "@/features/library/library";
+import GamePage from "@/features/lobby/components/game";
 import LobbyPage from "@/features/lobby/lobby";
 import NotFoundPage from "@/features/not-found";
 import NotificationsPage from "@/features/notifications/notifications";
-import ChatPage from "@/features/chat/chat";
 import { useMyProfile } from "@/features/profiles/hooks/use-my-profile";
 import MyProfilePage from "@/features/profiles/my-profile";
 import StoreGamePage from "@/features/store/game";
@@ -67,7 +66,6 @@ function Content() {
 
                 <Route path="/lobbies/:id" element={<LobbyPage />} />
                 <Route path="/lobbies/:id/game" element={<GamePage />} />
-                <Route path="/invites/:id" element={<InvitesPage />} />
 
                 <Route path="/profile" element={<MyProfilePage />} />
                 <Route path="/profiles/:name" element={<ProfilePage />} />
