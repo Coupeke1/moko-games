@@ -22,6 +22,9 @@ public class GameRegistrationStartup {
     private final ExternalRegisterRepository externalRegisterRepository;
     private final GameInfoProperties gameInfo;
 
+    private final static int MAX_RETRIES = 3;
+    private final static int RETRY_DELAY_MS = 2000;
+
     public GameRegistrationStartup(final ExternalRegisterRepository externalRegisterRepository,
                                    final GameInfoProperties gameInfoProperties) {
         this.externalRegisterRepository = externalRegisterRepository;
@@ -72,26 +75,25 @@ public class GameRegistrationStartup {
                 achievementRequests
         );
 
-        int maxRetries = 3;
-        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+        for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
             try {
                 boolean created = externalRegisterRepository.registerGame(request);
                 if (created) {
                     logger.info("Game '{}' successfully registered in the game service.", gameInfo.name());
                     return;
                 }
-                if (attempt < maxRetries) {
+                if (attempt < MAX_RETRIES) {
                     logger.warn("Game registration attempt {} failed. Retrying...", attempt);
                     try {
-                        Thread.sleep(2000);
+                        Thread.sleep(RETRY_DELAY_MS);
                     } catch (InterruptedException ignored) {
                     }
                 }
             } catch (GameServiceNotReachableException e) {
-                if (attempt < maxRetries) {
+                if (attempt < MAX_RETRIES) {
                     logger.warn("Game service not reachable on attempt {}. Retrying...", attempt);
                     try {
-                        Thread.sleep(2000);
+                        Thread.sleep(RETRY_DELAY_MS);
                     } catch (InterruptedException ignored) {
                     }
                 } else {
