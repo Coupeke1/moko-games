@@ -21,10 +21,10 @@ import org.springframework.web.client.RestClientException;
 
 @Repository
 public class ExternalBotRepository implements BotChatRepository {
-    @Value("${business.bot-service.api-key}")
+    @Value("${business.chat-service.api-key}")
     private String API_KEY;
 
-    @Value("${business.bot-service.team-number}")
+    @Value("${business.chat-service.team-number}")
     private int TEAM_NUMBER;
 
     private final Logger logger = LoggerFactory.getLogger(ExternalBotRepository.class);

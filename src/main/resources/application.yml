@@ -70,9 +70,10 @@ business:
     url: ${GAMES_SERVICE_URL:http://localhost:8084}
   social-service:
     url: ${SOCIAL_SERVICE_URL:http://localhost:8083}
-  bot-service:
-    url: ${BOT_SERVICE_URL:http://localhost:8090}
-    team-number: ${BOT_SERVICE_TEAM_NUMBER:22}
-    api-key: ${BOT_SERVICE_API_KEY:}
+  chat-service:
+    url: ${CHAT_SERVICE_URL:https://team3.techtitans.be}
+    fallback_url: ${CHAT_SERVICE_FALLBACK_URL:http://localhost:8090}
+    team-number: ${CHAT_SERVICE_TEAM_NUMBER:22}
+    api-key: ${CHAT_SERVICE_API_KEY:}
 
 cors.allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174,http://localhost:5175}
