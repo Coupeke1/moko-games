@@ -1,6 +1,3 @@
-default:
-    tags: [self-hosted]
-
 variables:
   SRC_USER: "AI-chatbot"
   SRC_PASS: "gldt-tF2YNLBsL9zUYs4yyxLX"
