@@ -12,6 +12,8 @@ import be.kdg.team22.gamesservice.infrastructure.store.ExternalStoreRepository;
 import be.kdg.team22.gamesservice.infrastructure.store.NewStoreEntryModel;
 import be.kdg.team22.gamesservice.infrastructure.store.StoreEntryModel;
 import be.kdg.team22.gamesservice.infrastructure.store.UpdateStoreEntryModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,8 @@ public class GameService {
     private final GameHealthChecker gameHealthChecker;
     private final ExternalStoreRepository externalStoreRepository;
     private final ExternalGamesRepository engine;
+
+    private final Logger logger = LoggerFactory.getLogger(GameService.class);
 
     public GameService(final GameRepository gameRepository, final GameHealthChecker gameHealthChecker, final ExternalStoreRepository externalStoreRepository, final ExternalGamesRepository engine) {
         this.gameRepository = gameRepository;
@@ -85,7 +89,7 @@ public class GameService {
 
         GameSettingsValidator.validateDefinition(request.settingsDefinition());
 
-        if (!gameHealthChecker.isHealthy(request)) throw new GameUnhealthyException(request.name());
+        if (!isHealthyWithRetries(request)) throw new GameUnhealthyException(request.name());
 
         Game game = Game.register(request);
         game.updateHealthStatus(true);
@@ -105,10 +109,7 @@ public class GameService {
             throw new DuplicateGameNameException(request.name());
         }
 
-        boolean isHealthy = gameHealthChecker.isHealthy(request);
-        if (!isHealthy) {
-            throw new GameUnhealthyException(request.name());
-        }
+        if (!isHealthyWithRetries(request)) throw new GameUnhealthyException(request.name());
 
         game.update(request);
         game.updateHealthStatus(true);
@@ -117,6 +118,15 @@ public class GameService {
         handleStoreEntry(game.id(), request.price(), request.category());
 
         return game;
+    }
+
+    private boolean isHealthyWithRetries(final RegisterGameRequest request) {
+        int maxRetries = 3;
+        for (int i = 0; i < maxRetries; i++) {
+            if (gameHealthChecker.isHealthy(request)) return true;
+            logger.info("Retrying to check if game is healthy {}/{}", i + 1, maxRetries);
+        }
+        return false;
     }
 
     private void handleStoreEntry(GameId id, BigDecimal price, GameCategory category) {
