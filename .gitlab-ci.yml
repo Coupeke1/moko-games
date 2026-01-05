@@ -57,7 +57,7 @@ mirror_image_player:
     - docker login registry.gitlab.com -u "$DST_USER_PLAYER" -p "$DST_PASS_PLAYER"
   
     # retag + push
-    - docker tag registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team3/ai-chatbot:latest registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/local-development/player:latest
+    - docker tag registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team3/ai-player:latest registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/local-development/player:latest
 
     - docker push registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/local-development/player:latest
   rules:
