@@ -32,7 +32,7 @@ export default function Page({ largerWidth, children }: Props) {
                 </section>
 
                 <section
-                    className={`flex flex-col ${Gap.Medium} mx-auto ${largerWidth ? "max-w-4xl" : "max-w-42xl"} w-full`}
+                    className={`flex flex-col ${Gap.Medium} mx-auto ${largerWidth ? "max-w-4xl" : "max-w-2xl"} w-full`}
                 >
                     {children}
                 </section>
