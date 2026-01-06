@@ -22,7 +22,7 @@ export default function GamePage() {
                         className={`
                             grid sm:grid-cols-12
                             ${Gap.Medium}
-                            md:h-[calc(100vh-12rem)]
+                            md:h-[calc(100vh-2rem)]
                         `}
                     >
                         <iframe
