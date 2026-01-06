@@ -20,5 +20,9 @@ export default function State({
     if (loading) return <LoadingState />;
     if (error) return <ErrorState />;
     if (empty) return message ? <ErrorState>{message}</ErrorState> : null;
-    return <>{children}</>;
+    return (
+        <section className="h-full w-full min-h-0 flex flex-col">
+            {children}
+        </section>
+    );
 }

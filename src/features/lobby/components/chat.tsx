@@ -42,7 +42,7 @@ export default function Chat({ padding, lobby }: Props) {
 
     return (
         <section
-            className={`h-full flex flex-col w-full ${Justify.Between} ${Gap.None}`}
+            className={`h-full flex flex-col w-full ${Justify.Between} ${Gap.Medium}`}
         >
             <section className="grow rounded-lg bg-bg-3 flex flex-col gap-8 h-72 w-full min-h-0">
                 <State
