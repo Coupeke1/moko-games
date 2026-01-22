@@ -1,0 +1,53 @@
+import validIdCheck from "@/lib/id";
+import axios from 'axios';
+import type { KeycloakTokenParsed } from "keycloak-js";
+import Keycloak from 'keycloak-js';
+import type {Profile} from "@/models/profile.ts";
+import {config} from "@/config.ts";
+
+const BASE_URL = config.userService;
+
+export function addToken(token: string | undefined) {
+    if (token) axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+    else {
+        removeToken()
+    }
+}
+
+export function removeToken() {
+    delete axios.defaults.headers.common['Authorization']
+}
+
+export async function findProfile(id: string): Promise<Profile> {
+    try {
+        validIdCheck(id);
+        const { data } = await axios.get<Profile>(`${BASE_URL}/${id}`);
+
+        if (data.id !== id) throw new Error("Profile not found!");
+        return data;
+    } catch {
+        throw new Error(`Profile with id '${id}' could not be fetched`);
+    }
+}
+
+export async function parseProfile(keycloak: Keycloak, token: string | null): Promise<Profile | null> {
+    try {
+        if (!token) {
+            throw new Error("Token not found");
+        }
+
+        addToken(token);
+
+        const parsedToken: KeycloakTokenParsed | undefined = keycloak.tokenParsed;
+        if (parsedToken === undefined) throw new Error("Token could not be parsed");
+
+        if (parsedToken.sub === undefined) throw new Error("Id could not be found");
+
+        const id: string = parsedToken.sub;
+        const profile = await findProfile(id);
+
+        return profile;
+    } catch {
+        throw new Error("Profile could not be found");
+    }
+}
