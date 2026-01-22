@@ -1,0 +1,179 @@
+package be.kdg.team22.tictactoeservice.domain.game;
+
+import be.kdg.team22.tictactoeservice.domain.game.exceptions.*;
+import be.kdg.team22.tictactoeservice.domain.player.Player;
+import be.kdg.team22.tictactoeservice.domain.player.PlayerId;
+import be.kdg.team22.tictactoeservice.domain.player.PlayerRole;
+import org.jmolecules.ddd.annotation.AggregateRoot;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+@AggregateRoot
+public class Game {
+    private final GameId id;
+    private final NavigableSet<Player> players;
+    private final Map<PlayerId, List<Move>> moveHistory;
+    private final PlayerRole botPlayer;
+    private Board board;
+    private GameStatus status;
+    private PlayerRole currentRole;
+    private PlayerId winner;
+
+    private static final Comparator<Player> PLAYER_COMPARATOR =
+            Comparator.comparingInt(p -> p.role().order());
+
+    public Game(PlayerId winner, PlayerRole currentRole, GameStatus status, Board board, PlayerRole botPlayer, Map<PlayerId, List<Move>> moveHistory, List<Player> players, GameId id) {
+        this.winner = winner;
+        this.currentRole = currentRole;
+        this.status = status;
+        this.board = board;
+        this.botPlayer = botPlayer;
+        this.moveHistory = moveHistory.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> new ArrayList<>(e.getValue())
+                ));
+        this.players = new TreeSet<>(PLAYER_COMPARATOR);
+        this.players.addAll(players);
+        this.id = id;
+    }
+
+    private Game(final int requestedSize, final List<Player> players, final PlayerRole botPlayer) {
+        this.id = GameId.create();
+        this.board = Board.create(requestedSize);
+        this.status = GameStatus.IN_PROGRESS;
+
+        this.players = new TreeSet<>(PLAYER_COMPARATOR);
+        this.players.addAll(players);
+
+        this.moveHistory = players.stream()
+                .collect(Collectors.toMap(Player::id, p -> new ArrayList<>()));
+
+        this.currentRole = this.players.getFirst().role();
+        this.winner = null;
+
+        this.botPlayer = botPlayer;
+    }
+
+    public static Game create(
+            final int minSize,
+            final int maxSize,
+            final int size,
+            final List<PlayerId> playerIds,
+            final boolean botPlayer
+    ) {
+        if (size < minSize || size > maxSize)
+            throw new BoardSizeException(minSize, maxSize);
+
+        Set<PlayerId> uniquePlayerIds = new HashSet<>(playerIds);
+        if (uniquePlayerIds.size() != playerIds.size())
+            throw new UniquePlayersException();
+
+        PlayerRole[] roles = PlayerRole.values();
+
+        List<Player> players = new ArrayList<>();
+        PlayerRole botRole = null;
+
+        for (int i = 0; i < playerIds.size(); i++) {
+            PlayerId playerId = playerIds.get(i);
+            PlayerRole role = roles[i % roles.length];
+
+            boolean isBot = botPlayer && i == playerIds.size() - 1;
+
+            players.add(new Player(playerId, role, isBot));
+
+            if (isBot) {
+                botRole = role;
+            }
+        }
+
+        if (players.size() < 2 || players.size() > roles.length)
+            throw new GameSizeException(roles.length);
+
+        return new Game(size, players, botRole);
+    }
+
+    public Player nextPlayer() {
+        Player current = currentPlayer();
+        List<Player> playerList = new ArrayList<>(players);
+        int currentIndex = playerList.indexOf(current);
+
+        int nextIndex = (currentIndex + 1) % playerList.size();
+        Player next = playerList.get(nextIndex);
+        this.currentRole = next.role();
+
+        return next;
+    }
+
+    public void requestMove(final Move move) {
+        if (status != GameStatus.IN_PROGRESS)
+            throw new GameNotInProgressException();
+
+        if (!currentPlayer().id().equals(move.playerId()))
+            throw new NotPlayersTurnException(currentPlayer().id().value());
+
+        if (move.row() < 0 || move.col() < 0
+                || move.row() >= board.size() || move.col() >= board.size())
+            throw new InvalidCellException(board.size());
+
+        if (board.cell(move.row(), move.col()) != null)
+            throw new CellOccupiedException(move.row(), move.col());
+
+        board = board.setCell(move.row(), move.col(), currentRole);
+        moveHistory.get(move.playerId()).add(move);
+
+        status = board.checkWinner(move.row(), move.col(), currentRole);
+        if (status == GameStatus.WON)
+            winner = move.playerId();
+
+        nextPlayer();
+    }
+
+    public GameId id() {
+        return id;
+    }
+
+    public Board board() {
+        return board;
+    }
+
+    public GameStatus status() {
+        return status;
+    }
+
+    public NavigableSet<Player> players() {
+        return players;
+    }
+
+    public Map<PlayerId, List<Move>> moveHistory() {
+        return moveHistory;
+    }
+
+    public PlayerRole currentRole() {
+        return currentRole;
+    }
+
+    public Player currentPlayer() {
+        return players.stream()
+                .filter(p -> p.role() == currentRole)
+                .findFirst()
+                .orElseThrow(() -> new RoleUnfulfilledException(currentRole));
+    }
+
+    public PlayerRole roleOfPlayer(PlayerId id) {
+        return players.stream()
+                .filter(p -> p.id().equals(id))
+                .map(Player::role)
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException(id.value()));
+    }
+
+    public PlayerId winner() {
+        return winner;
+    }
+
+    public PlayerRole botPlayer() {
+        return botPlayer;
+    }
+}
