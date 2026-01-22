@@ -1,0 +1,33 @@
+# Logs
+*.log
+logs/
+
+# Dependencies
+node_modules/
+vendor/
+package-lock.json
+
+# Build outputs
+build/
+dist/
+out/
+
+# Cache
+.cache/
+*.tmp
+
+# Environment variables
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+./test-results
