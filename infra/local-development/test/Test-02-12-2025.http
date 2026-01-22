@@ -1,0 +1,4 @@
+﻿### Health check tic tac toe
+GET http://localhost/tic-tac-toe-service/actuator/health
+
+###

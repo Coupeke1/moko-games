@@ -1,0 +1,578 @@
+﻿name: moko_prod_local
+
+include:
+  - black-box-chess-game.yaml
+  - ai-fallback.yaml
+
+services:
+  # Proxy
+  proxy:
+    image: nginx:stable-alpine
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./configs/proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - moko_frontend
+      - moko_backend
+      - moko_kc
+    depends_on:
+      - frontend-platform
+      - frontend-tic-tac-toe
+      - frontend-checkers
+      - service-user
+      - service-session
+      - service-social
+      - service-tic-tac-toe
+      - idp-keycloak
+      - service-games
+      - service-checkers
+      - service-communication
+      - service-socket
+      - service-store
+
+  # Frontend
+  frontend-platform:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/platform-frontend:main-latest
+    restart: always
+    pull_policy: always
+    environment:
+      VITE_AUTH_URL: http://localhost/auth
+      VITE_AUTH_REALM: moko
+      VITE_AUTH_CLIENT: platform-frontend
+
+      VITE_USER_SERVICE: http://localhost/user-service/api/profiles
+      VITE_ACHIEVEMENT_SERVICE: http://localhost/user-service/api/achievements
+      VITE_LIBRARY_SERVICE: http://localhost/user-service/api/library
+      VITE_SOCIAL_SERVICE: http://localhost/social-service/api/friends
+      VITE_NOTIFICATIONS_SERVICE: http://localhost/communication-service/api/notifications
+      VITE_CHAT_SERVICE: http://localhost/communication-service/api/chat
+      VITE_SESSION_SERVICE: http://localhost/session-service/api/lobbies
+      VITE_GAMES_SERVICE: http://localhost/games-service/api/games
+      VITE_STORE_SERVICE: http://localhost/store-service/api/store/games
+      VITE_ORDER_SERVICE: http://localhost/store-service/api/orders
+      VITE_CART_SERVICE: http://localhost/store-service/api/cart
+
+      VITE_SOCKET_SERVICE: http://localhost/socket-service
+    expose:
+      - "80"
+    networks:
+      - moko_frontend
+
+  frontend-tic-tac-toe:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/tic-tac-toe-frontend:main-latest
+    restart: always
+    pull_policy: always
+    environment:
+      VITE_AUTH_URL: http://localhost/auth
+      VITE_AUTH_REALM: moko
+      VITE_AUTH_CLIENT: tic-tac-toe-frontend
+
+      VITE_TIC_TAC_TOE_SERVICE: http://localhost/tic-tac-toe-service/api/games
+      VITE_USER_SERVICE: http://localhost/user-service/api/profiles
+    expose:
+      - "80"
+    networks:
+      - moko_frontend
+
+  frontend-checkers:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/checkers-frontend:main-latest
+    restart: always
+    pull_policy: always
+    environment:
+      VITE_AUTH_URL: http://localhost/auth
+      VITE_AUTH_REALM: moko
+      VITE_AUTH_CLIENT: checkers-frontend
+
+      VITE_CHECKERS_SERVICE: http://localhost/checkers-service/api/games
+      VITE_USER_SERVICE: http://localhost/user-service/api/profiles
+    expose:
+      - "80"
+    networks:
+      - moko_frontend
+
+  # Backend Services
+  service-user:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/user-service:main-latest
+    restart: always
+    pull_policy: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=user_service
+      SPRING_DATASOURCE_USER: user
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+      SPRING_RABBITMQ_HOST: app-rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: user
+      SPRING_RABBITMQ_PASSWORD: password
+
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
+
+      GAME_SERVICE_URL: http://service-games:8084
+
+      CORS_ALLOWED_ORIGINS: http://localhost
+    expose:
+      - "8089"
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8089/actuator/health" ]
+      interval: 1m
+      timeout: 15s
+      retries: 5
+      start_period: 5m
+    networks:
+      - moko_backend
+      - moko_kc
+    depends_on:
+      - app-postgres
+      - app-rabbitmq
+      - idp-keycloak
+
+  service-session:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/session-service:main-latest
+    restart: always
+    pull_policy: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=session_service
+      SPRING_DATASOURCE_USER: user
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+      SPRING_RABBITMQ_HOST: app-rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: user
+      SPRING_RABBITMQ_PASSWORD: password
+
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
+
+      USER_SERVICE_URL: http://service-user:8089
+      CHAT_SERVICE_URL: http://service-communication:8082
+      SOCIAL_SERVICE_URL: http://service-social:8083
+      GAME_SERVICE_URL: http://service-games:8084
+
+      CORS_ALLOWED_ORIGINS: http://localhost
+    expose:
+      - "8081"
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8081/actuator/health" ]
+      interval: 1m
+      timeout: 15s
+      retries: 5
+      start_period: 5m
+    networks:
+      - moko_backend
+      - moko_kc
+    depends_on:
+      - app-postgres
+      - app-rabbitmq
+      - idp-keycloak
+
+  service-communication:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/communication-service:main-latest
+    restart: always
+    pull_policy: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=communication_service
+      SPRING_DATASOURCE_USER: user
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+      SPRING_RABBITMQ_HOST: app-rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: user
+      SPRING_RABBITMQ_PASSWORD: password
+
+      SPRING_MAIL_USERNAME: ${MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD}
+
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
+
+      SESSION_SERVICE_URL: http://service-session:8081
+      USER_SERVICE_URL: http://service-user:8089
+      SOCIAL_SERVICE_URL: http://service-social:8083
+      GAMES_SERVICE_URL: http://service-games:8084
+
+      CHAT_SERVICE_URL: https://team3.techtitans.be
+      CHAT_SERVICE_FALLBACK_URL: http://host.docker.internal:3335
+      CHAT_SERVICE_API_KEY: ${AI_API_KEY}
+
+      CORS_ALLOWED_ORIGINS: http://localhost
+    expose:
+      - "8082"
+    healthcheck:
+       test: [ "CMD", "wget", "-qO-", "http://localhost:8082/actuator/health" ]
+       interval: 1m
+       timeout: 15s
+       retries: 5
+       start_period: 5m
+    networks:
+      - moko_backend
+      - moko_kc
+    depends_on:
+      - app-postgres
+      - app-rabbitmq
+      - idp-keycloak
+      - ai-chatbot
+
+  service-social:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/social-service:main-latest
+    restart: always
+    pull_policy: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=social_service
+      SPRING_DATASOURCE_USER: user
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+      SPRING_RABBITMQ_HOST: app-rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: user
+      SPRING_RABBITMQ_PASSWORD: password
+
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
+
+      USER_SERVICE_URL: http://service-user:8089
+
+      CORS_ALLOWED_ORIGINS: http://localhost
+    expose:
+      - "8083"
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8083/actuator/health" ]
+      interval: 1m
+      timeout: 15s
+      retries: 5
+      start_period: 5m
+    networks:
+      - moko_backend
+      - moko_kc
+    depends_on:
+      - app-postgres
+      - app-rabbitmq
+      - idp-keycloak
+
+  service-games:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/games-service:main-latest
+    restart: always
+    pull_policy: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=games_service
+      SPRING_DATASOURCE_USER: user
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+      SPRING_RABBITMQ_HOST: app-rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: user
+      SPRING_RABBITMQ_PASSWORD: password
+
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
+
+      STORE_SERVICE_URL: http://service-store:8085
+
+      CORS_ALLOWED_ORIGINS: http://localhost
+    expose:
+      - "8084"
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8084/actuator/health" ]
+      interval: 1m
+      timeout: 15s
+      retries: 5
+      start_period: 5m
+    networks:
+      - moko_backend
+      - moko_kc
+    depends_on:
+      - app-postgres
+      - app-rabbitmq
+      - idp-keycloak
+      - service-store
+
+  service-store:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/store-service:main-latest
+    restart: always
+    pull_policy: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://app-postgres:5432/moko?currentSchema=store_service
+      SPRING_DATASOURCE_USER: user
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+      SPRING_RABBITMQ_HOST: app-rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: user
+      SPRING_RABBITMQ_PASSWORD: password
+
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
+
+      USER_SERVICE_URL: http://service-user:8089
+      GAME_SERVICE_URL: http://service-games:8084
+
+      MOLLIE_API_KEY: ${MOLLIE_API_KEY}
+      FRONTEND_URL: http://localhost
+
+      CORS_ALLOWED_ORIGINS: http://localhost
+    expose:
+      - "8085"
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8085/actuator/health" ]
+      interval: 1m
+      timeout: 15s
+      retries: 5
+      start_period: 5m
+    networks:
+      - moko_backend
+      - moko_kc
+    depends_on:
+      - app-postgres
+      - app-rabbitmq
+      - idp-keycloak
+
+  service-socket:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/socket-service:main-latest
+    restart: always
+    pull_policy: always
+    environment:
+      SPRING_RABBITMQ_HOST: app-rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: user
+      SPRING_RABBITMQ_PASSWORD: password
+
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
+
+      CORS_ALLOWED_ORIGINS: http://localhost
+    expose:
+      - "8090"
+    networks:
+      - moko_backend
+      - moko_kc
+    depends_on:
+      - app-postgres
+      - app-rabbitmq
+      - idp-keycloak
+
+  service-acl:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/game-acl-service:main-latest
+    restart: always
+    pull_policy: always
+    environment:
+      SPRING_RABBITMQ_HOST: app-rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: user
+      SPRING_RABBITMQ_PASSWORD: password
+
+      GAME_SERVICE_URL: http://service-games:8084
+
+      ACL_CONFIG_BACKEND_URL: http://service-acl:8088
+      CHESS_INFO_BACKEND_URL: http://localhost:8080
+    expose:
+      - "8088"
+    networks:
+      - moko_backend
+      - moko_kc
+    depends_on:
+      - app-rabbitmq
+      - service-games
+      - service-store
+
+  service-tic-tac-toe:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/tic-tac-toe-service:main-latest
+    restart: always
+    pull_policy: always
+    environment:
+      SPRING_DATA_REDIS_HOST: app-redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_DATABASE: 0
+      SPRING_DATA_REDIS_PASSWORD: password
+
+      SPRING_RABBITMQ_HOST: app-rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: user
+      SPRING_RABBITMQ_PASSWORD: password
+
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
+
+      GAME_SERVICE_URL: http://service-games:8084
+      BUSINESS_AI_URL: https://team3.techtitans.be
+      BUSINESS_AI_API_KEY: ${AI_API_KEY}
+      BUSINESS_FALLBACK_AI_URL: http://host.docker.internal:3334
+      BUSINESS_FALLBACK_CHAT_URL: http://localhost:3335
+      CHAT_SERVICE_UPLOAD_ON_STARTUP: true
+
+      GAME_BACKEND_URL: http://service-tic-tac-toe:8086
+      GAME_FRONTEND_URL: http://localhost/tic-tac-toe/game
+
+      CORS_ALLOWED_ORIGINS: http://localhost
+    expose:
+      - "8086"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8086/actuator/health"]
+      interval: 1m
+      timeout: 15s
+      retries: 5
+      start_period: 5m
+    networks:
+      - moko_backend
+      - moko_kc
+    depends_on:
+      - app-rabbitmq
+      - app-redis
+      - idp-keycloak
+      - service-games
+      - service-store
+      - ai-chatbot
+
+  service-checkers:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team22/checkers-service:main-latest
+    restart: always
+    pull_policy: always
+    environment:
+      SPRING_DATA_REDIS_HOST: app-redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_DATABASE: 0
+      SPRING_DATA_REDIS_PASSWORD: password
+
+      SPRING_RABBITMQ_HOST: app-rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: user
+      SPRING_RABBITMQ_PASSWORD: password
+
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://idp-keycloak:8080/auth/realms/moko/protocol/openid-connect/certs
+
+      GAME_SERVICE_URL: http://service-games:8084
+      BUSINESS_AI_URL: https://team3.techtitans.be
+      BUSINESS_AI_API_KEY: ${AI_API_KEY}
+      BUSINESS_FALLBACK_AI_URL: http://host.docker.internal:3334
+      BUSINESS_FALLBACK_CHAT_URL: http://localhost:3335
+      CHAT_SERVICE_UPLOAD_ON_STARTUP: true
+
+      GAME_BACKEND_URL: http://service-checkers:8087
+      GAME_FRONTEND_URL: http://localhost/checkers/game
+
+      CORS_ALLOWED_ORIGINS: http://localhost
+    expose:
+      - "8087"
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8087/actuator/health" ]
+      interval: 1m
+      timeout: 15s
+      retries: 5
+      start_period: 5m
+    networks:
+      - moko_backend
+      - moko_kc
+    depends_on:
+      - app-rabbitmq
+      - app-redis
+      - idp-keycloak
+      - service-games
+      - service-store
+      - ai-chatbot
+
+  # Backend apps
+  app-postgres:
+    image: postgres:17.7-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: 'user'
+      POSTGRES_PASSWORD: 'password'
+      POSTGRES_DB: 'moko'
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5443:5432"
+    networks:
+      - moko_backend
+    volumes:
+      - moko_postgres_data:/var/lib/postgresql/data
+      - ./configs/sql:/docker-entrypoint-initdb.d/
+
+  app-rabbitmq:
+    image: rabbitmq:4.2-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: 'user'
+      RABBITMQ_DEFAULT_PASS: 'password'
+    ports:
+      - "6379:6379"
+      - "61613:61613"
+      - "15672:15672"
+    networks:
+      - moko_backend
+    volumes:
+      - moko_rabbitmq_all:/var/lib/rabbitmq/
+      - moko_rabbitmq_all:/var/log/rabbitmq/
+    command: >
+      sh -c "rabbitmq-plugins enable --offline rabbitmq_stomp && rabbitmq-server"
+
+  app-redis:
+    image: redis:8.4.0-alpine
+    command:
+      - redis-server
+      - --requirepass password
+    networks:
+      - moko_backend
+    volumes:
+      - moko_redis_all:/data
+
+  # Backend IDP
+  idp-mysql:
+    image: mysql:9.5
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root'
+      MYSQL_DATABASE: 'keycloak'
+      MYSQL_USER: 'keycloak'
+      MYSQL_PASSWORD: 'password'
+    volumes:
+      - moko_mysql_data:/var/lib/mysql
+    networks:
+      - moko_kc
+
+  idp-keycloak:
+    image: quay.io/keycloak/keycloak:26.4
+    restart: always
+    environment:
+      KC_HOSTNAME: localhost
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_PROXY_HEADERS: xforwarded
+      KC_HOSTNAME_STRICT: "true"
+      KC_HOSTNAME_STRICT_BACKCHANNEL: "true"
+      KC_HTTP_ENABLED: "true"
+      KC_HTTP_PORT: 8080
+
+      KC_BOOTSTRAP_ADMIN_USERNAME: 'admin'
+      KC_BOOTSTRAP_ADMIN_PASSWORD: 'admin'
+
+      KC_DB: 'mysql'
+      KC_DB_URL_HOST: 'idp-mysql'
+      KC_DB_URL_DATABASE: 'keycloak'
+      KC_DB_USERNAME: 'keycloak'
+      KC_DB_PASSWORD: 'password'
+    command:
+      - start-dev
+      - --import-realm
+    volumes:
+      - ./configs/keycloak-import:/opt/keycloak/data/import
+      - ./configs/themes/moko:/opt/keycloak/themes/moko:ro
+
+    expose:
+      - "8080"
+    depends_on:
+      - idp-mysql
+    networks:
+      - moko_kc
+
+volumes:
+  moko_postgres_data:
+  moko_redis_all:
+  moko_rabbitmq_all:
+  moko_mysql_data:
+
+networks:
+  moko_kc:
+    name: moko-kc-network
+    driver: bridge
+  moko_backend:
+    name: moko-back-network
+    driver: bridge
+  moko_frontend:
+    name: moko-front-network
+    driver: bridge
