@@ -1,0 +1,139 @@
+# 1) AUTHENTICATIE — JWT ophalen (PASSWORD GRANT)
+
+POST http://localhost:8180/realms/moko/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = password &
+client_id = user-service &
+client_secret = ZmXSd2mIzB6hsLrybeD3gH0c11vPwrej &
+username = mathias &
+password = loginmathias &
+scope = openid
+
+> {%
+    client.global.set("mathias_token", response.body.access_token);
+%}
+
+###
+POST http://localhost:8180/realms/moko/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = password &
+client_id = user-service &
+client_secret = ZmXSd2mIzB6hsLrybeD3gH0c11vPwrej &
+username = kaj &
+password = loginkaj &
+scope = openid
+
+> {%
+    client.global.set("kaj_token", response.body.access_token);
+%}
+
+
+### 2) USER-SERVICE TESTS — PROFIEL OPHALEN
+
+### Get Mathias profile (me)
+GET http://localhost:8080/api/profiles/me
+Authorization: Bearer {{mathias_token}}
+
+> {%
+    client.global.set("mathias_id", response.body.id);
+%}
+
+### Get Kaj profile (me)
+GET http://localhost:8080/api/profiles/me
+Authorization: Bearer {{kaj_token}}
+
+> {%
+    client.global.set("kaj_id", response.body.id);
+%}
+
+### Get Mathias by username
+GET http://localhost:8080/api/profiles/find/mathias
+Authorization: Bearer {{kaj_token}}
+
+### Get Kaj by username
+GET http://localhost:8080/api/profiles/find/kaj
+Authorization: Bearer {{mathias_token}}
+
+
+# 3) SOCIAL-SERVICE — SEND FRIEND REQUEST
+
+### Mathias → Kaj: send friend request
+POST http://localhost:8083/api/friends
+Authorization: Bearer {{mathias_token}}
+Content-Type: application/json
+
+{
+  "username": "kaj"
+}
+
+
+
+### 4) SOCIAL-SERVICE — OVERVIEW REQUESTS
+
+### Mathias sees outgoing
+GET http://localhost:8083/api/friends/requests/outgoing
+Authorization: Bearer {{mathias_token}}
+
+### Kaj sees incoming
+GET http://localhost:8083/api/friends
+Authorization: Bearer {{kaj_token}}
+
+
+# 5) Kaj ACCEPTS friend request
+
+### Kaj accepts Mathias request
+POST http://localhost:8083/api/friends/accept/{{mathias_id}}
+Authorization: Bearer {{kaj_token}}
+
+
+# 6) Both should now be FRIENDS
+
+
+### Mathias friend list
+GET http://localhost:8083/api/friends
+Authorization: Bearer {{mathias_token}}
+
+### Kaj friend list
+GET http://localhost:8083/api/friends
+Authorization: Bearer {{kaj_token}}
+
+
+# 7) TEST REJECT FLOW
+
+### First remove friendship (Mathias removes Kaj)
+DELETE http://localhost:8083/api/friends/remove/{{kaj_id}}
+Authorization: Bearer {{mathias_token}}
+
+### Mathias sends new request
+POST http://localhost:8083/api/friends
+Authorization: Bearer {{mathias_token}}
+Content-Type: application/json
+
+{
+  "username": "kaj"
+}
+
+### Kaj rejects the request
+POST http://localhost:8083/api/friends/reject/{{mathias_id}}
+Authorization: Bearer {{kaj_token}}
+
+
+# 8) TEST CANCEL FLOW
+
+### Mathias sends again
+POST http://localhost:8083/api/friends
+Authorization: Bearer {{kaj_token}}
+Content-Type: application/json
+
+{
+  "username": "mathias"
+}
+
+### Mathias cancels his own request
+POST http://localhost:8083/api/friends/cancel/{{kaj_id}}
+Authorization: Bearer {{mathias_token}}
+
+### Health check
+GET http://localhost:8083/actuator/health
