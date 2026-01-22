@@ -1,0 +1,38 @@
+package be.kdg.team22.communicationservice.api.chat;
+
+import be.kdg.team22.communicationservice.api.chat.models.message.CreateMessageModel;
+import be.kdg.team22.communicationservice.api.chat.models.message.MessageModel;
+import be.kdg.team22.communicationservice.application.chat.LobbyChatService;
+import be.kdg.team22.communicationservice.domain.chat.channel.ChannelId;
+import be.kdg.team22.communicationservice.domain.chat.message.Message;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/chat/lobby")
+public class LobbyChatController {
+    private final LobbyChatService service;
+
+    public LobbyChatController(final LobbyChatService service) {
+        this.service = service;
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<List<MessageModel>> getMessages(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final Instant since) {
+        List<Message> messages = service.getMessages(ChannelId.from(id), since, token);
+        return ResponseEntity.ok(messages.stream().map(MessageModel::from).toList());
+    }
+
+    @PostMapping("/{id}")
+    public ResponseEntity<MessageModel> sendMessage(@PathVariable final UUID id, @AuthenticationPrincipal final Jwt token, @RequestBody final CreateMessageModel request) {
+        Message message = service.sendMessage(ChannelId.from(id), request.content(), token);
+        return ResponseEntity.ok(MessageModel.from(message));
+    }
+}

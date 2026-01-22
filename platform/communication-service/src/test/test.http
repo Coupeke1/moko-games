@@ -1,0 +1,184 @@
+### 1) JWT Token (mathias)
+POST http://localhost:8180/realms/moko/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = password &
+client_id = communication-service &
+client_secret = cXwsnvyHm2NquygtuDb3QWTLjs9PUOzW &
+username = mathias &
+password = loginmathias &
+scope = openid
+
+> {%
+    client.global.set("chat_token", response.body.access_token);
+%}
+
+### 1) JWT Token (kaj)
+POST http://localhost:8180/realms/moko/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = password &
+client_id = communication-service &
+client_secret = cXwsnvyHm2NquygtuDb3QWTLjs9PUOzW &
+username = lee &
+password = loginlee &
+scope = openid
+
+> {%
+    client.global.set("kaj_Token", response.body.access_token);
+%}
+
+### create bot channel
+POST http://localhost:8082/api/chat/bot
+Authorization: Bearer {{chat_token}}
+
+### 2) Send message to BOT chat channel
+POST http://localhost:8082/api/chat/bot/a8d72186-49f3-4ed2-8837-adf0565e017c/messages
+Authorization: Bearer {{chat_token}}
+Content-Type: application/json
+
+{
+  "content": "How does Kining work?",
+  "gameName": "checkers"
+}
+
+> {%
+    client.global.set("bot_reference", "user123-tictactoe");
+%}
+
+
+
+### 3) Send second message to BOT
+POST http://localhost:8082/api/chat/bot/{{bot_reference}}
+Authorization: Bearer {{chat_token}}
+Content-Type: application/json
+
+{
+  "content": "Wat is de beste openingszet?"
+}
+
+
+
+### 4) GET BOT chat messages
+GET http://localhost:8082/api/chat/bot/{{bot_reference}}
+Authorization: Bearer {{chat_token}}
+
+
+
+### 5) GET BOT chat messages since timestamp
+GET http://localhost:8082/api/chat/bot/{{bot_reference}}?since=2025-01-01T00:00:00Z
+Authorization: Bearer {{chat_token}}
+
+### 6) Send message to LOBBY chat
+POST http://localhost:8082/api/chat/lobby/e943f180-eaba-4de3-9d12-eee13a25c1b5
+Authorization: Bearer {{chat_token}}
+Content-Type: application/json
+
+{
+  "content": "Hey iedereen!"
+}
+
+> {%
+    client.global.set("lobby_id", "e943f180-eaba-4de3-9d12-eee13a25c1b5");
+%}
+
+
+
+### 7) Send second message to LOBBY
+POST http://localhost:8082/api/chat/lobby/{{lobby_id}}
+Authorization: Bearer {{kaj_Token}}
+Content-Type: application/json
+
+{
+  "content": "Wanneer starten we?"
+}
+
+
+
+### 8) GET lobby chat messages
+GET http://localhost:8082/api/chat/lobby/{{lobby_id}}
+Authorization: Bearer {{chat_token}}
+
+### health check
+GET http://localhost:8082/actuator/health
+
+### testing notifications
+POST http://localhost:8082/api/notifications/test
+
+###########################################################
+### FRIENDS CHAT TESTS
+###########################################################
+
+### 9) Send message to FRIEND (replace UUID with actual friend's user ID)
+# Note: You need to be friends with this user in social-service first!
+POST http://localhost:8082/api/chat/friends/bd169114-8834-4a40-983f-59b4d8bc1334
+Authorization: Bearer {{chat_token}}
+Content-Type: application/json
+
+{
+  "content": "Hey! Hoe gaat het?"
+}
+
+### 10) Get friend chat messages
+GET http://localhost:8082/api/chat/friends/bd169114-8834-4a40-983f-59b4d8bc1334
+Authorization: Bearer {{chat_token}}
+
+### 11) Get friend chat messages since timestamp
+GET http://localhost:8082/api/chat/friends/bd169114-8834-4a40-983f-59b4d8bc1334?since=2025-01-01T00:00:00Z
+Authorization: Bearer {{chat_token}}
+
+### 12) Send message as the other friend (kaj to mathias)
+POST http://localhost:8082/api/chat/friends/cf36d3e1-a1e0-4c18-89eb-95fa76fc81ee
+Authorization: Bearer {{kaj_Token}}
+Content-Type: application/json
+
+{
+  "content": "Goed! Zin in een potje?"
+}
+
+### 13) Get chat as kaj - should see both messages
+GET http://localhost:8082/api/chat/friends/cf36d3e1-a1e0-4c18-89eb-95fa76fc81ee
+Authorization: Bearer {{kaj_Token}}
+
+### get unread notifications
+GET http://localhost:8082/api/notifications/unread
+Authorization: Bearer {{chat_token}}
+
+### testing
+POST http://localhost:8082/api/notifications/test
+Authorization: Bearer {{chat_token}}
+
+###
+# 2) Paginated: alles (page 0)
+GET http://localhost:8082/api/notifications?page=0&size=10
+Authorization: Bearer {{chat_token}}
+
+###
+# 3) Paginated: alles (page 1)
+GET http://localhost:8082/api/notifications?page=2&size=2
+Authorization: Bearer {{chat_token}}
+
+###
+# 4) Enkel unread (origin = unread)
+GET http://localhost:8082/api/notifications?origin=unread&page=0&size=10
+Authorization: Bearer {{chat_token}}
+
+###
+# 5) Enkel read (origin = read)
+GET http://localhost:8082/api/notifications?origin=read&page=0&size=10
+Authorization: Bearer {{chat_token}}
+
+###
+# 6) Enkel origin filter (bv friend_accepted)
+GET http://localhost:8082/api/notifications?origin=friend-request-accepted&page=0&size=10
+Authorization: Bearer {{chat_token}}
+
+###
+# 7) Combineer filters: unread + origin
+GET http://localhost:8082/api/notifications?origin=unread&origin=friend_request_received&page=0&size=10
+Authorization: Bearer {{chat_token}}
+
+###
+# 8) Origin met kebab-case (werkt als je converter '-' -> '_' doet)
+GET http://localhost:8082/api/notifications?origin=read&origin=friend-request-accepted&page=0&size=10
+Authorization: Bearer {{chat_token}}
