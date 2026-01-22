@@ -1,0 +1,48 @@
+### Register a game
+POST http://localhost:8084/api/games/register
+Content-Type: application/json
+
+{
+  "name": "tic-tac-toe",
+  "backendUrl": "http://localhost:8086",
+  "frontendUrl": "http://localhost:5174/tic-tac-toe/game",
+  "startEndpoint": "/api/games",
+  "healthEndpoint": "/actuator/health",
+  "title": "Tic Tac Toe",
+  "description": "Tic tac toe is played on a 3x3 grid",
+  "image": "test",
+  "price": 25,
+  "category": "PARTY",
+
+  "settingsDefinition": {
+    "settings": [
+      {
+        "name": "boardSize",
+        "type": "INTEGER",
+        "required": true,
+        "min": 3,
+        "max": null,
+        "allowedValues": null,
+        "defaultValue": 3
+      }
+    ]
+  },
+
+  "achievements": [
+    {
+      "key": "WIN",
+      "name": "Victory Royale",
+      "description": "Win your first TicTacToe game!",
+      "levels": 3
+    }
+  ]
+}
+
+### Get Achievements
+GET http://localhost:8084/api/games/f525cacf-1882-4773-976d-3430c6b88a86/achievements
+
+### Get Achievemnt
+GET http://localhost:8084/api/games/30793a77-a0ec-4acd-baa9-d4c612f30668/achievements/win
+
+### Health check
+GET http://localhost:8084/actuator/health

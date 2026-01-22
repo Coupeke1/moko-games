@@ -1,0 +1,58 @@
+package be.kdg.team22.gamesservice.infrastructure.game.engine;
+
+import be.kdg.team22.gamesservice.api.game.models.StartGameRequest;
+import be.kdg.team22.gamesservice.domain.game.Game;
+import be.kdg.team22.gamesservice.domain.game.exceptions.EngineGameNotFoundException;
+import be.kdg.team22.gamesservice.domain.game.exceptions.EngineNotReachableException;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
+
+import java.util.Objects;
+import java.util.UUID;
+
+@Component
+public class ExternalGamesRepository {
+
+    public UUID startExternalGame(Game game, StartGameRequest request, final Jwt token) {
+
+        String engineUrl = game.baseUrl() + game.startEndpoint();
+
+        EngineCreateGameRequest engineReq = new EngineCreateGameRequest(
+                request.players(),
+                request.hasBot(),
+                request.settings()
+        );
+
+        RestClient client = createRestClient(engineUrl);
+
+        try {
+            EngineGameResponse response = client.post()
+                    .header("Authorization", "Bearer " + token.getTokenValue())
+                    .body(engineReq)
+                    .retrieve()
+                    .body(EngineGameResponse.class);
+
+            return Objects.requireNonNull(response).id();
+
+        } catch (HttpClientErrorException ex) {
+
+            if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
+                throw new EngineGameNotFoundException(request.gameId());
+            }
+            throw ex;
+
+        } catch (RestClientException ex) {
+            throw new EngineNotReachableException(engineUrl);
+        }
+    }
+
+    RestClient createRestClient(String baseUrl) {
+        return RestClient.builder()
+                .baseUrl(baseUrl)
+                .build();
+    }
+}
