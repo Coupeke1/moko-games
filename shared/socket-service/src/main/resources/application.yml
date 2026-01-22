@@ -1,0 +1,29 @@
+server.port: 8090
+
+spring:
+  application:
+    name: socket-service
+
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:user}
+    password: ${SPRING_RABBITMQ_PASSWORD:password}
+
+  stomp:
+    relay:
+      host: ${SPRING_RABBITMQ_STOMP_HOST:${SPRING_RABBITMQ_HOST:localhost}}
+      port: ${SPRING_RABBITMQ_STOMP_PORT:61613}
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI:http://localhost:8180/realms/moko/protocol/openid-connect/certs}
+
+logging:
+  level:
+    sql: ${LOGGING_LEVEL_SQL:debug}
+    web: ${LOGGING_LEVEL_WEB:debug}
+
+cors.allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174,http://localhost:5175}
