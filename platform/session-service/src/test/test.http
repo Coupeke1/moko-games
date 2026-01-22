@@ -1,0 +1,141 @@
+### 1) JWT Token OWNER (mathias)
+POST http://localhost:8180/realms/moko/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = password &
+client_id = session-service &
+client_secret = hWzsxSaXWJtEtPkrhIoLByKFEMVuczUu &
+username = mathias &
+password = loginmathias &
+scope = openid
+
+> {%
+    client.global.set("owner_token", response.body.access_token);
+%}
+
+
+### 2) JWT Token OTHER (kaj)
+POST http://localhost:8180/realms/moko/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = password &
+client_id = session-service &
+client_secret = hWzsxSaXWJtEtPkrhIoLByKFEMVuczUu &
+username = kaj &
+password = loginkaj &
+scope = openid
+
+> {%
+    client.global.set("other_token", response.body.access_token);
+%}
+
+
+### 3) POST Create Lobby
+POST http://localhost:8081/api/lobbies
+Authorization: Bearer {{owner_token}}
+Content-Type: application/json
+
+{
+  "gameId": "207dad17-02d0-40be-b6ef-31bcd832b3a9",
+  "maxPlayers": 4
+}
+
+> {%
+    client.global.set("lobby_id", response.body.id);
+%}
+
+
+### 4) GET Lobby by ID
+GET http://localhost:8081/api/lobbies/{{lobby_id}}
+Authorization: Bearer {{owner_token}}
+
+### 7) CLOSE Lobby (owner only)
+POST http://localhost:8081/api/lobbies/{{lobby_id}}/close
+Authorization: Bearer {{owner_token}}
+
+### 9) PUT settings – Checkers update
+PUT http://localhost:8081/api/lobbies/{{lobby_id}}/settings
+Authorization: Bearer {{owner_token}}
+Content-Type: application/json
+
+{
+  "maxPlayers": 2,
+  "settings": {
+    "boardSize": 3
+  }
+}
+
+
+### 11) GET All Lobbies
+GET http://localhost:8081/api/lobbies
+Authorization: Bearer {{owner_token}}
+
+
+### 12) GET My Friends (needed for invites)
+GET http://localhost:8083/api/friends
+Authorization: Bearer {{owner_token}}
+
+
+### 13) Invite PLAYER (owner invites kaj)
+POST http://localhost:8081/api/lobbies/{{lobby_id}}/invite/bd169114-8834-4a40-983f-59b4d8bc1334
+Authorization: Bearer {{owner_token}}
+
+### 14B) ADD BOT to Lobby
+POST http://localhost:8081/api/lobbies/{{lobby_id}}/invite/bot
+Authorization: Bearer {{owner_token}}
+
+### 14C) REMOVE BOT from Lobby
+DELETE http://localhost:8081/api/lobbies/{{lobby_id}}/bot
+Authorization: Bearer {{owner_token}}
+
+
+### 15) OTHER checks his invites
+GET http://localhost:8081/api/lobbies/invited
+Authorization: Bearer {{other_token}}
+
+
+### 16) Accept Invite (kaj joined lobby)
+POST http://localhost:8081/api/lobbies/{{lobby_id}}/players/bd169114-8834-4a40-983f-59b4d8bc1334
+Authorization: Bearer {{other_token}}
+
+### 18) Owner removes player
+DELETE http://localhost:8081/api/lobbies/{{lobby_id}}/players/bd169114-8834-4a40-983f-59b4d8bc1334
+Authorization: Bearer {{owner_token}}
+
+#################################################
+
+### 21) OWNER sets himself READY
+PATCH http://localhost:8081/api/lobbies/{{lobby_id}}/players/ready
+Authorization: Bearer {{owner_token}}
+Content-Type: application/json
+
+{
+  "ready": true
+}
+
+
+### 22) OTHER sets himself READY
+PATCH http://localhost:8081/api/lobbies/{{lobby_id}}/players/ready
+Authorization: Bearer {{other_token}}
+Content-Type: application/json
+
+{
+  "ready": true
+}
+
+
+### 25) VALID – Start lobby
+POST http://localhost:8081/api/lobbies/{{lobby_id}}/start
+Authorization: Bearer {{owner_token}}
+
+> {%
+    client.global.set("game_instance_id", response.body.startedGameId);
+%}
+
+
+### 27) GET Lobby after START
+GET http://localhost:8081/api/lobbies/{{lobby_id}}
+Authorization: Bearer {{owner_token}}
+
+### Health check
+GET http://localhost:8081/actuator/health

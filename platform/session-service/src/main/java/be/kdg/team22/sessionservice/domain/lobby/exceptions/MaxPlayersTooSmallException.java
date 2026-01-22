@@ -1,0 +1,10 @@
+package be.kdg.team22.sessionservice.domain.lobby.exceptions;
+
+public class MaxPlayersTooSmallException extends RuntimeException {
+    public MaxPlayersTooSmallException(int currentPlayers, int maxPlayers) {
+        super(String.format(
+                "maxPlayers (%d) cannot be smaller than current player count (%d)",
+                maxPlayers, currentPlayers
+        ));
+    }
+}

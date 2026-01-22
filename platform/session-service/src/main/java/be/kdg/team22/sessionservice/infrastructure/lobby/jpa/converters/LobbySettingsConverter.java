@@ -1,0 +1,30 @@
+package be.kdg.team22.sessionservice.infrastructure.lobby.jpa.converters;
+
+import be.kdg.team22.sessionservice.domain.lobby.settings.LobbySettings;
+import be.kdg.team22.sessionservice.infrastructure.lobby.jpa.exceptions.SettingsConversionException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
+
+@Converter
+public class LobbySettingsConverter implements AttributeConverter<LobbySettings, String> {
+    private static final ObjectMapper mapper = new ObjectMapper();
+
+    @Override
+    public String convertToDatabaseColumn(LobbySettings attribute) {
+        try {
+            return mapper.writeValueAsString(attribute);
+        } catch (Exception e) {
+            throw SettingsConversionException.serializationError(attribute.getClass(), e);
+        }
+    }
+
+    @Override
+    public LobbySettings convertToEntityAttribute(String dbData) {
+        try {
+            return mapper.readValue(dbData, LobbySettings.class);
+        } catch (Exception e) {
+            throw SettingsConversionException.deserializationError(dbData, e);
+        }
+    }
+}
