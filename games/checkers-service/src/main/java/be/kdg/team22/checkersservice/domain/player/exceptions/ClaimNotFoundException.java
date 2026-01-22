@@ -1,0 +1,11 @@
+package be.kdg.team22.checkersservice.domain.player.exceptions;
+
+public class ClaimNotFoundException extends RuntimeException {
+    public ClaimNotFoundException(final String claim) {
+        super(String.format("Claim '%s' was not found", claim));
+    }
+
+    public static ClaimNotFoundException sub() {
+        return new ClaimNotFoundException("sub");
+    }
+}

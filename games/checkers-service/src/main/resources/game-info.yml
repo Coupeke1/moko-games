@@ -1,0 +1,45 @@
+﻿game-info:
+  name: ${GAME_NAME:checkers}
+  title: ${GAME_TITLE:Checkers}
+  description: ${GAME_DESCRIPTION:Checkers is played by two opponents on opposite sides of the game board.}
+  image: ${GAME_IMAGE:https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.etsystatic.com%2F9295891%2Fr%2Fil%2Ffe59d4%2F1941663431%2Fil_fullxfull.1941663431_27n8.jpg&f=1&nofb=1&ipt=19a33fabc9ec064ede9375f4c348d4e071701043299d452fd9650d057ea22329}
+  backend-url: ${GAME_BACKEND_URL:http://host.docker.internal:8087} #games service running in docker use 'host.docker.internal' game service running locally use 'localhost'
+  frontend-url: ${GAME_FRONTEND_URL:http://localhost:5175/checkers/game}
+  start-endpoint: ${GAME_START_ENDPOINT:/api/games}
+  health-endpoint: ${GAME_HEALTH_ENDPOINT:/actuator/health}
+  price: 45
+  category: PARTY
+
+  settings-definition:
+    settings:
+      - name: kingMovementMode
+        type: STRING
+        required: true
+        allowedValues: [SINGLE, DOUBLE, FLYING]
+        defaultValue: FLYING
+
+  achievements:
+    - key: WIN
+      name: Board Dominator
+      description: Win your first Checkers game!
+      levels: 3
+    - key: DRAW
+      name: Unstoppable Force, Immovable Object
+      description: Draw a Checkers game!
+      levels: 2
+    - key: LOSS
+      name: Checker'd Out
+      description: Lose a Checkers game!
+      levels: 1
+    - key: PROMOTION
+      name: Long Live The King
+      description: Promote a Checkers piece to a king!
+      levels: 4
+    - key: MULTICAPTURE
+      name: Float Like A Butterfly...
+      description: Make a multicapture in Checkers!
+      levels: 5
+    - key: THREE_KINGS
+      name: Three Wise Men
+      description: Own 3 kings in Checkers!
+      levels: 5

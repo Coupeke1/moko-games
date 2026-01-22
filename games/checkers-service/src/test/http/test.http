@@ -1,0 +1,148 @@
+### 1) Haal JWT-token op via Keycloak (PASSWORD GRANT)
+POST http://localhost:8180/realms/moko/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = password &
+client_id = user-service &
+client_secret = ZmXSd2mIzB6hsLrybeD3gH0c11vPwrej &
+username = matti &
+password = loginmatti &
+scope = openid
+
+> {%
+    client.global.set("access_token", response.body.access_token);
+%}
+
+### Create game
+POST localhost:8087/api/games
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "players": [
+    "642999ad-c546-40b6-876c-1048971c7942",
+    "cf36d3e1-a1e0-4c18-89eb-95fa76fc81ee"
+  ],
+  "hasBot": true,
+  "settings": {
+    "kingMovementMode": "SINGLE"
+  }
+}
+
+> {%
+    client.global.set("game_id", response.body.id);
+%}
+
+### Get Game
+GET localhost:8087/api/games/{{game_id}}
+Authorization: Bearer {{access_token}}
+Accept: application/json
+
+### Request Move
+POST localhost:8087/api/games/{{game_id}}/move
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "playerId": "642999ad-c546-40b6-876c-1048971c7942",
+  "cells": [
+    22, 18
+  ]
+}
+
+### Health Check
+GET http://localhost:8087/actuator/health
+
+### AI test
+POST http://localhost:3333/ai-player/move
+Content-Type: application/json
+
+{
+  "game_id": "642999ad-c546-40b6-876c-1048971c7942",
+  "game_name": "CHECKERS",
+  "board": [
+    [
+      "  ",
+      "W ",
+      "  ",
+      "W ",
+      "  ",
+      "W ",
+      "  ",
+      "W "
+    ],
+    [
+      "W ",
+      "  ",
+      "W ",
+      "  ",
+      "W ",
+      "  ",
+      "W ",
+      "  "
+    ],
+    [
+      "  ",
+      "W ",
+      "  ",
+      "W ",
+      "  ",
+      "W ",
+      "  ",
+      "W "
+    ],
+    [
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  "
+    ],
+    [
+      "  ",
+      "B ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  "
+    ],
+    [
+      "  ",
+      "  ",
+      "B ",
+      "  ",
+      "B ",
+      "  ",
+      "B ",
+      "  "
+    ],
+    [
+      "  ",
+      "B ",
+      "  ",
+      "B ",
+      "  ",
+      "B ",
+      "  ",
+      "B "
+    ],
+    [
+      "B ",
+      "  ",
+      "B ",
+      "  ",
+      "B ",
+      "  ",
+      "B ",
+      "  "
+    ]
+  ],
+  "current_player": "W",
+  "ai_player": "W",
+  "king_movement_mode": "SINGLE"
+}
