@@ -1,0 +1,43 @@
+import type { ReactNode } from "react";
+
+import CartIcon from "@/components/icons/bar/cart-icon";
+import ChatIcon from "@/components/icons/bar/chat-icon";
+import LibraryIcon from "@/components/icons/bar/library-icon";
+import NotificationsIcon from "@/components/icons/bar/notifications-icon";
+import ProfileIcon from "@/components/icons/bar/profile-icon";
+import StoreIcon from "@/components/icons/bar/store-icon";
+import UsersIcon from "@/components/icons/users-icon";
+
+export interface Link {
+    title: string;
+    icon: ReactNode;
+    path: string;
+}
+
+export interface Button {
+    title: string;
+    icon: ReactNode;
+    onClick?: () => void;
+    path?: string;
+}
+
+export function getLinks(): Link[] {
+    return [
+        { title: "Store", icon: <StoreIcon />, path: "/store" },
+        { title: "Library", icon: <LibraryIcon />, path: "/library" },
+        { title: "Profile", icon: <ProfileIcon />, path: "/profile" },
+        { title: "Friends", icon: <UsersIcon />, path: "/friends" },
+    ];
+}
+
+export function getButtons(onCart: () => void): Button[] {
+    return [
+        {
+            title: "Notifications",
+            icon: <NotificationsIcon />,
+            path: "/notifications?type=unread",
+        },
+        { title: "Chat", icon: <ChatIcon />, path: "/chat" },
+        { title: "Cart", icon: <CartIcon />, onClick: onCart },
+    ];
+}
